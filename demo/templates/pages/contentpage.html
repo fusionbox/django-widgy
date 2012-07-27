@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} - {{ page.title }}{% endblock %}
+
+{% block seo_description %}{{ page.keywords_string }}{% endblock %}
+{% block seo_keywords %}{{ page.description }}{% endblock %}
+
+{% block content %}
+  {{ page.get_content_model.render }}
+{% endblock %}
