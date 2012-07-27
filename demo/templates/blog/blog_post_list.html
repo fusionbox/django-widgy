@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n mezzanine_tags blog_tags keyword_tags disqus_tags %}
 
-{% block meta_title %}{% if page %}{{ page.richtextpage.title }}{% else %}{% trans "Blog" %}{% endif %}{% endblock %}
+{% block meta_title %}{% if page %}{{ page.title }}{% else %}{% trans "Blog" %}{% endif %}{% endblock %}
 
 {% block meta_keywords %}{% metablock %}
 {% if page %}
@@ -61,9 +61,7 @@
     </p>
 {% else %}
     {% if page %}
-    {% editable page.richtextpage.content %}
-    {{ page.richtextpage.content|safe }}
-    {% endeditable %}
+    {{ page.get_content_model.content|safe }}
     {% endif %}
 {% endif %}
 

@@ -66,6 +66,7 @@ HOST_NAME = socket.gethostname()
 # Setting to turn on featured images for blog posts. Defaults to False.
 #
 # BLOG_USE_FEATURED_IMAGE = True
+BLOG_URLS_ENABLED = False
 
 # If ``True``, users will be automatically redirected to HTTPS
 # for the URLs specified by the ``SSL_FORCE_URL_PREFIXES`` setting.
@@ -306,6 +307,7 @@ MIDDLEWARE_CLASSES = (
     "mezzanine.core.middleware.AdminLoginInterfaceSelectorMiddleware",
     # Uncomment the following if using any of the SSL settings:
     # "mezzanine.core.middleware.SSLRedirectMiddleware",
+    "urlconf_include.middleware.PatchUrlconfMiddleware",
     "mezzanine.pages.middleware.PageMiddleware",
     "mezzanine.core.middleware.FetchFromCacheMiddleware",
 )
@@ -341,6 +343,7 @@ COMPRESS_PRECOMPILERS = (
 
 
 FORCE_SCRIPT_NAME = ''
+
 
 ###################
 # DEPLOY SETTINGS #
