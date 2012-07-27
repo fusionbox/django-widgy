@@ -26,7 +26,6 @@ class ContentPage(Page):
             'root_node': self.root_widget,
             }))
 
-
 class WidgetNode(MP_Node):
     data_type = models.ForeignKey(ContentType)
     data_id = models.PositiveIntegerField()
