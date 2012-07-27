@@ -7,6 +7,5 @@
 
   
   var LayoutView = Widgy.nodes.LayoutView = Widgy.nodes.NodeView.extend({
-    render: Widgy.noop
   });
 })();
