@@ -25,7 +25,6 @@ class ContentPage(Page):
             'root_node': self.root_widget,
             })
 
-
 class WidgetNode(MP_Node):
     data_type = models.ForeignKey(ContentType)
     data_id = models.PositiveIntegerField()
@@ -40,7 +39,7 @@ class WidgetNode(MP_Node):
     def to_json(self):
         return {
                 'id': self.id,
-                'data': self.data.to_json(),
+                'content': self.data.to_json(),
                 }
 
     def render(self):
@@ -53,7 +52,7 @@ class WidgetData(models.Model):
                                object_id_field='data_id')
 
     @property
-    def widget(self):
+    def node(self):
         return self._widget.all()[0]
 
     class Meta:
@@ -67,7 +66,7 @@ class WidgetData(models.Model):
 
     def add_child(self, cls, **kwargs):
         obj = cls.objects.create(**kwargs)
-        node = self.widget.add_child(
+        node = self.node.add_child(
                 data=obj
                 )
         return obj
@@ -88,6 +87,15 @@ class WidgetData(models.Model):
         """
         pass
 
+    def to_json(self):
+        children = [child.to_json() for child in self.node.get_children()]
+        return {
+                'id': self.id,
+                'model': self._meta.module_name,
+                'object_name': self._meta.object_name,
+                'children': children,
+                }
+
 
 class Bucket(WidgetData):
     title = models.CharField(max_length=255)
@@ -96,15 +104,13 @@ class Bucket(WidgetData):
         return True
 
     def to_json(self):
-        return {
-                'id': self.id,
-                'title': self.title,
-                'children': [i.data.to_json() for i in self.widget.get_children()],
-                }
+        json = super(Bucket, self).to_json()
+        json['title'] = self.title
+        return json
 
     def render(self):
         return render_to_string('widgy/bucket.html', {
-            'nodes': self.widget.get_children(),
+            'nodes': self.node.get_children(),
             })
 
 
@@ -129,23 +135,16 @@ class TwoColumnLayout(WidgetData):
 
     @property
     def left_bucket(self):
-        return [i for i in self.widget.get_children() if i.data.title=='left'][0].data
+        return [i for i in self.node.get_children() if i.data.title=='left'][0]
 
     @property
     def right_bucket(self):
-        return [i for i in self.widget.get_children() if i.data.title=='right'][0].data
-
-    def to_json(self):
-        return {
-                'id': self.id,
-                'left': self.left_bucket.to_json(),
-                'right': self.right_bucket.to_json(),
-                }
+        return [i for i in self.node.get_children() if i.data.title=='right'][0]
 
     def render(self):
         return render_to_string('widgy/two_column_layout.html', {
-            'left_bucket': self.left_bucket,
-            'right_bucket': self.right_bucket,
+            'left_bucket': self.left_bucket.data,
+            'right_bucket': self.right_bucket.data,
             })
 
 
@@ -153,10 +152,9 @@ class TextContent(WidgetData):
     content = models.TextField()
 
     def to_json(self):
-        return {
-                'id': self.id,
-                'content': self.content,
-                }
+        json = super(TextContent, self).to_json()
+        json['content'] = self.content
+        return json
 
     def render(self):
         return render_to_string('widgy/text_content.html', {

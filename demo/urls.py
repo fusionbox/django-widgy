@@ -12,7 +12,7 @@ admin.autodiscover()
 # to the project's homepage.
 
 urlpatterns = patterns("",
-    #('^admin/widgy/', include('widgy.urls')),
+    ('^admin/widgy/', include('widgy.urls')),
     ("^admin/", include(admin.site.urls)),
 
     # We don't want to presume how your homepage works, so here are a
