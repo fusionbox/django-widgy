@@ -272,6 +272,7 @@ INSTALLED_APPS = (
     'django_extensions',
 
     'widgy',
+    'urlconf_include',
 )
 
 # List of processors used by RequestContext to populate the context.
