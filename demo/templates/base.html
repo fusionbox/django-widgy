@@ -23,6 +23,20 @@
 </head>
 <body>
   {% page_menu 'pages/menus/top_nav.html' %}
+  <style>
+    .left_nav {
+      float: left;
+      width: 20%;
+    }
+    .container {
+      float: right;
+      width: 80%;
+    }
+  </style>
+  <div class="left_nav">
+      <div class="panel tree">{% page_menu "pages/menus/tree.html" %}</div>
+  </div>
+
   <div class="container">
     {% block content %}
     {% endblock %}
