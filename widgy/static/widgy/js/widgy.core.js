@@ -24,8 +24,12 @@
 
     onClose: function() {},
 
+    template: false,
+
     render: function() {
-      this.$el.html(ich[this.template](this.model.toJSON()));
+      if (this.template) {
+        this.$el.html(ich[this.template](this.model.toJSON()));
+      }
 
       return this;
     }
@@ -35,8 +39,20 @@
   /**
    * Widgy Contents
    */
-  var createContent = exports.contents.createContent = function(content) {
-    return new exports.contents[content.object_name](content);
+
+  // Helper method to create a ContentModel, that finds the correct model based
+  // on the node content.
+  var createContent = exports.contents.createContent = function(node) {
+    var content = node.content,
+        children = content.children;
+
+    content.children = new ContentCollection;
+    content.node_id = node.id;
+    var model = new exports.contents[content.object_name](content);
+
+    model._children = children;
+
+    return model;
   };
 
 
@@ -60,43 +76,63 @@
   });
 
 
+  var ContentCollection = exports.contents.ContentCollection = Backbone.Collection.extend({
+    _prepareModel: function(node, options) {
+      options || (options = {});
+      var model = createContent(node);
+      return model;
+    }
+  });
+
+
   /**
    * Widgy Nodes
    */
   var createNode = exports.nodes.createNode = function(model) {
-    return new exports.nodes[model.viewClass]({model: model});
+    return new exports.nodes[model.viewClass]({
+      model: model,
+      collection: model.get('children')
+    });
   };
 
+  var node_map = exports.nodes.node_map = {};
+
   var NodeView = exports.nodes.NodeView = View.extend({
+    className: 'node',
+
     initialize: function() {
-      this.children = [];
-      _.each(this.model.get('children'), this.instantiateChild, this);
+      this.children_views = [];
+
+      _.bindAll(this, 'addAll', 'addOne');
+      this.collection.on('reset', this.addAll);
+      this.collection.on('add', this.addOne);
     },
 
-    instantiateChild: function(child) {
-      this.children.push(createNode(createContent(child.content)));
+    addAll: function() {
+      this.collection.each(this.addOne);
     },
 
-    widgyRender: function() {
-      this.render();
+    addOne: function(model) {
+      var node = createNode(model);
 
-      _.each(this.children, this.appendChild, this);
+      this.children_views.push(node);
+      this.$el.append(node.render().el);
 
-      return this;
-    },
+      node.collection.reset(model._children);
 
-    appendChild: function(child) {
-      this.$el.append(child.widgyRender().el);
+      node_map[model.get('node_id')] = this.collection;
     }
   });
 
 
   var WidgetView = exports.nodes.WidgetView = NodeView.extend({
     events: {
-      'click .edit': 'editWidget'
+      'click .edit': 'editWidget',
+      'change .right_of': 'moveToRightOf'
     },
 
     initialize: function() {
+      NodeView.prototype.initialize.apply(this, arguments);
       this.model.on('change', this.render, this);
     },
 
@@ -105,6 +141,14 @@
 
       var edit_view = createEditor(this);
       this.$el.append(edit_view.render().el);
+    },
+
+    moveToRightOf: function(event) {
+      var id = +this.$('.right_of').val();
+          collection = node_map[id],
+          left = collection.where({node_id: id})[0];
+
+      console.log(arguments, left);
     }
   });
 

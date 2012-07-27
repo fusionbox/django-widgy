@@ -45,6 +45,11 @@ class WidgetNode(MP_Node):
     def render(self):
         return self.data.render()
 
+    @staticmethod
+    def validate_parent_child(parent, child):
+        return parent.data.valid_parent_of(child) and child.data.valid_child_of(parent)
+
+
 
 class WidgetData(models.Model):
     _widget = generic.GenericRelation(WidgetNode,
