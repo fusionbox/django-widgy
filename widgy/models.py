@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.template import Context
-from django.template.loader import get_template
+from django.template.loader import render_to_string
 
 from mezzanine.pages.models import Page
 
@@ -20,11 +20,10 @@ class ContentPage(Page):
                 }
 
     def render(self):
-        t = get_template('widgy/content_page.html')
-        return t.render(Context({
+        return render_to_string('widgy/content_page.html', {
             'title': self.title,
             'root_node': self.root_widget,
-            }))
+            })
 
 
 class WidgetNode(MP_Node):
@@ -104,10 +103,9 @@ class Bucket(WidgetData):
                 }
 
     def render(self):
-        t = get_template('widgy/bucket.html')
-        return t.render(Context({
+        return render_to_string('widgy/bucket.html', {
             'nodes': self.widget.get_children(),
-            }))
+            })
 
 
 class TwoColumnLayout(WidgetData):
@@ -145,11 +143,10 @@ class TwoColumnLayout(WidgetData):
                 }
 
     def render(self):
-        t = get_template('widgy/two_column_layout.html')
-        return t.render(Context({
+        return render_to_string('widgy/two_column_layout.html', {
             'left_bucket': self.left_bucket,
             'right_bucket': self.right_bucket,
-            }))
+            })
 
 
 class TextContent(WidgetData):
@@ -162,7 +159,6 @@ class TextContent(WidgetData):
                 }
 
     def render(self):
-        t = get_template('widgy/text_content.html')
-        return t.render(Context({
+        return render_to_string('widgy/text_content.html', {
             'content': self.content,
-            }))
+            })
