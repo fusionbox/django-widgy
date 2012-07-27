@@ -93,7 +93,8 @@ class WidgetData(models.Model):
         children = [child.to_json() for child in self.node.get_children()]
         return {
                 'id': self.id,
-                'model': self._meta.object_name,
+                'model': self._meta.module_name,
+                'object_name': self._meta.object_name,
                 'children': children,
                 }
 

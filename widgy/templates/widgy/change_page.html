@@ -4,12 +4,16 @@
 <html>
 <head>
   <title>Widgy</title>
-  <script src="{% static "widgy/js/jquery.js" %}"></script>
-  <script src="{% static "widgy/js/underscore.js" %}"></script>
-  <script src="{% static "widgy/js/backbone.js" %}"></script>
-  <script src="{% static "widgy/js/ICanHaz.js" %}"></script>
-  <script src="{% static "widgy/js/core.js" %}"></script>
-  <script src="{% static "widgy/js/widgy.js" %}"></script>
+  <script src="{% static "widgy/js/lib/jquery.js" %}"></script>
+  <script src="{% static "widgy/js/lib/underscore.js" %}"></script>
+  <script src="{% static "widgy/js/lib/backbone.js" %}"></script>
+  <script src="{% static "widgy/js/lib/ICanHaz.js" %}"></script>
+  <script src="{% static "widgy/js/lib/fusionbox.js" %}"></script>
+  <script src="{% static "widgy/js/widgy.core.js" %}"></script>
+  <script src="{% static "widgy/js/widgy.two-column-layout.js" %}"></script>
+  <script src="{% static "widgy/js/widgy.bucket.js" %}"></script>
+  <script src="{% static "widgy/js/widgy.text-content.js" %}"></script>
+  <script src="{% static "widgy/js/widgy.main.js" %}"></script>
 </head>
 <body>
 
@@ -20,7 +24,7 @@
 {% literal_include "widgy/templates.html" %}
 <script>
   jQuery(function($) {
-    startApp({{ page.to_json|json }});
+    Widgy.main({{ page.to_json|json }});
   });
 </script>
 </body>

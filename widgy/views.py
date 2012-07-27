@@ -7,6 +7,7 @@ from django.http import HttpResponse, Http404
 from django.views.generic.base import View
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
+from django.contrib.contenttypes.models import ContentType
 
 from widgy.models import WidgetNode, ContentPage
 
@@ -100,8 +101,24 @@ class WidgetView(RestView):
     def auth(*args, **kwargs):
         pass
 
-    def get(self, request, node_pk):
-        obj = WidgetNode.objects.get(pk=node_pk)
+    def get_object(self, object_name, object_pk):
+        return ContentType.objects.get(model=object_name, app_label='widgy').get_object_for_this_type(pk=object_pk)
+
+    def get(self, request, object_name, object_pk):
+        obj = self.get_object(object_name, object_pk)
         return self.render_to_response(obj)
+
+    # stupid implementation
+    # only for existing objects right now
+    def put(self, request, object_name, object_pk):
+        obj = self.get_object(object_name, object_pk)
+        data = self.data()
+        for key, value in data.iteritems():
+            if hasattr(obj, key):
+                setattr(obj, key, value)
+        obj.save()
+
+        return self.render_to_response(obj, status=200)
+
 
 node = WidgetView.as_view()
