@@ -42,10 +42,12 @@
 
   // Helper method to create a ContentModel, that finds the correct model based
   // on the node content.
-  var createContent = exports.contents.createContent = function(content) {
-    var children = content.children;
+  var createContent = exports.contents.createContent = function(node) {
+    var content = node.content,
+        children = content.children;
 
     content.children = new ContentCollection;
+    content.node_id = node.id;
     var model = new exports.contents[content.object_name](content);
 
     model._children = children;
@@ -77,7 +79,7 @@
   var ContentCollection = exports.contents.ContentCollection = Backbone.Collection.extend({
     _prepareModel: function(node, options) {
       options || (options = {});
-      var model = createContent(node.content);
+      var model = createContent(node);
       return model;
     }
   });
@@ -92,6 +94,8 @@
       collection: model.get('children')
     });
   };
+
+  var node_map = exports.nodes.node_map = {};
 
   var NodeView = exports.nodes.NodeView = View.extend({
     className: 'node',
@@ -115,13 +119,16 @@
       this.$el.append(node.render().el);
 
       node.collection.reset(model._children);
+
+      node_map[model.get('node_id')] = this.collection;
     }
   });
 
 
   var WidgetView = exports.nodes.WidgetView = NodeView.extend({
     events: {
-      'click .edit': 'editWidget'
+      'click .edit': 'editWidget',
+      'change .right_of': 'moveToRightOf'
     },
 
     initialize: function() {
@@ -134,6 +141,14 @@
 
       var edit_view = createEditor(this);
       this.$el.append(edit_view.render().el);
+    },
+
+    moveToRightOf: function(event) {
+      var id = +this.$('.right_of').val();
+          collection = node_map[id],
+          left = collection.where({node_id: id})[0];
+
+      console.log(arguments, left);
     }
   });
 

@@ -121,4 +121,52 @@ class WidgetView(RestView):
         return self.render_to_response(obj, status=200)
 
 
-node = WidgetView.as_view()
+content = WidgetView.as_view()
+
+
+class InvalidTreeMovement(BaseException):
+    pass
+
+class RootDisplacementError(InvalidTreeMovement):
+    pass
+
+class ParentChildRejection(InvalidTreeMovement):
+    pass
+
+
+class NodeView(RestView):
+    def auth(*args, **kwargs):
+        pass
+
+    def put(self, node_pk):
+        """
+        If you put with a left_id, then your node will be placed immediately
+        to the right of the node corresponding with the left_id.
+
+        If you put with a parent_id, then your node will be placed as the
+        first-child of the node corresponding with the parent_id.
+        """
+        node = get_object_or_404(WidgetNode, pk=node_pk)
+        data = self.data()
+
+        try:
+            left = WidgetNode.objects.get(pk=data['left_id'])
+            if left.is_root():
+                raise InvalidTreeMovement
+
+            if not node.validate_parent_child(left.get_parent(), node):
+                raise ParentChildRejection
+
+            node.move(left, pos='right')
+        except WidgetNode.DoesNotExist:
+            try:
+                parent = WidgetNode.objects.get(pk=data['parent_id'])
+
+                if not node.validate_parent_child(parent, node):
+                    raise ParentChildRejection
+
+                node.move(parent, pos='first-child')
+            except WidgetNode.DoesNotExist:
+                raise Http404
+
+        return self.render_to_response(None, status=200)
