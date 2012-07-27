@@ -1,0 +1,27 @@
+{% load fusionbox_tags %}
+{% load literal_include %}
+<!doctype html>
+<html>
+<head>
+  <title>Widgy</title>
+  <script src="{% static "widgy/js/jquery.js" %}"></script>
+  <script src="{% static "widgy/js/underscore.js" %}"></script>
+  <script src="{% static "widgy/js/backbone.js" %}"></script>
+  <script src="{% static "widgy/js/ICanHaz.js" %}"></script>
+  <script src="{% static "widgy/js/core.js" %}"></script>
+  <script src="{% static "widgy/js/widgy.js" %}"></script>
+</head>
+<body>
+
+  <div id="app">
+  </div>
+
+
+{% literal_include "widgy/templates.html" %}
+<script>
+  jQuery(function($) {
+    startApp({{ page.to_json|json }});
+  });
+</script>
+</body>
+</html>

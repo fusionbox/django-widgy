@@ -3,6 +3,7 @@ from django.conf import settings
 
 urlpatterns = patterns('widgy.views',
     url('^contentpage/add/$', 'add_page'),
+    url('^contentpage/(?P<object_id>[^/]+)/$', 'change_page'),
     url('^(?P<content_type>[A-z_]+)/(?P<id>[^/]+)/$', 'node'),
 
     )

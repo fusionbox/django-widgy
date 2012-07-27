@@ -6,13 +6,22 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse, Http404
 from django.views.generic.base import View
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
+from django.template.response import TemplateResponse
 
-from widgy.models import WidgetNode
+from widgy.models import WidgetNode, ContentPage
 
 
 def add_page(request):
     return HttpResponse('aafba')
+
+
+def change_page(request, object_id):
+    page = get_object_or_404(ContentPage, pk=object_id)
+
+    return TemplateResponse(request, 'widgy/change_page.html', {
+        'page': page,
+        })
+
 
 
 def more_json(obj):
