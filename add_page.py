@@ -4,7 +4,7 @@ from widgy.models import *
 page = ContentPage.objects.create(
         title='widgy page'
         )
-page.root_widget = TwoColumnLayout.add_root().widget
+page.root_widget = TwoColumnLayout.add_root().node
 page.save()
 
 for i in range(3):
