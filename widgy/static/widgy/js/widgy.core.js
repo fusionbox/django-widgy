@@ -18,7 +18,7 @@
      */
     close: function() {
       this.remove();
-      this.unbind();
+      this.undelegateEvents();
       this.onClose();
     },
 
@@ -77,9 +77,10 @@
 
 
   var ContentCollection = exports.contents.ContentCollection = Backbone.Collection.extend({
-    _prepareModel: function(node, options) {
+    _prepareModel: function(model, options) {
       options || (options = {});
-      var model = createContent(node);
+      if (!(model instanceof Backbone.Model)) 
+        model = createContent(model);
       return model;
     }
   });
@@ -146,9 +147,10 @@
     moveToRightOf: function(event) {
       var id = +this.$('.right_of').val();
           collection = node_map[id],
-          left = collection.where({node_id: id})[0];
+          left = collection.where({node_id: id})[0],
+          leftIndex = collection.indexOf(left);
 
-      console.log(arguments, left);
+      collection.add(this.model, {at: leftIndex + 1});
     }
   });
 

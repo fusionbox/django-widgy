@@ -170,3 +170,5 @@ class NodeView(RestView):
                 raise Http404
 
         return self.render_to_response(None, status=200)
+
+node = NodeView.as_view()
