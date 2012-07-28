@@ -37,9 +37,11 @@ class WidgetNode(MP_Node):
             self.data.post_create()
 
     def to_json(self):
+        children = [child.to_json() for child in self.get_children()]
         return {
                 'id': self.id,
                 'content': self.data.to_json(),
+                'children': children,
                 }
 
     def render(self):
@@ -93,12 +95,10 @@ class WidgetData(models.Model):
         pass
 
     def to_json(self):
-        children = [child.to_json() for child in self.node.get_children()]
         return {
                 'id': self.id,
                 'model': self._meta.module_name,
                 'object_name': self._meta.object_name,
-                'children': children,
                 }
 
 

@@ -1,133 +1,76 @@
-  var contents = {},
-      nodes = {},
-      editors = {};
+;(function(Widgy) {
 
-  var createContent = function(content) {
-    return new contents[content.model](content);
-  };
+  var exports = Widgy.nodes || (Widgy.nodes = {});
 
-  var createNode = function(model) {
-    return new nodes[model.viewClass]({model: model});
-  };
+  var Node = Backbone.Model.extend({
+    urlRoot: '/admin/widgy/node/',
 
-  var createEditor = function(view) {
-    return new editors[view.editorClass]({model: view.model});
-  };
-
-  var ContentModel = Backbone.Model.extend({
     initialize: function() {
-      this.type = this.get('model');
-    },
+      var content = this.get('content');
+      this.content = Widgy.contents.instantiateModel(content.object_name, content);
+      this.unset('content');
 
-    save: function(attrs, options) {
-      this.set(attrs, options);
-      console.log('"saved" model', attrs, options);
+      var children = this.get('children');
+      this.children = new NodeCollection(children);
+      this.unset('children');
     }
   });
 
-  contents.TwoColumnLayout = ContentModel.extend({
-    viewClass: 'LayoutView'
-  });
 
-  contents.Bucket = ContentModel.extend({
-    viewClass: 'BucketView'
-  });
-
-  contents.TextContent = ContentModel.extend({
-    viewClass: 'TextContentView'
+  var NodeCollection = Backbone.Collection.extend({
+    model: Node,
   });
 
 
   var NodeView = Widgy.View.extend({
+    className: 'node',
+
     initialize: function() {
-      this.children = [];
-      _.each(this.model.get('children'), this.instantiateChild, this);
+      _.bindAll(this, 'addAll', 'addOne');
+      this.collection.on('reset', this.addAll);
+      this.collection.on('add', this.addOne);
+
+      // The root does not have a model.
+      if ( this.model )
+        this.model.bind('remove', this.close, this);
     },
 
-    instantiateChild: function(child) {
-      this.children.push(createNode(createContent(child.content)));
+    addAll: function() {
+      this.collection.each(this.addOne);
     },
 
-    widgyRender: function() {
-      this.render();
+    addOne: function(node) {
+      var node_view = new NodeView({
+        model: node,
+        collection: node.children
+      });
 
-      _.each(this.children, this.appendChild, this);
+      this.$el.append(node_view.render().el);
+    },
+
+    render: function() {
+      Widgy.View.prototype.render(this, arguments);
+
+      if ( this.model )
+      {
+        var content = this.model.content;
+        this.content_view = new content.viewClass({
+          model: content
+        });
+        this.$el.append(this.content_view.render().el);
+      }
+
+      this.addAll();
 
       return this;
-    },
-
-    appendChild: function(child) {
-      this.$el.append(child.widgyRender().el);
     }
   });
 
 
-  nodes.LayoutView = NodeView.extend({
-    render: function() {}
-  }); 
-
-  nodes.BucketView = NodeView.extend({
-    tagName: 'section',
-    className: 'bucket',
-
-    template: 'bucket'
+  _.extend(exports, {
+    Node: Node,
+    NodeCollection: NodeCollection,
+    NodeView: NodeView
   });
 
-  var WidgetView = NodeView.extend({
-    events: {
-      'click .edit': 'editWidget'
-    },
-
-    initialize: function() {
-      this.model.on('change', this.render, this);
-    },
-
-    editWidget: function(event) {
-      event.preventDefault();
-
-      var edit_view = createEditor(this);
-      this.$el.append(edit_view.render().el);
-    }
-  });
-
-  nodes.TextContentView = WidgetView.extend({
-    template: 'text_content',
-    editorClass: 'TextContentEditView'
-  });
-
-  editors.TextContentEditView = Widgy.View.extend({
-    template: 'edit_text_content',
-
-    events: {
-      'submit form': 'handleForm',
-      'click .cancel': 'close'
-    },
-
-    handleForm: function(event) {
-      event.preventDefault();
-      var values = this.hydrateForm();
-
-      this.model.save(values);
-      this.close();
-    },
-
-    hydrateForm: function() {
-      return this.$('form').serializeObject();
-    }
-  });
-
-  var App = Backbone.View.extend({
-    initialize: function() {
-      var page = this.options.page,
-          content = page.root_node.content;
-
-      var layout = createContent(content);
-      var layout_view = this.layout_view = createNode(layout);
-
-      this.$el.append(layout_view.widgyRender().el);
-    }
-  });
-
-  var startApp = function(page) {
-    app = new App({page: page, el: $('#app')});
-  };
+})(this.Widgy);

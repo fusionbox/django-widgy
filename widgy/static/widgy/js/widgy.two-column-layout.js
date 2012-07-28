@@ -1,11 +1,13 @@
-;(function() {
+;(function(Widgy) {
 
 
-  var TwoColumnLayout = Widgy.contents.TwoColumnLayout = Widgy.contents.ContentModel.extend({
-    viewClass: 'LayoutView'
+  var LayoutView = Widgy.contents.ContentView.extend({});
+
+  var TwoColumnLayout = Widgy.contents.Content.extend({
+    viewClass: LayoutView
   });
 
-  
-  var LayoutView = Widgy.nodes.LayoutView = Widgy.nodes.NodeView.extend({
-  });
-})();
+  Widgy.contents.registerModel('TwoColumnLayout', TwoColumnLayout);
+
+
+})(this.Widgy);

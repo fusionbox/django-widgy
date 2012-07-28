@@ -1,15 +1,15 @@
-;(function() {
+;(function(Widgy) {
 
 
-  var Bucket = Widgy.contents.Bucket = Widgy.contents.ContentModel.extend({
-    viewClass: 'BucketView'
-  });
-
-
-  var BucketView = Widgy.nodes.BucketView = Widgy.nodes.NodeView.extend({
-    tagName: 'section',
-    className: 'bucket',
-
+  var BucketView = Widgy.contents.ContentView.extend({
     template: 'bucket'
   });
-})();
+
+  var Bucket = Widgy.contents.Content.extend({
+    viewClass: BucketView
+  });
+
+
+  Widgy.contents.registerModel('Bucket', Bucket);
+
+})(this.Widgy);

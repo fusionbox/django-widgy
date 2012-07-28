@@ -10,10 +10,12 @@
   <script src="{% static "widgy/js/lib/ICanHaz.js" %}"></script>
   <script src="{% static "widgy/js/lib/fusionbox.js" %}"></script>
   <script src="{% static "widgy/js/widgy.core.js" %}"></script>
+  <script src="{% static "widgy/js/widgy.nodes.js" %}"></script>
+  <script src="{% static "widgy/js/widgy.contents.js" %}"></script>
+  <script src="{% static "widgy/js/widgy.widgets.js" %}"></script>
   <script src="{% static "widgy/js/widgy.two-column-layout.js" %}"></script>
   <script src="{% static "widgy/js/widgy.bucket.js" %}"></script>
   <script src="{% static "widgy/js/widgy.text-content.js" %}"></script>
-  <script src="{% static "widgy/js/widgy.main.js" %}"></script>
 </head>
 <body>
 
@@ -23,8 +25,9 @@
 
 {% literal_include "widgy/templates.html" %}
 <script>
+  var page = {{ page.to_json|json }};
   jQuery(function($) {
-    Widgy.main({{ page.to_json|json }});
+    Widgy.main(page);
   });
 </script>
 </body>
