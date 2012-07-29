@@ -14,7 +14,7 @@
    * to the custom Content Model.  You must provide a viewClass property on
    * your Content Model in for NodeView to know which ContentView to render.
    */
-  var Content = Backbone.Model.extend({
+  var Content = Widgy.Model.extend({
     urlRoot: '/admin/widgy/',
 
     viewClass: false,

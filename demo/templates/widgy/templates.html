@@ -7,6 +7,12 @@
     border: 1px #000 solid;
     margin: 1em;
   }
+
+  .node_drag_placeholder {
+    width: 100%;
+    height: 50px;
+    background-color: yellow;
+  }
 </style>
 
 <script id="text_content" type="text/html">
@@ -23,4 +29,15 @@
     <input type="submit">
     <button class="cancel" type="button">cancel</button>
   </form>
+</script>
+
+<script id="node_view" type="text/html">
+  <span class="drag_handle">drag</span>
+  <div class="content"></div>
+  <div class="children"></div>
+</script>
+
+<!-- for now, please put nothing inside that div -->
+<script id="node_drag_placeholder" type="text/html">
+  <div class="node_drag_placeholder"></div>
 </script>

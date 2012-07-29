@@ -38,10 +38,27 @@
      */
     render: function() {
       if (this.template) {
-        this.$el.html(ich[this.template](this.model.toJSON()));
+        var context = this.model ? this.model.toJSON() : {};
+        this.$el.html(this.renderTemplate(this.template, context));
       }
 
       return this;
+    },
+
+    renderTemplate: function(template_name, context) {
+      return ich[template_name](context);
+    }
+  });
+
+
+  var Model = Backbone.Model.extend({
+    url: function() {
+      var base_url = Backbone.Model.prototype.url.apply(this, arguments);
+
+      if ( base_url.charAt(base_url.length - 1) !== '/' )
+        base_url += '/';
+      
+      return base_url;
     }
   });
 
@@ -50,9 +67,10 @@
     initialize: function(options) {
       var page = options.page;
 
-      var collection = new Widgy.nodes.NodeCollection(page.root_node);
+      var root_node = new Widgy.nodes.Node(page.root_node);
       var root_view = this.root_view = new Widgy.nodes.NodeView({
-        collection: collection,
+        model: root_node,
+        collection: root_node.children
       });
 
       this.$el.html(root_view.render().el);
@@ -70,6 +88,7 @@
   
   _.extend(exports, {
     View: View,
+    Model: Model,
     Widgy: AppView,
     main: main
   });
