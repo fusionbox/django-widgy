@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.contrib.contenttypes.models import ContentType
 
-from widgy.models import WidgetNode, ContentPage
+from widgy.models import Node, ContentPage
 
 
 def add_page(request):
@@ -97,7 +97,7 @@ class RestView(JsonResponseMixin, JsonRequestMixin, View):
 
 
 
-class WidgetView(RestView):
+class ContentView(RestView):
     def auth(*args, **kwargs):
         pass
 
@@ -121,7 +121,7 @@ class WidgetView(RestView):
         return self.render_to_response(obj, status=200)
 
 
-content = WidgetView.as_view()
+content = ContentView.as_view()
 
 
 class InvalidTreeMovement(BaseException):
@@ -146,11 +146,11 @@ class NodeView(RestView):
         If you put with a parent_id, then your node will be placed as the
         first-child of the node corresponding with the parent_id.
         """
-        node = get_object_or_404(WidgetNode, pk=node_pk)
+        node = get_object_or_404(Node, pk=node_pk)
         data = self.data()
 
         try:
-            left = WidgetNode.objects.get(pk=data['left_id'])
+            left = Node.objects.get(pk=data['left_id'])
             if left.is_root():
                 raise InvalidTreeMovement
 
@@ -158,15 +158,15 @@ class NodeView(RestView):
                 raise ParentChildRejection
 
             node.move(left, pos='right')
-        except WidgetNode.DoesNotExist:
+        except Node.DoesNotExist:
             try:
-                parent = WidgetNode.objects.get(pk=data['parent_id'])
+                parent = Node.objects.get(pk=data['parent_id'])
 
                 if not node.validate_parent_child(parent, node):
                     raise ParentChildRejection
 
                 node.move(parent, pos='first-child')
-            except WidgetNode.DoesNotExist:
+            except Node.DoesNotExist:
                 raise Http404
 
         return self.render_to_response(None, status=200)

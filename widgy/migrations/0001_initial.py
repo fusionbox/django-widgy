@@ -11,20 +11,20 @@ class Migration(SchemaMigration):
         # Adding model 'ContentPage'
         db.create_table('widgy_contentpage', (
             ('page_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['pages.Page'], unique=True, primary_key=True)),
-            ('root_widget', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['widgy.WidgetNode'], null=True)),
+            ('root_node', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['widgy.Node'], null=True)),
         ))
         db.send_create_signal('widgy', ['ContentPage'])
 
-        # Adding model 'WidgetNode'
-        db.create_table('widgy_widgetnode', (
+        # Adding model 'Node'
+        db.create_table('widgy_node', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('path', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255)),
             ('depth', self.gf('django.db.models.fields.PositiveIntegerField')()),
             ('numchild', self.gf('django.db.models.fields.PositiveIntegerField')(default=0)),
-            ('data_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
-            ('data_id', self.gf('django.db.models.fields.PositiveIntegerField')()),
+            ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
+            ('content_id', self.gf('django.db.models.fields.PositiveIntegerField')()),
         ))
-        db.send_create_signal('widgy', ['WidgetNode'])
+        db.send_create_signal('widgy', ['Node'])
 
         # Adding model 'Bucket'
         db.create_table('widgy_bucket', (
@@ -51,8 +51,8 @@ class Migration(SchemaMigration):
         # Deleting model 'ContentPage'
         db.delete_table('widgy_contentpage')
 
-        # Deleting model 'WidgetNode'
-        db.delete_table('widgy_widgetnode')
+        # Deleting model 'Node'
+        db.delete_table('widgy_node')
 
         # Deleting model 'Bucket'
         db.delete_table('widgy_bucket')
@@ -123,7 +123,16 @@ class Migration(SchemaMigration):
         'widgy.contentpage': {
             'Meta': {'ordering': "('_order',)", 'object_name': 'ContentPage', '_ormbases': ['pages.Page']},
             'page_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['pages.Page']", 'unique': 'True', 'primary_key': 'True'}),
-            'root_widget': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['widgy.WidgetNode']", 'null': 'True'})
+            'root_node': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['widgy.Node']", 'null': 'True'})
+        },
+        'widgy.node': {
+            'Meta': {'object_name': 'Node'},
+            'content_id': ('django.db.models.fields.PositiveIntegerField', [], {}),
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'depth': ('django.db.models.fields.PositiveIntegerField', [], {}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'numchild': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
+            'path': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'})
         },
         'widgy.textcontent': {
             'Meta': {'object_name': 'TextContent'},
@@ -133,15 +142,6 @@ class Migration(SchemaMigration):
         'widgy.twocolumnlayout': {
             'Meta': {'object_name': 'TwoColumnLayout'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
-        },
-        'widgy.widgetnode': {
-            'Meta': {'object_name': 'WidgetNode'},
-            'data_id': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'data_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'depth': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'numchild': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
-            'path': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'})
         }
     }
 
