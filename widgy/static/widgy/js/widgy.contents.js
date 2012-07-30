@@ -1,7 +1,4 @@
-;(function(Widgy) {
-
-  var exports = Widgy.contents || (Widgy.contents = {});
-
+define([ 'widgy.backbone' ], function(Backbone) {
 
   /**
    * Base Model for Contents.  A Content holds the non-structure data for a
@@ -14,7 +11,7 @@
    * to the custom Content Model.  You must provide a viewClass property on
    * your Content Model in for NodeView to know which ContentView to render.
    */
-  var Content = Widgy.Model.extend({
+  var Content = Backbone.Model.extend({
     viewClass: false,
 
     initialize: function() {
@@ -38,51 +35,24 @@
    * Content and when the user wishes to edit the content, it will open another
    * view.  See `widgy.widgets.js`.
    */
-  var ContentView = Widgy.View.extend({
+  var ContentView = Backbone.View.extend({
     className: 'content',
   });
 
 
-  // TODO: Does this need to live on the AppView?  Should this be a List just
-  // like the NodeViewList?  Currently, this is effectively a global variable.
-  var models = {};
-
-
   /**
-   * In order to expose a Content to the rest of Widgy, you must register it.
-   * This method accepts a string name and a reference to the class.  To
-   * retrieve the model, you can use the `getModel` or `instantiateModel`
-   * methods.
+   * Returns a Model class that was fetched.  This method accepts the name of
+   * the model you are retrieving.
    */
-  function registerModel(name, cls) {
-    models[name] = cls;
+  function getModel(name, cb) {
+    var deps = [ 'components/' + name + '/component' ];
+    require(deps, cb);
   }
 
 
-  /**
-   * Returns a model that was registered using `registerModel`.  This method
-   * accepts the name of the model you are retrieving.
-   */
-  function getModel(name) {
-    return models[name];
-  }
-
-
-  /**
-   * Retrieves the Content Model class based on `name` and instantiates it
-   * passing in the `attrs` and `options`.
-   */
-  function instantiateModel(name, attrs, options) {
-    var model_class = getModel(name);
-    return new model_class(attrs, options);
-  }
-
-
-  _.extend(exports, {
+  return {
     Content: Content,
     ContentView: ContentView,
-    registerModel: registerModel,
-    getModel: getModel,
-    instantiateModel: instantiateModel
-  });
-})(this.Widgy);
+    getModel: getModel
+  };
+});
