@@ -153,14 +153,13 @@
       this.$el.prev().hide();
       this.clearPlaceholders();
 
-      $(document).on('mouseup.NodeView', this.stopDrag);
+      $(document).on('mouseup.' + this.cid, this.stopDrag);
       // TODO: store internal offset so as to know where on the drag handle I
       // started dragging.
-      $(document).on('mousemove.NodeView', this.followMouse);
+      $(document).on('mousemove.' + this.cid, this.followMouse);
       this.followMouse(event);
 
       this.$el.addClass('being_dragged');
-      this.trigger('startDrag', this);
     },
 
     stopDrag: function() {
@@ -168,7 +167,7 @@
         position: 'static'
       });
 
-      $(document).off('.NodeView');
+      $(document).off('.' + this.cid);
 
       this.trigger('stopDrag', this);
       this.$el.removeClass('being_dragged');
