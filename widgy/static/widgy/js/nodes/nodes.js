@@ -1,7 +1,7 @@
-define([ 'jquery', 'widgy.backbone', 'widgy.contents',
+define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     'text!nodes/node_view.html',
     'text!nodes/drop_target_view.html',
-    ], function($, Backbone, contents,
+    ], function($, _, Backbone, contents,
       node_view_template,
       drop_target_view_template
       ) {

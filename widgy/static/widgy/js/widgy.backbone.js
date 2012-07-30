@@ -1,4 +1,4 @@
-define([ 'jquery', 'backbone', 'mustache' ], function($, Backbone, Mustache) {
+define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbone, Mustache) {
 
   /**
    * Our base Backbone classes.

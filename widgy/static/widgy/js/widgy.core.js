@@ -1,4 +1,4 @@
-define([ 'jquery', 'widgy.backbone', 'nodes/nodes' ], function($, Backbone, nodes) {
+define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes' ], function($, _, Backbone, nodes) {
 
   /**
    * This is the view that handles the entire widgy App.  It will take the page
