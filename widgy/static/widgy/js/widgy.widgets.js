@@ -1,6 +1,5 @@
-(function(Widgy) {
+define([ 'widgy.backbone', 'widgy.contents' ], function(Backbone, contents) {
 
-  var exports = Widgy.widgets || (Widgy.widgets = {});
   // TODO: is Widget a good name?  We are trying to unify our vocabulary.
 
 
@@ -15,7 +14,7 @@
    * WidgetView with the EditorView.  When the EditorView closes, the
    * WidgetView will re-render itself.
    */
-  var WidgetView = Widgy.contents.ContentView.extend({
+  var WidgetView = contents.ContentView.extend({
     editorClass: false,
 
     events: {
@@ -23,6 +22,8 @@
     },
 
     initialize: function() {
+      Backbone.View.prototype.initialize.apply(this, arguments);
+
       this.model.on('change', this.render);
     },
 
@@ -51,7 +52,7 @@
    * Additionally, if you provide an element with a class `cancel`, the
    * EditorView will close if that element is clicked.
    */
-  var EditorView = Widgy.View.extend({
+  var EditorView = Backbone.View.extend({
     events: {
       'submit form': 'handleForm',
       'click .cancel': 'close'
@@ -76,8 +77,8 @@
   // in render.
 
 
-  _.extend(exports, {
+  return {
     WidgetView: WidgetView,
     EditorView: EditorView
-  });
-})(this.Widgy);
+  };
+});

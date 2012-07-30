@@ -100,6 +100,7 @@ class Content(models.Model):
     def to_json(self):
         return {
                 'url': self.get_api_url(),
+                '__module_name__': self._meta.module_name,
                 'model': self._meta.module_name,
                 'object_name': self._meta.object_name,
                 }
