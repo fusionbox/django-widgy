@@ -1,6 +1,9 @@
 require.config({
   // ordered dependencies (example: jquery plugins)
   shim: {
+    'underscore': {
+      exports: '_'
+    },
     'backbone': {
       deps: ['underscore', 'jquery', 'fusionbox'],
       exports: 'Backbone'
@@ -18,8 +21,4 @@ require.config({
   'fusionbox': '/static/widgy/js/lib/fusionbox',
   'text': '/static/widgy/js/require/text'
   }
-});
-
-require([ 'widgy.core', 'page' ], function(Widgy, page) {
-  window.widgy = new Widgy(page.jqueryable, page.page_data);
 });

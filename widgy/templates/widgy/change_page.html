@@ -6,9 +6,8 @@
   <title>Widgy</title>
   <script data-main="/static/widgy/js/main" src="{% static "widgy/js/require/require.js" %}"></script>
   <script>
-    define('page', {
-      jqueryable: '#app',
-      page_data: {{ page.to_json|json }}
+    require([ 'widgy.core' ], function(Widgy) {
+      window.widgy = new Widgy('#app', {{ page.to_json|json }});
     });
   </script>
 </head>
@@ -40,7 +39,5 @@
       background-color: steelblue;
     }
   </style>
-
-{% literal_include "widgy/templates.html" %}
 </body>
 </html>
