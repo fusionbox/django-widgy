@@ -111,6 +111,11 @@
    */
   var AppView = View.extend({
     initialize: function(options) {
+      _.bindAll(this,
+        'startDrag',
+        'stopDrag'
+      );
+
       var page = options.page;
 
       // instantiate node_view_list before creating the root node
@@ -130,6 +135,10 @@
     startDrag: function(dragged_view) {
       this.dragged_view = dragged_view;
 
+      $(document).on('mouseup.' + dragged_view.cid, this.stopDrag);
+      $(document).on('mousemove.' + dragged_view.cid, dragged_view.followMouse);
+      // TODO: follow mouse on scroll.
+
       this.node_view_list.each(function(node_view) {
         node_view.becomeDropTarget();
       });
@@ -138,6 +147,8 @@
     stopDrag: function() {
       var dragged_view = this.dragged_view;
       delete this.dragged_view;
+
+      $(document).off('.' + dragged_view.cid);
 
       this.node_view_list.each(function(node_view) {
         node_view.clearPlaceholders();

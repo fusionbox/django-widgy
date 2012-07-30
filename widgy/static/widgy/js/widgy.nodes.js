@@ -99,8 +99,6 @@
         app: this.app
       });
 
-      this.bindChildViewEvents(node_view);
-
       this.$children.append(node_view.render().el);
     },
 
@@ -118,14 +116,7 @@
       this.$el.prev().hide();
       this.clearPlaceholders();
 
-      // TODO: this should probably call this.app.stopDrag.  (Investigate)
-      // TODO: should a NodeView know about the document?  I would prefer it if
-      // views only knew about their subviews.  Not about anything above them.
-      $(document).on('mouseup.' + this.cid, this.stopDrag);
-      // TODO: store internal offset so as to know where on the drag handle I
-      // started dragging.
-      $(document).on('mousemove.' + this.cid, this.followMouse);
-      // TODO: follow mouse on scroll.
+      // follow mouse real quick, don't wait for mousemove.
       this.followMouse(event);
 
       this.$el.addClass('being_dragged');
@@ -136,9 +127,6 @@
         position: 'static'
       });
 
-      $(document).off('.' + this.cid);
-
-      this.trigger('stopDrag', this);
       this.$el.removeClass('being_dragged');
     },
 
@@ -168,16 +156,12 @@
     },
 
     /**
-     * `bindChildViewEvents`, `becomeDropTarget`, `dropChildView`,
-     * `setPlaceholders`, and `clearPlaceholders` all deal with a different
-     * NodeView being dragged.  It is confusing that these methods are on the
-     * same class that the methods dealing with being dragged around are on,
-     * but that's the nature of the beast with recursive nodes.
+     * `becomeDropTarget`, `dropChildView`, `setPlaceholders`, and
+     * `clearPlaceholders` all deal with a different NodeView being dragged.
+     * It is confusing that these methods are on the same class that the
+     * methods dealing with being dragged around are on, but that's the nature
+     * of the beast with recursive nodes.
      */
-    bindChildViewEvents: function(child_view) {
-      child_view.on('stopDrag', this.clearPlaceholders);
-    },
-
     becomeDropTarget: function() {
       this.setPlaceholders();
     },
