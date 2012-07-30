@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.template.loader import render_to_string
@@ -37,11 +38,20 @@ class Node(MP_Node):
 
     def to_json(self):
         children = [child.to_json() for child in self.get_children()]
-        return {
+        json = {
                 'url': self.get_api_url(),
                 'content': self.content.to_json(),
                 'children': children,
                 }
+        parent = self.get_parent()
+        if parent:
+            json['parent_id'] = parent.get_api_url()
+
+        left = self.get_prev_sibling()
+        if left:
+            json['left_id'] = left.get_api_url()
+
+        return json
 
     def render(self, *args, **kwargs):
         return self.content.render(*args, **kwargs)
@@ -53,6 +63,34 @@ class Node(MP_Node):
     @staticmethod
     def validate_parent_child(parent, child):
         return parent.content.valid_parent_of(child.content) and child.content.valid_child_of(parent.content)
+
+    # TODO: fix the error messages
+    def reposition(self, left=None, parent=None):
+        if left:
+            if left.is_root():
+                raise InvalidTreeMovement({'message': 'You can\'t move the root'})
+
+            if not self.validate_parent_child(left.get_parent(), self):
+                raise ParentChildRejection({'message': 'That node can\'t live inside that other node'})
+
+            self.move(left, pos='right')
+        elif parent:
+            if not self.validate_parent_child(parent, self):
+                raise ParentChildRejection({'message': 'That node can\'t live inside that other node'})
+
+            self.move(parent, pos='first-child')
+        else:
+            assert left or parent
+
+
+class InvalidTreeMovement(ValidationError):
+    pass
+
+class RootDisplacementError(InvalidTreeMovement):
+    pass
+
+class ParentChildRejection(InvalidTreeMovement):
+    pass
 
 
 class Content(models.Model):
@@ -79,6 +117,15 @@ class Content(models.Model):
                 content=obj
                 )
         return obj
+
+    def add_sibling(self, cls, **kwargs):
+        obj = cls.objects.create(**kwargs)
+        self.node.add_sibling(
+                content=obj,
+                pos='right'
+                )
+        return obj
+
 
     @classmethod
     def add_root(cls, **kwargs):

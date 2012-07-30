@@ -62,7 +62,7 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
      */
     close: function(event) {
       if ( event ) {
-        event.preventDefault();
+        event.preventDefault && event.preventDefault();
       }
 
       this.remove();
@@ -105,7 +105,11 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
     idAttribute: 'url',
 
     url: function() {
-      return this.id;
+      if ( ! this.id ) {
+        return Backbone.Model.prototype.url.apply(this, arguments);
+      } else {
+        return this.id;
+      }
     }
   });
 

@@ -25,6 +25,18 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       _.bindAll(this,
         'instantiateContent'
         );
+
+      this.loadContent();
+      this.on('change:content', this.loadContent);
+
+      // same as content.  We need to actually instantiate the NodeCollection
+      // and set it as a property, not an attribute.
+      var children = this.get('children');
+      this.children = new NodeCollection(children);
+      this.unset('children');
+    },
+
+    loadContent: function() {
       // content gets set because it is in the JSON for the node.  We need to
       // unset it as it is not an attribute, but a property.  We also need to
       // instantiate it as a real Content Model.
@@ -33,12 +45,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
       // This is asynchronous because of requirejs.
       contents.getModel(this._content.__module_name__, this.instantiateContent);
-
-      // same as content.  We need to actually instantiate the NodeCollection
-      // and set it as a property, not an attribute.
-      var children = this.get('children');
-      this.children = new NodeCollection(children);
-      this.unset('children');
     },
 
     instantiateContent: function(model_class) {
@@ -87,25 +93,28 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
         'startDrag',
         'followMouse',
         'stopDrag',
+        'repositionIfMoved',
         'reposition',
         'addDropTargets',
         'createDropTarget',
         'dropChildView',
-        'clearDropTargets'
+        'clearDropTargets',
+        'renderContent'
       );
+
+      this.model
+        .on('remove', this.close)
+        .on('change', this.repositionIfMoved)
+        .on('loaded:content', this.renderContent);
+
+      this.collection = this.model.children;
 
       this.collection
         .on('reset', this.addAll)
         .on('add', this.addOne);
 
-      this.model
-        .on('remove', this.close)
-        .on('change', this.reposition);
-
       this.app = options.app;
       this.app.node_view_list.push(this);
-
-      this.model.bind('loaded:content', this.render);
 
       this.drop_targets_list = new Backbone.ViewList;
     },
@@ -117,11 +126,11 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     addOne: function(node) {
       var node_view = new NodeView({
         model: node,
-        collection: node.children,
         app: this.app
       });
 
-      this.$children.append(node_view.el);
+      node_view.render().reposition(node);
+      // this.$children.append(node_view.render().el);
     },
 
     /**
@@ -160,21 +169,34 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       });
     },
 
+    repositionIfMoved: function(model, options) {
+      if (
+          (model.previous('parent_id') && model.hasChanged('parent_id')) ||
+          (model.hasChanged('left_id') && model.get('left_id') !== model.id)
+          )
+      {
+
+        return this.reposition(model);
+      }
+    },
+
     /**
      * This method puts the NodeView in the correct spot after a model change.
      */
-    reposition: function(model, options) {
-      if ( model.get('left_id') ) {
-        if ( model.get('left_id') === model.id )
-          return;
+    reposition: function(model) {
+      var parent_view = this.app.node_view_list.findById(model.get('parent_id'));
 
+      if ( model.get('left_id') ) {
         var left_view = this.app.node_view_list.findById(model.get('left_id'));
         left_view.$el.after(this.el);
       } else {
-        var parent_view = this.app.node_view_list.findById(model.get('parent_id'));
         parent_view.$children.prepend(this.el);
       }
-      // TODO: fix collections and stuff.
+
+      if ( model.collection !== parent_view.collection ) {
+        model.collection.remove(model);
+        parent_view.collection.add(model);
+      }
     },
 
     /**
@@ -237,24 +259,26 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       this.drop_targets_list.closeAll();
     },
 
-    render: function(content) {
+    render: function() {
       Backbone.View.prototype.render.apply(this, arguments);
 
-      var view_class = content.getViewClass();
-
-      this.content_view = new view_class({
-        model: content
-      });
-
-      this.$content = this.$('.content:first');
-      this.$content.append(this.content_view.render().el);
-
       this.$children = this.$('.children:first');
+      this.$content = this.$('.content:first');
 
       // TODO: investigate possible problems with this.
       this.addAll();
 
       return this;
+    },
+
+    renderContent: function(content) {
+      var view_class = content.getViewClass();
+
+      content_view = new view_class({
+        model: content
+      });
+
+      this.$content.append(content_view.render().el);
     }
   });
 

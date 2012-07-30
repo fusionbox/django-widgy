@@ -6,7 +6,7 @@
   <title>Widgy</title>
   <script data-main="/static/widgy/js/main" src="{% static "widgy/js/require/require.js" %}"></script>
   <script>
-    require([ 'widgy.core' ], function(Widgy) {
+    require([ 'widgy' ], function(Widgy) {
       window.widgy = new Widgy('#app', {{ page.to_json|json }});
     });
   </script>
@@ -17,6 +17,9 @@
 
   <style>
     #app {
+    }
+
+    #app > .node {
       width: 500px;
     }
 
@@ -37,6 +40,10 @@
 
     .repositioned {
       background-color: steelblue;
+    }
+
+    .shelf {
+      float: right;
     }
   </style>
 </body>

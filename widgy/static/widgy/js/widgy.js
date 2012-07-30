@@ -1,4 +1,4 @@
-define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes' ], function($, _, Backbone, nodes) {
+define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelves' ], function($, _, Backbone, nodes, shelves) {
 
   /**
    * This is the view that handles the entire widgy App.  It will take the page
@@ -25,11 +25,20 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes' ], function($, 
       var root_node = new nodes.Node(page.root_node);
       var root_node_view = this.root_node_view = new nodes.NodeView({
         model: root_node,
-        collection: root_node.children,
         app: this
       });
 
-      this.$el.html(root_node_view.el);
+      var shelf_list = new shelves.ShelfCollection;
+      var shelf_view = this.shelf_view = new shelves.ShelfView({
+        collection: shelf_list,
+        app: this
+      });
+      this.refreshShelf();
+
+      this.$el.append(
+          shelf_view.render().el,
+          root_node_view.render().el
+          );
     },
 
     startDrag: function(dragged_view) {
@@ -42,6 +51,10 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes' ], function($, 
       this.node_view_list.each(function(node_view) {
         node_view.addDropTargets();
       });
+    },
+
+    refreshShelf: function() {
+      this.shelf_view.collection.fetch();
     },
 
     stopDrag: function() {

@@ -123,16 +123,6 @@ class ContentView(RestView):
 
 content = ContentView.as_view()
 
-
-class InvalidTreeMovement(BaseException):
-    pass
-
-class RootDisplacementError(InvalidTreeMovement):
-    pass
-
-class ParentChildRejection(InvalidTreeMovement):
-    pass
-
 def extract_id(url):
     return url and url.split('/')[-2]
 
@@ -154,27 +144,44 @@ class NodeView(RestView):
 
         try:
             left = Node.objects.get(pk=extract_id(data['left_id']))
-            if left.is_root():
-                raise InvalidTreeMovement
-
-            if not node.validate_parent_child(left.get_parent(), node):
-                raise ParentChildRejection
-
-            node.move(left, pos='right')
+            node.reposition(left=left)
         except Node.DoesNotExist:
             try:
                 parent = Node.objects.get(pk=extract_id(data['parent_id']))
-
-                if not node.validate_parent_child(parent, node):
-                    raise ParentChildRejection
-
-                node.move(parent, pos='first-child')
+                node.reposition(parent=parent)
             except Node.DoesNotExist:
                 raise Http404
 
         return self.render_to_response(None, status=200)
 
+    def delete(self, request, node_pk):
+        node = get_object_or_404(Node, pk=node_pk)
+        node.delete()
+
+        return self.render_to_response(None)
+
+
 node = NodeView.as_view()
+
+
+class CreateNodeView(RestView):
+    def auth(*args, **kwargs):
+        pass
+
+    def post(self, request):
+        data = self.data()
+        content_class = get_object_or_404(ContentType, model=data['content_type'], app_label='widgy').model_class()
+        try:
+            left = get_object_or_404(Node, pk=extract_id(data['left_id']))
+            content = left.content.add_sibling(content_class)
+        except Http404:
+            parent = get_object_or_404(Node, pk=extract_id(data['parent_id']))
+            content = parent.content.add_child(content_class)
+
+        return self.render_to_response(content.node, status=201)
+
+
+create_node = CreateNodeView.as_view()
 
 
 class AllChildrenView(RestView):
