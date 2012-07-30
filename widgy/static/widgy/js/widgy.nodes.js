@@ -41,13 +41,33 @@
   });
 
 
-  var _node_view_list = [];
-
-  function find_node_view_by_el(el) {
-    return _.find(_node_view_list, function(view) {
-      return el === view.el;
-    }) || console.error('Could not find a view that matched the element:', el);
+  function NodeViewList() {
+    this.list = []
   }
+
+  _.extend(NodeViewList.prototype, {
+    push: function(view) {
+      this.list.push(view);
+    },
+
+    find: function(finder) {
+      return _.find(this.list, finder);
+    },
+
+    findById: function(id) {
+      return this.find(function(view) {
+        return id === view.model.id;
+      });
+    },
+
+    findByEl: function(el) {
+      return this.find(function(view) {
+        return el === view.el;
+      });
+    }
+  });
+
+  var node_view_list = new NodeViewList;
 
   /**
    * The NodeView provides an interface to the node.  It will also create a
@@ -74,16 +94,21 @@
         'addAll',
         'addOne',
         'startDrag',
+        'stopDrag',
         'startChildDrag',
-        'stopChildDrag'
+        'stopChildDrag',
+        'reposition'
       );
 
-      this.collection.on('reset', this.addAll);
-      this.collection.on('add', this.addOne);
+      this.collection
+        .on('reset', this.addAll)
+        .on('add', this.addOne);
 
-      this.model.bind('remove', this.close);
+      this.model
+        .on('remove', this.close)
+        .on('change', this.reposition);
 
-      _node_view_list.push(this);
+      node_view_list.push(this);
     },
 
     addAll: function() {
@@ -98,21 +123,27 @@
 
       this.bindChildViewEvents(node_view);
 
-      this.$('.children:first').append(node_view.render().el);
+      this.$children.append(node_view.render().el);
     },
 
     startDrag: function(event) {
       event.preventDefault();
       // TODO: don't stop propagation
       event.stopPropagation();
+
+      this.$el.addClass('being_dragged');
       this.trigger('startDrag', this);
+    },
+
+    stopDrag: function() {
+      this.$el.removeClass('being_dragged');
     },
 
     stopChildDrag: function(event) {
       event.preventDefault();
       event.stopPropagation();
 
-      var $children = this.$('.children:first');
+      var $children = this.$children;
       var index = $(event.target).index() / 2;
 
       this.clearPlaceholders();
@@ -123,16 +154,17 @@
       // it to null.
       if ( index !== 0 ) {
         var left_el = $children.children().eq(index - 1)[0],
-            left_view = find_node_view_by_el(left_el);
+            left_view = node_view_list.findByEl(left_el);
 
-        left_id = left_view.model.get('id');
+        left_id = left_view.model.id;
       }
 
       this.dragged_view.model.save({
-        parent_id: this.model.get('id'),
+        parent_id: this.model.id,
         left_id: left_id
       });
 
+      this.dragged_view.stopDrag();
       delete this.dragged_view;
     },
 
@@ -141,7 +173,7 @@
     },
 
     startChildDrag: function(child_view) {
-      var $children = this.$('.children:first'),
+      var $children = this.$children,
           $placeholder = this.renderTemplate('node_drag_placeholder');
 
       $children.prepend($placeholder);
@@ -153,9 +185,23 @@
     },
 
     clearPlaceholders: function() {
-      this.$('.children:first .node_drag_placeholder')
+      this.$children.find('.node_drag_placeholder')
         .unbind()
         .remove();
+    },
+
+    reposition: function(model, options) {
+      if ( model.get('left_id') ) {
+        if ( model.get('left_id') === model.id )
+          return;
+
+        var left_view = node_view_list.findById(model.get('left_id'));
+        left_view.$el.after(this.el);
+      } else {
+        var parent_view = node_view_list.findById(model.get('parent_id'));
+        parent_view.$children.prepend(this.el);
+      }
+      // TODO: fix collections and stuff.
     },
 
     render: function() {
@@ -168,7 +214,10 @@
         model: content
       });
 
-      this.$('.content').append(this.content_view.render().el);
+      this.$content = this.$('.content:first');
+      this.$content.append(this.content_view.render().el);
+
+      this.$children = this.$('.children:first');
 
       // TODO: investigate possible problems with this.
       this.addAll();

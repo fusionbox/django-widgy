@@ -138,7 +138,7 @@ class NodeView(RestView):
     def auth(*args, **kwargs):
         pass
 
-    def put(self, node_pk):
+    def put(self, request, node_pk):
         """
         If you put with a left_id, then your node will be placed immediately
         to the right of the node corresponding with the left_id.
