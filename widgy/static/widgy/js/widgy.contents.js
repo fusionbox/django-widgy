@@ -15,8 +15,6 @@
    * your Content Model in for NodeView to know which ContentView to render.
    */
   var Content = Widgy.Model.extend({
-    urlRoot: '/admin/widgy/',
-
     viewClass: false,
 
     initialize: function() {
@@ -30,16 +28,6 @@
       }
 
       return this.viewClass;
-    },
-
-    url: function() {
-      var url = this.urlRoot + this.get('model') + '/';
-
-      if ( ! this.isNew() ) {
-        url = url + this.id + '/';
-      }
-
-      return url;
     }
   });
 

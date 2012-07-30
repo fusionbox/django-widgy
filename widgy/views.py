@@ -108,7 +108,7 @@ class ContentView(RestView):
         obj = self.get_object(object_name, object_pk)
         return self.render_to_response(obj)
 
-    # stupid implementation
+    # TODO: stupid implementation
     # only for existing objects right now
     def put(self, request, object_name, object_pk):
         obj = self.get_object(object_name, object_pk)
@@ -133,6 +133,8 @@ class RootDisplacementError(InvalidTreeMovement):
 class ParentChildRejection(InvalidTreeMovement):
     pass
 
+def extract_id(url):
+    return url and url.split('/')[-2]
 
 class NodeView(RestView):
     def auth(*args, **kwargs):
@@ -151,7 +153,7 @@ class NodeView(RestView):
         data = self.data()
 
         try:
-            left = Node.objects.get(pk=data['left_id'])
+            left = Node.objects.get(pk=extract_id(data['left_id']))
             if left.is_root():
                 raise InvalidTreeMovement
 
@@ -161,7 +163,7 @@ class NodeView(RestView):
             node.move(left, pos='right')
         except Node.DoesNotExist:
             try:
-                parent = Node.objects.get(pk=data['parent_id'])
+                parent = Node.objects.get(pk=extract_id(data['parent_id']))
 
                 if not node.validate_parent_child(parent, node):
                     raise ParentChildRejection

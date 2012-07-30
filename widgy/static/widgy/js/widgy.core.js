@@ -50,13 +50,10 @@
 
 
   var Model = Backbone.Model.extend({
-    url: function() {
-      var base_url = Backbone.Model.prototype.url.apply(this, arguments);
+    idAttribute: 'url',
 
-      if ( base_url.charAt(base_url.length - 1) !== '/' )
-        base_url += '/';
-      
-      return base_url;
+    url: function() {
+      return this.id;
     }
   });
 

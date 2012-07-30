@@ -14,7 +14,6 @@ class ContentPage(Page):
 
     def to_json(self):
         return {
-                'id': self.id,
                 'title': self.title,
                 'root_node': self.root_node.to_json(),
                 }
@@ -39,13 +38,17 @@ class Node(MP_Node):
     def to_json(self):
         children = [child.to_json() for child in self.get_children()]
         return {
-                'id': self.id,
+                'url': self.get_api_url(),
                 'content': self.content.to_json(),
                 'children': children,
                 }
 
     def render(self):
         return self.content.render()
+
+    @models.permalink
+    def get_api_url(self):
+        return ('widgy.views.node', (), {'node_pk': self.pk})
 
     @staticmethod
     def validate_parent_child(parent, child):
@@ -96,10 +99,14 @@ class Content(models.Model):
 
     def to_json(self):
         return {
-                'id': self.id,
+                'url': self.get_api_url(),
                 'model': self._meta.module_name,
                 'object_name': self._meta.object_name,
                 }
+
+    @models.permalink
+    def get_api_url(self):
+        return ('widgy.views.content', (), {'object_name': self._meta.module_name, 'object_pk': self.pk})
 
 
 class Bucket(Content):
