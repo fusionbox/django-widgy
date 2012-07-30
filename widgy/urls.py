@@ -6,5 +6,6 @@ urlpatterns = patterns('widgy.views',
     url('^contentpage/(?P<object_id>[^/]+)/$', 'change_page'),
     url('^node/(?P<node_pk>[^/]+)/$', 'node'),
     url('^(?P<object_name>[A-z_]+)/(?P<object_pk>[^/]+)/$', 'content'),
+    url('^widgets/$', 'children'),
 
     )

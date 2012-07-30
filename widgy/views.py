@@ -175,3 +175,35 @@ class NodeView(RestView):
         return self.render_to_response(None, status=200)
 
 node = NodeView.as_view()
+
+
+class AllChildrenView(RestView):
+    def auth(*args, **kwargs):
+        pass
+
+    def get(self, request):
+        # TODO: do this for real
+        children = [
+                {'content_type': 'bucket',
+                    'content': {
+                        '__module_name__': 'bucket',
+                        'title': 'Bucket',
+                        },
+                    },
+                {'content_type': 'textareawidget',
+                    'content': {
+                        '__module_name__': 'textareawidget',
+                        'title': 'Textarea',
+                        },
+                    },
+                {'content_type': 'textcontent',
+                    'content': {
+                        '__module_name__': 'textcontent',
+                        'title': 'Text Content',
+                        },
+                    },
+                ]
+
+        return self.render_to_response(children)
+
+children = AllChildrenView.as_view()
