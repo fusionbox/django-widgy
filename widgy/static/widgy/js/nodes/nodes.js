@@ -1,9 +1,9 @@
 define([ 'jquery', 'widgy.backbone', 'widgy.contents',
     'text!nodes/node_view.html',
-    'text!nodes/placeholder.html',
+    'text!nodes/drop_target_view.html',
     ], function($, Backbone, contents,
       node_view_template,
-      placeholder_template
+      drop_target_view_template
       ) {
 
   /**
@@ -76,8 +76,7 @@ define([ 'jquery', 'widgy.backbone', 'widgy.contents',
     template: node_view_template,
     
     events: {
-      'mousedown .drag_handle': 'startDrag',
-      'mouseup .node_drag_placeholder': 'dropChildView'
+      'mousedown .drag_handle': 'startDrag'
     },
 
     initialize: function(options) {
@@ -88,11 +87,11 @@ define([ 'jquery', 'widgy.backbone', 'widgy.contents',
         'startDrag',
         'followMouse',
         'stopDrag',
-        'becomeDropTarget',
-        'dropChildView',
         'reposition',
-        'setPlaceholders',
-        'clearPlaceholders'
+        'addDropTargets',
+        'createDropTarget',
+        'dropChildView',
+        'clearDropTargets'
       );
 
       this.collection
@@ -107,6 +106,8 @@ define([ 'jquery', 'widgy.backbone', 'widgy.contents',
       this.app.node_view_list.push(this);
 
       this.model.bind('loaded:content', this.render);
+
+      this.drop_targets_list = new Backbone.ViewList;
     },
 
     addAll: function() {
@@ -133,9 +134,9 @@ define([ 'jquery', 'widgy.backbone', 'widgy.contents',
 
       this.app.startDrag(this);
 
-      // hide placeholder behind me.
+      // hide drop target behind me.
       this.$el.prev().hide();
-      this.clearPlaceholders();
+      this.clearDropTargets();
 
       // follow mouse real quick, don't wait for mousemove.
       this.followMouse(event);
@@ -177,31 +178,40 @@ define([ 'jquery', 'widgy.backbone', 'widgy.contents',
     },
 
     /**
-     * `becomeDropTarget`, `dropChildView`, `setPlaceholders`, and
-     * `clearPlaceholders` all deal with a different NodeView being dragged.
-     * It is confusing that these methods are on the same class that the
-     * methods dealing with being dragged around are on, but that's the nature
-     * of the beast with recursive nodes.
+     * `addDropTargets`, `createDropTarget`, `dropChildView`, and
+     * `clearDropTargets` all deal with a different NodeView being dragged.  It
+     * is confusing that these methods are on the same class that the methods
+     * dealing with being dragged around are on, but that's the nature of the
+     * beast with recursive nodes.
      */
-    becomeDropTarget: function() {
-      this.setPlaceholders();
+    createDropTarget: function() {
+      var drop_target = new DropTargetView;
+      drop_target.on('dropped', this.dropChildView);
+      this.drop_targets_list.push(drop_target);
+
+      return drop_target.render();
+    },
+
+    addDropTargets: function() {
+      var $children = this.$children,
+          that = this;
+
+      $children.prepend(this.createDropTarget().el);
+      $children.children('.node').each(function(index, elem) {
+        $(elem).after(that.createDropTarget().el);
+      });
     },
 
     /**
      * This is the method that is called when the NodeView that is being
-     * dragged is dropped one of my placeholders.
+     * dragged is dropped on one of my drop targets.
      */
-    dropChildView: function(event) {
-      event.preventDefault();
-      // The document is also listening to the event that triggers this method.
-      // We need to ensure that bubbling stops here.
-      event.stopPropagation();
-
+    dropChildView: function(view) {
       var $children = this.$children;
-      var index = $(event.target).index() / 2;
+      var index = view.$el.index() / 2;
 
       // We need to stop the drag before finding the left node.
-      // `this.app.stopDrag` will clear all of the placeholders, so we need to
+      // `this.app.stopDrag` will clear all of the drop targets, so we need to
       // remove them before we can get elements by index.
       var dragged_view = this.app.stopDrag();
 
@@ -223,22 +233,8 @@ define([ 'jquery', 'widgy.backbone', 'widgy.contents',
       }, {wait: true});
     },
 
-    // TODO: Placeholder probably should be its own view, that way we can put
-    // thing inside of it.
-    setPlaceholders: function() {
-      var $children = this.$children,
-          $placeholder = this.renderTemplate(placeholder_template);
-
-      $children.prepend($placeholder);
-      $children.children('.node').each(function(index, elem) {
-        $(elem).after($placeholder.clone());
-      });
-    },
-
-    clearPlaceholders: function() {
-      this.$children.find('.node_drag_placeholder')
-        .unbind()
-        .remove();
+    clearDropTargets: function() {
+      this.drop_targets_list.closeAll();
     },
 
     render: function(content) {
@@ -263,10 +259,22 @@ define([ 'jquery', 'widgy.backbone', 'widgy.contents',
   });
 
 
+  var DropTargetView = Backbone.View.extend({
+    className: 'node_drop_target',
+
+    template: drop_target_view_template,
+
+    triggers: {
+      'mouseup': 'dropped'
+    }
+  });
+
+
   return {
     Node: Node,
     NodeCollection: NodeCollection,
-    NodeView: NodeView
+    NodeView: NodeView,
+    DropTargetView: DropTargetView
   };
 
 });

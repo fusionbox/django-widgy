@@ -4,6 +4,8 @@ define([ 'jquery', 'backbone', 'mustache' ], function($, Backbone, Mustache) {
    * Our base Backbone classes.
    */
   var View = Backbone.View.extend({
+    triggers: {},
+
     /**
      * Please remember to call super:
      *
@@ -14,6 +16,42 @@ define([ 'jquery', 'backbone', 'mustache' ], function($, Backbone, Mustache) {
         'close',
         'render'
       );
+    },
+
+    /**
+     * These are DOM Events that just trigger an event on the View.
+     * 
+     * Inspired by Derick Bailey's Backbone.Marionette:
+     * https://github.com/derickbailey/backbone.marionette/blob/master/src/backbone.marionette.view.js#L70
+     */
+    configureTriggers: function() {
+      var events = {};
+      _.each(this.triggers, function(value, key) {
+        events[key] = function(event) {
+          if ( event ) {
+            event.preventDefault && event.preventDefault();
+            event.stopPropagation && event.stopPropagation();
+            this.trigger(value, this);
+          }
+        };
+      });
+
+      return events;
+    },
+
+    /**
+     * Copied from Derick Bailey's Backbone.Marionette:
+     * https://github.com/derickbailey/backbone.marionette/blob/master/src/backbone.marionette.view.js#L97
+     */
+    delegateEvents: function(events) {
+      events = events || this.events;
+      if (_.isFunction(events)){ events = events.call(this)}
+
+      var combinedEvents = {};
+      var triggers = this.configureTriggers();
+      _.extend(combinedEvents, events, triggers);
+
+      Backbone.View.prototype.delegateEvents.call(this, combinedEvents);
     },
 
     /**
@@ -90,6 +128,17 @@ define([ 'jquery', 'backbone', 'mustache' ], function($, Backbone, Mustache) {
 
     each: function(iterator, context) {
       return _.each(this.list, iterator, context);
+    },
+
+    delegate: function(method, args, context) {
+      return _.each(this.list, function(view) {
+        return view[method].call(context, args);
+      });
+    },
+
+    closeAll: function() {
+      this.delegate('close');
+      this.list = [];
     },
 
     find: function(finder) {

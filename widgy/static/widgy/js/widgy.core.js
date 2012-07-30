@@ -40,7 +40,7 @@ define([ 'jquery', 'widgy.backbone', 'nodes/nodes' ], function($, Backbone, node
       // TODO: follow mouse on scroll.
 
       this.node_view_list.each(function(node_view) {
-        node_view.becomeDropTarget();
+        node_view.addDropTargets();
       });
     },
 
@@ -51,7 +51,7 @@ define([ 'jquery', 'widgy.backbone', 'nodes/nodes' ], function($, Backbone, node
       $(document).off('.' + dragged_view.cid);
 
       this.node_view_list.each(function(node_view) {
-        node_view.clearPlaceholders();
+        node_view.clearDropTargets();
       });
 
       dragged_view.stopDrag();
