@@ -1,3 +1,4 @@
+{% load widgy_tags %}
 <style>
   .left {
     width: 32%;
@@ -11,8 +12,8 @@
   }
 </style>
 <div class="left">
-  {{ left_bucket.render }}
+  {% render content.left_bucket %}
 </div>
 <div class="right">
-  {{ right_bucket.render }}
+  {% render content.right_bucket %}
 </div>

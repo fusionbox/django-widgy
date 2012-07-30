@@ -1,7 +1,8 @@
+{% load widgy_tags %}
 <div class="bucket">
-  {% for node in nodes %}
+  {% for node in content.node.get_children %}
     <div class="node">
-      {{ node.render }}
+      {% render node %}
     </div>
   {% endfor %}
 </div>
