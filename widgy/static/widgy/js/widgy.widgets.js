@@ -1,6 +1,7 @@
 (function(Widgy) {
 
   var exports = Widgy.widgets || (Widgy.widgets = {});
+  // TODO: is Widget a good name?  We are trying to unify our vocabulary.
 
 
   /**
@@ -68,6 +69,11 @@
       return this.$('form').serializeObject();
     }
   });
+
+  // TODO: It would be nice to have field classes.  I want to define a list of
+  // fields and their types and properties like required and such.  EditorView
+  // subclasses could define a fields list that would be output automatically
+  // in render.
 
 
   _.extend(exports, {

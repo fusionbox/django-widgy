@@ -28,12 +28,12 @@
 
     onClose: function() {},
 
-    template: false,
-
     /**
      * If your subclass has a template property, render will use ICanHaz to
      * render the template and passes in `model.toJSON()`.
      */
+    template: false,
+
     render: function() {
       if (this.template) {
         var context = this.model ? this.model.toJSON() : {};
@@ -49,6 +49,10 @@
   });
 
 
+  /**
+   * None of our models use ids, they all use URLs to communicate with the
+   * server.  See `widgy/models.py` for more on how to expose the URL.
+   */
   var Model = Backbone.Model.extend({
     idAttribute: 'url',
 
@@ -58,6 +62,15 @@
   });
 
 
+  /**
+   * This is the view that handles the entire widgy App.  It will take the page
+   * data and create the root node.
+   *
+   * The AppView also acts as a mediator object for things like drag and drop.
+   * For example, when a node is being dragged, it informs the AppView, which
+   * can in turn tell the rest of the app to make itself droppable.  Every node
+   * has a reference to the instance of the AppView.
+   */
   var AppView = View.extend({
     initialize: function(options) {
       var page = options.page;
@@ -98,6 +111,16 @@
   });
 
 
+  /**
+   * Wrapper class to create a new instance of a Widgy editor.  The constructor
+   * accepts two parameters.  The first is either a selector, a DOM element, or
+   * a jQuery object which will be the element for the app.  The second is the
+   * page data object.
+   *
+   * This is to encourage non-global oriented design.  By exposing a
+   * constructor, we are encouraged to think of the Widgy editor as an
+   * instance.  This way we don't have global variables in our code.
+   */
   function Widgy(jqueryable, page) {
     this.app = new AppView({
       page: page,

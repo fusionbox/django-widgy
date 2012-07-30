@@ -42,9 +42,13 @@
 
 
   /**
-   * Maintains an app global list of all NodeViews so that you can
-   * find them using their properties, such as their `el` or their
-   * model's id.
+   * Maintains an app "global" list of all NodeViews so that you can find them
+   * using their properties, such as their `el` or their model's id.
+   *
+   * The AppView has an instance of this list.
+   *
+   * TODO: This list is not specific to NodeViews, might as well not put it
+   * under Widgy.nodes.  Move this to Widgy.ViewList.
    */
   function NodeViewList() {
     this.list = []
@@ -87,6 +91,7 @@
    * -  `this.model` is the node.
    * -  `this.collection` is the node's children (Also available in
    *    `this.model.children`.
+   * -  `this.app` is the instance of AppView
    */
   var NodeView = Widgy.View.extend({
     className: 'node',
@@ -94,7 +99,7 @@
     
     events: {
       'mousedown .drag_handle': 'startDrag',
-      'mouseup .node_drag_placeholder': 'stopChildDrag'
+      'mouseup .node_drag_placeholder': 'dropChildView'
     },
 
     initialize: function(options) {
@@ -105,7 +110,7 @@
         'followMouse',
         'stopDrag',
         'becomeDropTarget',
-        'stopChildDrag',
+        'dropChildView',
         'reposition',
         'setPlaceholders',
         'clearPlaceholders'
@@ -141,7 +146,8 @@
     },
 
     /**
-     * We want the mousedown event to bubble up to the app view.
+     * `startDrag`, `stopDrag`, `followMouse`, and `reposition` all deal with a
+     * NodeView itself being dragged around.
      */
     startDrag: function(event) {
       event.preventDefault();
@@ -153,10 +159,14 @@
       this.$el.prev().hide();
       this.clearPlaceholders();
 
+      // TODO: this should probably call this.app.stopDrag.  (Investigate)
+      // TODO: should a NodeView know about the document?  I would prefer it if
+      // views only knew about their subviews.  Not about anything above them.
       $(document).on('mouseup.' + this.cid, this.stopDrag);
       // TODO: store internal offset so as to know where on the drag handle I
       // started dragging.
       $(document).on('mousemove.' + this.cid, this.followMouse);
+      // TODO: follow mouse on scroll.
       this.followMouse(event);
 
       this.$el.addClass('being_dragged');
@@ -181,6 +191,30 @@
       });
     },
 
+    /**
+     * This method puts the NodeView in the correct spot after a model change.
+     */
+    reposition: function(model, options) {
+      if ( model.get('left_id') ) {
+        if ( model.get('left_id') === model.id )
+          return;
+
+        var left_view = this.app.node_view_list.findById(model.get('left_id'));
+        left_view.$el.after(this.el);
+      } else {
+        var parent_view = this.app.node_view_list.findById(model.get('parent_id'));
+        parent_view.$children.prepend(this.el);
+      }
+      // TODO: fix collections and stuff.
+    },
+
+    /**
+     * `bindChildViewEvents`, `becomeDropTarget`, `dropChildView`,
+     * `setPlaceholders`, and `clearPlaceholders` all deal with a different
+     * NodeView being dragged.  It is confusing that these methods are on the
+     * same class that the methods dealing with being dragged around are on,
+     * but that's the nature of the beast with recursive nodes.
+     */
     bindChildViewEvents: function(child_view) {
       child_view.on('stopDrag', this.clearPlaceholders);
     },
@@ -189,13 +223,22 @@
       this.setPlaceholders();
     },
 
-    stopChildDrag: function(event) {
+    /**
+     * This is the method that is called when the NodeView that is being
+     * dragged is dropped one of my placeholders.
+     */
+    dropChildView: function(event) {
       event.preventDefault();
+      // The document is also listening to the event that triggers this method.
+      // We need to ensure that bubbling stops here.
       event.stopPropagation();
 
       var $children = this.$children;
       var index = $(event.target).index() / 2;
 
+      // We need to stop the drag before finding the left node.
+      // `this.app.stopDrag` will clear all of the placeholders, so we need to
+      // remove them before we can get elements by index.
       var dragged_view = this.app.stopDrag();
 
       var left_id = null;
@@ -209,12 +252,15 @@
         left_id = left_view.model.id;
       }
 
+      // pessimistic save (for now).
       dragged_view.model.save({
         parent_id: this.model.id,
         left_id: left_id
       }, {wait: true});
     },
 
+    // TODO: Placeholder probably should be its own view, that way we can put
+    // thing inside of it.
     setPlaceholders: function() {
       var $children = this.$children,
           $placeholder = this.renderTemplate('node_drag_placeholder');
@@ -229,20 +275,6 @@
       this.$children.find('.node_drag_placeholder')
         .unbind()
         .remove();
-    },
-
-    reposition: function(model, options) {
-      if ( model.get('left_id') ) {
-        if ( model.get('left_id') === model.id )
-          return;
-
-        var left_view = this.app.node_view_list.findById(model.get('left_id'));
-        left_view.$el.after(this.el);
-      } else {
-        var parent_view = this.app.node_view_list.findById(model.get('parent_id'));
-        parent_view.$children.prepend(this.el);
-      }
-      // TODO: fix collections and stuff.
     },
 
     render: function() {

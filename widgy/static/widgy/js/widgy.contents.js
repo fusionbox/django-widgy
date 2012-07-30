@@ -43,6 +43,8 @@
   });
 
 
+  // TODO: Does this need to live on the AppView?  Should this be a List just
+  // like the NodeViewList?  Currently, this is effectively a global variable.
   var models = {};
 
 
