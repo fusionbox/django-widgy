@@ -49,7 +49,7 @@ class Node(MP_Node):
 
     @staticmethod
     def validate_parent_child(parent, child):
-        return parent.content.valid_parent_of(child) and child.content.valid_child_of(parent)
+        return parent.content.valid_parent_of(child.content) and child.content.valid_child_of(parent.content)
 
 
 
@@ -65,10 +65,10 @@ class Content(models.Model):
     class Meta:
         abstract = True
 
-    def valid_child_of(self, content_class):
+    def valid_child_of(self, content):
         return True
 
-    def valid_parent_of(self, content_class):
+    def valid_parent_of(self, content):
         return False
 
     def add_child(self, cls, **kwargs):
@@ -105,7 +105,7 @@ class Content(models.Model):
 class Bucket(Content):
     title = models.CharField(max_length=255)
 
-    def valid_parent_of(self, content_class):
+    def valid_parent_of(self, content):
         return True
 
     def to_json(self):
@@ -129,8 +129,11 @@ class TwoColumnLayout(Content):
             'right': Bucket,
             }
 
-    def valid_child_of(self, content_class):
-        return isinstance(content_class, ContentPage)
+    def valid_child_of(self, content):
+        return isinstance(content, ContentPage)
+
+    def valid_parent_of(self, content):
+        return isinstance(content, Bucket) and len(self.node.get_children()) < 2
 
     def post_create(self):
         for bucket_title, bucket_class in self.buckets.iteritems():

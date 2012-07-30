@@ -146,6 +146,7 @@ class NodeView(RestView):
         If you put with a parent_id, then your node will be placed as the
         first-child of the node corresponding with the parent_id.
         """
+        # TODO: put this in the model
         node = get_object_or_404(Node, pk=node_pk)
         data = self.data()
 
