@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-from django.template import Context
 from django.template.loader import render_to_string
 
 from mezzanine.pages.models import Page
@@ -23,6 +22,7 @@ class ContentPage(Page):
             'title': self.title,
             'root_node': self.root_node,
             })
+
 
 class Node(MP_Node):
     content_type = models.ForeignKey(ContentType)
@@ -53,7 +53,6 @@ class Node(MP_Node):
     @staticmethod
     def validate_parent_child(parent, child):
         return parent.content.valid_parent_of(child.content) and child.content.valid_child_of(parent.content)
-
 
 
 class Content(models.Model):
@@ -109,6 +108,18 @@ class Content(models.Model):
     def get_api_url(self):
         return ('widgy.views.content', (), {'object_name': self._meta.module_name, 'object_pk': self.pk})
 
+    def render_context(self):
+        context = {}
+        for field in self._meta.fields:
+            context[field.attname] = getattr(self, field.attname)
+        return context
+
+    def render(self):
+        templates = (
+                'widgy/{module_name}.html'.format(module_name=self._meta.module_name),
+                )
+        return render_to_string(templates, self.render_context())
+
 
 class Bucket(Content):
     title = models.CharField(max_length=255)
@@ -121,10 +132,8 @@ class Bucket(Content):
         json['title'] = self.title
         return json
 
-    def render(self):
-        return render_to_string('widgy/bucket.html', {
-            'nodes': self.node.get_children(),
-            })
+    def render_context(self):
+        return {'nodes': self.node.get_children()}
 
 
 class TwoColumnLayout(Content):
@@ -157,11 +166,11 @@ class TwoColumnLayout(Content):
     def right_bucket(self):
         return [i for i in self.node.get_children() if i.content.title=='right'][0]
 
-    def render(self):
-        return render_to_string('widgy/two_column_layout.html', {
+    def render_context(self):
+        return {
             'left_bucket': self.left_bucket.content,
             'right_bucket': self.right_bucket.content,
-            })
+            }
 
 
 class TextContent(Content):
@@ -171,8 +180,3 @@ class TextContent(Content):
         json = super(TextContent, self).to_json()
         json['content'] = self.content
         return json
-
-    def render(self):
-        return render_to_string('widgy/text_content.html', {
-            'content': self.content,
-            })
