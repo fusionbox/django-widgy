@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load widgy_tags %}
 
 {% block title %}{{ block.super }} - {{ page.title }}{% endblock %}
 
@@ -6,5 +7,5 @@
 {% block seo_keywords %}{{ page.description }}{% endblock %}
 
 {% block content %}
-  {{ page.get_content_model.render }}
+  {% render page.get_content_model.root_node %}
 {% endblock %}

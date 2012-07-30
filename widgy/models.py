@@ -43,8 +43,8 @@ class Node(MP_Node):
                 'children': children,
                 }
 
-    def render(self):
-        return self.content.render()
+    def render(self, *args, **kwargs):
+        return self.content.render(*args, **kwargs)
 
     @models.permalink
     def get_api_url(self):
@@ -108,17 +108,17 @@ class Content(models.Model):
     def get_api_url(self):
         return ('widgy.views.content', (), {'object_name': self._meta.module_name, 'object_pk': self.pk})
 
-    def render_context(self):
-        context = {}
-        for field in self._meta.fields:
-            context[field.attname] = getattr(self, field.attname)
-        return context
-
-    def render(self):
+    def get_templates(self):
         templates = (
                 'widgy/{module_name}.html'.format(module_name=self._meta.module_name),
                 )
-        return render_to_string(templates, self.render_context())
+        return templates
+
+    def render(self, context):
+        context.update({'content': self})
+        rendered_content = render_to_string(self.get_templates(), context)
+        context.pop()
+        return rendered_content
 
 
 class Bucket(Content):
@@ -131,9 +131,6 @@ class Bucket(Content):
         json = super(Bucket, self).to_json()
         json['title'] = self.title
         return json
-
-    def render_context(self):
-        return {'nodes': self.node.get_children()}
 
 
 class TwoColumnLayout(Content):
@@ -165,12 +162,6 @@ class TwoColumnLayout(Content):
     @property
     def right_bucket(self):
         return [i for i in self.node.get_children() if i.content.title=='right'][0]
-
-    def render_context(self):
-        return {
-            'left_bucket': self.left_bucket.content,
-            'right_bucket': self.right_bucket.content,
-            }
 
 
 class TextContent(Content):
