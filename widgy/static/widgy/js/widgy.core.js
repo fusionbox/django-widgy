@@ -1,7 +1,5 @@
 ;(function() {
 
-  var exports = this.Widgy || (this.Widgy = {});
-
   /**
    * Our base Backbone classes.
    */
@@ -67,29 +65,56 @@
     initialize: function(options) {
       var page = options.page;
 
+      // instantiate node_view_list before creating the root node
+      // please!
+      this.node_view_list = new Widgy.nodes.NodeViewList;
+
       var root_node = new Widgy.nodes.Node(page.root_node);
-      var root_view = this.root_view = new Widgy.nodes.NodeView({
+      var root_node_view = this.root_node_view = new Widgy.nodes.NodeView({
         model: root_node,
-        collection: root_node.children
+        collection: root_node.children,
+        app: this
       });
 
-      this.$el.html(root_view.render().el);
+      this.$el.html(root_node_view.render().el);
+    },
+
+    startDrag: function(dragged_view) {
+      this.dragged_view = dragged_view;
+
+      this.node_view_list.each(function(node_view) {
+        node_view.becomeDropTarget();
+      });
+    },
+
+    stopDrag: function() {
+      var dragged_view = this.dragged_view;
+      delete this.dragged_view;
+
+      this.node_view_list.each(function(node_view) {
+        node_view.clearPlaceholders();
+      });
+
+      dragged_view.stopDrag();
+      return dragged_view;
     }
   });
 
 
-  function main(page) {
-    exports.app = new AppView({
+  function Widgy(jqueryable, page) {
+    this.app = new AppView({
       page: page,
-      el: $('#app')
+      el: $(jqueryable)
     });
   }
 
+
+  var exports = this.Widgy = Widgy;
   
+
   _.extend(exports, {
     View: View,
     Model: Model,
-    Widgy: AppView,
-    main: main
+    Widgy: AppView
   });
 })();

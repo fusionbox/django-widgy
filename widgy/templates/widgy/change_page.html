@@ -27,7 +27,7 @@
 <script>
   var page = {{ page.to_json|json }};
   jQuery(function($) {
-    Widgy.main(page);
+    window.widgy = new Widgy('#app', page);
   });
 </script>
 </body>

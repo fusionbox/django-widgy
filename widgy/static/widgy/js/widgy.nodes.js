@@ -41,6 +41,11 @@
   });
 
 
+  /**
+   * Maintains an app global list of all NodeViews so that you can
+   * find them using their properties, such as their `el` or their
+   * model's id.
+   */
   function NodeViewList() {
     this.list = []
   }
@@ -48,6 +53,10 @@
   _.extend(NodeViewList.prototype, {
     push: function(view) {
       this.list.push(view);
+    },
+
+    each: function(iterator, context) {
+      return _.each(this.list, iterator, context);
     },
 
     find: function(finder) {
@@ -67,7 +76,6 @@
     }
   });
 
-  var node_view_list = new NodeViewList;
 
   /**
    * The NodeView provides an interface to the node.  It will also create a
@@ -89,14 +97,14 @@
       'mouseup .node_drag_placeholder': 'stopChildDrag'
     },
 
-    initialize: function() {
+    initialize: function(options) {
       _.bindAll(this,
         'addAll',
         'addOne',
         'startDrag',
         'followMouse',
         'stopDrag',
-        'startChildDrag',
+        'becomeDropTarget',
         'stopChildDrag',
         'reposition',
         'setPlaceholders',
@@ -111,7 +119,9 @@
         .on('remove', this.close)
         .on('change', this.reposition);
 
-      node_view_list.push(this);
+      this.app = options.app;
+
+      this.app.node_view_list.push(this);
     },
 
     addAll: function() {
@@ -121,7 +131,8 @@
     addOne: function(node) {
       var node_view = new NodeView({
         model: node,
-        collection: node.children
+        collection: node.children,
+        app: this.app
       });
 
       this.bindChildViewEvents(node_view);
@@ -129,10 +140,18 @@
       this.$children.append(node_view.render().el);
     },
 
+    /**
+     * We want the mousedown event to bubble up to the app view.
+     */
     startDrag: function(event) {
       event.preventDefault();
-      // TODO: don't stop propagation
       event.stopPropagation();
+
+      this.app.startDrag(this);
+
+      // hide placeholder behind me.
+      this.$el.prev().hide();
+      this.clearPlaceholders();
 
       $(document).on('mouseup.NodeView', this.stopDrag);
       // TODO: store internal offset so as to know where on the drag handle I
@@ -156,7 +175,6 @@
     },
 
     followMouse: function(event) {
-      console.log(event);
       this.$el.css({
         position: 'absolute',
         top: event.pageY,
@@ -165,18 +183,37 @@
     },
 
     bindChildViewEvents: function(child_view) {
-      child_view.on('startDrag', this.startChildDrag);
       child_view.on('stopDrag', this.clearPlaceholders);
     },
 
-    startChildDrag: function(child_view) {
+    becomeDropTarget: function() {
       this.setPlaceholders();
+    },
 
-      // should only have one placeholder surrounding a dragged view.
-      child_view.$el.prev().hide();
+    stopChildDrag: function(event) {
+      event.preventDefault();
+      event.stopPropagation();
 
-      // TODO: ensure this.dragged_view is deleted eventually.
-      this.dragged_view = child_view;
+      var $children = this.$children;
+      var index = $(event.target).index() / 2;
+
+      var dragged_view = this.app.stopDrag();
+
+      var left_id = null;
+
+      // If index is 0 there is no left element and we want to set
+      // it to null.
+      if ( index !== 0 ) {
+        var left_el = $children.children().eq(index - 1)[0],
+            left_view = this.app.node_view_list.findByEl(left_el);
+
+        left_id = left_view.model.id;
+      }
+
+      dragged_view.model.save({
+        parent_id: this.model.id,
+        left_id: left_id
+      });
     },
 
     setPlaceholders: function() {
@@ -187,35 +224,6 @@
       $children.children('.node').each(function(index, elem) {
         $(elem).after($placeholder.clone());
       });
-    },
-
-    stopChildDrag: function(event) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      var $children = this.$children;
-      var index = $(event.target).index() / 2;
-
-      this.clearPlaceholders();
-
-      var left_id = null;
-
-      // If index is 0 there is no left element and we want to set
-      // it to null.
-      if ( index !== 0 ) {
-        var left_el = $children.children().eq(index - 1)[0],
-            left_view = node_view_list.findByEl(left_el);
-
-        left_id = left_view.model.id;
-      }
-
-      this.dragged_view.model.save({
-        parent_id: this.model.id,
-        left_id: left_id
-      });
-
-      this.dragged_view.stopDrag();
-      delete this.dragged_view;
     },
 
     clearPlaceholders: function() {
@@ -229,10 +237,10 @@
         if ( model.get('left_id') === model.id )
           return;
 
-        var left_view = node_view_list.findById(model.get('left_id'));
+        var left_view = this.app.node_view_list.findById(model.get('left_id'));
         left_view.$el.after(this.el);
       } else {
-        var parent_view = node_view_list.findById(model.get('parent_id'));
+        var parent_view = this.app.node_view_list.findById(model.get('parent_id'));
         parent_view.$children.prepend(this.el);
       }
       // TODO: fix collections and stuff.
@@ -264,7 +272,8 @@
   _.extend(exports, {
     Node: Node,
     NodeCollection: NodeCollection,
-    NodeView: NodeView
+    NodeView: NodeView,
+    NodeViewList: NodeViewList
   });
 
 })(this.Widgy);
