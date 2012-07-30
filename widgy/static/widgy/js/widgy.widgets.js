@@ -26,9 +26,7 @@
     },
 
     getEditorClass: function() {
-      if ( ! this.editorClass ) {
-        throw new Error('You must provide an editorClass property for Widgets');
-      }
+      return this.editorClass;
     },
 
     editWidget: function(event) {

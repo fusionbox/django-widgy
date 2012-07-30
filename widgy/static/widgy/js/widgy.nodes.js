@@ -85,8 +85,8 @@
     template: 'node_view',
     
     events: {
-      'click .drag_handle': 'startDrag',
-      'click .node_drag_placeholder': 'stopChildDrag'
+      'mousedown .drag_handle': 'startDrag',
+      'mouseup .node_drag_placeholder': 'stopChildDrag'
     },
 
     initialize: function() {
@@ -94,10 +94,13 @@
         'addAll',
         'addOne',
         'startDrag',
+        'followMouse',
         'stopDrag',
         'startChildDrag',
         'stopChildDrag',
-        'reposition'
+        'reposition',
+        'setPlaceholders',
+        'clearPlaceholders'
       );
 
       this.collection
@@ -131,12 +134,59 @@
       // TODO: don't stop propagation
       event.stopPropagation();
 
+      $(document).on('mouseup.NodeView', this.stopDrag);
+      // TODO: store internal offset so as to know where on the drag handle I
+      // started dragging.
+      $(document).on('mousemove.NodeView', this.followMouse);
+      this.followMouse(event);
+
       this.$el.addClass('being_dragged');
       this.trigger('startDrag', this);
     },
 
     stopDrag: function() {
+      this.$el.css({
+        position: 'static'
+      });
+
+      $(document).off('.NodeView');
+
+      this.trigger('stopDrag', this);
       this.$el.removeClass('being_dragged');
+    },
+
+    followMouse: function(event) {
+      console.log(event);
+      this.$el.css({
+        position: 'absolute',
+        top: event.pageY,
+        left: event.pageX
+      });
+    },
+
+    bindChildViewEvents: function(child_view) {
+      child_view.on('startDrag', this.startChildDrag);
+      child_view.on('stopDrag', this.clearPlaceholders);
+    },
+
+    startChildDrag: function(child_view) {
+      this.setPlaceholders();
+
+      // should only have one placeholder surrounding a dragged view.
+      child_view.$el.prev().hide();
+
+      // TODO: ensure this.dragged_view is deleted eventually.
+      this.dragged_view = child_view;
+    },
+
+    setPlaceholders: function() {
+      var $children = this.$children,
+          $placeholder = this.renderTemplate('node_drag_placeholder');
+
+      $children.prepend($placeholder);
+      $children.children('.node').each(function(index, elem) {
+        $(elem).after($placeholder.clone());
+      });
     },
 
     stopChildDrag: function(event) {
@@ -166,22 +216,6 @@
 
       this.dragged_view.stopDrag();
       delete this.dragged_view;
-    },
-
-    bindChildViewEvents: function(child_view) {
-      child_view.on('startDrag', this.startChildDrag);
-    },
-
-    startChildDrag: function(child_view) {
-      var $children = this.$children,
-          $placeholder = this.renderTemplate('node_drag_placeholder');
-
-      $children.prepend($placeholder);
-      $children.children('.node').each(function(index, elem) {
-        $(elem).after($placeholder.clone());
-      });
-
-      this.dragged_view = child_view;
     },
 
     clearPlaceholders: function() {
