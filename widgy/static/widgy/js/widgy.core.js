@@ -63,6 +63,44 @@
 
 
   /**
+   * Maintains an app "global" list of Views so that you can find them using
+   * their properties, such as their `el` or their model's id.
+   *
+   * The AppView has an instance of this list to keep track of all of the node
+   * views.
+   */
+  function ViewList() {
+    this.list = []
+  }
+
+  _.extend(ViewList.prototype, {
+    push: function(view) {
+      this.list.push(view);
+    },
+
+    each: function(iterator, context) {
+      return _.each(this.list, iterator, context);
+    },
+
+    find: function(finder) {
+      return _.find(this.list, finder);
+    },
+
+    findById: function(id) {
+      return this.find(function(view) {
+        return id === view.model.id;
+      });
+    },
+
+    findByEl: function(el) {
+      return this.find(function(view) {
+        return el === view.el;
+      });
+    }
+  });
+
+
+  /**
    * This is the view that handles the entire widgy App.  It will take the page
    * data and create the root node.
    *
@@ -77,7 +115,7 @@
 
       // instantiate node_view_list before creating the root node
       // please!
-      this.node_view_list = new Widgy.nodes.NodeViewList;
+      this.node_view_list = new ViewList;
 
       var root_node = new Widgy.nodes.Node(page.root_node);
       var root_node_view = this.root_node_view = new Widgy.nodes.NodeView({
@@ -135,6 +173,7 @@
   _.extend(exports, {
     View: View,
     Model: Model,
-    Widgy: AppView
+    Widgy: AppView,
+    ViewList: ViewList
   });
 })();

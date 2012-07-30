@@ -42,46 +42,6 @@
 
 
   /**
-   * Maintains an app "global" list of all NodeViews so that you can find them
-   * using their properties, such as their `el` or their model's id.
-   *
-   * The AppView has an instance of this list.
-   *
-   * TODO: This list is not specific to NodeViews, might as well not put it
-   * under Widgy.nodes.  Move this to Widgy.ViewList.
-   */
-  function NodeViewList() {
-    this.list = []
-  }
-
-  _.extend(NodeViewList.prototype, {
-    push: function(view) {
-      this.list.push(view);
-    },
-
-    each: function(iterator, context) {
-      return _.each(this.list, iterator, context);
-    },
-
-    find: function(finder) {
-      return _.find(this.list, finder);
-    },
-
-    findById: function(id) {
-      return this.find(function(view) {
-        return id === view.model.id;
-      });
-    },
-
-    findByEl: function(el) {
-      return this.find(function(view) {
-        return el === view.el;
-      });
-    }
-  });
-
-
-  /**
    * The NodeView provides an interface to the node.  It will also create a
    * ContentView for the node's content.  Additionally, it will create child
    * NodeViews for all of the nodes in children.
@@ -125,7 +85,6 @@
         .on('change', this.reposition);
 
       this.app = options.app;
-
       this.app.node_view_list.push(this);
     },
 
@@ -303,8 +262,7 @@
   _.extend(exports, {
     Node: Node,
     NodeCollection: NodeCollection,
-    NodeView: NodeView,
-    NodeViewList: NodeViewList
+    NodeView: NodeView
   });
 
 })(this.Widgy);
