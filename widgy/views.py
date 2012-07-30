@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.contrib.contenttypes.models import ContentType
 
-from widgy.models import Node, ContentPage
+from widgy.models import Node, ContentPage, Content
 
 
 def add_page(request):
@@ -181,29 +181,8 @@ class AllChildrenView(RestView):
     def auth(*args, **kwargs):
         pass
 
-    def get(self, request):
-        # TODO: do this for real
-        children = [
-                {'content_type': 'bucket',
-                    'content': {
-                        '__module_name__': 'bucket',
-                        'title': 'Bucket',
-                        },
-                    },
-                {'content_type': 'textareawidget',
-                    'content': {
-                        '__module_name__': 'textareawidget',
-                        'title': 'Textarea',
-                        },
-                    },
-                {'content_type': 'textcontent',
-                    'content': {
-                        '__module_name__': 'textcontent',
-                        'title': 'Text Content',
-                        },
-                    },
-                ]
-
-        return self.render_to_response(children)
+    def get(self, ):
+        content_classes = Content.__subclasses__()
+        return self.render_to_response([i.class_to_json() for i in content_classes])
 
 children = AllChildrenView.as_view()
