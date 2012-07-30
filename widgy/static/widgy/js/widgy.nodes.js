@@ -212,7 +212,7 @@
       dragged_view.model.save({
         parent_id: this.model.id,
         left_id: left_id
-      });
+      }, {wait: true});
     },
 
     setPlaceholders: function() {
