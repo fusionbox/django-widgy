@@ -141,7 +141,7 @@ class TwoColumnLayout(Content):
         return isinstance(content, ContentPage)
 
     def valid_parent_of(self, content):
-        return isinstance(content, Bucket) and len(self.node.get_children()) < 2
+        return isinstance(content, Bucket) and (len(self.node.get_children()) < 2 or content.id in [i.content.id for i in self.node.get_children()])
 
     def post_create(self):
         for bucket_title, bucket_class in self.buckets.iteritems():
