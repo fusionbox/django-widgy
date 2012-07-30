@@ -31,6 +31,7 @@ define([ 'jquery', 'widgy.backbone', 'widgy.contents',
       this._content = this.get('content');
       this.unset('content');
 
+      // This is asynchronous because of requirejs.
       contents.getModel(this._content.__module_name__, this.instantiateContent);
 
       // same as content.  We need to actually instantiate the NodeCollection

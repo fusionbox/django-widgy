@@ -4,10 +4,11 @@ define([ 'jquery', 'backbone', 'mustache' ], function($, Backbone, Mustache) {
    * Our base Backbone classes.
    */
   var View = Backbone.View.extend({
-    constructor: function() {
-      Backbone.View.prototype.constructor.apply(this, arguments);
-    },
-
+    /**
+     * Please remember to call super:
+     *
+     * Backbone.View.prototype.initialize.apply(this, arguments);
+     */
     initialize: function() {
       _.bindAll(this,
         'close',
@@ -42,6 +43,7 @@ define([ 'jquery', 'backbone', 'mustache' ], function($, Backbone, Mustache) {
 
     render: function() {
       if (this.template) {
+        // TODO: maybe make a getContext method for overriding?
         var context = this.model ? this.model.toJSON() : {};
         this.$el.html(this.renderTemplate(this.template, context));
       }
