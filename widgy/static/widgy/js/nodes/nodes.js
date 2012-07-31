@@ -101,7 +101,8 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     template: node_view_template,
     
     events: {
-      'mousedown .drag_handle': 'startDrag'
+      'mousedown .drag_handle': 'startDrag',
+      'click .delete': 'delete'
     },
 
     initialize: function(options) {
@@ -123,6 +124,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
       this.model
         .on('remove', this.close)
+        .on('destroy', this.close)
         .on('reposition', this.reposition)
         .on('load:content', this.renderContent);
 
@@ -149,6 +151,11 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       });
 
       this.position(node_view.render());
+    },
+
+    'delete': function(event) {
+      event.stopPropagation();
+      this.model.destroy();
     },
 
     /**

@@ -36,6 +36,9 @@ class Node(MP_Node):
         if new:
             self.content.post_create()
 
+    def delete(self, *args, **kwargs):
+        self.content.delete()
+
     def to_json(self):
         children = [child.to_json() for child in self.get_children()]
         json = {

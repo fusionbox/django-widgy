@@ -156,6 +156,7 @@ class NodeView(RestView):
 
     def delete(self, request, node_pk):
         node = get_object_or_404(Node, pk=node_pk)
+        # TODO: don't leave content behind
         node.delete()
 
         return self.render_to_response(None)
