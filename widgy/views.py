@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.contrib.contenttypes.models import ContentType
 
-from widgy.models import Node, ContentPage, Content
+from widgy.models import Node, ContentPage, Content, InvalidTreeMovement
 
 
 def add_page(request):
@@ -160,6 +160,10 @@ class NodeView(RestView):
 
     def delete(self, request, node_pk):
         node = get_object_or_404(Node, pk=node_pk)
+
+        if not node.content.deletable:
+            raise InvalidTreeMovement({'message': "You can't delete me"})
+
         # TODO: don't leave content behind
         node.delete()
 

@@ -68,6 +68,9 @@ class Node(MP_Node):
 
     # TODO: fix the error messages
     def reposition(self, right=None, parent=None):
+        if not self.content.draggable:
+            raise InvalidTreeMovement({'message': "You can't move me"})
+
         if right:
             if right.is_root():
                 raise InvalidTreeMovement({'message': 'You can\'t move the root'})
