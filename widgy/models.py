@@ -232,10 +232,10 @@ class TwoColumnLayout(Content):
         return isinstance(content, ContentPage)
 
     def valid_parent_of_instance(self, content):
-        return content.id in [i.content.id for i in self.node.get_children()]
+        return content.id in [i.content.id for i in self.node.get_children()] or len(self.node.get_children()) < 2
 
     def valid_parent_of_class(self, cls):
-        return issubclass(cls, Bucket) and len(self.node.get_children()) < 2
+        return issubclass(cls, Bucket)
 
     def post_create(self):
         for bucket_title, bucket_class in self.buckets.iteritems():
