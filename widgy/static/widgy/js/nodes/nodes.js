@@ -129,6 +129,10 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
      * NodeView itself being dragged around.
      */
     startDrag: function(event) {
+      // only on a left click.
+      if ( event.button !== 0 )
+        return;
+
       event.preventDefault();
       event.stopPropagation();
 
