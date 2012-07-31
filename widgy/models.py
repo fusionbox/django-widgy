@@ -37,7 +37,9 @@ class Node(MP_Node):
             self.content.post_create()
 
     def delete(self, *args, **kwargs):
-        self.content.delete()
+        content = self.content
+        super(Node, self).delete(*args, **kwargs)
+        content.delete()
 
     def to_json(self):
         children = [child.to_json() for child in self.get_children().reverse()]
@@ -74,7 +76,7 @@ class Node(MP_Node):
             self.move(right, pos='left')
         elif parent:
             parent.content.validate_relationship(self.content)
-            self.move(parent, pos='first-child')
+            self.move(parent, pos='last-child')
         else:
             assert right or parent
 
