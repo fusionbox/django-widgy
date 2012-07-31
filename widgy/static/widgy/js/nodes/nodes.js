@@ -279,6 +279,11 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       var $children = this.$children,
           that = this;
 
+      if ( this.model.content && !this.model.content.get('accepting_children') )
+      {
+        return;
+      }
+
       $children.prepend(this.createDropTarget().el);
       $children.children('.node').each(function(index, elem) {
         $(elem).after(that.createDropTarget().el);

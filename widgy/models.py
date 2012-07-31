@@ -268,6 +268,8 @@ class Bucket(Content):
     draggable = models.BooleanField(default=True)
     deletable = models.BooleanField(default=True)
 
+    accepting_children = True
+
     def valid_parent_of_class(self, cls):
         return not issubclass(cls, Bucket)
 
