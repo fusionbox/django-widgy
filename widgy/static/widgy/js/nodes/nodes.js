@@ -162,6 +162,10 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       this.app.startDrag(this);
       this.afterStartDrag();
 
+      // Store the mouse offset in this container for followMouse to use.
+      this.offsetY = event.offsetY;
+      this.offsetX = event.offsetX;
+
       // follow mouse real quick, don't wait for mousemove.
       this.followMouse(event);
 
@@ -181,8 +185,8 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     followMouse: function(event) {
       this.$el.css({
         position: 'absolute',
-        top: event.pageY,
-        left: event.pageX
+        top: event.pageY - this.offsetY,
+        left: event.pageX - this.offsetX,
       });
     },
 
