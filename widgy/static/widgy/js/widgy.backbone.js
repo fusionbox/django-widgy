@@ -14,7 +14,8 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
     initialize: function() {
       _.bindAll(this,
         'close',
-        'render'
+        'render',
+        'toJSON'
       );
     },
 
@@ -81,9 +82,7 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
 
     render: function() {
       if (this.template) {
-        // TODO: maybe make a getContext method for overriding?
-        var context = this.model ? this.model.toJSON() : {};
-        this.$el.html(this.renderTemplate(this.template, context));
+        this.$el.html(this.renderTemplate(this.template, this.toJSON()));
       }
 
       return this;
@@ -92,6 +91,10 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
     // TODO: caching templates?
     renderTemplate: function(template, context) {
       return Mustache.render(template, context);
+    },
+
+    toJSON: function() {
+      return this.model ? this.model.toJSON() : {};
     }
   });
 

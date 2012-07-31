@@ -98,7 +98,6 @@ class Node(MP_Node):
                     return False
             return new
         allowed_classes = set([c for c in classes if exception_to_bool(self.content.validate_relationship)(c)])
-        print self.content, allowed_classes
         for child in self.get_children():
             allowed_classes.update(child.filter_child_classes(classes))
         return allowed_classes
@@ -335,4 +334,16 @@ class TextContent(Content):
     def to_json(self):
         json = super(TextContent, self).to_json()
         json['content'] = self.content
+        return json
+
+
+from mezzanine.core.fields import FileField
+class ImageContent(Content):
+    image = FileField(max_length=255, format="Image")
+
+    def to_json(self):
+        json = super(ImageContent, self).to_json()
+        if self.image:
+            json['image'] = self.image.path
+            json['image_url'] = self.image.url
         return json
