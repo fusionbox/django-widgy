@@ -23,17 +23,35 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       Backbone.Model.prototype.initialize.apply(this, arguments);
 
       _.bindAll(this,
-        'instantiateContent'
+        'instantiateContent',
+        'checkDidReposition'
         );
 
-      this.loadContent(this, this.get('content'));
-      this.on('change:content', this.loadContent);
+      this
+        .on('change', this.checkDidReposition)
+        .on('change:content', this.loadContent);
 
       // same as content.  We need to actually instantiate the NodeCollection
       // and set it as a property, not an attribute.
       var children = this.get('children');
       this.children = new NodeCollection(children);
       this.unset('children');
+    },
+
+    checkDidReposition: function() {
+      if ( this.hasChanged('parent_id') ||
+          (this.hasChanged('left') && this.id !== this.get('left_id')) )
+      {
+        this.trigger('reposition', this, this.get('parent_id'), this.get('left_id'));
+      }
+    },
+
+    checkIsContentLoaded: function() {
+      if ( this.content && this.content instanceof contents.Content ) {
+        this.trigger('load:content', this.content);
+      } else {
+        this.loadContent(this, this.get('content'));
+      }
     },
 
     loadContent: function(model, content) {
@@ -94,8 +112,8 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
         'startDrag',
         'followMouse',
         'stopDrag',
-        'repositionIfMoved',
         'reposition',
+        'position',
         'addDropTargets',
         'createDropTarget',
         'dropChildView',
@@ -105,7 +123,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
       this.model
         .on('remove', this.close)
-        .on('change', this.repositionIfMoved)
+        .on('reposition', this.reposition)
         .on('load:content', this.renderContent);
 
       this.collection = this.model.children;
@@ -130,8 +148,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
         app: this.app
       });
 
-      node_view.render().reposition(node);
-      // this.$children.append(node_view.render().el);
+      this.position(node_view.render());
     },
 
     /**
@@ -170,33 +187,32 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       });
     },
 
-    repositionIfMoved: function(model, options) {
-      if (
-          (model.previous('parent_id') && model.hasChanged('parent_id')) ||
-          (model.hasChanged('left_id') && model.get('left_id') !== model.id)
-          )
-      {
-
-        return this.reposition(model);
-      }
-    },
-
     /**
      * This method puts the NodeView in the correct spot after a model change.
      */
-    reposition: function(model) {
-      var parent_view = this.app.node_view_list.findById(model.get('parent_id'));
+    reposition: function(model, parent_id, left_id) {
+      var parent_view = this.app.node_view_list.findById(parent_id);
 
-      if ( model.get('left_id') ) {
-        var left_view = this.app.node_view_list.findById(model.get('left_id'));
-        left_view.$el.after(this.el);
-      } else {
-        parent_view.$children.prepend(this.el);
-      }
-
+      // This line is a little confusing.  For a model, the `collection`
+      // property is its parent collection, for a view, the `collection` is a
+      // child.  If a model has the same `collection` as a view, that means the
+      // view is the parent of the model.
       if ( model.collection !== parent_view.collection ) {
         model.collection.remove(model);
         parent_view.collection.add(model);
+      } else {
+        parent_view.position(this);
+      }
+    },
+
+    position: function(child_node_view) {
+      var child_node = child_node_view.model;
+
+      if ( child_node.get('left_id') ) {
+        var left_view = this.app.node_view_list.findById(child_node.get('left_id'));
+        left_view.$el.after(child_node_view.el);
+      } else {
+        this.$children.prepend(child_node_view.el);
       }
     },
 
@@ -265,6 +281,9 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
       this.$children = this.$('.children:first');
       this.$content = this.$('.content:first');
+
+      // TODO: this could be like a document.ready sorta?
+      this.model.checkIsContentLoaded();
 
       // TODO: investigate possible problems with this.
       this.addAll();
