@@ -10,7 +10,7 @@ from treebeard.mp_tree import MP_Node
 
 
 class ContentPage(Page):
-    root_node = models.ForeignKey('Node', null=True)
+    root_node = models.ForeignKey('Node', null=True, on_delete=models.SET_NULL)
 
     def to_json(self):
         return {
