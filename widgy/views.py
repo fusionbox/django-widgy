@@ -170,7 +170,8 @@ class CreateNodeView(RestView):
 
     def post(self, request):
         data = self.data()
-        content_class = get_object_or_404(ContentType, model=data['content_type'], app_label='widgy').model_class()
+        app_label, model = data['__class__'].split('.')
+        content_class = get_object_or_404(ContentType, model=model, app_label=app_label).model_class()
         try:
             left = get_object_or_404(Node, pk=extract_id(data['left_id']))
             content = left.content.add_sibling(content_class)
@@ -188,7 +189,7 @@ class AllChildrenView(RestView):
     def auth(*args, **kwargs):
         pass
 
-    def get(self, ):
+    def get(self, request):
         content_classes = Content.__subclasses__()
         return self.render_to_response([i.class_to_json() for i in content_classes])
 

@@ -26,7 +26,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
         'instantiateContent'
         );
 
-      this.loadContent();
+      this.loadContent(this, this.get('content'));
       this.on('change:content', this.loadContent);
 
       // same as content.  We need to actually instantiate the NodeCollection
@@ -36,22 +36,23 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       this.unset('children');
     },
 
-    loadContent: function() {
-      // content gets set because it is in the JSON for the node.  We need to
-      // unset it as it is not an attribute, but a property.  We also need to
-      // instantiate it as a real Content Model.
-      this._content = this.get('content');
-      this.unset('content');
+    loadContent: function(model, content) {
+      if ( content )
+      {
+        // content gets set because it is in the JSON for the node.  We need to
+        // unset it as it is not an attribute, but a property.  We also need to
+        // instantiate it as a real Content Model.
+        this.unset('content');
 
-      // This is asynchronous because of requirejs.
-      contents.getModel(this._content.__module_name__, this.instantiateContent);
+        // This is asynchronous because of requirejs.
+        contents.getModel(content.__module_name__, _.bind(this.instantiateContent, this, content));
+      }
     },
 
-    instantiateContent: function(model_class) {
-      this.content = new model_class(this._content);
-      delete this._content;
+    instantiateContent: function(content, model_class) {
+      this.content = new model_class(content);
 
-      this.trigger('loaded:content', this.content);
+      this.trigger('load:content', this.content);
     }
   });
 
@@ -105,7 +106,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       this.model
         .on('remove', this.close)
         .on('change', this.repositionIfMoved)
-        .on('loaded:content', this.renderContent);
+        .on('load:content', this.renderContent);
 
       this.collection = this.model.children;
 
@@ -144,7 +145,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       this.app.startDrag(this);
 
       // hide drop target behind me.
-      this.$el.prev().hide();
+      // this.$el.prev().hide();
       this.clearDropTargets();
 
       // follow mouse real quick, don't wait for mousemove.
@@ -278,7 +279,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
         model: content
       });
 
-      this.$content.append(content_view.render().el);
+      this.$content.html(content_view.render().el);
     }
   });
 
