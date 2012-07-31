@@ -101,8 +101,12 @@ class ContentView(RestView):
     def auth(*args, **kwargs):
         pass
 
-    def get_object(self, object_name, object_pk):
-        return ContentType.objects.get(model=object_name, app_label='widgy').get_object_for_this_type(pk=object_pk)
+    def get_object(self, app_label, object_name, object_pk):
+        return ContentType.objects.get(
+                    model=object_name,
+                    app_label=app_label
+                ).get_object_for_this_type(
+                    pk=object_pk)
 
     def get(self, request, object_name, object_pk):
         obj = self.get_object(object_name, object_pk)
@@ -110,8 +114,8 @@ class ContentView(RestView):
 
     # TODO: stupid implementation
     # only for existing objects right now
-    def put(self, request, object_name, object_pk):
-        obj = self.get_object(object_name, object_pk)
+    def put(self, request, app_label, object_name, object_pk):
+        obj = self.get_object(app_label, object_name, object_pk)
         data = self.data()
         for key, value in data.iteritems():
             if hasattr(obj, key):
@@ -191,8 +195,11 @@ class AllChildrenView(RestView):
     def auth(*args, **kwargs):
         pass
 
-    def get(self, request):
+    def get(self, request, node_pk=None):
         content_classes = Content.__subclasses__()
+        if node_pk:
+            node = get_object_or_404(Node, pk=node_pk)
+            content_classes = node.filter_child_classes(content_classes)
         return self.render_to_response([i.class_to_json() for i in content_classes])
 
 children = AllChildrenView.as_view()

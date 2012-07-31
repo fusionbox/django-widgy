@@ -71,7 +71,15 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       this.content = new model_class(content);
 
       this.trigger('load:content', this.content);
+    },
+
+    toJSON: function() {
+      var json = Backbone.Model.prototype.toJSON.apply(this, arguments);
+      if ( this.content )
+        json.content = this.content.toJSON();
+      return json;
     }
+
   });
 
 

@@ -80,6 +80,21 @@ class Node(MP_Node):
         else:
             assert right or parent
 
+    def filter_child_classes(self, classes):
+        def exception_to_bool(fn):
+            def new(*args, **kwargs):
+                try:
+                    fn(*args, **kwargs)
+                    return True
+                except:
+                    return False
+            return new
+        allowed_classes = set([c for c in classes if exception_to_bool(self.content.validate_relationship)(c)])
+        print self.content, allowed_classes
+        for child in self.get_children():
+            allowed_classes.update(child.filter_child_classes(classes))
+        return allowed_classes
+
 
 class InvalidTreeMovement(ValidationError):
     pass
@@ -88,7 +103,17 @@ class RootDisplacementError(InvalidTreeMovement):
     pass
 
 class ParentChildRejection(InvalidTreeMovement):
-    pass
+    def __init__(self):
+        super(ParentChildRejection, self).__init__({'message': self.message})
+
+class BadParentRejection(ParentChildRejection):
+    message = "You can't put me in that"
+
+class BadChildRejection(ParentChildRejection):
+    message = "You can't put that in me"
+
+class OhHellNo(BadParentRejection, BadChildRejection):
+    message = "Everyone hates everything"
 
 
 class Content(models.Model):
@@ -104,24 +129,51 @@ class Content(models.Model):
         abstract = True
 
     def valid_child_of(self, content):
+        """
+        Given a content instance, will we consent to be adopted by them?
+        """
+        return self.valid_child_class_of(content)
+
+    @classmethod
+    def valid_child_class_of(cls, content):
+        """
+        Given a content instance, does our class consent to be adopted by them?
+        """
         return True
 
-    def valid_parent_of(self, content):
-        return self.valid_parent_of_class(type(content)) and\
-                self.valid_parent_of_instance(content)
+    def valid_parent_of_class(self, cls):
+        """
+        Given a content class, can it be _added_ as our child?
+        Note: this does not apply to _existing_ children (adoption)
+        """
+        return self.accepting_children
 
     def valid_parent_of_instance(self, content):
-        return False
+        """
+        Given a content instance, can we adopt them?
+        """
+        return self.valid_parent_of_class(type(content))
 
-    def valid_parent_of_class(self, cls):
-        return False
+    draggable = True
+    deletable = True
+    accepting_children = False
 
     def validate_relationship(self, child):
-        if not self.valid_parent_of(child):
-            raise ParentChildRejection({'message': 'You can\'t put that in me.'})
+        parent = self
+        if isinstance(child, Content):
+            bad_parent = not child.valid_child_of(parent)
+            bad_child = not parent.valid_parent_of_instance(child)
+        else:
+            bad_parent = not child.valid_child_class_of(parent)
+            bad_child = not parent.valid_parent_of_class(child)
 
-        if not child.valid_child_of(self):
-            raise ParentChildRejection({'message': 'You can\'t put me in that.'})
+        if bad_parent and bad_child:
+            raise OhHellNo
+        elif bad_parent:
+            raise BadParentRejection
+        elif bad_child:
+            raise BadChildRejection
+
 
     def add_child(self, cls, **kwargs):
         obj = cls.objects.create(**kwargs)
@@ -179,11 +231,17 @@ class Content(models.Model):
                 '__module_name__': self._meta.module_name,
                 'model': self._meta.module_name,
                 'object_name': self._meta.object_name,
+                'draggable': self.draggable,
+                'deletable': self.deletable,
+                'accepting_children': self.accepting_children,
                 }
 
     @models.permalink
     def get_api_url(self):
-        return ('widgy.views.content', (), {'object_name': self._meta.module_name, 'object_pk': self.pk})
+        return ('widgy.views.content', (), {
+            'object_name': self._meta.module_name,
+            'app_label': self._meta.app_label,
+            'object_pk': self.pk})
 
     def get_templates(self):
         templates = (
@@ -207,12 +265,11 @@ class Content(models.Model):
 
 class Bucket(Content):
     title = models.CharField(max_length=255)
-
-    def valid_parent_of_instance(self, content):
-        return True
+    draggable = models.BooleanField(default=True)
+    deletable = models.BooleanField(default=True)
 
     def valid_parent_of_class(self, cls):
-        return True
+        return not issubclass(cls, Bucket)
 
     def to_json(self):
         json = super(Bucket, self).to_json()
@@ -230,19 +287,27 @@ class TwoColumnLayout(Content):
             'right': Bucket,
             }
 
-    def valid_child_of(self, content):
-        return isinstance(content, ContentPage)
+    draggable = False
+    deletable = False
 
     def valid_parent_of_instance(self, content):
-        return content.id in [i.content.id for i in self.node.get_children()] or len(self.node.get_children()) < 2
+        return isinstance(content, Bucket) and\
+                (content.id in [i.content.id for i in self.node.get_children()] or
+                        len(self.node.get_children()) < 2)
 
     def valid_parent_of_class(self, cls):
-        return issubclass(cls, Bucket)
+        return issubclass(cls, Bucket) and len(self.node.get_children()) < 2
+
+    @classmethod
+    def valid_child_class_of(cls, content):
+        return isinstance(content, ContentPage)
 
     def post_create(self):
         for bucket_title, bucket_class in self.buckets.iteritems():
             bucket = self.add_child(bucket_class,
                     title=bucket_title,
+                    draggable=False,
+                    deletable=False,
                     )
 
     @property
