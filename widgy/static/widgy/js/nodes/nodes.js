@@ -1,8 +1,10 @@
 define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     'text!nodes/node_view.html',
-    'text!nodes/drop_target_view.html',
+    'text!nodes/node_preview_view.html',
+    'text!nodes/drop_target_view.html'
     ], function($, _, Backbone, contents,
       node_view_template,
+      node_preview_view_template,
       drop_target_view_template
       ) {
 
@@ -372,6 +374,12 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
   });
 
 
+  var NodePreviewView = NodeViewBase.extend({
+    tagName: 'li',
+    template: node_preview_view_template
+  });
+
+
   var DropTargetView = Backbone.View.extend({
     className: 'node_drop_target',
 
@@ -393,8 +401,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     deactivate: function(event) {
       this.$el.removeClass('active');
     }
-
-
   });
 
 
@@ -403,6 +409,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     Node: Node,
     NodeCollection: NodeCollection,
     NodeView: NodeView,
+    NodePreviewView: NodePreviewView,
     NodeViewBase: NodeViewBase
   };
 

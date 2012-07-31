@@ -1,23 +1,12 @@
 define([ 'underscore', 'widgy.backbone', 'nodes/nodes',
-    'text!shelves/shelf_view.html',
-    'text!shelves/node_preview_view.html'
+    'text!shelves/shelf_view.html'
     ], function(_, Backbone, nodes,
-      shelf_view_template,
-      node_preview_view_template
+      shelf_view_template
       ) {
 
   var ShelfCollection = Backbone.Collection.extend({
     url: '/admin/widgy/widgets/',
-    model: nodes.Node,
-
-    parse: function(resp) {
-      return _.map(resp, function(content_type) {
-        return {
-          title: content_type['title'],
-          __class__: content_type['__class__']
-        };
-      });
-    }
+    model: nodes.Node
   });
 
   var ShelfView = Backbone.View.extend({
@@ -43,7 +32,7 @@ define([ 'underscore', 'widgy.backbone', 'nodes/nodes',
     },
 
     addOne: function(model) {
-      var view = new NodePreviewView({
+      var view = new nodes.NodePreviewView({
         model: model,
         app: this.app
       });
@@ -60,14 +49,7 @@ define([ 'underscore', 'widgy.backbone', 'nodes/nodes',
   });
 
 
-  var NodePreviewView = nodes.NodeViewBase.extend({
-    tagName: 'li',
-    template: node_preview_view_template,
-  });
-
-
   return {
-    NodePreviewView: NodePreviewView,
     ShelfCollection: ShelfCollection,
     ShelfView: ShelfView
   };
