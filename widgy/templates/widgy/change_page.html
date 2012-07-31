@@ -30,12 +30,16 @@
 
     .node.being_dragged {
       margin: 0;
+      pointer-events: none;
     }
 
     .node_drop_target {
       width: 100%;
       height: 50px;
       background-color: yellow;
+    }
+    .node_drop_target.active {
+      outline: 1px dashed red;
     }
 
     .being_dragged {
@@ -49,6 +53,7 @@
     .shelf {
       float: right;
     }
+
   </style>
 </body>
 </html>

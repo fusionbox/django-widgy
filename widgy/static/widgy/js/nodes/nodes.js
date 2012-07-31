@@ -186,7 +186,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       this.$el.css({
         position: 'absolute',
         top: event.pageY - this.offsetY,
-        left: event.pageX - this.offsetX,
+        left: event.pageX - this.offsetX
       });
     },
 
@@ -346,7 +346,22 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
     triggers: {
       'mouseup': 'dropped'
+    },
+
+    events: {
+      'mouseenter': 'activate',
+      'mouseleave': 'deactivate'
+    },
+
+    activate: function(event) {
+      this.$el.addClass('active');
+    },
+
+    deactivate: function(event) {
+      this.$el.removeClass('active');
     }
+
+
   });
 
 
