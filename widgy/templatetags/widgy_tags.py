@@ -9,5 +9,4 @@ def render(context, content):
     # AssertionError
     assert hasattr(content, 'render')
 
-    print 'arst'
     return content.render(context)
