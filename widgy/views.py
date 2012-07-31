@@ -132,8 +132,8 @@ class NodeView(RestView):
 
     def put(self, request, node_pk):
         """
-        If you put with a left_id, then your node will be placed immediately
-        to the right of the node corresponding with the left_id.
+        If you put with a right_id, then your node will be placed immediately
+        to the right of the node corresponding with the right_id.
 
         If you put with a parent_id, then your node will be placed as the
         first-child of the node corresponding with the parent_id.
@@ -143,8 +143,8 @@ class NodeView(RestView):
         data = self.data()
 
         try:
-            left = Node.objects.get(pk=extract_id(data['left_id']))
-            node.reposition(left=left)
+            right = Node.objects.get(pk=extract_id(data['right_id']))
+            node.reposition(right=right)
         except Node.DoesNotExist:
             try:
                 parent = Node.objects.get(pk=extract_id(data['parent_id']))
@@ -173,9 +173,10 @@ class CreateNodeView(RestView):
         data = self.data()
         app_label, model = data['__class__'].split('.')
         content_class = get_object_or_404(ContentType, model=model, app_label=app_label).model_class()
+
         try:
-            left = get_object_or_404(Node, pk=extract_id(data['left_id']))
-            content = left.content.add_sibling(content_class)
+            right = get_object_or_404(Node, pk=extract_id(data['right_id']))
+            content = right.content.add_sibling(content_class)
         except Http404:
             parent = get_object_or_404(Node, pk=extract_id(data['parent_id']))
             content = parent.content.add_child(content_class)

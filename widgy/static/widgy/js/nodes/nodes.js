@@ -40,9 +40,9 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
     checkDidReposition: function() {
       if ( this.hasChanged('parent_id') ||
-          (this.hasChanged('left') && this.id !== this.get('left_id')) )
+          (this.hasChanged('right_id') && this.id !== this.get('right_id')) )
       {
-        this.trigger('reposition', this, this.get('parent_id'), this.get('left_id'));
+        this.trigger('reposition', this, this.get('parent_id'), this.get('right_id'));
       }
     },
 
@@ -80,7 +80,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
    * interface to NodeViews for how to handle child NodeViews.
    */
   var NodeCollection = Backbone.Collection.extend({
-    model: Node,
+    model: Node
   });
 
 
@@ -96,7 +96,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
    *    `this.model.children`.
    * -  `this.app` is the instance of AppView
    */
-  var NodeView = Backbone.View.extend({
+  var NodeViewBase = Backbone.View.extend({
     className: 'node',
     template: node_view_template,
     
@@ -116,8 +116,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
         'reposition',
         'position',
         'addDropTargets',
-        'createDropTarget',
-        'dropChildView',
         'clearDropTargets',
         'renderContent'
       );
@@ -153,11 +151,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       this.position(node_view.render());
     },
 
-    'delete': function(event) {
-      event.stopPropagation();
-      this.model.destroy();
-    },
-
     /**
      * `startDrag`, `stopDrag`, `followMouse`, and `reposition` all deal with a
      * NodeView itself being dragged around.
@@ -167,16 +160,15 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       event.stopPropagation();
 
       this.app.startDrag(this);
-
-      // hide drop target behind me.
-      // this.$el.prev().hide();
-      this.clearDropTargets();
+      this.afterStartDrag();
 
       // follow mouse real quick, don't wait for mousemove.
       this.followMouse(event);
 
       this.$el.addClass('being_dragged');
     },
+
+    afterStartDrag: function() {},
 
     stopDrag: function() {
       this.$el.css({
@@ -197,7 +189,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     /**
      * This method puts the NodeView in the correct spot after a model change.
      */
-    reposition: function(model, parent_id, left_id) {
+    reposition: function(model, parent_id, right_id) {
       var parent_view = this.app.node_view_list.findById(parent_id);
 
       // This line is a little confusing.  For a model, the `collection`
@@ -215,11 +207,12 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     position: function(child_node_view) {
       var child_node = child_node_view.model;
 
-      if ( child_node.get('left_id') ) {
-        var left_view = this.app.node_view_list.findById(child_node.get('left_id'));
-        left_view.$el.after(child_node_view.el);
+      if ( child_node.get('right_id') ) {
+        var right_id = child_node.get('right_id'),
+          right_view = this.app.node_view_list.findById(right_id);
+          right_view.$el.before(child_node_view.el);
       } else {
-        this.$children.prepend(child_node_view.el);
+        this.$children.append(child_node_view.el);
       }
     },
 
@@ -230,58 +223,9 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
      * dealing with being dragged around are on, but that's the nature of the
      * beast with recursive nodes.
      */
-    createDropTarget: function() {
-      var drop_target = new DropTargetView;
-      drop_target.on('dropped', this.dropChildView);
-      this.drop_targets_list.push(drop_target);
-
-      return drop_target.render();
-    },
-
-    addDropTargets: function() {
-      var $children = this.$children,
-          that = this;
-
-      $children.prepend(this.createDropTarget().el);
-      $children.children('.node').each(function(index, elem) {
-        $(elem).after(that.createDropTarget().el);
-      });
-    },
-
-    /**
-     * This is the method that is called when the NodeView that is being
-     * dragged is dropped on one of my drop targets.
-     */
-    dropChildView: function(view) {
-      var $children = this.$children;
-      var index = view.$el.index() / 2;
-
-      // We need to stop the drag before finding the left node.
-      // `this.app.stopDrag` will clear all of the drop targets, so we need to
-      // remove them before we can get elements by index.
-      var dragged_view = this.app.stopDrag();
-
-      var left_id = null;
-
-      // If index is 0 there is no left element and we want to set
-      // it to null.
-      if ( index !== 0 ) {
-        var left_el = $children.children().eq(index - 1)[0],
-            left_view = this.app.node_view_list.findByEl(left_el);
-
-        left_id = left_view.model.id;
-      }
-
-      // pessimistic save (for now).
-      dragged_view.model.save({
-        parent_id: this.model.id,
-        left_id: left_id
-      }, {wait: true});
-    },
-
-    clearDropTargets: function() {
-      this.drop_targets_list.closeAll();
-    },
+    addDropTargets: function() {},
+    createDropTarget: function() {}, 
+    clearDropTargets: function() {},
 
     render: function() {
       Backbone.View.prototype.render.apply(this, arguments);
@@ -309,6 +253,87 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     }
   });
 
+  var NodeView = NodeViewBase.extend({
+    initialize: function() {
+      NodeViewBase.prototype.initialize.apply(this, arguments);
+      _.bindAll(this,
+        'createDropTarget',
+        'dropChildView'
+        );
+    },
+
+    addDropTargets: function() {
+      var $children = this.$children,
+          that = this;
+
+      $children.prepend(this.createDropTarget().el);
+      $children.children('.node').each(function(index, elem) {
+        $(elem).after(that.createDropTarget().el);
+      });
+    },
+
+    createDropTarget: function() {
+      var drop_target = new DropTargetView;
+      drop_target.on('dropped', this.dropChildView);
+      this.drop_targets_list.push(drop_target);
+
+      return drop_target.render();
+    },
+
+    /**
+     * This is the method that is called when the NodeView that is being
+     * dragged is dropped on one of my drop targets.
+     */
+    dropChildView: function(view) {
+      var $children = this.$children;
+      var index = view.$el.index() / 2;
+
+      // We need to stop the drag before finding the right node.
+      // `this.app.stopDrag` will clear all of the drop targets, so we need to
+      // remove them before we can get elements by index.
+      var dragged_view = this.app.stopDrag();
+
+      var right_id = null;
+
+      // If index is the length of $children.children there is no right element
+      // and we want it set to null.  Otherwise there is a right and we need
+      // its id.
+      //
+      // ($children.children() refers to DOM elements.)
+      if ( index !== $children.children().length ) {
+        var right_el = $children.children().eq(index)[0],
+            right_view = this.app.node_view_list.findByEl(right_el);
+
+        right_id = right_view.model.id;
+      }
+
+      // Dragged into my own drop target.
+      if ( dragged_view === right_view )
+        return;
+
+      // pessimistic save (for now).
+      dragged_view.model.save({
+        parent_id: this.model.id,
+        right_id: right_id
+      }, {wait: true});
+    },
+
+    'delete': function(event) {
+      event.stopPropagation();
+      this.model.destroy();
+    },
+
+    afterStartDrag: function() {
+      // hide drop target behind me.
+      this.$el.next().hide();
+      this.clearDropTargets();
+    },
+
+    clearDropTargets: function() {
+      this.drop_targets_list.closeAll();
+    }
+  });
+
 
   var DropTargetView = Backbone.View.extend({
     className: 'node_drop_target',
@@ -322,10 +347,11 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
 
   return {
+    DropTargetView: DropTargetView,
     Node: Node,
     NodeCollection: NodeCollection,
     NodeView: NodeView,
-    DropTargetView: DropTargetView
+    NodeViewBase: NodeViewBase
   };
 
 });

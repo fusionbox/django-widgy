@@ -60,9 +60,11 @@ define([ 'underscore', 'widgy.backbone', 'nodes/nodes',
   });
 
 
-  var NodePreviewView = nodes.NodeView.extend({
+  var NodePreviewView = nodes.NodeViewBase.extend({
     tagName: 'li',
-    template: node_preview_view_template
+    template: node_preview_view_template,
+
+    'delete': function() {},
   });
 
 

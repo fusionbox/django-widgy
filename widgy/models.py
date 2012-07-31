@@ -40,7 +40,7 @@ class Node(MP_Node):
         self.content.delete()
 
     def to_json(self):
-        children = [child.to_json() for child in self.get_children()]
+        children = [child.to_json() for child in self.get_children().reverse()]
         json = {
                 'url': self.get_api_url(),
                 'content': self.content.to_json(),
@@ -50,9 +50,9 @@ class Node(MP_Node):
         if parent:
             json['parent_id'] = parent.get_api_url()
 
-        left = self.get_prev_sibling()
-        if left:
-            json['left_id'] = left.get_api_url()
+        right = self.get_next_sibling()
+        if right:
+            json['right_id'] = right.get_api_url()
 
         return json
 
@@ -63,27 +63,20 @@ class Node(MP_Node):
     def get_api_url(self):
         return ('widgy.views.node', (), {'node_pk': self.pk})
 
-    @staticmethod
-    def validate_parent_child(parent, child):
-        return parent.content.valid_parent_of(child.content) and child.content.valid_child_of(parent.content)
 
     # TODO: fix the error messages
-    def reposition(self, left=None, parent=None):
-        if left:
-            if left.is_root():
+    def reposition(self, right=None, parent=None):
+        if right:
+            if right.is_root():
                 raise InvalidTreeMovement({'message': 'You can\'t move the root'})
 
-            if not self.validate_parent_child(left.get_parent(), self):
-                raise ParentChildRejection({'message': 'That node can\'t live inside that other node'})
-
-            self.move(left, pos='right')
+            right.get_parent().content.validate_relationship(self.content)
+            self.move(right, pos='left')
         elif parent:
-            if not self.validate_parent_child(parent, self):
-                raise ParentChildRejection({'message': 'That node can\'t live inside that other node'})
-
+            parent.content.validate_relationship(self.content)
             self.move(parent, pos='first-child')
         else:
-            assert left or parent
+            assert right or parent
 
 
 class InvalidTreeMovement(ValidationError):
@@ -112,20 +105,52 @@ class Content(models.Model):
         return True
 
     def valid_parent_of(self, content):
+        return self.valid_parent_of_class(type(content)) and\
+                self.valid_parent_of_instance(content)
+
+    def valid_parent_of_instance(self, content):
         return False
+
+    def valid_parent_of_class(self, cls):
+        return False
+
+    def validate_relationship(self, child):
+        if not self.valid_parent_of(child):
+            raise ParentChildRejection({'message': 'You can\'t put that in me.'})
+
+        if not child.valid_child_of(self):
+            raise ParentChildRejection({'message': 'You can\'t put me in that.'})
 
     def add_child(self, cls, **kwargs):
         obj = cls.objects.create(**kwargs)
-        node = self.node.add_child(
+
+        try:
+            self.validate_relationship(obj)
+        except ParentChildRejection:
+            obj.delete()
+            raise
+
+        self.node.add_child(
                 content=obj
                 )
         return obj
 
     def add_sibling(self, cls, **kwargs):
+        if self.node.is_root():
+            raise RootDisplacementError({'message': 'You can\'t put things next to me'})
+
         obj = cls.objects.create(**kwargs)
+        parent = self.node.get_parent().content
+
+        try:
+            parent.validate_relationship(obj)
+        except ParentChildRejection:
+            obj.delete()
+            raise
+
         self.node.add_sibling(
                 content=obj,
-                pos='right'
+                pos='left'
                 )
         return obj
 
@@ -181,7 +206,10 @@ class Content(models.Model):
 class Bucket(Content):
     title = models.CharField(max_length=255)
 
-    def valid_parent_of(self, content):
+    def valid_parent_of_instance(self, content):
+        return True
+
+    def valid_parent_of_class(self, cls):
         return True
 
     def to_json(self):
@@ -203,8 +231,11 @@ class TwoColumnLayout(Content):
     def valid_child_of(self, content):
         return isinstance(content, ContentPage)
 
-    def valid_parent_of(self, content):
-        return isinstance(content, Bucket) and (len(self.node.get_children()) < 2 or content.id in [i.content.id for i in self.node.get_children()])
+    def valid_parent_of_instance(self, content):
+        return content.id in [i.content.id for i in self.node.get_children()]
+
+    def valid_parent_of_class(self, cls):
+        return issubclass(cls, Bucket) and len(self.node.get_children()) < 2
 
     def post_create(self):
         for bucket_title, bucket_class in self.buckets.iteritems():

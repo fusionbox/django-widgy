@@ -125,7 +125,7 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
     this.list = []
   }
 
-  _.extend(ViewList.prototype, {
+  _.extend(ViewList.prototype, Backbone.Events, {
     push: function(view) {
       this.list.push(view);
     },
