@@ -63,8 +63,6 @@ define([ 'underscore', 'widgy.backbone', 'nodes/nodes',
   var NodePreviewView = nodes.NodeViewBase.extend({
     tagName: 'li',
     template: node_preview_view_template,
-
-    'delete': function() {},
   });
 
 
