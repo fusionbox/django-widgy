@@ -73,7 +73,15 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       this.content = new model_class(content);
 
       this.trigger('load:content', this.content);
+    },
+
+    toJSON: function() {
+      var json = Backbone.Model.prototype.toJSON.apply(this, arguments);
+      if ( this.content )
+        json.content = this.content.toJSON();
+      return json;
     }
+
   });
 
 
@@ -276,6 +284,11 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     addDropTargets: function() {
       var $children = this.$children,
           that = this;
+
+      if ( this.model.content && !this.model.content.get('accepting_children') )
+      {
+        return;
+      }
 
       $children.prepend(this.createDropTarget().el);
       $children.children('.node').each(function(index, elem) {

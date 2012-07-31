@@ -6,7 +6,7 @@ urlpatterns = patterns('widgy.views',
     url('^contentpage/(?P<object_id>[^/]+)/$', 'change_page'),
     url('^node/$', 'create_node'),
     url('^node/(?P<node_pk>[^/]+)/$', 'node'),
-    url('^(?P<object_name>[A-z_]+)/(?P<object_pk>[^/]+)/$', 'content'),
+    url('^node/(?P<node_pk>[^/]+)/available-children-recursive/$', 'children'),
     url('^widgets/$', 'children'),
-
+    url('^contents/(?P<app_label>[A-z_-]+)/(?P<object_name>[A-z_-]+)/(?P<object_pk>[^/]+)/$', 'content'),
     )
