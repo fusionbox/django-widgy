@@ -123,26 +123,38 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
    */
   function ViewList() {
     this.list = []
+
+    _.bindAll(this,
+      'remove'
+    );
   }
 
   _.extend(ViewList.prototype, {
     push: function(view) {
+      view.on('close', this.remove);
       this.list.push(view);
+    },
+
+    remove: function(view) {
+      view.off('close', this.remove);
+
+      var index = _.indexOf(this.list, view);
+
+      if ( index >= 0 ) {
+        return this.list.splice(index, 1);
+      } else {
+        return false;
+      }
     },
 
     each: function(iterator, context) {
       return _.each(this.list, iterator, context);
     },
 
-    delegate: function(method, args, context) {
-      return _.each(this.list, function(view) {
-        return view[method].call(context, args);
-      });
-    },
-
     closeAll: function() {
-      this.delegate('close');
-      this.list = [];
+      return _.each(_.clone(this.list), function(view) {
+        return view.close();
+      });
     },
 
     find: function(finder) {
