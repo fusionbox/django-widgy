@@ -167,6 +167,13 @@ class Content(models.Model):
         context.pop()
         return rendered_content
 
+    @classmethod
+    def class_to_json(cls):
+        return {
+                '__class__': "%s.%s" % (cls._meta.app_label, cls._meta.module_name),
+                'title': cls._meta.verbose_name.title(),
+                }
+
 
 class Bucket(Content):
     title = models.CharField(max_length=255)

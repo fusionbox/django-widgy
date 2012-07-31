@@ -65,6 +65,7 @@ Not Working Yet:
     less of a toy
   - Nicer compatibility (preerrors and aftererrors)
   - Creating a new ContentPage
+  - Widgets from apps besides `widgy` (custom project widgets)
 
 ## Features required before we can show somebody else
 These are the features that we need to be able to show people other than
