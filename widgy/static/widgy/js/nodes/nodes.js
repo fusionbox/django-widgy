@@ -85,70 +85,41 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
 
   /**
-   * The NodeView provides an interface to the node.  It will also create a
-   * ContentView for the node's content.  Additionally, it will create child
-   * NodeViews for all of the nodes in children.
+   * Provides an interface for a draggable NodeView.  See NodeView for more
+   * specific Node functionality related definition.  NodeViewBase is exposed
+   * for subclassing by a NodePreviewView and NodeView.
    *
-   * Properties:
-   *
-   * -  `this.model` is the node.
-   * -  `this.collection` is the node's children (Also available in
-   *    `this.model.children`.
-   * -  `this.app` is the instance of AppView
+   * TODO: Does NodePreviewView do anything that NodeViewBase doesn't?
    */
   var NodeViewBase = Backbone.View.extend({
     className: 'node',
-    template: node_view_template,
     
     events: {
-      'mousedown .drag_handle': 'startDrag',
-      'click .delete': 'delete'
+      'mousedown .drag_handle': 'startDrag'
     },
 
     initialize: function(options) {
       Backbone.View.prototype.initialize.apply(this, arguments);
+
       _.bindAll(this,
-        'addAll',
-        'addOne',
         'startDrag',
+        'afterStartDrag',
         'followMouse',
         'stopDrag',
         'reposition',
-        'position',
         'addDropTargets',
-        'clearDropTargets',
-        'renderContent'
+        'clearDropTargets'
       );
 
       this.model
         .on('remove', this.close)
         .on('destroy', this.close)
-        .on('reposition', this.reposition)
-        .on('load:content', this.renderContent);
-
-      this.collection = this.model.children;
-
-      this.collection
-        .on('reset', this.addAll)
-        .on('add', this.addOne);
+        .on('reposition', this.reposition);
 
       this.app = options.app;
       this.app.node_view_list.push(this);
 
       this.drop_targets_list = new Backbone.ViewList;
-    },
-
-    addAll: function() {
-      this.collection.each(this.addOne);
-    },
-
-    addOne: function(node) {
-      var node_view = new NodeView({
-        model: node,
-        app: this.app
-      });
-
-      this.position(node_view.render());
     },
 
     /**
@@ -162,16 +133,21 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       this.app.startDrag(this);
       this.afterStartDrag();
 
-      // Store the mouse offset in this container for followMouse to use.
+      // Store the mouse offset in this container for followMouse to
+      // use.
       this.offsetY = event.offsetY;
       this.offsetX = event.offsetX;
 
-      // follow mouse real quick, don't wait for mousemove.
+      // follow mouse really quick, just in case they haven't moved their mouse
+      // yet.
       this.followMouse(event);
 
       this.$el.addClass('being_dragged');
     },
 
+    /**
+     * Hook called when a node is starting to be dragged.
+     */
     afterStartDrag: function() {},
 
     stopDrag: function() {
@@ -191,15 +167,21 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     },
 
     /**
-     * This method puts the NodeView in the correct spot after a model change.
+     * If the node has been put into a different parent, we need to update the
+     * collection.  That parent will be listening for adding and it will handle
+     * the positioning.  Otherwise, this node is still in the right parent and
+     * it just needs to be positioned in the parent.
+     *
+     * This is a callback to the reposition event on the Node model.
      */
     reposition: function(model, parent_id, right_id) {
       var parent_view = this.app.node_view_list.findById(parent_id);
 
-      // This line is a little confusing.  For a model, the `collection`
-      // property is its parent collection, for a view, the `collection` is a
-      // child.  If a model has the same `collection` as a view, that means the
-      // view is the parent of the model.
+      // This line is a little confusing.  For a model, the
+      // `collection` property is its parent collection, for a view,
+      // the `collection` is a child.  If a model has the same
+      // `collection` as a view, that means the view is the parent
+      // of the model.
       if ( model.collection !== parent_view.collection ) {
         model.collection.remove(model);
         parent_view.collection.add(model);
@@ -208,64 +190,83 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       }
     },
 
-    position: function(child_node_view) {
-      var child_node = child_node_view.model;
+    /**
+     * `addDropTargets` and `clearDropTargets` are required as an API for the
+     * AppView. See NodeView for the actual implementation.
+     */
+    addDropTargets: function() {},
+    clearDropTargets: function() {}
+  });
 
-      if ( child_node.get('right_id') ) {
-        var right_id = child_node.get('right_id'),
-          right_view = this.app.node_view_list.findById(right_id);
-          right_view.$el.before(child_node_view.el);
-      } else {
-        this.$children.append(child_node_view.el);
-      }
+
+  /**
+   * The NodeView provides an interface to the node.  It will also create a
+   * ContentView for the node's content.  Additionally, it will create child
+   * NodeViews for all of the nodes in children.
+   *
+   * Properties:
+   *
+   * -  `this.model` is the node.
+   * -  `this.collection` is the node's children (Also available in
+   *    `this.model.children`.
+   * -  `this.app` is the instance of AppView
+   */
+  var NodeView = NodeViewBase.extend({
+    template: node_view_template,
+
+    events: function() {
+      return _.extend({}, NodeViewBase.prototype.events , {
+        'click .delete': 'delete'
+      });
+    },
+
+    initialize: function() {
+      NodeViewBase.prototype.initialize.apply(this, arguments);
+
+      _.bindAll(this,
+        'addAll',
+        'addOne',
+        'position',
+        'createDropTarget',
+        'dropChildView',
+        'renderContent'
+        );
+
+      this.model
+        .on('load:content', this.renderContent);
+
+      this.collection = this.model.children;
+
+      this.collection
+        .on('reset', this.addAll)
+        .on('add', this.addOne);
+    },
+
+    addAll: function() {
+      this.collection.each(this.addOne);
+    },
+
+    addOne: function(node) {
+      var node_view = new NodeView({
+        model: node,
+        app: this.app
+      });
+
+      this.position(node_view.render());
+    },
+
+    'delete': function(event) {
+      event.stopPropagation();
+      this.model.destroy();
     },
 
     /**
-     * `addDropTargets`, `createDropTarget`, `dropChildView`, and
-     * `clearDropTargets` all deal with a different NodeView being dragged.  It
-     * is confusing that these methods are on the same class that the methods
-     * dealing with being dragged around are on, but that's the nature of the
-     * beast with recursive nodes.
+     * `addDropTargets`, `createDropTarget`, `clearDropTargets`, `position`,
+     * and `dropChildView` all deal with a possible child NodeView being
+     * dragged.  It is confusing that these methods are on the same class that
+     * the methods dealing with being dragged around are on, but that's the
+     * nature of the beast with recursive nodes.
      */
-    addDropTargets: function() {},
-    createDropTarget: function() {}, 
-    clearDropTargets: function() {},
-
-    render: function() {
-      Backbone.View.prototype.render.apply(this, arguments);
-
-      this.$children = this.$('.children:first');
-      this.$content = this.$('.content:first');
-
-      // TODO: this could be like a document.ready sorta?
-      this.model.checkIsContentLoaded();
-
-      // TODO: investigate possible problems with this.
-      this.addAll();
-
-      return this;
-    },
-
-    renderContent: function(content) {
-      var view_class = content.getViewClass();
-
-      content_view = new view_class({
-        model: content
-      });
-
-      this.$content.html(content_view.render().el);
-    }
-  });
-
-  var NodeView = NodeViewBase.extend({
-    initialize: function() {
-      NodeViewBase.prototype.initialize.apply(this, arguments);
-      _.bindAll(this,
-        'createDropTarget',
-        'dropChildView'
-        );
-    },
-
     addDropTargets: function() {
       var $children = this.$children,
           that = this;
@@ -282,6 +283,22 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       this.drop_targets_list.push(drop_target);
 
       return drop_target.render();
+    },
+
+    clearDropTargets: function() {
+      this.drop_targets_list.closeAll();
+    },
+
+    position: function(child_node_view) {
+      var child_node = child_node_view.model;
+
+      if ( child_node.get('right_id') ) {
+        var right_id = child_node.get('right_id'),
+          right_view = this.app.node_view_list.findById(right_id);
+          right_view.$el.before(child_node_view.el);
+      } else {
+        this.$children.append(child_node_view.el);
+      }
     },
 
     /**
@@ -322,19 +339,35 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       }, {wait: true});
     },
 
-    'delete': function(event) {
-      event.stopPropagation();
-      this.model.destroy();
-    },
-
     afterStartDrag: function() {
       // hide drop target behind me.
       this.$el.next().hide();
       this.clearDropTargets();
     },
 
-    clearDropTargets: function() {
-      this.drop_targets_list.closeAll();
+    render: function() {
+      Backbone.View.prototype.render.apply(this, arguments);
+
+      this.$children = this.$('.children:first');
+      this.$content = this.$('.content:first');
+
+      // TODO: this could be like a document.ready sorta?
+      this.model.checkIsContentLoaded();
+
+      // TODO: investigate possible problems with this.
+      this.addAll();
+
+      return this;
+    },
+
+    renderContent: function(content) {
+      var view_class = content.getViewClass();
+
+      content_view = new view_class({
+        model: content
+      });
+
+      this.$content.html(content_view.render().el);
     }
   });
 
