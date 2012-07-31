@@ -57,6 +57,7 @@ Working:
   - Node reordering
   - Node re-rooting (moving a node up/down in the tree, from the left column to
     the right column, for example)
+  - Delete widgets
 
 Not Working Yet:
 
@@ -76,4 +77,3 @@ the company.
     on scroll, snap into drop targets on mouseover.
   - Admin chrome around the widgy editor
   - Editing of the [mezzanine] page metadata (title, published)
-  - Delete widgets
