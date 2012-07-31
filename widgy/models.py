@@ -47,6 +47,7 @@ class Node(MP_Node):
                 'url': self.get_api_url(),
                 'content': self.content.to_json(),
                 'children': children,
+                'available_children_url': self.get_available_children_url(),
                 }
         parent = self.get_parent()
         if parent:
@@ -64,6 +65,10 @@ class Node(MP_Node):
     @models.permalink
     def get_api_url(self):
         return ('widgy.views.node', (), {'node_pk': self.pk})
+
+    @models.permalink
+    def get_available_children_url(self):
+        return ('widgy.views.children', (), {'node_pk': self.pk})
 
 
     # TODO: fix the error messages

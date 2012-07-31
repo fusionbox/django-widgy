@@ -28,7 +28,9 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelv
         app: this
       });
 
-      var shelf_list = new shelves.ShelfCollection;
+      var shelf_list = new shelves.ShelfCollection({
+        node: root_node
+      });
       var shelf_view = this.shelf_view = new shelves.ShelfView({
         collection: shelf_list,
         app: this

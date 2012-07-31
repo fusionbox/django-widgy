@@ -5,8 +5,28 @@ define([ 'underscore', 'widgy.backbone', 'nodes/nodes',
       ) {
 
   var ShelfCollection = Backbone.Collection.extend({
-    url: '/admin/widgy/widgets/',
-    model: nodes.Node
+    model: nodes.Node,
+
+    initialize: function(options) {
+      _.bindAll(this,
+        'update'
+      );
+
+      this.node = options.node;
+      this.on('remove', this.update);
+    },
+
+    url: function() {
+      return this.node.get('available_children_url');
+    },
+
+    update: function() {
+      // TODO: instead of a destructive overwriting, we need to merge the
+      // things on the shelf.  With the return, we need to delete any widgets
+      // that are no longer acceptable children and add the new widgets,
+      // without modifying ones that haven't changed.
+      this.fetch();
+    }
   });
 
   var ShelfView = Backbone.View.extend({
