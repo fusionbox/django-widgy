@@ -91,8 +91,7 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
 
     // TODO: caching templates?
     renderTemplate: function(template, context) {
-      var m =  $(Mustache.render(template, context));
-      return m;
+      return Mustache.render(template, context);
     }
   });
 
