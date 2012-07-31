@@ -393,7 +393,25 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
   var NodePreviewView = NodeViewBase.extend({
     tagName: 'li',
-    template: node_preview_view_template
+    template: node_preview_view_template,
+
+    /**
+     * When a NodePreviewView is repositioned, it needs to be put in the new
+     * collection.
+     */
+    reposition: function(model, parent_id) {
+      var parent_view = this.app.node_view_list.findById(parent_id);
+      model.collection.remove(model);
+      parent_view.collection.add(model);
+    },
+
+    /**
+     * When a Node is removed from the ShelfCollection, it closes this, but we
+     * need to clean up our bindings.
+     */
+    onClose: function() {
+      this.model.off('reposition', this.reposition);
+    }
   });
 
 
