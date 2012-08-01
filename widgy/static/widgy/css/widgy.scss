@@ -1,0 +1,38 @@
+.widgy {
+  .editor {
+    width: 500px;
+    display: inline-block;
+  }
+
+  .toolbox {
+    float: right;
+  }
+
+  // Node Container
+  .node_children {
+    padding: 0;
+  }
+
+  .node {
+    border: 1px #000 solid;
+    list-style: none;
+    margin: 1em;
+    padding: 0;
+
+    &.being_dragged {
+      background-color: blue;
+      margin: 0;
+      pointer-events: none;
+    }
+  }
+
+  .node_drop_target {
+    width: 100%;
+    height: 50px;
+    background-color: yellow;
+
+    &.active {
+      outline: 1px dashed red;
+    }
+  }
+}

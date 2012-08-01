@@ -122,6 +122,8 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
    *
    * The AppView has an instance of this list to keep track of all of the node
    * views.
+   * 
+   * This is analogous to a Collection for Views.
    */
   function ViewList() {
     this.list = []
@@ -149,18 +151,10 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
       }
     },
 
-    each: function(iterator, context) {
-      return _.each(this.list, iterator, context);
-    },
-
     closeAll: function() {
       return _.each(_.clone(this.list), function(view) {
         return view.close();
       });
-    },
-
-    find: function(finder) {
-      return _.find(this.list, finder);
     },
 
     findById: function(id) {
@@ -174,6 +168,17 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
         return el === view.el;
       });
     }
+  });
+
+  // mixin some underscore methods.
+  var methods = [
+    'each', 'find', 'contains'
+    ];
+
+  _.each(methods, function(method) {
+    ViewList.prototype[method] = function() {
+      return _[method].apply(_, [this.list].concat(_.toArray(arguments)));
+    };
   });
 
 
