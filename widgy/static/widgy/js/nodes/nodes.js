@@ -65,7 +65,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
         this.unset('content');
 
         // This is asynchronous because of requirejs.
-        contents.getModel(content.__module_name__, _.bind(this.instantiateContent, this, content));
+        contents.getModel(content.__class__, _.bind(this.instantiateContent, this, content));
       }
     },
 
