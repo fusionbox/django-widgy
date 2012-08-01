@@ -5,12 +5,13 @@ from django.contrib.contenttypes import generic
 from django.template.loader import render_to_string
 
 from mezzanine.pages.models import Page
+from mezzanine.core.fields import FileField
 
 from treebeard.mp_tree import MP_Node
 
 
 class ContentPage(Page):
-    root_node = models.ForeignKey('Node', null=True, on_delete=models.SET_NULL)
+    root_node = models.ForeignKey('Node', blank=True, null=True, on_delete=models.SET_NULL, editable=False)
 
     def to_json(self):
         return {
@@ -24,6 +25,12 @@ class ContentPage(Page):
             'root_node': self.root_node,
             })
 
+    @classmethod
+    def get_valid_layouts(cls):
+        classes = [c for c in Layout.__subclasses__() if c.valid_child_class_of(cls)]
+        return classes
+
+
 def exception_to_bool(fn):
     def new(*args, **kwargs):
         try:
@@ -32,6 +39,7 @@ def exception_to_bool(fn):
         except:
             return False
     return new
+
 
 class Node(MP_Node):
     content_type = models.ForeignKey(ContentType)
@@ -298,6 +306,9 @@ class Bucket(Content):
 
 
 class Layout(Content):
+    """
+    Base class for all layouts.
+    """
     class Meta:
         abstract = True
 
@@ -315,7 +326,7 @@ class Layout(Content):
 
     @classmethod
     def valid_child_class_of(cls, content):
-        return isinstance(content, ContentPage)
+        return isinstance(content, ContentPage) or issubclass(content, Page)
 
     def post_create(self):
         for bucket_title, bucket_class, args, kwargs in self.buckets:
@@ -350,7 +361,6 @@ class TextContent(Content):
         return json
 
 
-from mezzanine.core.fields import FileField
 class ImageContent(Content):
     image = FileField(max_length=255, format="Image")
 
