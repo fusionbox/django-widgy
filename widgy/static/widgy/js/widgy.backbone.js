@@ -75,15 +75,38 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
     onClose: function() {},
 
     /**
-     * If your subclass has a template property, render will use ICanHaz to
-     * render the template and passes in `model.toJSON()`.
+     * If your subclass has a template property, render will use Mustache to
+     * render the template and passes in a context that is retrieved using
+     * `View.toJSON`.
      */
     template: false,
 
+    /**
+     * If your subclass has a layout property, render will use Mustache to
+     * render the output of the template in a layout.  It will pass in the
+     * context retrieved using `View.toJSON` with an additional `yield`
+     * property which is the return of html.
+     */
+    layout: false,
+
     render: function() {
+      var context = this.toJSON(),
+          html;
+
+      this.yield = this.el;
+
       if (this.template) {
-        this.$el.html(this.renderTemplate(this.template, this.toJSON()));
+        html = this.renderTemplate(this.template, context);
+        this.yield = this.convertTojQuery(html);
       }
+
+      if (this.layout) {
+        context.yield = html;
+        html = this.renderTemplate(this.layout, context);
+      }
+
+      this.$el.html(html);
+      this.$yield = $(this.yield);
 
       return this;
     },
@@ -91,6 +114,11 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
     // TODO: caching templates?
     renderTemplate: function(template, context) {
       return Mustache.render(template, context);
+    },
+
+    // TODO: HACK HACK HACK
+    convertTojQuery: function(string) {
+      return $('<div/>').html(string).contents();
     },
 
     toJSON: function() {
@@ -122,6 +150,8 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
    *
    * The AppView has an instance of this list to keep track of all of the node
    * views.
+   * 
+   * This is analogous to a Collection for Views.
    */
   function ViewList() {
     this.list = []
@@ -149,18 +179,10 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
       }
     },
 
-    each: function(iterator, context) {
-      return _.each(this.list, iterator, context);
-    },
-
     closeAll: function() {
       return _.each(_.clone(this.list), function(view) {
         return view.close();
       });
-    },
-
-    find: function(finder) {
-      return _.find(this.list, finder);
     },
 
     findById: function(id) {
@@ -174,6 +196,17 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
         return el === view.el;
       });
     }
+  });
+
+  // mixin some underscore methods.
+  var methods = [
+    'each', 'find', 'contains'
+    ];
+
+  _.each(methods, function(method) {
+    ViewList.prototype[method] = function() {
+      return _[method].apply(_, [this.list].concat(_.toArray(arguments)));
+    };
   });
 
 

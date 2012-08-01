@@ -1,4 +1,8 @@
-define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelves' ], function($, _, Backbone, nodes, shelves) {
+define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelves',
+    'text!app.html'
+    ], function($, _, Backbone, nodes, shelves,
+      app_template
+      ) {
 
   /**
    * This is the view that handles the entire widgy App.  It will take the page
@@ -10,6 +14,8 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelv
    * has a reference to the instance of the AppView.
    */
   var AppView = Backbone.View.extend({
+    template: app_template,
+
     initialize: function(options) {
       _.bindAll(this,
         'startDrag',
@@ -25,7 +31,8 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelv
       var root_node = new nodes.Node(page.root_node);
       var root_node_view = this.root_node_view = new nodes.NodeView({
         model: root_node,
-        app: this
+        app: this,
+        tagName: 'div'
       });
 
       var shelf_list = new shelves.ShelfCollection({
@@ -36,11 +43,18 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelv
         app: this
       });
       this.refreshShelf();
+    },
 
-      this.$el.append(
-          shelf_view.render().el,
-          root_node_view.render().el
-          );
+    render: function() {
+      Backbone.View.prototype.render.apply(this, arguments);
+
+      this.$editor = this.$el.children('.editor');
+      this.$editor.append(this.root_node_view.render().el);
+
+      this.$toolbox = this.$el.children('.toolbox');
+      this.$toolbox.append(this.shelf_view.render().el);
+
+      return this;
     },
 
     startDrag: function(dragged_view) {
@@ -51,7 +65,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelv
       // TODO: follow mouse on scroll.
 
       this.node_view_list.each(function(node_view) {
-        node_view.addDropTargets();
+        node_view.addDropTargets(dragged_view);
       });
     },
 
@@ -85,11 +99,13 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelv
    * constructor, we are encouraged to think of the Widgy editor as an
    * instance.  This way we don't have global variables in our code.
    */
-  function Widgy(jqueryable, page) {
+  function Widgy(target, page) {
     this.app = new AppView({
       page: page,
-      el: $(jqueryable)
+      el: $(target)
     });
+
+    this.app.render();
   }
 
   return _.extend(Widgy, {

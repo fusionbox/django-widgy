@@ -102,6 +102,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
    * TODO: Does NodePreviewView do anything that NodeViewBase doesn't?
    */
   var NodeViewBase = Backbone.View.extend({
+    tagName: 'li',
     className: 'node',
     
     events: {
@@ -113,7 +114,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
       _.bindAll(this,
         'startDrag',
-        'afterStartDrag',
         'followMouse',
         'stopDrag',
         'reposition',
@@ -145,7 +145,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       event.stopPropagation();
 
       this.app.startDrag(this);
-      this.afterStartDrag();
 
       // Store the mouse offset in this container for followMouse to
       // use.
@@ -158,11 +157,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
       this.$el.addClass('being_dragged');
     },
-
-    /**
-     * Hook called when a node is starting to be dragged.
-     */
-    afterStartDrag: function() {},
 
     stopDrag: function() {
       this.$el.css({
@@ -258,6 +252,8 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       this.collection
         .on('reset', this.addAll)
         .on('add', this.addOne);
+
+      this.list = new Backbone.ViewList;
     },
 
     addAll: function() {
@@ -271,6 +267,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       });
 
       this.position(node_view.render());
+      this.list.push(node_view);
     },
 
     'delete': function(event) {
@@ -285,18 +282,24 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
      * the methods dealing with being dragged around are on, but that's the
      * nature of the beast with recursive nodes.
      */
-    addDropTargets: function() {
+    addDropTargets: function(view) {
       var $children = this.$children,
-          that = this;
+          that = this,
+          mine = this.list.contains(view);
 
-      if ( this.model.content && !this.model.content.get('accepting_children') )
+      // do nothing if it's me or I'm not accepting children.
+      if ( this === view ||
+          (! mine && this.model.content && !this.model.content.get('accepting_children')) )
       {
         return;
       }
 
       $children.prepend(this.createDropTarget().el);
       $children.children('.node').each(function(index, elem) {
-        $(elem).after(that.createDropTarget().el);
+        var drop_target = that.createDropTarget().$el.insertAfter(elem);
+
+        if ( mine && view.el == elem )
+          drop_target.hide();
       });
     },
 
@@ -362,17 +365,11 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       }, {wait: true});
     },
 
-    afterStartDrag: function() {
-      // hide drop target behind me.
-      this.$el.next().hide();
-      this.clearDropTargets();
-    },
-
     render: function() {
       Backbone.View.prototype.render.apply(this, arguments);
 
-      this.$children = this.$('.children:first');
-      this.$content = this.$('.content:first');
+      this.$children = this.$el.children('.node_children');
+      this.$content = this.$el.children('.content');
 
       // TODO: this could be like a document.ready sorta?
       this.model.checkIsContentLoaded();
@@ -396,7 +393,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
 
   var NodePreviewView = NodeViewBase.extend({
-    tagName: 'li',
     template: node_preview_view_template
   });
 
