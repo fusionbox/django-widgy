@@ -1,20 +1,22 @@
 define([ 'widgy.contents', 'widgy.widgets',
-    'text!components/textcontent/text_content.html',
-    'text!components/textcontent/edit_text_content.html'
+    'text!./content.html',
+    'text!./edit.html'
     ], function(contents, widgets,
-      text_content_template, edit_text_content_template) {
+      content_template,
+      edit_content_template
+      ) {
 
-  var EditTextContentView = widgets.EditorView.extend({
-    template: edit_text_content_template
+  var EditorView = widgets.EditorView.extend({
+    template: edit_content_template
   });
 
-  var TextContentView = widgets.WidgetView.extend({
-    template: text_content_template,
-    editorClass: EditTextContentView
+  var ContentView = widgets.WidgetView.extend({
+    template: content_template,
+    editorClass: EditorView
   });
 
   var TextContent = contents.Content.extend({
-    viewClass: TextContentView
+    viewClass: ContentView
   });
 
   return TextContent;

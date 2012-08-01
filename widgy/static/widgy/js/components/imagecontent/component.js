@@ -1,10 +1,12 @@
 define([ 'widgy.contents', 'widgy.widgets',
-    'text!./image_content.html',
-    'text!./edit_image_content.html'
+    'text!./content.html',
+    'text!./edit.html'
     ], function(contents, widgets,
-      content_template, edit_template) {
+      content_template,
+      edit_template
+      ) {
 
-  var EditImageContentView = widgets.EditorView.extend({
+  var EditorView = widgets.EditorView.extend({
     template: edit_template,
     events: function() {
       return _.extend({}, widgets.EditorView.prototype.events , {
@@ -33,13 +35,13 @@ define([ 'widgy.contents', 'widgy.widgets',
     }
   });
 
-  var ImageContentView = widgets.WidgetView.extend({
+  var ContentView = widgets.WidgetView.extend({
     template: content_template,
-    editorClass: EditImageContentView,
+    editorClass: EditorView,
   });
 
   var ImageContent = contents.Content.extend({
-    viewClass: ImageContentView
+    viewClass: ContentView
   });
 
   return ImageContent;
