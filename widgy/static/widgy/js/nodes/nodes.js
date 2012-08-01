@@ -1,7 +1,7 @@
 define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
-    'text!nodes/node_view.html',
-    'text!nodes/node_preview_view.html',
-    'text!nodes/drop_target_view.html'
+    'text!./node.html',
+    'text!./preview.html',
+    'text!./drop_target.html'
     ], function($, _, Backbone, contents,
       node_view_template,
       node_preview_view_template,

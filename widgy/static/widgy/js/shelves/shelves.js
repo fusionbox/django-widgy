@@ -1,5 +1,5 @@
 define([ 'underscore', 'widgy.backbone', 'nodes/nodes',
-    'text!shelves/shelf_view.html'
+    'text!./shelf.html'
     ], function(_, Backbone, nodes,
       shelf_view_template
       ) {
