@@ -45,9 +45,12 @@ define([ 'underscore', 'widgy.backbone', 'nodes/nodes',
         .on('add', this.addOne);
 
       this.app = options.app;
+
+      this.list = new Backbone.ViewList;
     },
 
     addAll: function() {
+      this.list.closeAll();
       this.collection.each(this.addOne);
     },
 
@@ -57,6 +60,7 @@ define([ 'underscore', 'widgy.backbone', 'nodes/nodes',
         app: this.app
       });
 
+      this.list.push(view);
       this.$list.append(view.render().el);
     },
 
