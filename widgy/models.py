@@ -272,6 +272,14 @@ class Content(models.Model):
                 'title': cls._meta.verbose_name.title(),
                 }
 
+    @classmethod
+    def all_concrete_subclasses(cls):
+        classes = set(c for c in cls.__subclasses__() if not c._meta.abstract)
+        for c in cls.__subclasses__():
+            classes.update(c.all_concrete_subclasses())
+        return classes
+
+
 
 class Bucket(Content):
     title = models.CharField(max_length=255)
@@ -289,46 +297,48 @@ class Bucket(Content):
         return json
 
 
-class TwoColumnLayout(Content):
-    """
-    On creation, creates a left and right bucket.
-    """
-
-    buckets = {
-            'left': Bucket,
-            'right': Bucket,
-            }
+class Layout(Content):
+    class Meta:
+        abstract = True
 
     draggable = False
     deletable = False
 
     def valid_parent_of_instance(self, content):
-        return isinstance(content, Bucket) and\
+        return any(isinstance(content, bucket_meta[1]) for bucket_meta in self.buckets) and\
                 (content.id in [i.content.id for i in self.node.get_children()] or
-                        len(self.node.get_children()) < 2)
+                        len(self.node.get_children()) < len(self.buckets))
 
     def valid_parent_of_class(self, cls):
-        return issubclass(cls, Bucket) and len(self.node.get_children()) < 2
+        return any(issubclass(cls, bucket_meta[1]) for bucket_meta in self.buckets) and\
+                len(self.node.get_children()) < len(self.buckets)
 
     @classmethod
     def valid_child_class_of(cls, content):
         return isinstance(content, ContentPage)
 
     def post_create(self):
-        for bucket_title, bucket_class in self.buckets.iteritems():
-            bucket = self.add_child(bucket_class,
-                    title=bucket_title,
-                    draggable=False,
-                    deletable=False,
-                    )
+        for bucket_title, bucket_class, args, kwargs in self.buckets:
+            self.add_child(bucket_class, title=bucket_title, *args, **kwargs)
+
+
+class TwoColumnLayout(Layout):
+    """
+    On creation, creates a left and right bucket.
+    """
+
+    buckets = [
+            ('left', Bucket, (), {'draggable': False, 'deletable': False}),
+            ('right', Bucket, (), {'draggable': False, 'deletable': False}),
+            ]
 
     @property
     def left_bucket(self):
-        return [i for i in self.node.get_children() if i.content.title=='left'][0]
+        return self.node.get_children()[0]
 
     @property
     def right_bucket(self):
-        return [i for i in self.node.get_children() if i.content.title=='right'][0]
+        return self.node.get_children()[1]
 
 
 class TextContent(Content):
