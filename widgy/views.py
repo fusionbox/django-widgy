@@ -201,7 +201,7 @@ class ChildrenView(RestView):
 
     def get(self, request, node_pk):
         node = get_object_or_404(Node, pk=node_pk)
-        content_classes = Content.__subclasses__()
+        content_classes = Content.all_concrete_subclasses()
         content_classes = node.filter_child_classes(content_classes)
 
         return self.render_to_response([i.class_to_json() for i in content_classes])
@@ -214,7 +214,7 @@ class RecursiveChildrenView(RestView):
         pass
 
     def get(self, request, node_pk=None):
-        content_classes = Content.__subclasses__()
+        content_classes = Content.all_concrete_subclasses()
         if node_pk:
             node = get_object_or_404(Node, pk=node_pk)
             content_classes = node.filter_child_classes_recursive(content_classes)
