@@ -10,7 +10,7 @@ from treebeard.mp_tree import MP_Node
 
 
 class ContentPage(Page):
-    root_node = models.ForeignKey('Node', null=True, on_delete=models.SET_NULL)
+    root_node = models.ForeignKey('Node', blank=True, null=True, on_delete=models.SET_NULL)
 
     def to_json(self):
         return {
@@ -23,6 +23,11 @@ class ContentPage(Page):
             'title': self.title,
             'root_node': self.root_node,
             })
+
+    @classmethod
+    def get_valid_layouts(cls):
+        classes = [c for c in Layout.__subclasses__() if c.valid_child_class_of(cls)]
+        return classes
 
 
 class Node(MP_Node):
@@ -286,7 +291,15 @@ class Bucket(Content):
         return json
 
 
-class TwoColumnLayout(Content):
+class Layout(Content):
+    """
+    Base class for all layouts.
+    """
+    class Meta:
+        abstract = True
+
+
+class TwoColumnLayout(Layout):
     """
     On creation, creates a left and right bucket.
     """
@@ -309,7 +322,7 @@ class TwoColumnLayout(Content):
 
     @classmethod
     def valid_child_class_of(cls, content):
-        return isinstance(content, ContentPage)
+        return isinstance(content, ContentPage) or issubclass(content, Page)
 
     def post_create(self):
         for bucket_title, bucket_class in self.buckets.iteritems():
