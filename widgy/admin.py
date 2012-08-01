@@ -40,10 +40,11 @@ class WidgyPageAdmin(PageAdmin):
         fieldsets = super(WidgyPageAdmin, self).get_fieldsets(request, obj)
         if not obj and 'layout_content_type' not in fieldsets[0][1]['fields']:
             fieldsets[0][1]['fields'].append('layout_content_type')
+
+        # https://github.com/stephenmcd/mezzanine/pull/354
         try:
-            index = fieldsets[0][1]['fields'].index('root_node')
-            fieldsets[0][1]['fields'].pop(index)
-        except IndexError:
+            fieldsets[0][1]['fields'].remove('root_node')
+        except ValueError:
             pass
 
         return fieldsets
