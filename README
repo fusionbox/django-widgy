@@ -57,6 +57,7 @@ Working:
   - Node reordering
   - Node re-rooting (moving a node up/down in the tree, from the left column to
     the right column, for example)
+  - Delete widgets
 
 Not Working Yet:
 

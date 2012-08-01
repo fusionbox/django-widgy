@@ -14,7 +14,8 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
     initialize: function() {
       _.bindAll(this,
         'close',
-        'render'
+        'render',
+        'toJSON'
       );
     },
 
@@ -62,7 +63,7 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
      */
     close: function(event) {
       if ( event ) {
-        event.preventDefault();
+        event.preventDefault && event.preventDefault();
       }
 
       this.remove();
@@ -81,9 +82,7 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
 
     render: function() {
       if (this.template) {
-        // TODO: maybe make a getContext method for overriding?
-        var context = this.model ? this.model.toJSON() : {};
-        this.$el.html(this.renderTemplate(this.template, context));
+        this.$el.html(this.renderTemplate(this.template, this.toJSON()));
       }
 
       return this;
@@ -91,8 +90,11 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
 
     // TODO: caching templates?
     renderTemplate: function(template, context) {
-      var m =  $(Mustache.render(template, context));
-      return m;
+      return Mustache.render(template, context);
+    },
+
+    toJSON: function() {
+      return this.model ? this.model.toJSON() : {};
     }
   });
 
@@ -105,7 +107,11 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
     idAttribute: 'url',
 
     url: function() {
-      return this.id;
+      if ( ! this.id ) {
+        return Backbone.Model.prototype.url.apply(this, arguments);
+      } else {
+        return this.id;
+      }
     }
   });
 
@@ -119,26 +125,38 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
    */
   function ViewList() {
     this.list = []
+
+    _.bindAll(this,
+      'remove'
+    );
   }
 
   _.extend(ViewList.prototype, {
     push: function(view) {
+      view.on('close', this.remove);
       this.list.push(view);
+    },
+
+    remove: function(view) {
+      view.off('close', this.remove);
+
+      var index = _.indexOf(this.list, view);
+
+      if ( index >= 0 ) {
+        return this.list.splice(index, 1);
+      } else {
+        return false;
+      }
     },
 
     each: function(iterator, context) {
       return _.each(this.list, iterator, context);
     },
 
-    delegate: function(method, args, context) {
-      return _.each(this.list, function(view) {
-        return view[method].call(context, args);
-      });
-    },
-
     closeAll: function() {
-      this.delegate('close');
-      this.list = [];
+      return _.each(_.clone(this.list), function(view) {
+        return view.close();
+      });
     },
 
     find: function(finder) {

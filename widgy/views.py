@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.contrib.contenttypes.models import ContentType
 
-from widgy.models import Node, ContentPage, Content
+from widgy.models import Node, ContentPage, Content, InvalidTreeMovement
 
 
 def add_page(request):
@@ -101,8 +101,12 @@ class ContentView(RestView):
     def auth(*args, **kwargs):
         pass
 
-    def get_object(self, object_name, object_pk):
-        return ContentType.objects.get(model=object_name, app_label='widgy').get_object_for_this_type(pk=object_pk)
+    def get_object(self, app_label, object_name, object_pk):
+        return ContentType.objects.get(
+                    model=object_name,
+                    app_label=app_label
+                ).get_object_for_this_type(
+                    pk=object_pk)
 
     def get(self, request, object_name, object_pk):
         obj = self.get_object(object_name, object_pk)
@@ -110,8 +114,8 @@ class ContentView(RestView):
 
     # TODO: stupid implementation
     # only for existing objects right now
-    def put(self, request, object_name, object_pk):
-        obj = self.get_object(object_name, object_pk)
+    def put(self, request, app_label, object_name, object_pk):
+        obj = self.get_object(app_label, object_name, object_pk)
         data = self.data()
         for key, value in data.iteritems():
             if hasattr(obj, key):
@@ -123,16 +127,6 @@ class ContentView(RestView):
 
 content = ContentView.as_view()
 
-
-class InvalidTreeMovement(BaseException):
-    pass
-
-class RootDisplacementError(InvalidTreeMovement):
-    pass
-
-class ParentChildRejection(InvalidTreeMovement):
-    pass
-
 def extract_id(url):
     return url and url.split('/')[-2]
 
@@ -142,8 +136,8 @@ class NodeView(RestView):
 
     def put(self, request, node_pk):
         """
-        If you put with a left_id, then your node will be placed immediately
-        to the right of the node corresponding with the left_id.
+        If you put with a right_id, then your node will be placed immediately
+        to the right of the node corresponding with the right_id.
 
         If you put with a parent_id, then your node will be placed as the
         first-child of the node corresponding with the parent_id.
@@ -153,36 +147,63 @@ class NodeView(RestView):
         data = self.data()
 
         try:
-            left = Node.objects.get(pk=extract_id(data['left_id']))
-            if left.is_root():
-                raise InvalidTreeMovement
-
-            if not node.validate_parent_child(left.get_parent(), node):
-                raise ParentChildRejection
-
-            node.move(left, pos='right')
+            right = Node.objects.get(pk=extract_id(data['right_id']))
+            node.reposition(right=right)
         except Node.DoesNotExist:
             try:
                 parent = Node.objects.get(pk=extract_id(data['parent_id']))
-
-                if not node.validate_parent_child(parent, node):
-                    raise ParentChildRejection
-
-                node.move(parent, pos='first-child')
+                node.reposition(parent=parent)
             except Node.DoesNotExist:
                 raise Http404
 
         return self.render_to_response(None, status=200)
 
+    def delete(self, request, node_pk):
+        node = get_object_or_404(Node, pk=node_pk)
+
+        if not node.content.deletable:
+            raise InvalidTreeMovement({'message': "You can't delete me"})
+
+        # TODO: don't leave content behind
+        node.delete()
+
+        return self.render_to_response(None)
+
+
 node = NodeView.as_view()
+
+
+class CreateNodeView(RestView):
+    def auth(*args, **kwargs):
+        pass
+
+    def post(self, request):
+        data = self.data()
+        app_label, model = data['__class__'].split('.')
+        content_class = get_object_or_404(ContentType, model=model, app_label=app_label).model_class()
+
+        try:
+            right = get_object_or_404(Node, pk=extract_id(data['right_id']))
+            content = right.content.add_sibling(content_class)
+        except Http404:
+            parent = get_object_or_404(Node, pk=extract_id(data['parent_id']))
+            content = parent.content.add_child(content_class)
+
+        return self.render_to_response(content.node, status=201)
+
+
+create_node = CreateNodeView.as_view()
 
 
 class AllChildrenView(RestView):
     def auth(*args, **kwargs):
         pass
 
-    def get(self, ):
+    def get(self, request, node_pk=None):
         content_classes = Content.__subclasses__()
+        if node_pk:
+            node = get_object_or_404(Node, pk=node_pk)
+            content_classes = node.filter_child_classes(content_classes)
         return self.render_to_response([i.class_to_json() for i in content_classes])
 
 children = AllChildrenView.as_view()

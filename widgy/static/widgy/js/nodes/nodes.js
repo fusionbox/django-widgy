@@ -1,8 +1,10 @@
 define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     'text!nodes/node_view.html',
-    'text!nodes/drop_target_view.html',
+    'text!nodes/node_preview_view.html',
+    'text!nodes/drop_target_view.html'
     ], function($, _, Backbone, contents,
       node_view_template,
+      node_preview_view_template,
       drop_target_view_template
       ) {
 
@@ -23,16 +25,13 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       Backbone.Model.prototype.initialize.apply(this, arguments);
 
       _.bindAll(this,
-        'instantiateContent'
+        'instantiateContent',
+        'checkDidReposition'
         );
-      // content gets set because it is in the JSON for the node.  We need to
-      // unset it as it is not an attribute, but a property.  We also need to
-      // instantiate it as a real Content Model.
-      this._content = this.get('content');
-      this.unset('content');
 
-      // This is asynchronous because of requirejs.
-      contents.getModel(this._content.__module_name__, this.instantiateContent);
+      this
+        .on('change', this.checkDidReposition)
+        .on('change:content', this.loadContent);
 
       // same as content.  We need to actually instantiate the NodeCollection
       // and set it as a property, not an attribute.
@@ -41,12 +40,48 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       this.unset('children');
     },
 
-    instantiateContent: function(model_class) {
-      this.content = new model_class(this._content);
-      delete this._content;
+    checkDidReposition: function() {
+      if ( this.hasChanged('parent_id') ||
+          (this.hasChanged('right_id') && this.id !== this.get('right_id')) )
+      {
+        this.trigger('reposition', this, this.get('parent_id'), this.get('right_id'));
+      }
+    },
 
-      this.trigger('loaded:content', this.content);
+    checkIsContentLoaded: function() {
+      if ( this.content && this.content instanceof contents.Content ) {
+        this.trigger('load:content', this.content);
+      } else {
+        this.loadContent(this, this.get('content'));
+      }
+    },
+
+    loadContent: function(model, content) {
+      if ( content )
+      {
+        // content gets set because it is in the JSON for the node.  We need to
+        // unset it as it is not an attribute, but a property.  We also need to
+        // instantiate it as a real Content Model.
+        this.unset('content');
+
+        // This is asynchronous because of requirejs.
+        contents.getModel(content.__module_name__, _.bind(this.instantiateContent, this, content));
+      }
+    },
+
+    instantiateContent: function(content, model_class) {
+      this.content = new model_class(content);
+
+      this.trigger('load:content', this.content);
+    },
+
+    toJSON: function() {
+      var json = Backbone.Model.prototype.toJSON.apply(this, arguments);
+      if ( this.content )
+        json.content = this.content.toJSON();
+      return json;
     }
+
   });
 
 
@@ -55,7 +90,130 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
    * interface to NodeViews for how to handle child NodeViews.
    */
   var NodeCollection = Backbone.Collection.extend({
-    model: Node,
+    model: Node
+  });
+
+
+  /**
+   * Provides an interface for a draggable NodeView.  See NodeView for more
+   * specific Node functionality related definition.  NodeViewBase is exposed
+   * for subclassing by a NodePreviewView and NodeView.
+   *
+   * TODO: Does NodePreviewView do anything that NodeViewBase doesn't?
+   */
+  var NodeViewBase = Backbone.View.extend({
+    className: 'node',
+    
+    events: {
+      'mousedown .drag_handle': 'startDrag'
+    },
+
+    initialize: function(options) {
+      Backbone.View.prototype.initialize.apply(this, arguments);
+
+      _.bindAll(this,
+        'startDrag',
+        'afterStartDrag',
+        'followMouse',
+        'stopDrag',
+        'reposition',
+        'addDropTargets',
+        'clearDropTargets'
+      );
+
+      this.model
+        .on('remove', this.close)
+        .on('destroy', this.close)
+        .on('reposition', this.reposition);
+
+      this.app = options.app;
+      this.app.node_view_list.push(this);
+
+      this.drop_targets_list = new Backbone.ViewList;
+    },
+
+    /**
+     * `startDrag`, `stopDrag`, `followMouse`, and `reposition` all deal with a
+     * NodeView itself being dragged around.
+     */
+    startDrag: function(event) {
+      // only on a left click.
+      if ( event.button !== 0 )
+        return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      this.app.startDrag(this);
+      this.afterStartDrag();
+
+      // Store the mouse offset in this container for followMouse to
+      // use.
+      this.offsetY = event.offsetY;
+      this.offsetX = event.offsetX;
+
+      // follow mouse really quick, just in case they haven't moved their mouse
+      // yet.
+      this.followMouse(event);
+
+      this.$el.addClass('being_dragged');
+    },
+
+    /**
+     * Hook called when a node is starting to be dragged.
+     */
+    afterStartDrag: function() {},
+
+    stopDrag: function() {
+      this.$el.css({
+        position: 'static'
+      });
+
+      this.$el.removeClass('being_dragged');
+    },
+
+    followMouse: function(event) {
+      this.$el.css({
+        position: 'absolute',
+        top: event.pageY - this.offsetY,
+        left: event.pageX - this.offsetX
+      });
+    },
+
+    /**
+     * If the node has been put into a different parent, we need to update the
+     * collection.  That parent will be listening for adding and it will handle
+     * the positioning.  Otherwise, this node is still in the right parent and
+     * it just needs to be positioned in the parent.
+     *
+     * This is a callback to the reposition event on the Node model.
+     *
+     * When a Node is removed from the Collection, it closes this, but we need
+     * to clean up our bindings.
+     */
+    reposition: function(model, parent_id, right_id) {
+      var parent_view = this.app.node_view_list.findById(parent_id);
+
+      // This line is a little confusing.  For a model, the
+      // `collection` property is its parent collection, for a view,
+      // the `collection` is a child.  If a model has the same
+      // `collection` as a view, that means the view is the parent
+      // of the model.
+      if ( model.collection !== parent_view.collection ) {
+        model.collection.remove(model);
+        this.model.off('reposition', this.reposition);
+        parent_view.collection.add(model);
+      } else {
+        parent_view.position(this);
+      }
+    },
+
+    /**
+     * `addDropTargets` and `clearDropTargets` are required as an API for the
+     * AppView. See NodeView for the actual implementation.
+     */
+    addDropTargets: function() {},
+    clearDropTargets: function() {}
   });
 
 
@@ -71,43 +229,35 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
    *    `this.model.children`.
    * -  `this.app` is the instance of AppView
    */
-  var NodeView = Backbone.View.extend({
-    className: 'node',
+  var NodeView = NodeViewBase.extend({
     template: node_view_template,
-    
-    events: {
-      'mousedown .drag_handle': 'startDrag'
+
+    events: function() {
+      return _.extend({}, NodeViewBase.prototype.events , {
+        'click .delete': 'delete'
+      });
     },
 
-    initialize: function(options) {
-      Backbone.View.prototype.initialize.apply(this, arguments);
+    initialize: function() {
+      NodeViewBase.prototype.initialize.apply(this, arguments);
+
       _.bindAll(this,
         'addAll',
         'addOne',
-        'startDrag',
-        'followMouse',
-        'stopDrag',
-        'reposition',
-        'addDropTargets',
+        'position',
         'createDropTarget',
         'dropChildView',
-        'clearDropTargets'
-      );
+        'renderContent'
+        );
+
+      this.model
+        .on('load:content', this.renderContent);
+
+      this.collection = this.model.children;
 
       this.collection
         .on('reset', this.addAll)
         .on('add', this.addOne);
-
-      this.model
-        .on('remove', this.close)
-        .on('change', this.reposition);
-
-      this.app = options.app;
-      this.app.node_view_list.push(this);
-
-      this.model.bind('loaded:content', this.render);
-
-      this.drop_targets_list = new Backbone.ViewList;
     },
 
     addAll: function() {
@@ -117,73 +267,39 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     addOne: function(node) {
       var node_view = new NodeView({
         model: node,
-        collection: node.children,
         app: this.app
       });
 
-      this.$children.append(node_view.el);
+      this.position(node_view.render());
     },
 
-    /**
-     * `startDrag`, `stopDrag`, `followMouse`, and `reposition` all deal with a
-     * NodeView itself being dragged around.
-     */
-    startDrag: function(event) {
-      event.preventDefault();
+    'delete': function(event) {
       event.stopPropagation();
-
-      this.app.startDrag(this);
-
-      // hide drop target behind me.
-      this.$el.prev().hide();
-      this.clearDropTargets();
-
-      // follow mouse real quick, don't wait for mousemove.
-      this.followMouse(event);
-
-      this.$el.addClass('being_dragged');
-    },
-
-    stopDrag: function() {
-      this.$el.css({
-        position: 'static'
-      });
-
-      this.$el.removeClass('being_dragged');
-    },
-
-    followMouse: function(event) {
-      this.$el.css({
-        position: 'absolute',
-        top: event.pageY,
-        left: event.pageX
-      });
+      this.model.destroy();
     },
 
     /**
-     * This method puts the NodeView in the correct spot after a model change.
+     * `addDropTargets`, `createDropTarget`, `clearDropTargets`, `position`,
+     * and `dropChildView` all deal with a possible child NodeView being
+     * dragged.  It is confusing that these methods are on the same class that
+     * the methods dealing with being dragged around are on, but that's the
+     * nature of the beast with recursive nodes.
      */
-    reposition: function(model, options) {
-      if ( model.get('left_id') ) {
-        if ( model.get('left_id') === model.id )
-          return;
+    addDropTargets: function() {
+      var $children = this.$children,
+          that = this;
 
-        var left_view = this.app.node_view_list.findById(model.get('left_id'));
-        left_view.$el.after(this.el);
-      } else {
-        var parent_view = this.app.node_view_list.findById(model.get('parent_id'));
-        parent_view.$children.prepend(this.el);
+      if ( this.model.content && !this.model.content.get('accepting_children') )
+      {
+        return;
       }
-      // TODO: fix collections and stuff.
+
+      $children.prepend(this.createDropTarget().el);
+      $children.children('.node').each(function(index, elem) {
+        $(elem).after(that.createDropTarget().el);
+      });
     },
 
-    /**
-     * `addDropTargets`, `createDropTarget`, `dropChildView`, and
-     * `clearDropTargets` all deal with a different NodeView being dragged.  It
-     * is confusing that these methods are on the same class that the methods
-     * dealing with being dragged around are on, but that's the nature of the
-     * beast with recursive nodes.
-     */
     createDropTarget: function() {
       var drop_target = new DropTargetView;
       drop_target.on('dropped', this.dropChildView);
@@ -192,14 +308,20 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       return drop_target.render();
     },
 
-    addDropTargets: function() {
-      var $children = this.$children,
-          that = this;
+    clearDropTargets: function() {
+      this.drop_targets_list.closeAll();
+    },
 
-      $children.prepend(this.createDropTarget().el);
-      $children.children('.node').each(function(index, elem) {
-        $(elem).after(that.createDropTarget().el);
-      });
+    position: function(child_node_view) {
+      var child_node = child_node_view.model;
+
+      if ( child_node.get('right_id') ) {
+        var right_id = child_node.get('right_id'),
+          right_view = this.app.node_view_list.findById(right_id);
+          right_view.$el.before(child_node_view.el);
+      } else {
+        this.$children.append(child_node_view.el);
+      }
     },
 
     /**
@@ -210,52 +332,72 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       var $children = this.$children;
       var index = view.$el.index() / 2;
 
-      // We need to stop the drag before finding the left node.
+      // We need to stop the drag before finding the right node.
       // `this.app.stopDrag` will clear all of the drop targets, so we need to
       // remove them before we can get elements by index.
       var dragged_view = this.app.stopDrag();
 
-      var left_id = null;
+      var right_id = null;
 
-      // If index is 0 there is no left element and we want to set
-      // it to null.
-      if ( index !== 0 ) {
-        var left_el = $children.children().eq(index - 1)[0],
-            left_view = this.app.node_view_list.findByEl(left_el);
+      // If index is the length of $children.children there is no right element
+      // and we want it set to null.  Otherwise there is a right and we need
+      // its id.
+      //
+      // ($children.children() refers to DOM elements.)
+      if ( index !== $children.children().length ) {
+        var right_el = $children.children().eq(index)[0],
+            right_view = this.app.node_view_list.findByEl(right_el);
 
-        left_id = left_view.model.id;
+        right_id = right_view.model.id;
       }
+
+      // Dragged into my own drop target.
+      if ( dragged_view === right_view )
+        return;
 
       // pessimistic save (for now).
       dragged_view.model.save({
         parent_id: this.model.id,
-        left_id: left_id
+        right_id: right_id
       }, {wait: true});
     },
 
-    clearDropTargets: function() {
-      this.drop_targets_list.closeAll();
+    afterStartDrag: function() {
+      // hide drop target behind me.
+      this.$el.next().hide();
+      this.clearDropTargets();
     },
 
-    render: function(content) {
+    render: function() {
       Backbone.View.prototype.render.apply(this, arguments);
 
-      var view_class = content.getViewClass();
-
-      this.content_view = new view_class({
-        model: content
-      });
-
-      this.$content = this.$('.content:first');
-      this.$content.append(this.content_view.render().el);
-
       this.$children = this.$('.children:first');
+      this.$content = this.$('.content:first');
+
+      // TODO: this could be like a document.ready sorta?
+      this.model.checkIsContentLoaded();
 
       // TODO: investigate possible problems with this.
       this.addAll();
 
       return this;
+    },
+
+    renderContent: function(content) {
+      var view_class = content.getViewClass();
+
+      content_view = new view_class({
+        model: content
+      });
+
+      this.$content.html(content_view.render().el);
     }
+  });
+
+
+  var NodePreviewView = NodeViewBase.extend({
+    tagName: 'li',
+    template: node_preview_view_template
   });
 
 
@@ -266,15 +408,30 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
     triggers: {
       'mouseup': 'dropped'
+    },
+
+    events: {
+      'mouseenter': 'activate',
+      'mouseleave': 'deactivate'
+    },
+
+    activate: function(event) {
+      this.$el.addClass('active');
+    },
+
+    deactivate: function(event) {
+      this.$el.removeClass('active');
     }
   });
 
 
   return {
+    DropTargetView: DropTargetView,
     Node: Node,
     NodeCollection: NodeCollection,
     NodeView: NodeView,
-    DropTargetView: DropTargetView
+    NodePreviewView: NodePreviewView,
+    NodeViewBase: NodeViewBase
   };
 
 });
