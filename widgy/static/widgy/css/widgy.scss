@@ -24,6 +24,12 @@
       margin: 0;
       pointer-events: none;
     }
+
+    .delete {
+      float: right;
+      background-color: red;
+      color: white;
+    }
   }
 
   .node_drop_target {
