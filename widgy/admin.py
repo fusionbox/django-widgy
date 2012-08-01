@@ -21,6 +21,7 @@ class WidgyPageForm(forms.ModelForm):
         model = ContentPage
         exclude = ('root_node',)
 
+
 class WidgyPageAdmin(PageAdmin):
     form = WidgyPageForm
 
@@ -39,6 +40,12 @@ class WidgyPageAdmin(PageAdmin):
         fieldsets = super(WidgyPageAdmin, self).get_fieldsets(request, obj)
         if not obj and 'layout_content_type' not in fieldsets[0][1]['fields']:
             fieldsets[0][1]['fields'].append('layout_content_type')
+        try:
+            index = fieldsets[0][1]['fields'].index('root_node')
+            fieldsets[0][1]['fields'].pop(index)
+        except IndexError:
+            pass
+
         return fieldsets
 
     def save_model(self, request, obj, form, change):
