@@ -1,6 +1,6 @@
 define([ 'widgy.contents', 'widgy.widgets',
-    'text!components/imagecontent/image_content.html',
-    'text!components/imagecontent/edit_image_content.html'
+    'text!./image_content.html',
+    'text!./edit_image_content.html'
     ], function(contents, widgets,
       content_template, edit_template) {
 
