@@ -103,9 +103,11 @@ class ContentView(RestView):
     def put(self, request, app_label, object_name, object_pk):
         obj = self.get_object(app_label, object_name, object_pk)
         data = self.data()
-        for key, value in data.iteritems():
-            if hasattr(obj, key):
-                setattr(obj, key, value)
+        for field in obj._meta.fields:
+            if not field.editable:
+                continue
+            if field.attname in data:
+                setattr(obj, field.attname, data[field.attname])
         obj.save()
 
         return self.render_to_response(obj, status=200)
