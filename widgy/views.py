@@ -195,7 +195,21 @@ class CreateNodeView(RestView):
 create_node = CreateNodeView.as_view()
 
 
-class AllChildrenView(RestView):
+class ChildrenView(RestView):
+    def auth(*args, **kwargs):
+        pass
+
+    def get(self, request, node_pk):
+        node = get_object_or_404(Node, pk=node_pk)
+        content_classes = Content.__subclasses__()
+        content_classes = node.filter_child_classes(content_classes)
+
+        return self.render_to_response([i.class_to_json() for i in content_classes])
+
+children = ChildrenView.as_view()
+
+
+class RecursiveChildrenView(RestView):
     def auth(*args, **kwargs):
         pass
 
@@ -203,7 +217,7 @@ class AllChildrenView(RestView):
         content_classes = Content.__subclasses__()
         if node_pk:
             node = get_object_or_404(Node, pk=node_pk)
-            content_classes = node.filter_child_classes(content_classes)
+            content_classes = node.filter_child_classes_recursive(content_classes)
         return self.render_to_response([i.class_to_json() for i in content_classes])
 
-children = AllChildrenView.as_view()
+recursive_children = RecursiveChildrenView.as_view()

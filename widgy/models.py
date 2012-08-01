@@ -24,6 +24,14 @@ class ContentPage(Page):
             'root_node': self.root_node,
             })
 
+def exception_to_bool(fn):
+    def new(*args, **kwargs):
+        try:
+            fn(*args, **kwargs)
+            return True
+        except:
+            return False
+    return new
 
 class Node(MP_Node):
     content_type = models.ForeignKey(ContentType)
@@ -68,7 +76,7 @@ class Node(MP_Node):
 
     @models.permalink
     def get_available_children_url(self):
-        return ('widgy.views.children', (), {'node_pk': self.pk})
+        return ('widgy.views.recursive_children', (), {'node_pk': self.pk})
 
 
     # TODO: fix the error messages
@@ -89,15 +97,10 @@ class Node(MP_Node):
             assert right or parent
 
     def filter_child_classes(self, classes):
-        def exception_to_bool(fn):
-            def new(*args, **kwargs):
-                try:
-                    fn(*args, **kwargs)
-                    return True
-                except:
-                    return False
-            return new
-        allowed_classes = set([c for c in classes if exception_to_bool(self.content.validate_relationship)(c)])
+        return set([c for c in classes if exception_to_bool(self.content.validate_relationship)(c)])
+
+    def filter_child_classes_recursive(self, classes):
+        allowed_classes = self.filter_child_classes(classes)
         for child in self.get_children():
             allowed_classes.update(child.filter_child_classes(classes))
         return allowed_classes
