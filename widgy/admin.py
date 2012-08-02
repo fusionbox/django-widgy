@@ -1,81 +1,74 @@
 import operator
 
+from django import forms
 from django.contrib import admin
-from django.template.response import TemplateResponse
-from django.shortcuts import get_object_or_404
-from django.conf.urls import patterns, url
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 
 from mezzanine.pages.admin import PageAdmin
 
-from widgy.models import ContentPage, Node, Content
 
-from django import forms
-
-
-class WidgyPageForm(forms.ModelForm):
-    layout_content_type = forms.ModelChoiceField(queryset=ContentType.objects.none())
-
-    class Meta:
-        model = ContentPage
-        exclude = ('root_node',)
+from widgy.models import ContentPage, Node
 
 
 class WidgyPageAdmin(PageAdmin):
-    form = WidgyPageForm
+    widgy_fields = None
 
     add_form_template = 'admin/widgy/change_form.html'
     change_form_template = 'admin/widgy/change_form.html'
 
-    def get_form(self, *args, **kwargs):
-        form = super(WidgyPageAdmin, self).get_form(*args, **kwargs)
-        layouts = self.model.get_valid_layouts()
-        qs = [Q(app_label=c._meta.app_label, model=c._meta.module_name) for c in layouts]
-        form.base_fields['layout_content_type'].queryset = ContentType.objects.filter(
-                reduce(operator.or_, qs))
+    def __init__(self, *args, **kwargs):
+        """
+        Creates a list of foreign keys that point to Node instances.  Used to
+        determine what layout fields need to be auto generated.
+        """
+        super(WidgyPageAdmin, self).__init__(*args, **kwargs)
+        if self.widgy_fields is None:
+            widgy_fields = {}
+            for field in self.model._meta.fields:
+                if not field.rel:
+                    continue
+                if issubclass(field.rel.to, Node):
+                    widgy_fields[field.name] = field.verbose_name
+
+        self.widgy_fields = widgy_fields or None
+
+    def get_form(self, request, obj=None, **kwargs):
+        if self.widgy_fields:
+            exclude = kwargs.get('exclude') or []
+            exclude.extend(self.widgy_fields.keys())
+            kwargs['exclude'] = exclude
+        form = super(WidgyPageAdmin, self).get_form(request, obj, **kwargs)
+        if self.widgy_fields and obj is None:
+            layouts = self.model.get_valid_layouts()
+            qs = [Q(app_label=c._meta.app_label, model=c._meta.module_name) for c in layouts]
+            layout_qs = ContentType.objects.filter(reduce(operator.or_, qs))
+            for field_name, field_title in self.widgy_fields.iteritems():
+                form.base_fields[field_name + '_layout'] = forms.ModelChoiceField(label=field_title.title() + ' Layout', queryset=layout_qs)
         return form
 
     def get_fieldsets(self, request, obj=None):
         fieldsets = super(WidgyPageAdmin, self).get_fieldsets(request, obj)
-        if not obj and 'layout_content_type' not in fieldsets[0][1]['fields']:
-            fieldsets[0][1]['fields'].append('layout_content_type')
+        if not obj and self.widgy_fields:
+            for field_name in self.widgy_fields:
+                if field_name + '_layout' not in fieldsets[0][1]['fields']:
+                    fieldsets[0][1]['fields'].append(field_name + '_layout')
 
         # https://github.com/stephenmcd/mezzanine/pull/354
-        try:
-            fieldsets[0][1]['fields'].remove('root_node')
-        except ValueError:
-            pass
+        if self.widgy_fields:
+            for field_name in self.widgy_fields:
+                try:
+                    fieldsets[0][1]['fields'].remove('root_node')
+                except ValueError:
+                    pass
 
         return fieldsets
 
     def save_model(self, request, obj, form, change):
-        if not change:
-            obj.root_node = form.cleaned_data['layout_content_type'].model_class().add_root().node
+        if not change and self.widgy_fields:
+            for field_name in self.widgy_fields:
+                root_node = form.cleaned_data[field_name + '_layout'].model_class().add_root().node
+                setattr(obj, field_name, root_node)
         super(WidgyPageAdmin, self).save_model(request, obj, form, change)
-
-    ##|
-    ##| Views
-    ##|
-    def get_urls(self):
-        urls = super(WidgyPageAdmin, self).get_urls()
-        my_urls = patterns('',
-            url(r'^(?P<page_pk>[0-9]+)/edit-widget/(?P<node_pk>[0-9]+)/$', self.admin_site.admin_view(self.edit_widget), name='edit_widget'),
-        )
-        return my_urls + urls
-
-    def edit_widget(self, request, page_pk, node_pk):
-        template = 'admin/widgy/widgy_edit.html'
-        env = {}
-
-        res = super(WidgyPageAdmin, self).change_view(request, page_pk, None)
-        env.update(res.context_data)
-
-        page = get_object_or_404(ContentPage, pk=page_pk)
-        env['page'] = page
-
-        return TemplateResponse(request, 'admin/widgy/widgy_edit.html', env)
-
-        return TemplateResponse(request, template, env)
 
 admin.site.register(ContentPage, WidgyPageAdmin)
