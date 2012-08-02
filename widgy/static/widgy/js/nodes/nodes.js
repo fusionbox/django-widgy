@@ -144,11 +144,12 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       event.preventDefault();
       event.stopPropagation();
 
-      this.app.startDrag(this);
-
-      // Store the mouse offset in this container for followMouse to
-      // use.
-      // The +80 is due to the 'div#content.offsetTop'
+      // Store the mouse offset in this container for followMouse to use.  We
+      // need to get this before `this.app.startDrag`, otherwise the drop
+      // targets screw everything up.
+      //
+      // TODO: The +80 is due to the 'div#content.offsetTop'.  Maybe we
+      // shouldn't hard code it?
       var offset = this.$el.offset();
       this.offsetX = event.pageX - offset.left;
       this.offsetY = event.pageY - offset.top + 80;
@@ -156,6 +157,8 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       // follow mouse really quick, just in case they haven't moved their mouse
       // yet.
       this.followMouse(event);
+
+      this.app.startDrag(this);
 
       this.$el.addClass('being_dragged');
     },
