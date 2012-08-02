@@ -1,16 +1,22 @@
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
 from django.test import TestCase
 
+from widgy.models import ContentPage, TwoColumnLayout, Bucket
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
+
+class TwoColumnLayoutTest(TestCase):
+    def setUp(self):
+        page = ContentPage.objects.create(
+                title='test page'
+                )
+        page.root_node = TwoColumnLayout.add_root().node
+        page.save()
+        self.page = page
+
+    def test_layout_bucket_creation(self):
         """
-        Tests that 1 + 1 always equals 2.
+        Tests that buckets ar auto-created correctly on layouts.
         """
-        self.assertEqual(1 + 1, 2)
+        page = self.page
+
+        self.assertTrue(isinstance(page.root_node.get_children()[0].content, Bucket))
+        self.assertTrue(isinstance(page.root_node.get_children()[1].content, Bucket))
