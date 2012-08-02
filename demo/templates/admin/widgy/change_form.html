@@ -4,6 +4,7 @@
 {% load admin_urls %}
 {% load fusionbox_tags %}
 {% load literal_include %}
+{% load compress %}
 
 {% block extrahead %}{{ block.super }}
 <script data-main="/static/widgy/js/main" src="{% static "widgy/js/require/require.js" %}"></script>
@@ -12,49 +13,9 @@
     window.widgy = new Widgy('#app', {{ original.to_json|json }});
   });
 </script>
-{% endblock %}
-
-{% block extrastyle %}{{ block.super }}
-  <style>
-    #app {
-    }
-
-    #app > .node {
-      width: 500px;
-    }
-
-    .node {
-      border: 1px #000 solid;
-      margin: 1em;
-    }
-
-    .node.being_dragged {
-      margin: 0;
-      pointer-events: none;
-    }
-
-    .node_drop_target {
-      width: 100%;
-      height: 50px;
-      background-color: yellow;
-    }
-    .node_drop_target.active {
-      outline: 1px dashed red;
-    }
-
-    .being_dragged {
-      background-color: blue;
-    }
-
-    .repositioned {
-      background-color: steelblue;
-    }
-
-    .shelf {
-      float: right;
-    }
-
-  </style>
+{% compress css %}
+<link type="text/x-scss" href="{% static "widgy/css/widgy.scss" %}" rel="stylesheet">
+{% endcompress %}
 {% endblock %}
 
 {% block coltype %}{% if ordered_objects %}colMS{% else %}colM{% endif %}{% endblock %}
@@ -93,7 +54,7 @@
   {% if add %}
     {{ layout_form }}
   {% else %}
-    <div id="app"></div>
+    <div id="app" class="widgy"></div>
   {% endif %}
 {% endblock %}
 
