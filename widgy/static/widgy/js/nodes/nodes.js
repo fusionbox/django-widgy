@@ -403,8 +403,8 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
 
   var DropTargetView = Backbone.View.extend({
+    tagName: 'li',
     className: 'node_drop_target',
-
     template: drop_target_view_template,
 
     triggers: {
