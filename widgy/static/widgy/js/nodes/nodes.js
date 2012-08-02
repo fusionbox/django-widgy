@@ -148,7 +148,8 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
       // Store the mouse offset in this container for followMouse to
       // use.
-      this.offsetY = event.offsetY;
+      // The +80 is due to the 'div#content.offsetTop'
+      this.offsetY = event.offsetY + 80;
       this.offsetX = event.offsetX;
 
       // follow mouse really quick, just in case they haven't moved their mouse
