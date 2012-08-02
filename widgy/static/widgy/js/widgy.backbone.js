@@ -93,11 +93,8 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
       var context = this.toJSON(),
           html;
 
-      this.yield = this.el;
-
       if (this.template) {
         html = this.renderTemplate(this.template, context);
-        this.yield = this.convertTojQuery(html);
       }
 
       if (this.layout) {
@@ -106,7 +103,6 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
       }
 
       this.$el.html(html);
-      this.$yield = $(this.yield);
 
       return this;
     },
@@ -114,11 +110,6 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
     // TODO: caching templates?
     renderTemplate: function(template, context) {
       return Mustache.render(template, context);
-    },
-
-    // TODO: HACK HACK HACK
-    convertTojQuery: function(string) {
-      return $('<div/>').html(string).contents();
     },
 
     toJSON: function() {

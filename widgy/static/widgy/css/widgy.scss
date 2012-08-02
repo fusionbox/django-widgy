@@ -9,7 +9,7 @@
   }
 
   // Node Container
-  .node_children {
+  .nodeChildren {
     padding: 0;
   }
 
@@ -34,10 +34,11 @@
 
   .node_drop_target {
     width: 100%;
-    height: 50px;
+    height: 25px;
     background-color: yellow;
 
     &.active {
+      height: 50px;
       outline: 1px dashed red;
     }
   }

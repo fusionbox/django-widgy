@@ -79,3 +79,29 @@ the company.
 
   - Follow mouse on scroll while dragging.
   - Designer magic wand.
+
+## JavaScript
+We use require.js to handle dependency management and to encourage code
+modularity.  This helps a lot in development, but it also means that page loads
+may be rather slow.  If page loads are too slow for you while you are
+developing, you can run the optimizer to compile and minify the file into one
+file and then you will have zippier page loads.
+
+Steps:
+
+  1.  Install the RequireJS command line tool.
+      
+      $ [sudo] npm install -g requirejs
+
+  2.  From the project path root, run the optimizer.
+
+      $ r.js -o build.js
+
+      This will create an optimized file which is placed in
+      static/widgy/js/widgy-built.js
+
+  3.  Change your script tag to update the new location of the widgy files.
+
+      <script data-main="/static/widgy/js/widgy-built" src="/static/widgy/js/require/require.js"></script>
+
+**Note:** Please avoid committing the change in step 3.
