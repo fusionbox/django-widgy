@@ -7,12 +7,6 @@
 {% load compress %}
 
 {% block extrahead %}{{ block.super }}
-<script data-main="/static/widgy/js/main" src="{% static "widgy/js/require/require.js" %}"></script>
-<script>
-  require([ 'widgy' ], function(Widgy) {
-    window.widgy = new Widgy('#app', {{ original.to_json|json }});
-  });
-</script>
 {% compress css %}
 <link type="text/x-scss" href="{% static "widgy/css/widgy.scss" %}" rel="stylesheet">
 {% endcompress %}
@@ -51,11 +45,13 @@
 {% endblock %}
 
 {% block after_field_sets %}
-  {% if add %}
-    {{ layout_form }}
-  {% else %}
-    <div id="app" class="widgy"></div>
-  {% endif %}
+  <div id="app" class="widgy"></div>
+<script data-main="/static/widgy/js/main" src="{% static "widgy/js/require/require.js" %}"></script>
+<script>
+  require([ 'widgy' ], function(Widgy) {
+    window.widgy = new Widgy('#app', {{ original.to_json|json }});
+  });
+</script>
 {% endblock %}
 
 {% block inline_field_sets %}
