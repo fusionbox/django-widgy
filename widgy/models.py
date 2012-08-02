@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.exceptions import ValidationError
+from django.db.models.signals import post_save
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.template.loader import render_to_string
@@ -8,6 +8,9 @@ from mezzanine.pages.models import Page
 from mezzanine.core.fields import FileField
 
 from treebeard.mp_tree import MP_Node
+
+from widgy.exceptions import (InvalidTreeMovement, OhHellNo, BadChildRejection,
+        BadParentRejection, ParentChildRejection, RootDisplacementError)
 
 
 class ContentPage(Page):
@@ -46,12 +49,6 @@ class Node(MP_Node):
     content_id = models.PositiveIntegerField()
     content = generic.GenericForeignKey('content_type', 'content_id')
 
-    def save(self, *args, **kwargs):
-        new = not self.id
-        super(Node, self).save(*args, **kwargs)
-        if new:
-            self.content.post_create()
-
     def delete(self, *args, **kwargs):
         content = self.content
         super(Node, self).delete(*args, **kwargs)
@@ -86,7 +83,6 @@ class Node(MP_Node):
     def get_available_children_url(self):
         return ('widgy.views.recursive_children', (), {'node_pk': self.pk})
 
-
     # TODO: fix the error messages
     def reposition(self, right=None, parent=None):
         if not self.content.draggable:
@@ -114,24 +110,11 @@ class Node(MP_Node):
         return allowed_classes
 
 
-class InvalidTreeMovement(ValidationError):
-    pass
+def call_content_post_save(sender, instance, created, **kwargs):
+    if created:
+        instance.content.post_create()
 
-class RootDisplacementError(InvalidTreeMovement):
-    pass
-
-class ParentChildRejection(InvalidTreeMovement):
-    def __init__(self):
-        super(ParentChildRejection, self).__init__({'message': self.message})
-
-class BadParentRejection(ParentChildRejection):
-    message = "You can't put me in that"
-
-class BadChildRejection(ParentChildRejection):
-    message = "You can't put that in me"
-
-class OhHellNo(BadParentRejection, BadChildRejection):
-    message = "Everyone hates everything"
+post_save.connect(call_content_post_save, sender=Node)
 
 
 class Content(models.Model):
@@ -192,7 +175,6 @@ class Content(models.Model):
         elif bad_child:
             raise BadChildRejection
 
-
     def add_child(self, cls, **kwargs):
         obj = cls.objects.create(**kwargs)
 
@@ -226,11 +208,10 @@ class Content(models.Model):
                 )
         return obj
 
-
     @classmethod
     def add_root(cls, **kwargs):
         obj = cls.objects.create(**kwargs)
-        node = Node.add_root(
+        Node.add_root(
                 content=obj
                 )
         return obj
@@ -286,7 +267,6 @@ class Content(models.Model):
         for c in cls.__subclasses__():
             classes.update(c.all_concrete_subclasses())
         return classes
-
 
 
 class Bucket(Content):
