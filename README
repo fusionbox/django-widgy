@@ -66,7 +66,8 @@ Working:
   - Admin chrome around the widgy editor
   - Editing of the [mezzanine] page metadata (title, published)
   - Nice drag and drop: retain the inside node offset (ask Gavin), snap into
-  drop targets on mouseover.  
+    drop targets on mouseover.  
+  - Follow mouse on scroll while dragging.
 
 Not Working Yet:
 
@@ -77,7 +78,6 @@ These are the features that we need to be able to show people other than
 developers.  When we finish this feature list, we can sell it to other people in
 the company.
 
-  - Follow mouse on scroll while dragging.
   - Designer magic wand.
 
 ## JavaScript

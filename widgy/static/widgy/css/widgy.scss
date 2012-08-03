@@ -137,7 +137,7 @@ $green:       #559911;
       background-color: blue;
       margin: 0;
       pointer-events: none; /* leave this per Rocky's request */
-      position: absolute;
+      position: fixed;
     }
     
     p.title {
