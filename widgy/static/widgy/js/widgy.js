@@ -32,7 +32,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelv
       var root_node_view = this.root_node_view = new nodes.NodeView({
         model: root_node,
         app: this,
-        tagName: 'div'
+        tagName: 'section'
       });
 
       var shelf_list = new shelves.ShelfCollection({

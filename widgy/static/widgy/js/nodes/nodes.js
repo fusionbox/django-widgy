@@ -165,7 +165,8 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
     stopDrag: function() {
       this.$el.css({
-        position: 'static'
+        top: 0,
+        left: 0
       });
 
       this.$el.removeClass('being_dragged');
@@ -173,7 +174,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
 
     followMouse: function(event) {
       this.$el.css({
-        position: 'absolute',
         top: event.pageY - this.offsetY,
         left: event.pageX - this.offsetX
       });
@@ -389,10 +389,11 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       var view_class = content.getViewClass();
 
       content_view = new view_class({
-        model: content
+        model: content,
+        el: this.$content
       });
-
-      this.$content.html(content_view.render().el);
+      
+      content_view.render();
     }
   });
 

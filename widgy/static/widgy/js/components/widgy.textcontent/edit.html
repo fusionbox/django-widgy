@@ -1,5 +1,9 @@
   <form>
-    <input type="text" name="content" value="{{ content }}">
-    <input type="submit">
-    <button class="cancel" type="button">cancel</button>
+    <p class="text-input">
+      <textarea name="content">{{ content }}</textarea>
+    </p>
+    <p class="submit-row">
+      <button class="cancel" type="button">Cancel</button>
+      <input type="submit" value="Save">
+    </p>
   </form>

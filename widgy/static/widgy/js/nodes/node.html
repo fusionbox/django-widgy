@@ -1,10 +1,12 @@
 {{# content }}
-  {{# draggable }}
-  <span class="drag_handle dragHandle">drag</span>
-  {{/ draggable }}
-  {{# deletable }}
-  <button class="delete">delete</button>
-  {{/ deletable }}
+  <p class="drag-row">
+    {{# draggable }}
+    <span class="drag_handle dragHandle icon-move"></span>
+    {{/ draggable }}
+    {{# deletable }}
+    <button class="delete"><span class="icon-remove"></span> Delete</button>
+    {{/ deletable }}
+  </p>
 {{/ content }}
   <div class="content"></div>
   <ul class="node_children nodeChildren"></ul>

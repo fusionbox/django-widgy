@@ -8,6 +8,8 @@
 
 {% block extrahead %}{{ block.super }}
 {% compress css %}
+<link type="text/css" href="{% static "widgy/css/font-awesome.css" %}" rel="stylesheet">
+<link type="text/x-scss" href="{% static "widgy/css/common.scss" %}" rel="stylesheet">
 <link type="text/x-scss" href="{% static "widgy/css/widgy.scss" %}" rel="stylesheet">
 {% endcompress %}
 {% endblock %}

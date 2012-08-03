@@ -1,16 +1,16 @@
-<style>
-.mezz-fb-thumbnail {display:inline; margin-left:5px !important;}
-.mezz-fb-thumbnail img {width:20px; height:20px; margin-top:0 !important;}
-.vFileBrowseField {display:none;}
-</style>
-<p class="help mezz-fb-thumbnail" id="help_{{ input_id }}">
+<p class="help mezz-fb-thumbnail image-thumbnail" id="help_{{ input_id }}">
     <a href="{{ image_url  }}" target="_blank" id="link_{{ input_id }}">
         <img id="image_{{ input_id }}" src="{{ image_url }}" class="preview">
     </a>
 </p>
-  <form>
-    <button class="upload">upload</button>
+
+<form>
+  <p class="file-select">
     <input id="{{ input_id }}" type="text" name="image" value="{{ image }}">
-    <input type="submit">
-    <button class="cancel" type="button">cancel</button>
-  </form>
+    <button class="upload action">Select Image</button>
+  </p>
+  <p class="submit-row">
+    <button class="cancel" type="button">Cancel</button>
+    <input type="submit" value="Save">
+  </p>
+</form>

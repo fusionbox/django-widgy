@@ -1,3 +1,105 @@
+/* SASS Mixins
+--------------------------------------------------*/
+
+@mixin shadow($color: rgba(0,0,0,0.3), $left: 0px, $top: 0px, $blur: 8px) {
+  box-shadow: $left $top $blur $color;
+    -o-box-shadow: $left $top $blur $color;
+    -ms-box-shadow: $left $top $blur $color;
+    -moz-box-shadow: $left $top $blur $color;
+    -webkit-box-shadow: $left $top $blur $color;
+}
+
+@mixin inset-shadow($color: rgba(0,0,0,0.3), $left: 0px, $top: 0px, $blur: 8px) {
+  box-shadow: inset $left $top $blur $color;
+    -o-box-shadow: inset $left $top $blur $color;
+    -ms-box-shadow: inset $left $top $blur $color;
+    -moz-box-shadow: inset $left $top $blur $color;
+    -webkit-box-shadow: inset $left $top $blur $color;
+}
+
+
+@mixin text-shadow($color: rgba(0,0,0,0.3), $left: 0px, $top: 0px, $blur: 8px) {
+  text-shadow: $left $top $blur $color;
+    -o-text-shadow: $left $top $blur $color;
+    -moz-text-shadow: $left $top $blur $color;
+    -webkit-text-shadow: $left $top $blur $color;
+}
+
+@mixin rounded($radius) {
+  border-radius: $radius;
+    -o-border-radius: $radius;
+    -ms-border-radius: $radius;
+    -moz-border-radius: $radius;
+    -webkit-border-radius: $radius;
+}
+
+@mixin gradient($bottom,$top) {
+  background-color: $bottom;
+    background-image: -o-linear-gradient(center bottom, $bottom 1%, $top 100%);
+    background-image: -ms-linear-gradient(center bottom, $bottom 1%, $top 100%);
+    background-image: -moz-linear-gradient(center bottom, $bottom 1%, $top 100%);
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, $bottom), color-stop(1.00, $top));
+}
+
+@mixin default {
+  display: inline;
+  float: left;
+  height: auto;
+  width: 100%;
+}
+
+@mixin inner {
+  display: block;
+  margin: 0 auto;
+  padding: 0px;
+  text-align: left;
+  width: 960px;
+}
+
+@mixin clearfix {
+  &:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+  }
+  * html & { height: 1px }
+}
+
+@mixin wrapper {
+  display: block;
+  height: auto;
+  min-width: 960px;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+
+@mixin html {
+  h1, h2, h3, h4, h5, h6, p, blockquote, ol, ul, hgroup, hr {
+    display: block !important;
+    float: none !important;
+    margin: 0px 0px 15px 0px !important;
+    width: auto !important;
+  }
+  .fl { float: left; margin: 0px 25px 15px 0px; }
+  .fr { float: right; margin: 0px 0px 15px 25px; }
+  img { @include rounded(2px); &.left { float: left; margin: 5px 20px 15px 0px; } &.right { float: right; margin: 5px 0px 15px 20px; }}
+  table { display: table; width: 100% !important; }
+}
+
+
+/* Variables
+-----------------------------------------------*/
+
+$black10: rgba(0,0,0,0.1);
+$white20: rgba(255,255,255,0.2);
+$darkgrey:    #888888;
+$red:         #BF3030;
+$blue:        #309BBF;
+$green:       #559911;
+
 .widgy {
   .editor {
     width: 500px;
@@ -9,26 +111,64 @@
   }
 
   // Node Container
-  .nodeChildren {
-    padding: 0;
+  ul.nodeChildren {
+    margin: 0 !important;
+    padding: 0 !important;
+    
+    li ul.nodeChildren {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
   }
 
   .node {
-    border: 1px #000 solid;
+    @include rounded(4px);
+    background: $black10;
     list-style: none;
     margin: 1em;
-    padding: 0;
+    padding: 10px;
+    position: relative;
+    
+    p.drag-row {
+      @include clearfix;
+    }
 
     &.being_dragged {
       background-color: blue;
       margin: 0;
-      pointer-events: none;
+      pointer-events: none; /* leave this per Rocky's request */
+      position: absolute;
     }
-
-    .delete {
+    
+    p.title {
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 18px;
+      margin-bottom: 10px;
+      
+      &.bucket {
+        font-size: 18px;
+        line-height: 24px;
+        padding-top: 0px;
+      }
+    }
+    
+    button.edit {
+      position: absolute;
+      right: 79px;
+      top: 10px;
+      z-index: 10;
+    }
+    
+    button.delete {
       float: right;
-      background-color: red;
-      color: white;
+    }
+    
+    .dragHandle {
+      left: -5px;
+      float: left;
+      font-size: 20px;
+      position: relative;
     }
   }
 
@@ -42,4 +182,132 @@
       outline: 1px dashed red;
     }
   }
+
+  /* Inputs
+  -------------------*/
+  
+  input[type='text'], textarea {
+    @include inset-shadow($black10,0px,1px,2px);
+    border: 0px;
+    font-weight: normal !important;
+    padding: 6px 4px 5px;
+  }
+  
+  textarea {
+    height: 120px;
+  }
+
+  /* Image Widget
+  -------------------*/
+
+  .vFileBrowseField {display:none;}
+  
+  p.image-thumbnail {
+    @include rounded(3px);
+    background: white;
+    display: block !important;
+    margin: 0px 0px 10px 0px;
+    padding: 15px;
+    text-align: center;
+    
+    img {
+      border: 0px;
+      margin: 0 auto;
+      padding: 0px;
+      width: 60%;
+    }
+  }
+
+  /* Text Widget
+  -------------------*/
+  
+  p.text-input {
+    @include clearfix;
+    margin: 20px 0px 20px 0px;
+    
+    input[type='text'], textarea {
+      width: 98%;
+    }
+  }
+  
+
+  /* File Select
+  -------------------*/
+  
+  p.file-select {
+    @include clearfix;
+    margin: 0px 0px 20px 0px;
+    
+    input[type='text'] {
+      float: left;
+      width: 70%;
+    }
+    
+    button {
+      float: right;
+    }
+  }
+
+  /* Submit Row
+  -------------------*/
+  
+  p.submit-row {
+    @include rounded(3px);
+    background: $white20;
+    margin: 0px;
+    padding: 4px;
+  }
+
+  /* Buttons
+  -------------------*/
+
+  button {
+    background: $blue;
+    height: auto;
+    
+    &:hover {
+      background-color: lighten($blue,10%);
+    }
+
+    &.cancel {
+      background: $darkgrey;
+      opacity: 0.7;
+      
+      &:hover {
+        background-color: lighten($darkgrey,10%);
+        opacity: 1;
+      }
+    }
+    
+    &.edit {
+      padding: 2px;
+    }    
+
+    &.delete {
+      background-color: $red;
+      color: white;
+      height: auto;
+      padding: 2px;
+      &:hover {
+        background-color: lighten($red,10%);
+      }
+    }
+  }
+  
+  input[type='submit'] {
+    background: $green;
+    height: auto;
+    
+    &:hover {
+      background-color: lighten($green,5%);
+    }
+  }
+}
+
+
+
+/* Global
+-----------------------------------------------*/
+.change-form div.submit-row {
+  z-index: 1000;
 }

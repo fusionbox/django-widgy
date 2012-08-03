@@ -1,0 +1,116 @@
+/*
+ * Common SCSS File - SCSS v1.0
+ * last edited 02/17/12
+ * @author Justin Stollsteimer - Fusionbox, Inc. 
+ * http://www.fusionbox.com
+ *
+ *
+ * Lists: Line 
+ * HR: Line 
+ * Table: Line 
+ * Form Elements: Line 
+ *
+ */
+
+
+/* HR (usable as HTML property or div class)
+------------------------------------------------------*/
+
+hr {
+  @include default;
+  background: transparent;
+  border-width: 0px;
+  font-size: 0px;
+  height: 1px;
+  line-height: 0px;
+}
+
+
+/*| Table (styling for generic table)
+------------------------------------------------------*/
+
+table { 
+  border-collapse: collapse;
+  display: table; 
+  margin: 0px 0px 15px 0px;
+  width: 100%; 
+  float: none;
+}
+
+th { 
+  border: 1px solid;
+  font-weight: bold; 
+  padding: 5px 8px; 
+}
+
+td { 
+  border: 1px solid; 
+  padding: 5px 8px; 
+}
+
+/* Common Classes 
+------------------------------------------------------*/
+
+strong, 
+.strong {
+  font-weight: bold; 
+}
+  
+em, 
+.em { 
+  font-style: italic; 
+}
+  
+sup {
+  font-size: 60% !important;
+  position: relative; 
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+  @include default;
+}
+
+
+/* Block Elements
+------------------------------------------------------*/
+
+pre {
+  display: block;
+  margin: 10px 0px;
+  padding: 15px 25px;
+  width: auto;
+  background: #dddddd;
+  font-style: monospace;
+}
+
+blockquote {
+  display: block;
+  margin: 10px 0px;
+  padding: 15px 25px;
+  width: auto;
+  background: #dddddd;
+  font-style: italic;
+}
+      
+code { 
+  background: #dddddd; 
+  font-style: monospace;
+}
+
+
+/* Misc CKEditor Styles Tags
+------------------------------------------------------*/
+
+tt, kbd, samp, code { font-family: monospace; }
+cite { font-style: italic; padding: 10px; }
+small { font-size: 70%; line-height: 120%; display: inline-block; }
+big { font-size: 150%; }
+address { display: inline; font-style: italic; }
+q { font-style: italic; }
+var { font-weight: bold; }
+del { text-decoration: line-through; }
+
+.error, .errors li { color: #A53A3A; }
+
+label.required:after, span.required:after { content: '*'; color: #cc2222; }
+
