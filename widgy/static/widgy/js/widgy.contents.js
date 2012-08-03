@@ -36,7 +36,7 @@ define([ 'widgy.backbone' ], function(Backbone) {
    * view.  See `widgy.widgets.js`.
    */
   var ContentView = Backbone.View.extend({
-    className: 'content',
+    className: 'content'
   });
 
 
