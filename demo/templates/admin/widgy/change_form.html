@@ -45,13 +45,15 @@
 {% endblock %}
 
 {% block after_field_sets %}
-  <div id="app" class="widgy"></div>
 <script data-main="/static/widgy/js/main" src="{% static "widgy/js/require/require.js" %}"></script>
+{% for node in original.root_nodes %}
+  <div id="node_{{ node.id }}" class="widgy"></div>
 <script>
   require([ 'widgy' ], function(Widgy) {
-    window.widgy = new Widgy('#app', {{ original.to_json|json }});
+    window.widgy = new Widgy('#node_{{ node.id }}', {{ node.to_json|json }});
   });
 </script>
+{% endfor %}
 {% endblock %}
 
 {% block inline_field_sets %}

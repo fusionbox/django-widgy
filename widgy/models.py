@@ -13,25 +13,34 @@ from widgy.exceptions import (InvalidTreeMovement, OhHellNo, BadChildRejection,
         BadParentRejection, ParentChildRejection, RootDisplacementError)
 
 
-class ContentPage(Page):
-    root_node = models.ForeignKey('Node', blank=True, null=True, on_delete=models.SET_NULL, editable=False)
+class WidgyMixin(models.Model):
+    @property
+    def root_nodes(self):
+        for field in self.get_node_fields():
+            yield getattr(self, field.name)
 
-    def to_json(self):
-        return {
-                'title': self.title,
-                'root_node': self.root_node.to_json(),
-                }
-
-    def render(self):
-        return render_to_string('widgy/content_page.html', {
-            'title': self.title,
-            'root_node': self.root_node,
-            })
+    @classmethod
+    def get_node_fields(cls):
+        for field in cls._meta.fields:
+            if not field.rel:
+                continue
+            if issubclass(field.rel.to, Node):
+                yield field
 
     @classmethod
     def get_valid_layouts(cls):
         classes = [c for c in Layout.__subclasses__() if c.valid_child_class_of(cls)]
         return classes
+
+    class Meta:
+        abstract = True
+
+
+class ContentPage(Page, WidgyMixin):
+    root_node = models.ForeignKey('Node', verbose_name="Widgy Content", blank=True, null=True, on_delete=models.SET_NULL, editable=False)
+
+    class Meta:
+        verbose_name = 'Widgy Page'
 
 
 def exception_to_bool(fn):
@@ -330,6 +339,9 @@ class TwoColumnLayout(Layout):
     @property
     def right_bucket(self):
         return self.node.get_children()[1]
+
+    class Meta:
+        verbose_name = 'Two Column Layout'
 
 
 class TextContent(Content):

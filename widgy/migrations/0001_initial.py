@@ -11,7 +11,7 @@ class Migration(SchemaMigration):
         # Adding model 'ContentPage'
         db.create_table('widgy_contentpage', (
             ('page_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['pages.Page'], unique=True, primary_key=True)),
-            ('root_node', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['widgy.Node'], null=True)),
+            ('root_node', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['widgy.Node'], null=True, on_delete=models.SET_NULL, blank=True)),
         ))
         db.send_create_signal('widgy', ['ContentPage'])
 
@@ -30,6 +30,8 @@ class Migration(SchemaMigration):
         db.create_table('widgy_bucket', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('draggable', self.gf('django.db.models.fields.BooleanField')(default=True)),
+            ('deletable', self.gf('django.db.models.fields.BooleanField')(default=True)),
         ))
         db.send_create_signal('widgy', ['Bucket'])
 
@@ -45,6 +47,13 @@ class Migration(SchemaMigration):
             ('content', self.gf('django.db.models.fields.TextField')()),
         ))
         db.send_create_signal('widgy', ['TextContent'])
+
+        # Adding model 'ImageContent'
+        db.create_table('widgy_imagecontent', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('image', self.gf('mezzanine.core.fields.FileField')(max_length=255)),
+        ))
+        db.send_create_signal('widgy', ['ImageContent'])
 
 
     def backwards(self, orm):
@@ -62,6 +71,9 @@ class Migration(SchemaMigration):
 
         # Deleting model 'TextContent'
         db.delete_table('widgy_textcontent')
+
+        # Deleting model 'ImageContent'
+        db.delete_table('widgy_imagecontent')
 
 
     models = {
@@ -117,13 +129,20 @@ class Migration(SchemaMigration):
         },
         'widgy.bucket': {
             'Meta': {'object_name': 'Bucket'},
+            'deletable': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'draggable': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
         'widgy.contentpage': {
             'Meta': {'ordering': "('_order',)", 'object_name': 'ContentPage', '_ormbases': ['pages.Page']},
             'page_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['pages.Page']", 'unique': 'True', 'primary_key': 'True'}),
-            'root_node': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['widgy.Node']", 'null': 'True'})
+            'root_node': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['widgy.Node']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'})
+        },
+        'widgy.imagecontent': {
+            'Meta': {'object_name': 'ImageContent'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'image': ('mezzanine.core.fields.FileField', [], {'max_length': '255'})
         },
         'widgy.node': {
             'Meta': {'object_name': 'Node'},

@@ -22,13 +22,13 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelv
         'stopDrag'
       );
 
-      var page = options.page;
+      var root_node = options.root_node;
 
       // instantiate node_view_list before creating the root node
       // please!
       this.node_view_list = new Backbone.ViewList;
 
-      var root_node = new nodes.Node(page.root_node);
+      var root_node = new nodes.Node(root_node);
       var root_node_view = this.root_node_view = new nodes.NodeView({
         model: root_node,
         app: this,
@@ -99,9 +99,9 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelv
    * constructor, we are encouraged to think of the Widgy editor as an
    * instance.  This way we don't have global variables in our code.
    */
-  function Widgy(target, page) {
+  function Widgy(target, root_node) {
     this.app = new AppView({
-      page: page,
+      root_node: root_node,
       el: $(target)
     });
 
