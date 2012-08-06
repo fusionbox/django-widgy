@@ -4,8 +4,11 @@ from copy import deepcopy
 from django import forms
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import Group
 from django.db.models import Q
 
+from mezzanine.generic.models import ThreadedComment
+from mezzanine.pages.models import RichTextPage
 from mezzanine.pages.admin import PageAdmin
 
 from widgy.models import ContentPage
@@ -80,3 +83,6 @@ class WidgyPageAdmin(PageAdmin):
         super(WidgyPageAdmin, self).save_model(request, obj, form, change)
 
 admin.site.register(ContentPage, WidgyPageAdmin)
+admin.site.unregister(RichTextPage)
+admin.site.unregister(ThreadedComment)
+admin.site.unregister(Group)
