@@ -1,3 +1,6 @@
+from collections import defaultdict
+from operator import attrgetter
+
 from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.contenttypes.models import ContentType
@@ -17,7 +20,8 @@ class WidgyMixin(models.Model):
     @property
     def root_nodes(self):
         for field in self.get_node_fields():
-            yield getattr(self, field.name)
+            node = getattr(self, field.name)
+            yield node
 
     @classmethod
     def get_node_fields(cls):
@@ -64,7 +68,9 @@ class Node(MP_Node):
         content.delete()
 
     def to_json(self):
-        children = [child.to_json() for child in self.get_children().reverse()]
+        # reversed because we use 'right_id' and how backbone instantiates
+        # nodes
+        children = [c.to_json() for c in self.get_children().reverse()]
         json = {
                 'url': self.get_api_url(),
                 'content': self.content.to_json(),
@@ -82,7 +88,69 @@ class Node(MP_Node):
         return json
 
     def render(self, *args, **kwargs):
+        """
+        Delegates the render call to the content instance.
+        """
         return self.content.render(*args, **kwargs)
+
+    def get_children(self):
+        """
+        Wraps the MP_Tree API call to return the pre_built tree of children if
+        it is present.
+        """
+        if hasattr(self, '_children'):
+            return self._children
+        return super(Node, self).get_children()
+
+    def prefetch_tree(self):
+        """
+        Builds the entire tree using python.  Each node has it's Content
+        instance filled in, and the reverse node relation on the content filled
+        in as well.
+        """
+        # Build a list with the current node and all descendants
+        tree = list(self.get_descendants()) + [self]
+
+        # Build a mapping of content_types -> ids
+        contents = defaultdict(list)
+        for node in tree:
+            contents[node.content_type_id].append(node.content_id)
+
+        # Convert that mapping to content_types -> Content instances
+        for content_type_id, content_ids in contents.iteritems():
+            ct = ContentType.objects.get(pk=content_type_id)
+            contents[content_type_id] = dict([(i.id, i) for i in ct.model_class().objects.filter(pk__in=content_ids)])
+
+        # Loop throudh the nodes both assigning the content instance and the
+        # node instance onto the content
+        for node in tree:
+            node.content = contents[node.content_type_id][node.content_id]
+            node.content.node = node
+
+        # Knock the root node off before building out the tree structure
+        tree.pop()
+
+        self.assign_children(tree, True)
+
+    def assign_children(self, descendants, sort=False):
+        """
+        Helper method to assign the proper children in the proper order to each
+        node
+        """
+        if sort:
+            descendants.sort(key=attrgetter('depth', 'path'), reverse=True)
+
+        self._children = []
+
+        while descendants:
+            child = descendants[-1]
+            if child.depth == self.depth + 1 and child.path.startswith(self.path):
+                self._children.append(descendants.pop())
+            else:
+                break
+
+        for child in self._children:
+            child.assign_children(descendants)
 
     @models.permalink
     def get_api_url(self):
@@ -127,13 +195,20 @@ post_save.connect(call_content_post_save, sender=Node)
 
 
 class Content(models.Model):
-    _node = generic.GenericRelation(Node,
+    _nodes = generic.GenericRelation(Node,
                                content_type_field='content_type',
                                object_id_field='content_id')
 
-    @property
-    def node(self):
-        return self._node.all()[0]
+    def get_node(self):
+        if hasattr(self, '_node'):
+            return self._node
+        return self._nodes.all()[0]
+
+    def set_node(self, value):
+        self._node = value
+
+    # Settable property used by Node.prefetch_tree to optimize tree rendering
+    node = property(get_node, set_node)
 
     class Meta:
         abstract = True
