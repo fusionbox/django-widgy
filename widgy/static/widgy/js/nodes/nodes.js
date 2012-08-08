@@ -40,6 +40,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       this.unset('children');
     },
 
+    // TODO: we cannot rely on the `right_id` being up-to-date.  See #105207.
     checkDidReposition: function() {
       if ( this.hasChanged('parent_id') ||
           (this.hasChanged('right_id') && this.id !== this.get('right_id')) )
