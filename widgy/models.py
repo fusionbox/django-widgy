@@ -17,14 +17,23 @@ from widgy.exceptions import (InvalidTreeMovement, OhHellNo, BadChildRejection,
 
 
 class WidgyMixin(models.Model):
+    """
+    Abstract Base Class for models which will have an associated widgy tree.
+    """
     @property
     def root_nodes(self):
+        """
+        Returns all root node instances.
+        """
         for field in self.get_node_fields():
             node = getattr(self, field.name)
             yield node
 
     @classmethod
     def get_node_fields(cls):
+        """
+        Returns all foreign key fields which point to ``Node`` instances.
+        """
         for field in cls._meta.fields:
             if not field.rel:
                 continue
@@ -33,6 +42,10 @@ class WidgyMixin(models.Model):
 
     @classmethod
     def get_valid_layouts(cls):
+        """
+        Hook for determining which classes of nodes may reside under this
+        model.  Implementations should return an iterable of Content classes.
+        """
         classes = [c for c in Layout.__subclasses__() if c.valid_child_class_of(cls)]
         return classes
 

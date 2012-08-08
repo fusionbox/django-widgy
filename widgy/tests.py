@@ -49,14 +49,16 @@ class TreeFetchingOptimization(TestCase):
         page = self.page
 
         root = page.root_node
+        root.prefetch_tree()
 
         def test_children(parent):
-            if not hasattr(self, '_children'):
-                parent.prefetch_tree()
-            built_children = parent._children
+            children = parent._children
             del parent._children
-            self.assertTrue(built_children == list(parent.get_children()))
+            self.assertTrue(children == list(parent.get_children()))
+            parent._children = children
 
-        test_children(root)
-        for descendant in root.get_descendants():
-            test_children(descendant)
+        descendents = [root]
+        while descendents:
+            descendent = descendents.pop()
+            descendents += descendent.get_children()
+            test_children(descendent)

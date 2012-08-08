@@ -15,9 +15,13 @@ from widgy.models import ContentPage
 
 
 class WidgyPageAdmin(PageAdmin):
+    """
+    Model Admin for models which will have a widgy tree under them
+    """
+    # TODO: See if this works with the generic django admin rather than the
+    # Mezzanine admin
     widgy_fields = None
 
-    #add_form_template = 'admin/widgy/change_form.html'
     change_form_template = 'admin/widgy/change_form.html'
 
     def __init__(self, *args, **kwargs):
@@ -83,6 +87,8 @@ class WidgyPageAdmin(PageAdmin):
         super(WidgyPageAdmin, self).save_model(request, obj, form, change)
 
 admin.site.register(ContentPage, WidgyPageAdmin)
+
+# Remove built in Django and Mezzanine models from the admin center
 admin.site.unregister(RichTextPage)
 admin.site.unregister(ThreadedComment)
 admin.site.unregister(Group)
