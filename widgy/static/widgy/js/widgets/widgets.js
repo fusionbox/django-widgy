@@ -1,5 +1,5 @@
 define([ 'widgy.backbone', 'widgy.contents',
-    'text!./widget.html',
+    'text!./widget.html'
     ], function(Backbone, contents,
       widget_layout
       ) {
