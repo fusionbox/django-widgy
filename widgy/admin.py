@@ -4,11 +4,8 @@ from copy import deepcopy
 from django import forms
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.models import Group
 from django.db.models import Q
 
-from mezzanine.generic.models import ThreadedComment
-from mezzanine.pages.models import RichTextPage
 from mezzanine.pages.admin import PageAdmin
 
 from widgy.models import ContentPage
@@ -69,14 +66,6 @@ class WidgyPageAdmin(PageAdmin):
                 if field_name + '_layout' not in fieldsets[0][1]['fields']:
                     fieldsets[0][1]['fields'].append(field_name + '_layout')
 
-        # https://github.com/stephenmcd/mezzanine/pull/354
-        if self.widgy_fields:
-            for field_name in self.widgy_fields:
-                try:
-                    fieldsets[0][1]['fields'].remove('root_node')
-                except ValueError:
-                    pass
-
         return fieldsets
 
     def save_model(self, request, obj, form, change):
@@ -89,6 +78,11 @@ class WidgyPageAdmin(PageAdmin):
 admin.site.register(ContentPage, WidgyPageAdmin)
 
 # Remove built in Django and Mezzanine models from the admin center
+from django.contrib.auth.models import Group
+from mezzanine.generic.models import ThreadedComment
+from mezzanine.pages.models import RichTextPage
+
 admin.site.unregister(RichTextPage)
 admin.site.unregister(ThreadedComment)
 admin.site.unregister(Group)
+

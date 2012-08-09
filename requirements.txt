@@ -7,7 +7,7 @@ django-compressor
 django-debug-toolbar
 django-extensions
 MySQL-python==1.2.3
-Mezzanine==1.1.4
+Mezzanine==1.2.0
 pyScss==1.1.3
 django-treebeard==1.61
 #psycopg2==2.4.5

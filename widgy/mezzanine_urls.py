@@ -67,7 +67,7 @@ urlpatterns += patterns("",
 )
 
 # Mezzanine's Blog app.
-BLOG_SLUG = settings.BLOG_SLUG
+BLOG_SLUG = getattr(settings, 'BLOG_SLUG', '')
 blog_installed = "mezzanine.blog" in settings.INSTALLED_APPS and getattr(settings, 'BLOG_URLS_ENABLED', True)
 if blog_installed:
     if BLOG_SLUG:
