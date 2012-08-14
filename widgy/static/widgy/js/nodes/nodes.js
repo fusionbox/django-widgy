@@ -60,11 +60,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     loadContent: function(model, content) {
       if ( content )
       {
-        // content gets set because it is in the JSON for the node.  We need to
-        // unset it as it is not an attribute, but a property.  We also need to
-        // instantiate it as a real Content Model.
-        this.unset('content');
-
         // This is asynchronous because of requirejs.
         contents.getModel(content.__class__, _.bind(this.instantiateContent, this, content));
       }
@@ -73,16 +68,13 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     instantiateContent: function(content, model_class) {
       this.content = new model_class(content);
 
+      // content gets set because it is in the JSON for the node.  We need to
+      // unset it as it is not an attribute, but a property.  We also need to
+      // instantiate it as a real Content Model.
+      this.unset('content');
+
       this.trigger('load:content', this.content);
-    },
-
-    toJSON: function() {
-      var json = Backbone.Model.prototype.toJSON.apply(this, arguments);
-      if ( this.content )
-        json.content = this.content.toJSON();
-      return json;
     }
-
   });
 
 
@@ -392,6 +384,14 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       });
       
       content_view.render();
+    },
+
+    toJSON: function() {
+      var json = this.model.toJSON();
+      if ( this.model.content )
+        json.content = this.model.content.toJSON();
+
+      return json;
     }
   });
 
