@@ -130,6 +130,8 @@ class Node(MP_Node):
             contents[node.content_type_id].append(node.content_id)
 
         # Convert that mapping to content_types -> Content instances
+        # TODO: Maybe use in_bulk here to avoid doing a query for every content
+        # type
         for content_type_id, content_ids in contents.iteritems():
             ct = ContentType.objects.get(pk=content_type_id)
             contents[content_type_id] = dict([(i.id, i) for i in ct.model_class().objects.filter(pk__in=content_ids)])
