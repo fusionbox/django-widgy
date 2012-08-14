@@ -117,7 +117,7 @@ class Node(MP_Node):
 
     def prefetch_tree(self):
         """
-        Builds the entire tree using python.  Each node has it's Content
+        Builds the entire tree using python.  Each node has its Content
         instance filled in, and the reverse node relation on the content filled
         in as well.
         """
@@ -130,11 +130,13 @@ class Node(MP_Node):
             contents[node.content_type_id].append(node.content_id)
 
         # Convert that mapping to content_types -> Content instances
+        # TODO: Maybe use in_bulk here to avoid doing a query for every content
+        # type
         for content_type_id, content_ids in contents.iteritems():
             ct = ContentType.objects.get(pk=content_type_id)
             contents[content_type_id] = dict([(i.id, i) for i in ct.model_class().objects.filter(pk__in=content_ids)])
 
-        # Loop throudh the nodes both assigning the content instance and the
+        # Loop through the nodes both assigning the content instance and the
         # node instance onto the content
         for node in tree:
             node.content = contents[node.content_type_id][node.content_id]
