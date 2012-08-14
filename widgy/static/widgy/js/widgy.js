@@ -35,14 +35,12 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelv
         tagName: 'section'
       });
 
-      var shelf_list = new shelves.ShelfCollection({
-        node: root_node
-      });
       var shelf_view = this.shelf_view = new shelves.ShelfView({
-        collection: shelf_list,
+        collection: new shelves.ShelfCollection({ node: root_node }),
         app: this
       });
-      this.refreshShelf();
+
+      shelf_view.collection.fetch();
     },
 
     render: function() {
@@ -67,10 +65,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelv
       this.node_view_list.each(function(node_view) {
         node_view.addDropTargets(dragged_view);
       });
-    },
-
-    refreshShelf: function() {
-      this.shelf_view.collection.fetch();
     },
 
     stopDrag: function() {
