@@ -152,7 +152,6 @@ class NodeView(RestView):
         if not node.content.deletable:
             raise InvalidTreeMovement({'message': "You can't delete me"})
 
-        # TODO: don't leave content behind
         node.delete()
 
         return self.render_to_response(None)
