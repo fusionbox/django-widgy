@@ -25,12 +25,10 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       Backbone.Model.prototype.initialize.apply(this, arguments);
 
       _.bindAll(this,
-        'instantiateContent',
-        'checkDidReposition'
+        'instantiateContent'
         );
 
       this
-        .on('change', this.checkDidReposition)
         .on('change:content', this.loadContent);
 
       // same as content.  We need to actually instantiate the NodeCollection
@@ -38,15 +36,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       var children = this.get('children');
       this.children = new NodeCollection(children);
       this.unset('children');
-    },
-
-    // TODO: we cannot rely on the `right_id` being up-to-date.  See #105207.
-    checkDidReposition: function() {
-      if ( this.hasChanged('parent_id') ||
-          (this.hasChanged('right_id') && this.id !== this.get('right_id')) )
-      {
-        this.trigger('reposition', this, this.get('parent_id'), this.get('right_id'));
-      }
     },
 
     checkIsContentLoaded: function() {
@@ -60,11 +49,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     loadContent: function(model, content) {
       if ( content )
       {
-        // content gets set because it is in the JSON for the node.  We need to
-        // unset it as it is not an attribute, but a property.  We also need to
-        // instantiate it as a real Content Model.
-        this.unset('content');
-
         // This is asynchronous because of requirejs.
         contents.getModel(content.__class__, _.bind(this.instantiateContent, this, content));
       }
@@ -73,16 +57,13 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     instantiateContent: function(content, model_class) {
       this.content = new model_class(content);
 
+      // content gets set because it is in the JSON for the node.  We need to
+      // unset it as it is not an attribute, but a property.  We also need to
+      // instantiate it as a real Content Model.
+      this.unset('content');
+
       this.trigger('load:content', this.content);
-    },
-
-    toJSON: function() {
-      var json = Backbone.Model.prototype.toJSON.apply(this, arguments);
-      if ( this.content )
-        json.content = this.content.toJSON();
-      return json;
     }
-
   });
 
 
@@ -241,6 +222,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       _.bindAll(this,
         'addAll',
         'addOne',
+        'checkDidReposition',
         'position',
         'createDropTarget',
         'dropChildView',
@@ -248,6 +230,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
         );
 
       this.model
+        .on('change', this.checkDidReposition)
         .on('load:content', this.renderContent);
 
       this.collection = this.model.children;
@@ -276,6 +259,28 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
     'delete': function(event) {
       event.stopPropagation();
       this.model.destroy();
+    },
+
+    checkDidReposition: function(model) {
+      var changed = model.hasChanged('parent_id'),
+          new_right_id = model.get('right_id'),
+          old_right_id,
+          right_view;
+
+      if ( ! changed ) {
+        right_view = this.app.node_view_list.findByEl(this.$el.next());
+
+        if ( right_view ) {
+          old_right_id = right_view.model.id;
+        } else {
+          old_right_id = null;
+        }
+
+        changed = old_right_id == new_right_id && this.id !== new_right_id;
+      }
+
+      if ( changed )
+        model.trigger('reposition', model, model.get('parent_id'), model.get('right_id'));
     },
 
     /**
@@ -392,6 +397,14 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       });
       
       content_view.render();
+    },
+
+    toJSON: function() {
+      var json = this.model.toJSON();
+      if ( this.model.content )
+        json.content = this.model.content.toJSON();
+
+      return json;
     }
   });
 
