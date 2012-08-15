@@ -46,3 +46,7 @@ class ListContentBase(Content):
             'list_content.html',
             )
         return templates
+
+    def component_name(self):
+        return "widgy.listcontentbase"
+
