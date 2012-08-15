@@ -8,3 +8,4 @@ media/*
 tmp/
 settings_local.py
 build/
+tags
