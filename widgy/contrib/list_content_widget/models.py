@@ -8,6 +8,13 @@ class ListContentBase(Content):
 
     It is up to the developer to inherit this class and implement their own
     list content.
+
+    If the default manager will be used, you can just set the `model` class
+    property to the Django model you wish to callout.
+
+    If you need a more complex query, you may override the `queryset` class
+    property.  If the queryset needs knowledge of the model instance, there is
+    a `get_queryset` method that is available.
     """
     model = None
     paginate_by = None
