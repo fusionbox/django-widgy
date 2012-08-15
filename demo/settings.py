@@ -272,8 +272,13 @@ INSTALLED_APPS = (
     'south',
     'django_extensions',
 
+    # widgy apps
     'widgy',
     'urlconf_include',
+    'widgy.contrib.list_content_widget',
+
+    # local project
+    'demo.demo_widgets'
 )
 
 FORMS_LABEL_MAX_LENGTH = 255
