@@ -50,7 +50,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       if ( content )
       {
         // This is asynchronous because of requirejs.
-        contents.getModel(content.__class__, _.bind(this.instantiateContent, this, content));
+        contents.getModel(content.component, _.bind(this.instantiateContent, this, content));
       }
     },
 
