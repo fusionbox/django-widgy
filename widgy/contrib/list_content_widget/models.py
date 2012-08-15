@@ -17,9 +17,9 @@ class ListContentBase(Content):
     a `get_queryset` method that is available.
     """
     model = None
-    paginate_by = None
     queryset = None
-    template_name = None
+    limit = 3
+    component_name = "widgy.listcontentbase"
 
     header = CharField(max_length=255, blank=True, default="")
 
@@ -33,15 +33,12 @@ class ListContentBase(Content):
 
         Overwrite this method to return a custom queryset.
         """
-        return self.queryset or self.model._default_manager.all()
+        return self.queryset or self.model._default_manager.all()[:self.limit]
 
     def get_context(self):
         """
         """
-        return {
-                'list': self.get_queryset(),
-                'paginate_by': self.paginate_by,
-                }
+        return {'list': self.get_queryset()}
 
     def render(self, context):
         """
@@ -56,9 +53,6 @@ class ListContentBase(Content):
             'list_content.html',
             )
         return templates
-
-    def component_name(self):
-        return "widgy.listcontentbase"
 
     def to_json(self):
         json = super(ListContentBase, self).to_json()
