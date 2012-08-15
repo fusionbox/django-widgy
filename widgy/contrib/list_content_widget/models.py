@@ -1,3 +1,4 @@
+from django.db.models import CharField
 from widgy.models import Content
 
 
@@ -12,6 +13,8 @@ class ListContentBase(Content):
     paginate_by = None
     queryset = None
     template_name = None
+
+    header = CharField(max_length=255, blank=True, default="")
 
     class Meta:
         abstract = True
@@ -50,3 +53,9 @@ class ListContentBase(Content):
     def component_name(self):
         return "widgy.listcontentbase"
 
+    def to_json(self):
+        json = super(ListContentBase, self).to_json()
+        list_tojson = [item.__unicode__() for item in self.get_queryset()]
+        json['list'] = list_tojson
+        json['header'] = self.header
+        return json
