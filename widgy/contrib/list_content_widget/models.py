@@ -43,7 +43,6 @@ class ListContentBase(Content):
         """
         """
         templates = (
-            self.template_name,
-            'widgy/contrib/list_content_widget/templates/list_content.html',
+            'list_content.html',
             )
         return templates
