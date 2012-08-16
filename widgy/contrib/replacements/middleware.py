@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.core.urlresolvers import resolve
 from django.contrib.sites.models import Site
 from django.template.defaultfilters import escape
 from widgy.contrib.replacements.models import (
@@ -6,7 +8,7 @@ from widgy.contrib.replacements.models import (
         )
 
 
-class TagReplacementMiddleware:
+class TagReplacementMiddleware(object):
     """
     Handles replacement of {{ tags }} that have been set up as sitewide
     replacements.
@@ -17,6 +19,9 @@ class TagReplacementMiddleware:
         is run on the rendered_content of the response.  This replaces any
         matched tags with those defined in the database.
         """
+        if (resolve(request.path).app_name in
+            settings.REPLACEMENTS_APP_BLACKLIST):
+            return response
         replacements = Replacement.published\
                 .filter(site=Site.objects.get_current())\
                 .all()
