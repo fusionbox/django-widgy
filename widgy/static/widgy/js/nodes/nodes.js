@@ -123,7 +123,33 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.drop_targets_list = new Backbone.ViewList;
     },
 
-    checkDidReposition: function(model) {
+    checkDidReposition: function(model, options) {
+      if ( ! options.possible_reposition )
+        return;
+
+      var changed = model.hasChanged('parent_id'),
+          new_right_id = model.get('right_id'),
+          old_right_id,
+          right_view;
+
+      if ( ! changed ) {
+        right_view = this.app.node_view_list.findByEl(this.$el.next());
+
+        if ( right_view ) {
+          old_right_id = right_view.model.id;
+        } else {
+          old_right_id = null;
+        }
+
+        changed = old_right_id == new_right_id;
+      }
+
+      if ( changed ) {
+        this.triggerReposition(model);
+      }
+    },
+
+    triggerReposition: function(model) {
       model.trigger('reposition', model, model.get('parent_id'), model.get('right_id'));
     },
 
@@ -272,28 +298,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.model.destroy();
     },
 
-    checkDidReposition: function(model) {
-      var changed = model.hasChanged('parent_id'),
-          new_right_id = model.get('right_id'),
-          old_right_id,
-          right_view;
-
-      if ( ! changed ) {
-        right_view = this.app.node_view_list.findByEl(this.$el.next());
-
-        if ( right_view ) {
-          old_right_id = right_view.model.id;
-        } else {
-          old_right_id = null;
-        }
-
-        changed = old_right_id == new_right_id;
-      }
-
-      if ( changed )
-        NodeViewBase.prototype.checkDidReposition.apply(this, arguments);
-    },
-
     /**
      * `addDropTargets`, `createDropTarget`, `clearDropTargets`, `position`,
      * and `dropChildView` all deal with a possible child NodeView being
@@ -381,7 +385,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       dragged_view.model.save({
         parent_id: this.model.id,
         right_id: right_id
-      }, {wait: true});
+      }, {wait: true, possible_reposition: true});
     },
 
     render: function() {
