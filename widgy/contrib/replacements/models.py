@@ -26,6 +26,8 @@ class Replacement(Timestampable, Publishable):
             help_text=u'When this text is encountered \
             anywhere on site surrounded by {{ }}, it will be replaced with \
             the replacement text.')
+    replacement = CharField(max_length=255,
+            help_text=u'This text replaces the tag.')
 
     class Meta:
         verbose_name = 'replacement'
