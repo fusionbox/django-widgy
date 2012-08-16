@@ -413,7 +413,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       
       content_view.render();
 
-      if ( ! this.model.get('parent_id') )
+      if ( ! this.model.get('parent_id') || content.get('shelf') )
       {
         this.renderShelf();
       }
