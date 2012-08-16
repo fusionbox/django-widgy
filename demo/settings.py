@@ -276,6 +276,7 @@ INSTALLED_APPS = (
     'widgy',
     'urlconf_include',
     'widgy.contrib.list_content_widget',
+    'widgy.contrib.replacements',
 
     # local project
     'demo.demo_widgets'
@@ -317,6 +318,7 @@ MIDDLEWARE_CLASSES = (
     # "mezzanine.core.middleware.SSLRedirectMiddleware",
     "urlconf_include.middleware.PatchUrlconfMiddleware",
     "mezzanine.pages.middleware.PageMiddleware",
+    "widgy.contrib.replacements.middleware.TagReplacementMiddleware",
     "mezzanine.core.middleware.FetchFromCacheMiddleware",
 )
 
