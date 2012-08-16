@@ -14,6 +14,11 @@ no_curlies_validator = RegexValidator(no_curlies_regex,
 
 class Replacement(Timestampable, Publishable):
     """
+    Replacement models represent a sitewide text replacement.  During every
+    response, the body is checked for {{ tag }} and replaces with the
+    corresponding replacement text.
+
+    Requires installation of the `TagReplacementMiddleware`
     """
     site = ForeignKey(Site, related_name='replacements')
     tag = CharField(max_length=255,
