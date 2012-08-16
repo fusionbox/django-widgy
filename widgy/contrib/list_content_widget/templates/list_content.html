@@ -1,0 +1,9 @@
+{% load widgy_tags %}
+<div class="list_content">
+  <h2 class="list_content_header">{{ content.header }}</h2>
+  <ul>
+    {% for item in list %}
+    <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+</div>

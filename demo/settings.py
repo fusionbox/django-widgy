@@ -272,9 +272,17 @@ INSTALLED_APPS = (
     'south',
     'django_extensions',
 
+    # widgy apps
     'widgy',
     'urlconf_include',
+    'widgy.contrib.list_content_widget',
+
+    # local project
+    'demo.demo_widgets'
 )
+
+FORMS_LABEL_MAX_LENGTH = 255
+FORMS_FIELD_MAX_LENGTH = 255
 
 # List of processors used by RequestContext to populate the context.
 # Each one should be a callable that takes the request object as its

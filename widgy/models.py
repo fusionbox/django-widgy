@@ -323,10 +323,26 @@ class Content(models.Model):
         """
         pass
 
+    @property
+    def class_name(self):
+        """
+        Return a fully qualified classname including app_label and module_name
+        """
+        return "%s.%s" % (self._meta.app_label, self._meta.module_name)
+
+    @property
+    def component_name(self):
+        """
+        Return a string that will be used clientside to retrieve this content's
+        component.js resource.
+        """
+        return self.class_name
+
     def to_json(self):
         return {
                 'url': self.get_api_url(),
-                '__class__': "%s.%s" % (self._meta.app_label, self._meta.module_name),
+                '__class__': self.class_name,
+                'component': self.component_name,
                 'model': self._meta.module_name,
                 'object_name': self._meta.object_name,
                 'draggable': self.draggable,
