@@ -4,6 +4,8 @@ from django.core.validators import RegexValidator
 from fusionbox.behaviors import Timestampable, Publishable
 from django.db.models import CharField, ForeignKey
 
+surrounded_by_curlies = re.compile(r'{{\s*[^\{\}]+\s*}}')
+
 no_curlies_regex = re.compile(r'^[^\{\}]*$')
 
 no_curlies_validator = RegexValidator(no_curlies_regex,
