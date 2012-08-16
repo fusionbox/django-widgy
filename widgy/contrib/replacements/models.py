@@ -1,9 +1,12 @@
+import re
 from django.contrib.sites.models import Site
 from django.core.validators import RegexValidator
 from fusionbox.behaviors import Timestampable, Publishable
 from django.db.models import CharField, ForeignKey
 
-no_curlies_validator = RegexValidator(r'^[^\{\}]+$',
+no_curlies_regex = re.compile(r'^[^\{\}]*$')
+
+no_curlies_validator = RegexValidator(no_curlies_regex,
         message='The replacement tag may not contain "}" or "{"')
 
 
