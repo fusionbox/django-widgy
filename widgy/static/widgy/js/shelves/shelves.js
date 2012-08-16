@@ -1,16 +1,16 @@
-define([ 'underscore', 'widgy.backbone', 'nodes/nodes',
+define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
     'text!./shelf.html'
-    ], function(_, Backbone, nodes,
+    ], function(exports, _, Backbone, nodes,
       shelf_view_template
       ) {
 
   var ShelfCollection = Backbone.Collection.extend({
-    model: nodes.Node,
-
     initialize: function(options) {
       _.bindAll(this,
         'update'
       );
+
+      this.model = nodes.Node;
 
       this.node = options.node;
       this.on('remove', this.update);
@@ -73,8 +73,8 @@ define([ 'underscore', 'widgy.backbone', 'nodes/nodes',
   });
 
 
-  return {
+  _.extend(exports, {
     ShelfCollection: ShelfCollection,
     ShelfView: ShelfView
-  };
+  });
 });

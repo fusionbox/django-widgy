@@ -104,10 +104,12 @@ $green:       #559911;
   .editor {
     width: 500px;
     display: inline-block;
-  }
 
-  .toolbox {
-    float: right;
+    .shelf {
+      position: absolute;
+      top: 0;
+      right: -210px;
+    }
   }
 
   // Node Container

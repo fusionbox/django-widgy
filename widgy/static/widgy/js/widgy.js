@@ -1,6 +1,6 @@
-define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelves',
+define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
     'text!app.html'
-    ], function($, _, Backbone, nodes, shelves,
+    ], function($, _, Backbone, nodes,
       app_template
       ) {
 
@@ -34,13 +34,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelv
         app: this,
         tagName: 'section'
       });
-
-      var shelf_view = this.shelf_view = new shelves.ShelfView({
-        collection: new shelves.ShelfCollection({ node: root_node }),
-        app: this
-      });
-
-      shelf_view.collection.fetch();
     },
 
     render: function() {
@@ -48,9 +41,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes', 'shelves/shelv
 
       this.$editor = this.$el.children('.editor');
       this.$editor.append(this.root_node_view.render().el);
-
-      this.$toolbox = this.$el.children('.toolbox');
-      this.$toolbox.append(this.shelf_view.render().el);
 
       return this;
     },

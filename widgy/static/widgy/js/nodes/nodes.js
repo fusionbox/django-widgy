@@ -1,8 +1,8 @@
-define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
+define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 'shelves/shelves',
     'text!./node.html',
     'text!./preview.html',
     'text!./drop_target.html'
-    ], function($, _, Backbone, contents,
+    ], function(exports, $, _, Backbone, contents, shelves,
       node_view_template,
       node_preview_view_template,
       drop_target_view_template
@@ -36,6 +36,13 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       var children = this.get('children');
       this.children = new NodeCollection(children);
       this.unset('children');
+    },
+
+    url: function() {
+      if ( this.id ) {
+        return this.id;
+      }
+      return this.urlRoot;
     },
 
     checkIsContentLoaded: function() {
@@ -397,6 +404,24 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
       });
       
       content_view.render();
+
+      if ( ! this.model.get('parent_id') )
+      {
+        this.renderShelf();
+      }
+    },
+
+    renderShelf: function() {
+      var shelf_view = this.shelf_view = new shelves.ShelfView({
+        collection: new shelves.ShelfCollection({
+            node: this.model
+          }),
+        app: this.app
+      });
+
+      shelf_view.collection.fetch();
+
+      this.$el.append(shelf_view.render().el);
     },
 
     toJSON: function() {
@@ -438,13 +463,13 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents',
   });
 
 
-  return {
+  _.extend(exports, {
     DropTargetView: DropTargetView,
     Node: Node,
     NodeCollection: NodeCollection,
     NodeView: NodeView,
     NodePreviewView: NodePreviewView,
     NodeViewBase: NodeViewBase
-  };
+  });
 
 });
