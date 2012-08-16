@@ -105,12 +105,14 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         'startDrag',
         'followMouse',
         'stopDrag',
+        'checkDidReposition',
         'reposition',
         'addDropTargets',
         'clearDropTargets'
       );
 
       this.model
+        .on('change', this.checkDidReposition)
         .on('remove', this.close)
         .on('destroy', this.close)
         .on('reposition', this.reposition);
@@ -119,6 +121,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.app.node_view_list.push(this);
 
       this.drop_targets_list = new Backbone.ViewList;
+    },
+
+    checkDidReposition: function(model) {
+      model.trigger('reposition', model, model.get('parent_id'), model.get('right_id'));
     },
 
     /**
@@ -229,7 +235,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       _.bindAll(this,
         'addAll',
         'addOne',
-        'checkDidReposition',
         'position',
         'createDropTarget',
         'dropChildView',
@@ -237,7 +242,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         );
 
       this.model
-        .on('change', this.checkDidReposition)
         .on('load:content', this.renderContent);
 
       this.collection = this.model.children;
@@ -283,11 +287,11 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
           old_right_id = null;
         }
 
-        changed = old_right_id == new_right_id && this.id !== new_right_id;
+        changed = old_right_id == new_right_id;
       }
 
       if ( changed )
-        model.trigger('reposition', model, model.get('parent_id'), model.get('right_id'));
+        NodeViewBase.prototype.checkDidReposition.apply(this, arguments);
     },
 
     /**
