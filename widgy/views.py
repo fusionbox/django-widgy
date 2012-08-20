@@ -94,8 +94,8 @@ class ContentView(RestView):
                 ).get_object_for_this_type(
                     pk=object_pk)
 
-    def get(self, request, object_name, object_pk):
-        obj = self.get_object(object_name, object_pk)
+    def get(self, request, app_label, object_name, object_pk):
+        obj = self.get_object(app_label, object_name, object_pk)
         return self.render_to_response(obj)
 
     # TODO: stupid implementation

@@ -95,8 +95,7 @@ class Node(MP_Node):
             json['parent_id'] = parent.get_api_url()
 
         right = self.get_next_sibling()
-        if right:
-            json['right_id'] = right.get_api_url()
+        json['right_id'] = right and right.get_api_url()
 
         return json
 
