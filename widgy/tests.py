@@ -150,6 +150,3 @@ class TestApi(HttpTestCase):
         new_child['parent_id'] = self.root_node.to_json()['children'][1]['url']
         r = self.put(new_child['url'], new_child)
         assert r.status_code == 200
-        r = json.loads(r.content)
-
-        assert r['parent_id'] == self.root_node.to_json()['children'][1]['url']
