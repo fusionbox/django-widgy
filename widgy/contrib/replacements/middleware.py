@@ -1,11 +1,18 @@
+from datetime import datetime
 from django.conf import settings
 from django.core.urlresolvers import resolve
-from django.contrib.sites.models import Site
 from django.template.defaultfilters import escape
 from widgy.contrib.replacements.models import (
         surrounded_by_curlies,
         Replacement
         )
+### TODO: Move this to a utility function:
+if getattr(settings, 'USE_TZ', False):
+    from django.utils.timezone import utc
+
+    now = datetime.utcnow().replace(tzinfo=utc)
+else:
+    now = datetime.now()
 
 
 class TagReplacementMiddleware(object):
@@ -22,8 +29,9 @@ class TagReplacementMiddleware(object):
         if (resolve(request.path).app_name in
             settings.REPLACEMENTS_APP_BLACKLIST):
             return response
-        replacements = Replacement.published\
-                .filter(site=Site.objects.get_current())\
+
+        replacements = Replacement.objects\
+                .filter(is_published=True, publish_at__lte=now)\
                 .all()
         repl_list = [(r.tag, escape(r.replacement)) for r in replacements]
 
