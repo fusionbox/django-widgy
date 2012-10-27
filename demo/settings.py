@@ -268,7 +268,7 @@ INSTALLED_APPS = (
     # standard fusionbox apps
     'debug_toolbar',
     'compressor',
-    'fusionbox',
+    'fusionbox.core',
     'south',
     'django_extensions',
 
