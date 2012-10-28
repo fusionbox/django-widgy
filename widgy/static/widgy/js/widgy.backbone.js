@@ -15,7 +15,8 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
       _.bindAll(this,
         'close',
         'render',
-        'toJSON'
+        'toJSON',
+        'bubble'
       );
     },
 
@@ -114,6 +115,10 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
 
     toJSON: function() {
       return this.model ? this.model.toJSON() : {};
+    },
+
+    bubble: function() {
+      this.trigger.apply(this, arguments);
     }
   });
 

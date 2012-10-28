@@ -60,6 +60,8 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
         app: this.app
       });
 
+      view.on('all', this.bubble);
+
       this.list.push(view);
       this.$list.append(view.render().el);
     },

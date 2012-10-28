@@ -34,6 +34,9 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
         app: this,
         tagName: 'section'
       });
+
+      root_node_view.on('startDrag', this.startDrag);
+      root_node_view.on('stopDrag', this.stopDrag);
     },
 
     render: function() {
@@ -57,7 +60,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
       });
     },
 
-    stopDrag: function() {
+    stopDrag: function(index, cb) {
       var dragged_view = this.dragged_view;
       delete this.dragged_view;
 
@@ -68,7 +71,8 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
       });
 
       dragged_view.stopDrag();
-      return dragged_view;
+
+      cb(dragged_view, index);
     }
   });
 

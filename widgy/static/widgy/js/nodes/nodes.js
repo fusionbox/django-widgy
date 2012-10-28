@@ -176,7 +176,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       // yet.
       this.followMouse(event);
 
-      this.app.startDrag(this);
+      this.trigger('startDrag', this);
 
       this.$el.addClass('being_dragged');
     },
@@ -264,6 +264,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         'position',
         'createDropTarget',
         'dropChildView',
+        'receiveChildView',
         'renderContent'
         );
 
@@ -288,6 +289,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         model: node,
         app: this.app
       });
+
+      node_view.on('all', this.bubble);
 
       this.position(node_view.render());
       this.list.push(node_view);
@@ -350,20 +353,23 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       }
     },
 
-    /**
-     * This is the method that is called when the NodeView that is being
-     * dragged is dropped on one of my drop targets.
-     */
-    dropChildView: function(view) {
-      var $children = this.$children;
-      var index = view.$el.index() / 2;
+
+    dropChildView: function(drop_target) {
+      var index = drop_target.$el.index() / 2;
 
       // We need to stop the drag before finding the right node.
       // `this.app.stopDrag` will clear all of the drop targets, so we need to
       // remove them before we can get elements by index.
-      var dragged_view = this.app.stopDrag();
+      this.trigger('stopDrag', index, this.receiveChildView);
+    },
 
-      var right_id = null;
+    /**
+     * This is the method that is called when the NodeView that is being
+     * dragged is dropped on one of my drop targets.
+     */
+    receiveChildView: function(dragged_view, index) {
+      var $children = this.$children,
+          right_id = null;
 
       // If index is the length of $children.children there is no right element
       // and we want it set to null.  Otherwise there is a right and we need
@@ -427,6 +433,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         app: this.app
       });
 
+      shelf_view.on('all', this.bubble);
       shelf_view.collection.fetch();
 
       this.$el.append(shelf_view.render().el);
