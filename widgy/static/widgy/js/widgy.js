@@ -35,8 +35,12 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
         tagName: 'section'
       });
 
-      root_node_view.on('startDrag', this.startDrag);
-      root_node_view.on('stopDrag', this.stopDrag);
+      this.node_view_list.push(root_node_view);
+
+      root_node_view
+        .on('startDrag', this.startDrag)
+        .on('stopDrag', this.stopDrag)
+        .on('created', this.node_view_list.push);
     },
 
     render: function() {

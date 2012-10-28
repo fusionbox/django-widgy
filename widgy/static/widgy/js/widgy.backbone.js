@@ -153,7 +153,8 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
     this.list = []
 
     _.bindAll(this,
-      'remove'
+      'remove',
+      'push'
     );
   }
 

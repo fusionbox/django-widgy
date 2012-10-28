@@ -118,7 +118,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         .on('reposition', this.reposition);
 
       this.app = options.app;
-      this.app.node_view_list.push(this);
 
       this.drop_targets_list = new Backbone.ViewList;
     },
@@ -292,8 +291,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       node_view.on('all', this.bubble);
 
-      this.position(node_view.render());
       this.list.push(node_view);
+      this.trigger('created', node_view);
+
+      this.position(node_view.render());
     },
 
     'delete': function(event) {
@@ -346,7 +347,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       if ( child_node.get('right_id') ) {
         var right_id = child_node.get('right_id'),
-          right_view = this.app.node_view_list.findById(right_id);
+          right_view = this.list.findById(right_id);
           right_view.$el.before(child_node_view.el);
       } else {
         this.$children.append(child_node_view.el);
@@ -378,7 +379,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       // ($children.children() refers to DOM elements.)
       if ( index !== $children.children().length ) {
         var right_el = $children.children().eq(index)[0],
-            right_view = this.app.node_view_list.findByEl(right_el);
+            right_view = this.list.findByEl(right_el);
 
         right_id = right_view.model.id;
       }
