@@ -72,7 +72,9 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
 
       dragged_view.stopDrag();
 
-      cb(dragged_view, index);
+      if (cb) {
+        cb(dragged_view, index);
+      }
     }
   });
 
