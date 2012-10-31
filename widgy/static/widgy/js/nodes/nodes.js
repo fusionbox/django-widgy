@@ -8,7 +8,13 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       drop_target_view_template
       ) {
 
-  var debug = function(where) { console.log(where, this, _.rest(arguments)); };
+  window.debug = function(where) {
+    if ( debug[where] ) {
+      debugger;
+    } else {
+      console.log(where, this, _.rest(arguments));
+    }
+  };
 
   /**
    * Nodes provide structure in the tree.  Nodes only hold data that deals with
@@ -114,7 +120,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       );
 
       this.model
-        .on('sync', this.checkDidReposition)
         .on('remove', this.close)
         .on('destroy', this.close)
         .on('reposition', this.reposition);
@@ -399,7 +404,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       // pessimistic save (for now).
       debug('receiveChildView', dragged_view, attributes);
-      dragged_view.model.save(attributes, {wait: true, possible_reposition: true});
+      dragged_view.model.save(attributes, {
+        wait: true,
+        success: dragged_view.checkDidReposition
+      });
     },
 
     render: function() {
