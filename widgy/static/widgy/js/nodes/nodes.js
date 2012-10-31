@@ -8,6 +8,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       drop_target_view_template
       ) {
 
+  var debug = function(where) { console.log(where, this, _.rest(arguments)); };
+
   /**
    * Nodes provide structure in the tree.  Nodes only hold data that deals with
    * structure.  Any other data lives in it's content.
@@ -112,7 +114,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       );
 
       this.model
-        .on('change', this.checkDidReposition)
+        .on('sync', this.checkDidReposition)
         .on('remove', this.close)
         .on('destroy', this.close)
         .on('reposition', this.reposition);
@@ -122,9 +124,12 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.drop_targets_list = new Backbone.ViewList;
     },
 
-    checkDidReposition: function(model, options) {
-      if ( ! options.possible_reposition )
-        return;
+    /*
+     * Make sure this happens after model sync.  We need to have the
+     * updated data.
+     */
+    checkDidReposition: function(model, resp, options) {
+      debug('checkDidReposition');
 
       var changed = model.hasChanged('parent_id'),
           new_right_id = model.get('right_id'),
@@ -132,7 +137,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
           right_view;
 
       if ( ! changed ) {
-        right_view = this.app.node_view_list.findByEl(this.$el.next());
+        right_view = this.app.node_view_list.findByEl(this.$el.next()[0]);
 
         if ( right_view ) {
           old_right_id = right_view.model.id;
@@ -140,7 +145,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
           old_right_id = null;
         }
 
-        changed = old_right_id == new_right_id;
+        changed = old_right_id !== new_right_id;
       }
 
       if ( changed ) {
@@ -370,7 +375,11 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
      */
     receiveChildView: function(dragged_view, index) {
       var $children = this.$children,
-          right_id = null;
+          right_id = null,
+          attributes = {
+            parent_id: this.model.id,
+            right_id: null,
+          };
 
       // If index is the length of $children.children there is no right element
       // and we want it set to null.  Otherwise there is a right and we need
@@ -381,18 +390,16 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         var right_el = $children.children().eq(index)[0],
             right_view = this.list.findByEl(right_el);
 
-        right_id = right_view.model.id;
+        // Dragged into its own drop target.
+        if ( dragged_view === right_view )
+          return;
+
+        attributes.right_id = right_view.model.id;
       }
 
-      // Dragged into my own drop target.
-      if ( dragged_view === right_view )
-        return;
-
       // pessimistic save (for now).
-      dragged_view.model.save({
-        parent_id: this.model.id,
-        right_id: right_id
-      }, {wait: true, possible_reposition: true});
+      debug('receiveChildView', dragged_view, attributes);
+      dragged_view.model.save(attributes, {wait: true, possible_reposition: true});
     },
 
     render: function() {
