@@ -405,7 +405,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       // pessimistic save (for now).
       debug('receiveChildView', dragged_view, attributes);
       dragged_view.model.save(attributes, {
-        wait: true,
         success: dragged_view.checkDidReposition
       });
     },
