@@ -129,31 +129,26 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.drop_targets_list = new Backbone.ViewList;
     },
 
-    /*
-     * Make sure this happens after model sync.  We need to have the
-     * updated data.
-     */
     checkDidReposition: function(model, resp, options) {
       debug('checkDidReposition');
 
-      var changed = model.hasChanged('parent_id'),
+      var new_parent_id = model.get('parent_id'),
+          old_parent_id = null,
           new_right_id = model.get('right_id'),
-          old_right_id,
-          right_view;
+          old_right_id = null,
+          right_view = this.app.node_view_list.findByEl(this.$el.next()[0]),
+          parent_view = this.app.node_view_list.findByEl(this.$el.parents('.node')[0]);
 
-      if ( ! changed ) {
-        right_view = this.app.node_view_list.findByEl(this.$el.next()[0]);
 
-        if ( right_view ) {
-          old_right_id = right_view.model.id;
-        } else {
-          old_right_id = null;
-        }
-
-        changed = old_right_id !== new_right_id;
+      if ( parent_view ) {
+        old_parent_id = parent_view.model.id;
       }
 
-      if ( changed ) {
+      if ( right_view ) {
+        old_right_id = right_view.model.id;
+      }
+
+      if ( old_right_id !== new_right_id || old_parent_id !== new_parent_id ) {
         this.triggerReposition(model);
       }
     },
@@ -379,8 +374,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
      * dragged is dropped on one of my drop targets.
      */
     receiveChildView: function(dragged_view, index) {
+      debug('receiveChildView');
+
       var $children = this.$children,
-          right_id = null,
           attributes = {
             parent_id: this.model.id,
             right_id: null,
@@ -402,8 +398,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         attributes.right_id = right_view.model.id;
       }
 
-      // pessimistic save (for now).
-      debug('receiveChildView', dragged_view, attributes);
       dragged_view.model.save(attributes, {
         success: dragged_view.checkDidReposition
       });
