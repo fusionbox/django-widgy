@@ -103,16 +103,16 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     className: 'node',
     
     events: {
-      'mousedown .drag_handle': 'startDrag'
+      'mousedown .drag_handle': 'startBeingDragged'
     },
 
     initialize: function(options) {
       Backbone.View.prototype.initialize.apply(this, arguments);
 
       _.bindAll(this,
-        'startDrag',
+        'startBeingDragged',
         'followMouse',
-        'stopDrag',
+        'stopBeingDragged',
         'checkDidReposition',
         'reposition',
         'addDropTargets',
@@ -163,10 +163,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     /**
-     * `startDrag`, `stopDrag`, `followMouse`, and `reposition` all deal with a
+     * `startBeingDragged`, `stopBeingDragged`, `followMouse`, and `reposition` all deal with a
      * NodeView itself being dragged around.
      */
-    startDrag: function(event) {
+    startBeingDragged: function(event) {
       // only on a left click.
       if ( event.button !== 0 )
         return;
@@ -190,7 +190,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.$el.addClass('being_dragged');
     },
 
-    stopDrag: function() {
+    stopBeingDragged: function() {
       this.$el.css({
         top: 0,
         left: 0

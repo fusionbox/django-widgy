@@ -74,7 +74,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
         node_view.clearDropTargets();
       });
 
-      dragged_view.stopDrag();
+      dragged_view.stopBeingDragged();
 
       if (cb) {
         cb(dragged_view, index);
