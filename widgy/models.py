@@ -1,8 +1,13 @@
+"""
+Classes in this module supply the abstract models used to create new widgy
+objects.
+"""
 from collections import defaultdict
 from operator import attrgetter
 
 from django.db import models
 from django.db.models.signals import post_save
+from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.template.loader import render_to_string
@@ -14,6 +19,27 @@ from treebeard.mp_tree import MP_Node
 
 from widgy.exceptions import (InvalidTreeMovement, OhHellNo, BadChildRejection,
         BadParentRejection, ParentChildRejection, RootDisplacementError)
+
+from widgy.forms import WidgyFormField
+
+
+class WidgyField(models.ForeignKey):
+
+    def __init__(self, to=None, **kwargs):
+        if to is None:
+            to = 'Node'
+        defaults = {
+            'blank': True,
+            'null': True,
+            'on_delete': models.SET_NULL
+        }
+        defaults.update(kwargs)
+        super(WidgyField, self).__init__(to, **defaults)
+
+    def formfield(self, **kwargs):
+        defaults = {'form_class': WidgyFormField}
+        defaults.update(kwargs)
+        return super(WidgyField, self).formfield(**defaults)
 
 
 class WidgyMixin(models.Model):
@@ -54,7 +80,7 @@ class WidgyMixin(models.Model):
 
 
 class ContentPage(Page, WidgyMixin):
-    root_node = models.ForeignKey('Node', verbose_name="Widgy Content", blank=True, null=True, on_delete=models.SET_NULL, editable=False)
+    root_node = WidgyField('Node', verbose_name='Widgy Content')
 
     class Meta:
         verbose_name = 'Widgy Page'
