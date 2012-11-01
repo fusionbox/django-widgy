@@ -101,6 +101,9 @@ $blue:        #309BBF;
 $green:       #559911;
 
 .widgy {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+
   .editor {
     width: 500px;
     display: inline-block;
@@ -131,6 +134,12 @@ $green:       #559911;
     padding: 10px;
     position: relative;
     
+
+    .content {
+      -webkit-user-select: auto;
+      -moz-user-select: auto;
+    }
+
     p.drag-row {
       @include clearfix;
     }
