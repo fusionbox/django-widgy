@@ -62,8 +62,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     loadContent: function(model, content) {
-      if ( content )
-      {
+      if ( content ) {
         // This is asynchronous because of requirejs.
         contents.getModel(content.component, _.bind(this.instantiateContent, this, content));
       }

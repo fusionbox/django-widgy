@@ -22,15 +22,12 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
         'stopDrag'
       );
 
-      var root_node = options.root_node;
-
       // instantiate node_view_list before creating the root node
       // please!
       this.node_view_list = new Backbone.ViewList;
 
-      var root_node = new nodes.Node(root_node);
       var root_node_view = this.root_node_view = new nodes.NodeView({
-        model: root_node,
+        model: new nodes.Node(options.root_node),
         app: this,
         tagName: 'section'
       });
