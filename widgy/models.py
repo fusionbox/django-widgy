@@ -458,6 +458,17 @@ class TextContent(Content):
         return json
 
 
+class CommonCallout(models.Model):
+    title = models.Charfield(max_length=255)
+    content = models.TextField(blank=True, default='')
+    button_text = models.CharField(max_length=255, blank=True, default='')
+    button_href = models.CharField(max_length=255, blank=True, default='')
+
+
+class CommonCalloutContent(Content):
+    inherits_from = models.ForeignKey(CommonCallout, null=True, blank=True)
+
+
 class ImageContent(Content):
     image = FileField(max_length=255, format="Image")
 
