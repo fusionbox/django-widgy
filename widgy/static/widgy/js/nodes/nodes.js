@@ -8,12 +8,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       drop_target_view_template
       ) {
 
-  window.debug = function(where) {
-    if ( debug[where] ) {
-      debugger;
-    } else {
-      console.log(where, this, _.rest(arguments));
-    }
+  var debug = function(where) {
+    console.log(where, this, _.rest(arguments));
   };
 
   /**
@@ -125,7 +121,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       this.app = options.app;
 
-      this.drop_targets_list = new Backbone.ViewList;
+      this.drop_targets_list = new Backbone.ViewList();
     },
 
     checkDidReposition: function(model, resp, options) {
@@ -166,7 +162,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         return;
 
       event.preventDefault();
-      event.stopPropagation();
 
       // Store the mouse offset in this container for followMouse to use.  We
       // need to get this before `this.app.startDrag`, otherwise the drop
@@ -178,8 +173,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       // follow mouse really quick, just in case they haven't moved their mouse
       // yet.
       this.followMouse(event);
-
-      this.trigger('startDrag', this);
 
       this.$el.addClass('being_dragged');
     },
@@ -280,7 +273,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         .on('reset', this.addAll)
         .on('add', this.addOne);
 
-      this.list = new Backbone.ViewList;
+      this.list = new Backbone.ViewList();
     },
 
     addAll: function() {
@@ -335,7 +328,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     createDropTarget: function() {
-      var drop_target = new DropTargetView;
+      var drop_target = new DropTargetView();
       drop_target.on('dropped', this.dropChildView);
       this.drop_targets_list.push(drop_target);
 
@@ -378,7 +371,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       var $children = this.$children,
           attributes = {
             parent_id: this.model.id,
-            right_id: null,
+            right_id: null
           };
 
       // If index is the length of $children.children there is no right element
