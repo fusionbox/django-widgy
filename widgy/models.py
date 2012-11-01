@@ -30,6 +30,66 @@ class ContentPage(Page):
         ),
     )
 
+
+class WidgyField(models.ForeignKey):
+
+    def __init__(self, to=None, **kwargs):
+        if to is None:
+            to = 'Node'
+        defaults = {
+            'blank': True,
+            'null': True,
+            'on_delete': models.SET_NULL
+        }
+        defaults.update(kwargs)
+        super(WidgyField, self).__init__(to, **defaults)
+
+    def formfield(self, **kwargs):
+        defaults = {'form_class': WidgyFormField}
+        defaults.update(kwargs)
+        return super(WidgyField, self).formfield(**defaults)
+
+
+class WidgyMixin(models.Model):
+    """
+    Abstract Base Class for models which will have an associated widgy tree.
+    """
+    @property
+    def root_nodes(self):
+        """
+        :Returns: all root node instances.
+        """
+        for field in self.get_node_fields():
+            node = getattr(self, field.name)
+            yield node
+
+    @classmethod
+    def get_node_fields(cls):
+        """
+        :Returns: all foreign key fields which point to :class:`Node` instances.
+        """
+        for field in cls._meta.fields:
+            if not field.rel:
+                continue
+            if issubclass(field.rel.to, Node):
+                yield field
+
+    @classmethod
+    def get_valid_layouts(cls):
+        """
+        Hook for determining which classes of nodes may reside under this
+        model.  Implementations should return an iterable of Content classes.
+        """
+        classes = [c for c in Layout.__subclasses__() if c.valid_child_class_of(cls)]
+        return classes
+
+    class Meta:
+        abstract = True
+
+
+class ContentPage(Page, WidgyMixin):
+    root_node = WidgyField('Node', verbose_name='Widgy Content')
+
     class Meta:
         verbose_name = 'Widgy Page'
 
@@ -45,6 +105,19 @@ def exception_to_bool(fn):
 
 
 class Node(MP_Node):
+    """
+    Instances of this class maintain the Materialized Path tree structure that
+    the generic content is attached to.
+
+    .. Treebeard_
+
+    **Model Fields**:
+        :content_type: ``models.ForeignKey(ContentType)``
+
+        :content_id: ``models.PositiveIntegerField()``
+
+        :content: ``generic.GenericForeignKey('content_type', 'content_id')``
+    """
     content_type = models.ForeignKey(ContentType)
     content_id = models.PositiveIntegerField()
     content = generic.GenericForeignKey('content_type', 'content_id')
@@ -93,6 +166,10 @@ class Node(MP_Node):
         Builds the entire tree using python.  Each node has its Content
         instance filled in, and the reverse node relation on the content filled
         in as well.
+
+        .. todo::
+
+            Maybe use in_bulk here to avoid doing a query for every content
         """
         # Build a list with the current node and all descendants
         tree = list(self.get_descendants()) + [self]
@@ -124,6 +201,9 @@ class Node(MP_Node):
         """
         Helper method to assign the proper children in the proper order to each
         node
+
+        .. todo::
+            fix the error messages
         """
         if sort:
             descendants.sort(key=attrgetter('depth', 'path'), reverse=True)
@@ -176,6 +256,12 @@ class Node(MP_Node):
 
 
 def call_content_post_save(sender, instance, created, **kwargs):
+    """
+    Auto-calls ``content.post_create()`` on the instance that this signal is
+    connected to.
+
+    This is intended for post_save triggers for :class:`Node`-like objects
+    """
     if created:
         instance.content.post_create()
 
@@ -183,29 +269,25 @@ post_save.connect(call_content_post_save, sender=Node)
 
 
 class Content(models.Model):
+    """
+    Abstract base class for all models that are intended to a part of a Widgy
+    tree structure.
+
+    **Model Fields**:
+        :_nodes: ``generic.GenericRelation(Node,
+                                   content_type_field='content_type',
+                                   object_id_field='content_id')``
+    """
     _nodes = generic.GenericRelation(Node,
                                content_type_field='content_type',
                                object_id_field='content_id')
 
-    def get_node(self):
-        if hasattr(self, '_node'):
-            return self._node
-        return self._nodes.all()[0]
-
-    def set_node(self, value):
-        self._node = value
-
-    # Settable property used by Node.prefetch_tree to optimize tree rendering
-    node = property(get_node, set_node)
+    draggable = True  #: Set this content to be draggable
+    deletable = True  #: Set this content instance to be deleteable
+    accepting_children = False  #: Sets this content instance to be able to have children.
 
     class Meta:
         abstract = True
-
-    def valid_child_of(self, content):
-        """
-        Given a content instance, will we consent to be adopted by them?
-        """
-        return self.valid_child_class_of(content)
 
     @classmethod
     def valid_child_class_of(cls, content):
@@ -213,6 +295,56 @@ class Content(models.Model):
         Given a content instance, does our class consent to be adopted by them?
         """
         return True
+
+    @classmethod
+    def class_to_json(cls):
+        """
+        :Returns: a json-able python object that represents the class type.
+        """
+        return {
+                '__class__': "%s.%s" % (cls._meta.app_label, cls._meta.module_name),
+                'title': cls._meta.verbose_name.title(),
+                }
+
+    @classmethod
+    def all_concrete_subclasses(cls):
+        """
+        Recursively gathers all the non-abstract subclasses.
+        """
+        classes = set(c for c in cls.__subclasses__() if not c._meta.abstract)
+        for c in cls.__subclasses__():
+            classes.update(c.all_concrete_subclasses())
+        return classes
+
+    @classmethod
+    def add_root(cls, **kwargs):
+        """
+        Creates a new Content instance, stores it in the database, and calls
+        :method:`Node.add_root`
+        """
+        obj = cls.objects.create(**kwargs)
+        Node.add_root(content=obj)
+        return obj
+
+    @property
+    def node(self):
+        """
+        Settable property used by Node.prefetch_tree to optimize tree
+        rendering
+        """
+        if hasattr(self, '_node'):
+            return self._node
+        return self._nodes.all()[0]
+
+    @node.setter
+    def node(self, value):
+        self._node = value
+
+    def valid_child_of(self, content):
+        """
+        Given a content instance, will we consent to be adopted by them?
+        """
+        return self.valid_child_class_of(content)
 
     def valid_parent_of_class(self, cls):
         """
@@ -226,10 +358,6 @@ class Content(models.Model):
         Given a content instance, can we adopt them?
         """
         return self.valid_parent_of_class(type(content))
-
-    draggable = True
-    deletable = True
-    accepting_children = False
 
     def validate_relationship(self, child):
         parent = self
@@ -280,14 +408,6 @@ class Content(models.Model):
                 )
         return obj
 
-    @classmethod
-    def add_root(cls, **kwargs):
-        obj = cls.objects.create(**kwargs)
-        Node.add_root(
-                content=obj
-                )
-        return obj
-
     def post_create(self):
         """
         Hook for custom code which needs to be run after creation.  Since the
@@ -299,15 +419,14 @@ class Content(models.Model):
     @property
     def class_name(self):
         """
-        Return a fully qualified classname including app_label and module_name
+        :Returns: a fully qualified classname including app_label and module_name
         """
         return "%s.%s" % (self._meta.app_label, self._meta.module_name)
 
     @property
     def component_name(self):
         """
-        Return a string that will be used clientside to retrieve this content's
-        component.js resource.
+        :Returns: a string that will be used clientside to retrieve this content's component.js resource.
         """
         return self.class_name
 
@@ -341,20 +460,6 @@ class Content(models.Model):
         rendered_content = render_to_string(self.get_templates(), context)
         context.pop()
         return rendered_content
-
-    @classmethod
-    def class_to_json(cls):
-        return {
-                '__class__': "%s.%s" % (cls._meta.app_label, cls._meta.module_name),
-                'title': cls._meta.verbose_name.title(),
-                }
-
-    @classmethod
-    def all_concrete_subclasses(cls):
-        classes = set(c for c in cls.__subclasses__() if not c._meta.abstract)
-        for c in cls.__subclasses__():
-            classes.update(c.all_concrete_subclasses())
-        return classes
 
 
 class Bucket(Content):
