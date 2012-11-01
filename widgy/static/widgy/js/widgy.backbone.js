@@ -117,7 +117,7 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
       return this.model ? this.model.toJSON() : {};
     },
 
-    bubble: function() {
+    bubble: function(event) {
       this.trigger.apply(this, arguments);
     }
   });

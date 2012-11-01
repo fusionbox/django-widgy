@@ -157,11 +157,12 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
      * NodeView itself being dragged around.
      */
     startBeingDragged: function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+
       // only on a left click.
       if ( event.button !== 0 )
         return;
-
-      event.preventDefault();
 
       // Store the mouse offset in this container for followMouse to use.  We
       // need to get this before `this.app.startDrag`, otherwise the drop
@@ -175,6 +176,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.followMouse(event);
 
       this.$el.addClass('being_dragged');
+
+      this.trigger('startDrag', this);
     },
 
     stopBeingDragged: function() {
@@ -259,6 +262,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         'addOne',
         'position',
         'createDropTarget',
+        'startDrag',
+        'stopDrag',
+        'stopDragging',
         'dropChildView',
         'receiveChildView',
         'renderContent'
@@ -286,10 +292,12 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         app: this.app
       });
 
-      node_view.on('all', this.bubble);
+      node_view
+        .on('startDrag', this.startDrag)
+        .on('stopDrag', this.stopDrag);
 
+      this.app.node_view_list.push(node_view);
       this.list.push(node_view);
-      this.trigger('created', node_view);
 
       this.position(node_view.render());
     },
@@ -297,6 +305,46 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     'delete': function(event) {
       event.stopPropagation();
       this.model.destroy();
+    },
+
+    startDrag: function(dragged_view) {
+      debug.call(this, 'startDrag', dragged_view);
+
+      if ( ( this.hasShelf() && ! dragged_view.model.id || ! this.model.get('parent_id') )) {
+        this.dragged_view = dragged_view;
+
+        $(document).on('mouseup.' + dragged_view.cid, this.stopDragging);
+        $(document).on('mousemove.' + dragged_view.cid, dragged_view.followMouse);
+
+        this.addDropTargets(dragged_view);
+      } else {
+        // propagate event
+        this.trigger('startDrag', dragged_view);
+      }
+    },
+
+    stopDragging: function() {
+      var dragged_view = this.dragged_view;
+      delete this.dragged_view;
+
+      $(document).off('.' + dragged_view.cid);
+
+      this.clearDropTargets();
+
+      dragged_view.stopBeingDragged();
+
+      return dragged_view;
+    },
+
+    stopDrag: function(callback) {
+      debug.call(this, 'stopDrag', callback);
+
+      if ( this.hasShelf() && this.dragged_view ) {
+        callback(this.stopDragging());
+      } else {
+        // propagate event
+        this.trigger('stopDrag', callback);
+      }
     },
 
     /**
@@ -310,6 +358,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       var $children = this.$children,
           that = this,
           mine = this.list.contains(view);
+
+      this.list.each(function(node_view) {
+        node_view.addDropTargets(view);
+      });
 
       // do nothing if it's me or I'm not accepting children.
       if ( this === view ||
@@ -337,6 +389,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
     clearDropTargets: function() {
       this.drop_targets_list.closeAll();
+
+      this.list.each(function(node_view) {
+        node_view.clearDropTargets();
+      });
     },
 
     position: function(child_node_view) {
@@ -353,19 +409,20 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
 
     dropChildView: function(drop_target) {
-      var index = drop_target.$el.index() / 2;
+      var index = drop_target.$el.index() / 2,
+          dragCallback = _.bind(this.receiveChildView, this, index);
 
       // We need to stop the drag before finding the right node.
       // `this.app.stopDrag` will clear all of the drop targets, so we need to
       // remove them before we can get elements by index.
-      this.trigger('stopDrag', index, this.receiveChildView);
+      this.stopDrag(dragCallback);
     },
 
     /**
      * This is the method that is called when the NodeView that is being
      * dragged is dropped on one of my drop targets.
      */
-    receiveChildView: function(dragged_view, index) {
+    receiveChildView: function(index, dragged_view) {
       debug('receiveChildView');
 
       var $children = this.$children,
@@ -395,6 +452,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       });
     },
 
+    hasShelf: function() {
+      return ! this.model.get('parent_id') || this.model.content.get('shelf');
+    },
+
     render: function() {
       Backbone.View.prototype.render.apply(this, arguments);
 
@@ -420,8 +481,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       
       content_view.render();
 
-      if ( ! this.model.get('parent_id') || content.get('shelf') )
-      {
+      if ( this.hasShelf() ) {
         this.renderShelf();
       }
     },
@@ -434,7 +494,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         app: this.app
       });
 
-      shelf_view.on('all', this.bubble);
+      shelf_view.on('startDrag', this.startDrag);
       shelf_view.collection.fetch();
 
       this.$el.append(shelf_view.render().el);

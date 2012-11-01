@@ -17,14 +17,9 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
     template: app_template,
 
     initialize: function(options) {
-      _.bindAll(this,
-        'startDrag',
-        'stopDrag'
-      );
-
       // instantiate node_view_list before creating the root node
       // please!
-      this.node_view_list = new Backbone.ViewList;
+      this.node_view_list = new Backbone.ViewList();
 
       var root_node_view = this.root_node_view = new nodes.NodeView({
         model: new nodes.Node(options.root_node),
@@ -35,8 +30,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
       this.node_view_list.push(root_node_view);
 
       root_node_view
-        .on('startDrag', this.startDrag)
-        .on('stopDrag', this.stopDrag)
         .on('created', this.node_view_list.push);
     },
 
@@ -47,35 +40,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
       this.$editor.append(this.root_node_view.render().el);
 
       return this;
-    },
-
-    startDrag: function(dragged_view) {
-      this.dragged_view = dragged_view;
-
-      $(document).on('mouseup.' + dragged_view.cid, this.stopDrag);
-      $(document).on('mousemove.' + dragged_view.cid, dragged_view.followMouse);
-      // TODO: follow mouse on scroll.
-
-      this.node_view_list.each(function(node_view) {
-        node_view.addDropTargets(dragged_view);
-      });
-    },
-
-    stopDrag: function(index, cb) {
-      var dragged_view = this.dragged_view;
-      delete this.dragged_view;
-
-      $(document).off('.' + dragged_view.cid);
-
-      this.node_view_list.each(function(node_view) {
-        node_view.clearDropTargets();
-      });
-
-      dragged_view.stopBeingDragged();
-
-      if (cb) {
-        cb(dragged_view, index);
-      }
     }
   });
 
