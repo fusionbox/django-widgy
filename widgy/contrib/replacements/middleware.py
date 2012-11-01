@@ -1,6 +1,6 @@
 from datetime import datetime
 from django.conf import settings
-from django.core.urlresolvers import resolve
+from django.core.urlresolvers import resolve, Resolver404
 from django.template.defaultfilters import escape
 from widgy.contrib.replacements.models import (
         surrounded_by_curlies,
@@ -26,8 +26,11 @@ class TagReplacementMiddleware(object):
         is run on the rendered_content of the response.  This replaces any
         matched tags with those defined in the database.
         """
-        if (resolve(request.path).app_name in
-            settings.REPLACEMENTS_APP_BLACKLIST):
+        try:
+            app_name = resolve(request.path).app_name
+        except Resolver404:
+            return response
+        if app_name in settings.REPLACEMENTS_APP_BLACKLIST:
             return response
 
         replacements = Replacement.objects\
