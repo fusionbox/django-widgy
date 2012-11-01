@@ -459,7 +459,7 @@ class TextContent(Content):
 
 
 class CommonCallout(models.Model):
-    title = models.Charfield(max_length=255)
+    title = models.CharField(max_length=255)
     content = models.TextField(blank=True, default='')
     button_text = models.CharField(max_length=255, blank=True, default='')
     button_href = models.CharField(max_length=255, blank=True, default='')
