@@ -12,6 +12,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.template.loader import render_to_string
 from django.db.models import Q
+from django.db.models.fields.related import add_lazy_relation
+from django.conf import settings
 
 from mezzanine.pages.models import Page
 from mezzanine.core.fields import FileField
@@ -24,46 +26,65 @@ from widgy.exceptions import (InvalidTreeMovement, OhHellNo, BadChildRejection,
 from widgy.forms import WidgyFormField
 
 
-def get_layout_contenttypes(layouts):
-    qs = [Q(app_label=c._meta.app_label, model=c._meta.module_name) for c in layouts]
-    return ContentType.objects.filter(reduce(or_, qs))
-
-
 class WidgyField(models.ForeignKey):
     __metaclass__ = models.SubfieldBase
 
-    def __init__(self, to=None, **kwargs):
+    def __init__(self, to=None, root_choices=None, **kwargs):
         if to is None:
             to = 'Node'
+
+        if root_choices is None:
+            pass
+
+        self.root_choices = root_choices
+
         defaults = {
             'blank': True,
             'null': True,
             'on_delete': models.SET_NULL
         }
         defaults.update(kwargs)
+
         super(WidgyField, self).__init__(to, **defaults)
 
     def formfield(self, **kwargs):
-        # TODO: Can we rely on the model to have this method?
-        #
-        # Wouldn't it be better if we did it here?
-        layouts = self.model.get_valid_layouts()
-
-        # TODO: figure out how to not have the BLANK_CHOICE_DASHES
         defaults = {
             'form_class': WidgyFormField,
-            'queryset': get_layout_contenttypes(layouts),
+            'queryset': self.get_layout_contenttypes(self.root_choices),
         }
         defaults.update(kwargs)
         return super(WidgyField, self).formfield(**defaults)
 
     def pre_save(self, model_instance, add):
         value = getattr(model_instance, self.name)
+
         if isinstance(value, ContentType):
-            self.root_node = value.model_class().add_root().node
-            return self.root_node
-        else:
-            return super(WidgyField, self).pre_save(model_instance, add)
+            node = value.model_class().add_root().node
+            setattr(model_instance, self.name, node)
+            setattr(model_instance, self.attname, node.pk)
+
+            return node.pk
+
+        return super(WidgyField, self).pre_save(model_instance, add)
+
+    def get_layout_contenttypes(self, layouts):
+        qs = []
+
+        for layout in layouts:
+            try:
+                app_label, model_name = layout.split(".")
+            except ValueError:
+                app_label = self.model._meta.app_label
+                model_name = layout
+            except AttributeError:
+                app_label = layout._meta.app_label
+                model_name = layout._meta.object_name
+
+            cls = models.get_model(app_label, model_name, seed_cache=False, only_installed=False)
+
+            qs.append(Q(app_label=app_label, model=cls._meta.module_name))
+
+        return ContentType.objects.filter(reduce(or_, qs))
 
 
 class WidgyMixin(models.Model):
@@ -90,21 +111,17 @@ class WidgyMixin(models.Model):
             if issubclass(field.rel.to, Node):
                 yield field
 
-    @classmethod
-    def get_valid_layouts(cls):
-        """
-        Hook for determining which classes of nodes may reside under this
-        model.  Implementations should return an iterable of Content classes.
-        """
-        classes = [c for c in Layout.__subclasses__() if c.valid_child_class_of(cls)]
-        return classes
-
     class Meta:
         abstract = True
 
 
 class ContentPage(Page, WidgyMixin):
-    root_node = WidgyField('Node', verbose_name='Widgy Content')
+    root_node = WidgyField('Node',
+                           verbose_name='Widgy Content',
+                           root_choices=(
+                               'TwoColumnLayout',
+                           ),
+                           )
 
     class Meta:
         verbose_name = 'Widgy Page'
