@@ -3,7 +3,7 @@ Classes in this module supply the abstract models used to create new widgy
 objects.
 """
 from collections import defaultdict
-from operator import attrgetter
+from operator import attrgetter, or_
 
 from django.db import models
 from django.db.models.signals import post_save
@@ -11,6 +11,7 @@ from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.template.loader import render_to_string
+from django.db.models import Q
 
 from mezzanine.pages.models import Page
 from mezzanine.core.fields import FileField
@@ -23,7 +24,13 @@ from widgy.exceptions import (InvalidTreeMovement, OhHellNo, BadChildRejection,
 from widgy.forms import WidgyFormField
 
 
+def get_layout_contenttypes(layouts):
+    qs = [Q(app_label=c._meta.app_label, model=c._meta.module_name) for c in layouts]
+    return ContentType.objects.filter(reduce(or_, qs))
+
+
 class WidgyField(models.ForeignKey):
+    __metaclass__ = models.SubfieldBase
 
     def __init__(self, to=None, **kwargs):
         if to is None:
@@ -37,9 +44,26 @@ class WidgyField(models.ForeignKey):
         super(WidgyField, self).__init__(to, **defaults)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': WidgyFormField}
+        # TODO: Can we rely on the model to have this method?
+        #
+        # Wouldn't it be better if we did it here?
+        layouts = self.model.get_valid_layouts()
+
+        # TODO: figure out how to not have the BLANK_CHOICE_DASHES
+        defaults = {
+            'form_class': WidgyFormField,
+            'queryset': get_layout_contenttypes(layouts),
+        }
         defaults.update(kwargs)
         return super(WidgyField, self).formfield(**defaults)
+
+    def pre_save(self, model_instance, add):
+        value = getattr(model_instance, self.name)
+        if isinstance(value, ContentType):
+            self.root_node = value.model_class().add_root().node
+            return self.root_node
+        else:
+            return super(WidgyField, self).pre_save(model_instance, add)
 
 
 class WidgyMixin(models.Model):
