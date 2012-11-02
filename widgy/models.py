@@ -3,17 +3,13 @@ Classes in this module supply the abstract models used to create new widgy
 objects.
 """
 from collections import defaultdict
-from operator import attrgetter, or_
+from operator import attrgetter
 
 from django.db import models
 from django.db.models.signals import post_save
-from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.template.loader import render_to_string
-from django.db.models import Q
-from django.db.models.fields.related import add_lazy_relation
-from django.conf import settings
 
 from mezzanine.pages.models import Page
 from mezzanine.core.fields import FileField
@@ -23,105 +19,16 @@ from treebeard.mp_tree import MP_Node
 from widgy.exceptions import (InvalidTreeMovement, OhHellNo, BadChildRejection,
         BadParentRejection, ParentChildRejection, RootDisplacementError)
 
-from widgy.forms import WidgyFormField
+from widgy.forms import WidgyField
 
 
-class WidgyField(models.ForeignKey):
-    __metaclass__ = models.SubfieldBase
-
-    def __init__(self, to=None, root_choices=None, **kwargs):
-        if to is None:
-            to = 'Node'
-
-        if root_choices is None:
-            pass
-
-        self.root_choices = root_choices
-
-        defaults = {
-            'blank': True,
-            'null': True,
-            'on_delete': models.SET_NULL
-        }
-        defaults.update(kwargs)
-
-        super(WidgyField, self).__init__(to, **defaults)
-
-    def formfield(self, **kwargs):
-        defaults = {
-            'form_class': WidgyFormField,
-            'queryset': self.get_layout_contenttypes(self.root_choices),
-        }
-        defaults.update(kwargs)
-        return super(WidgyField, self).formfield(**defaults)
-
-    def pre_save(self, model_instance, add):
-        value = getattr(model_instance, self.name)
-
-        if isinstance(value, ContentType):
-            node = value.model_class().add_root().node
-            setattr(model_instance, self.name, node)
-            setattr(model_instance, self.attname, node.pk)
-
-            return node.pk
-
-        return super(WidgyField, self).pre_save(model_instance, add)
-
-    def get_layout_contenttypes(self, layouts):
-        qs = []
-
-        for layout in layouts:
-            try:
-                app_label, model_name = layout.split(".")
-            except ValueError:
-                app_label = self.model._meta.app_label
-                model_name = layout
-            except AttributeError:
-                app_label = layout._meta.app_label
-                model_name = layout._meta.object_name
-
-            cls = models.get_model(app_label, model_name, seed_cache=False, only_installed=False)
-
-            qs.append(Q(app_label=app_label, model=cls._meta.module_name))
-
-        return ContentType.objects.filter(reduce(or_, qs))
-
-
-class WidgyMixin(models.Model):
-    """
-    Abstract Base Class for models which will have an associated widgy tree.
-    """
-    @property
-    def root_nodes(self):
-        """
-        Returns all root node instances.
-        """
-        for field in self.get_node_fields():
-            node = getattr(self, field.name)
-            yield node
-
-    @classmethod
-    def get_node_fields(cls):
-        """
-        Returns all foreign key fields which point to ``Node`` instances.
-        """
-        for field in cls._meta.fields:
-            if not field.rel:
-                continue
-            if issubclass(field.rel.to, Node):
-                yield field
-
-    class Meta:
-        abstract = True
-
-
-class ContentPage(Page, WidgyMixin):
-    root_node = WidgyField('Node',
-                           verbose_name='Widgy Content',
-                           root_choices=(
-                               'TwoColumnLayout',
-                           ),
-                           )
+class ContentPage(Page):
+    root_node = WidgyField(
+        verbose_name='Widgy Content',
+        root_choices=(
+            'TwoColumnLayout',
+        ),
+    )
 
     class Meta:
         verbose_name = 'Widgy Page'

@@ -7,7 +7,5 @@
 {% block seo_keywords %}{{ page.description }}{% endblock %}
 
 {% block content %}
-  {% for node in page.get_content_model.root_nodes %}
-    {% render node %}
-  {% endfor %}
+  {% render page.get_content_model.root_node %}
 {% endblock %}
