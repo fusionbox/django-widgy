@@ -30,7 +30,3 @@ class WidgyFormWidget(forms.Select):
 
 class WidgyFormField(forms.ModelChoiceField):
     widget = WidgyFormWidget
-
-    def __init__(self, model=None, *args, **kwargs):
-        super(WidgyFormField, self).__init__(*args, **kwargs)
-        self.model = self.widget.model = model
