@@ -34,14 +34,7 @@ class ContentPage(Page):
         verbose_name = 'Widgy Page'
 
 
-def exception_to_bool(fn):
-    def new(*args, **kwargs):
-        try:
-            fn(*args, **kwargs)
-            return True
-        except:
-            return False
-    return new
+from widgy.utils import exception_to_bool
 
 
 class Node(MP_Node):
