@@ -148,8 +148,11 @@ class Node(MP_Node):
     def get_available_children_url(self):
         return ('widgy.views.recursive_children', (), {'node_pk': self.pk})
 
-    # TODO: fix the error messages
     def reposition(self, right=None, parent=None):
+        """
+        .. todo::
+            fix the error messages
+        """
         if not self.content.draggable:
             raise InvalidTreeMovement({'message': "You can't move me"})
 
@@ -189,8 +192,8 @@ class Content(models.Model):
                                content_type_field='content_type',
                                object_id_field='content_id')
 
-    draggable = True  #: Set this content to be draggable
-    deletable = True  #: Set this content instance to be deleteable
+    draggable = True            #: Set this content to be draggable
+    deletable = True            #: Set this content instance to be deleteable
     accepting_children = False  #: Sets this content instance to be able to have children.
 
     class Meta:
