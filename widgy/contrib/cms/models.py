@@ -2,6 +2,7 @@
 Collection of widgy classes for building a content-driven website.
 """
 from django.db import models
+from django.template.defaultfilters import escape
 from widgy.forms import WidgyField
 from widgy.models import Content
 from mezzanine.core.fields import FileField
@@ -104,24 +105,52 @@ class TextContent(Content):
         return json
 
 
-class CommonCallout(models.Model):
+class Callout(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField(blank=True, default='')
     button_text = models.CharField(max_length=255, blank=True, default='')
     button_href = models.CharField(max_length=255, blank=True, default='')
 
+    def __unicode__(self):
+        return u'%s' % self.pk
 
-class CommonCalloutContent(Content):
-    inherits_from = models.ForeignKey(CommonCallout, null=True, blank=True)
+
+class CalloutContent(Content):
+    inherits_from = models.ForeignKey(Callout, null=True, blank=True)
+
+    def to_json(self):
+        json = super(CalloutContent, self).to_json()
+
+        def add_option(acc, next_option):
+            acc += '<option {selected} value="{value}">{label}</option>'\
+                    .format(
+                        selected=(
+                            u'selected'
+                            if self.inherits_from_id == next_option.pk
+                            else u''
+                        ),
+                        value=next_option.pk,
+                        label=escape(unicode(next_option)))
+            return acc
+
+        options = reduce(add_option, Callout.objects.all(), u'')
+        json['options'] = options
+        if self.inherits_from:
+            json.update({
+                'title': self.inherits_from.title,
+                'content': self.inherits_from.content,
+                'button_text': self.inherits_from.button_text,
+                'button_href': self.inherits_from.button_href
+            })
+        return json
 
     class Meta:
-        verbose_name = 'Common Callout Content'
-        db_table = 'widgy_cms_commoncalloutcontent'
+        verbose_name = 'Callout Content'
+        db_table = 'widgy_cms_calloutcontent'
 
 
 class ImageContent(Content):
     image = FileField(max_length=255, format="Image")
-
 
     def to_json(self):
         json = super(ImageContent, self).to_json()

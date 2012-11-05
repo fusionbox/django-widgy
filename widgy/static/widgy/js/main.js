@@ -19,6 +19,7 @@ require.config({
   'backbone': './lib/backbone',
   'mustache': './lib/mustache',
   'fusionbox': './lib/fusionbox',
+  'django_admin' : './lib/django_admin',
   'text': 'require/text'
   }
 });

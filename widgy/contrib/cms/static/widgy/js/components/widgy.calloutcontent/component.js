@@ -1,29 +1,34 @@
-define([ 'widgy.contents', 'widgets/widgets',
+define(['widgy.contents', 'widgets/widgets',
+    'underscore',
+    'django_admin',
     'text!./content.html',
     'text!./edit.html'
     ], function(contents, widgets,
-      content_template,
-      edit_template
-      ) {
+    _,
+    admin,
+    content_template,
+    edit_template) {
 
   var EditorView = widgets.EditorView.extend({
     template: edit_template,
     events: function(){
       return _.extend({}, widgets.EditorView.prototype.events, {
-        'click .select': 'select'
+        'click [data-add_button]': 'add'
       });
     },
     initialize: function() {
+      if ( ! window.dismissAddAnotherPopup )
+        window.dismissAddAnotherPopup = admin.RelatedObjectLookups.dismissAddAnotherPopup;
+      if ( ! window.SelectBox )
+        window.SelectBox = admin.SelectBox;
       widgets.EditorView.prototype.initialize.apply(this, arguments);
-      _.bindAll(this, 'select');
+      _.bindAll(this, 'add');
     },
-    select: function(event){
-      event.preventDefault();
-      var id = 'id_callout_widget_' + this.cid;
-      var id2 = String(id).replace(/\-/g,"____").split(".").join("___");
-      FBWindow = window.open('/admin/media-library/browse/?pop=1&type=Image', id2, 'height=600&width=1000,resizeable=yes,scrollbars=yes');
-      FBWindow.focus();
+
+    add: function(event){
+      return admin.RelatedObjectLookups.showAddAnotherPopup(event.currentTarget);
     },
+
     toJSON: function() {
       var json = widgets.EditorView.prototype.toJSON.call(this, arguments);
       json.cid = this.cid;

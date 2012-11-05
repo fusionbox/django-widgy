@@ -21,6 +21,7 @@
     'backbone': './lib/backbone',
     'mustache': './lib/mustache',
     'fusionbox': './lib/fusionbox',
+    'RelatedObjectLookups' : './lib/RelatedObjectLookups',
     'text': 'require/text'
   },
   uglify: {

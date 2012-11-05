@@ -1,7 +1,9 @@
   <form>
     <p class="callout-select">
-    <input id="{{ input_id }}" type="text" name="inherits_from" value="{{ inherits_from }}">
-    <button class="select action">Select Callout</button>
+    <select id="{{ input_id }}" name="inherits_from_id">
+      {{{ options }}}
+    </select>
+    <button href="/admin/cms/callout/add/" id="add_{{ input_id }}" data-add_button class="select action">Add New</button>
     </p>
     <p class="submit-row">
       <button class="cancel" type="button">Cancel</button>
