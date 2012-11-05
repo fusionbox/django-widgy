@@ -13,7 +13,8 @@ Contents
    :maxdepth: 2
 
    intro
-   models
+   widgy/index
+   cms/index
 
 TODO
 ====

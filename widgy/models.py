@@ -23,7 +23,7 @@ class Node(MP_Node):
     Instances of this class maintain the Materialized Path tree structure that
     the generic content is attached to.
 
-    .. Treebeard_
+    For more information, consult the Treebeard_ documentation.
 
     **Model Fields**:
         :content_type: ``models.ForeignKey(ContentType)``
@@ -31,6 +31,8 @@ class Node(MP_Node):
         :content_id: ``models.PositiveIntegerField()``
 
         :content: ``generic.GenericForeignKey('content_type', 'content_id')``
+
+    .. _Treebeard: https://tabo.pe/projects/django-treebeard/docs/1.61/index.html
     """
     content_type = models.ForeignKey(ContentType)
     content_id = models.PositiveIntegerField()
@@ -150,8 +152,12 @@ class Node(MP_Node):
 
     def reposition(self, right=None, parent=None):
         """
+        Validates the requested node restructering and executes by calling :meth:`~Node.move` on
+        the instance.
+
         .. todo::
-            fix the error messages
+
+        fix the error messages
         """
         if not self.content.draggable:
             raise InvalidTreeMovement({'message': "You can't move me"})
@@ -230,7 +236,7 @@ class Content(models.Model):
     def add_root(cls, **kwargs):
         """
         Creates a new Content instance, stores it in the database, and calls
-        :method:`Node.add_root`
+        ``Node.add_root``
         """
         obj = cls.objects.create(**kwargs)
         Node.add_root(content=obj)

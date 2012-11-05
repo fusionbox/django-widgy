@@ -1,3 +1,6 @@
+"""
+A collection of model and form field classes.
+"""
 from operator import or_
 
 from django.db import models
@@ -9,6 +12,7 @@ from django.utils.safestring import mark_safe
 
 from fusionbox.core.templatetags.fusionbox_tags import json
 from south.modelsinspector import add_introspection_rules
+from widgy.models import Node
 
 add_introspection_rules([], ["^widgy\.forms\.WidgyField"])
 
@@ -25,6 +29,10 @@ WIDGY_FIELD_TEMPLATE = u"""
 
 
 class WidgyWidget(forms.HiddenInput):
+    """
+    Django form widget that is used to load the backbone.js application code
+    for a Widgy field.
+    """
     def render(self, name, value, attrs=None):
         node_json = json(self.node.to_json())
         return mark_safe(WIDGY_FIELD_TEMPLATE.format(
@@ -36,10 +44,18 @@ class WidgyWidget(forms.HiddenInput):
 
 
 class WidgyFormField(forms.ModelChoiceField):
-    widget = WidgyWidget
+    """
+    Django form field that switches its widget based on the context of the
+    Node.
+    """
+    widget = WidgyWidget #: default widget
 
     def conform_to_value(self, value):
-        from widgy.models import Node
+        """
+        When no root node has been set, we prompt the user to choose one from
+        the list of choices.  Otherwise, we set the ``WidgyWidget`` class as
+        the widget we use for this field instance.
+        """
         if isinstance(value, Node):
             self.node = self.widget.node = value
             self.queryset = None
@@ -61,6 +77,10 @@ class WidgyFormField(forms.ModelChoiceField):
 
 
 class WidgyFormMixin(object):
+    """
+    Form mixin that enables the widget switching by calling
+    :meth:`~WidgyFormField.conform_to_value` on the field instance.
+    """
     def __init__(self, *args, **kwargs):
         super(WidgyFormMixin, self).__init__(*args, **kwargs)
 
@@ -71,11 +91,14 @@ class WidgyFormMixin(object):
 
 
 class WidgyFieldObjectDescriptor(ReverseSingleRelatedObjectDescriptor):
-    def __set__(self, instance, value):
-        """
-        HACK: we need to transport the ContentType of the Node all the way to
+    """
+    .. note::
+        we need to transport the ContentType of the Node all the way to
         ``pre_save``, without saving an instance of the node, because we don't
         know if the rest of the model is valid yet.
+    """
+    def __set__(self, instance, value):
+        """
         """
         if isinstance(value, ContentType):
             value, value._ct = self.field.rel.to(), value
@@ -84,6 +107,10 @@ class WidgyFieldObjectDescriptor(ReverseSingleRelatedObjectDescriptor):
 
 
 class WidgyField(models.ForeignKey):
+    """
+    Model field that inherits from ``models.ForeignKey``.  Contains validation
+    and context switching that is needed for Widgy fields.
+    """
     def __init__(self, to=None, root_choices=None, **kwargs):
         if to is None:
             to = 'widgy.Node'
@@ -101,9 +128,10 @@ class WidgyField(models.ForeignKey):
 
     def contribute_to_class(self, cls, name):
         """
-        HACK: we need to use WidgyFieldObjectDescriptor instead of
-        ReverseSingleRelatedObjectDescriptor because of the modifications to
-        __set__.
+
+        .. note:: we need to use WidgyFieldObjectDescriptor instead of
+            ``ReverseSingleRelatedObjectDescriptor`` because of the modifications
+            to __set__.
         """
         super(WidgyField, self).contribute_to_class(cls, name)
         setattr(cls, self.name, WidgyFieldObjectDescriptor(self))
