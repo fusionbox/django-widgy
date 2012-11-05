@@ -82,7 +82,6 @@ class RestView(JsonResponseMixin, JsonRequestMixin, View):
         return r
 
 
-
 class ContentView(RestView):
     def auth(*args, **kwargs):
         pass
