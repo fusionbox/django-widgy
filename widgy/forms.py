@@ -88,8 +88,6 @@ class WidgyField(models.ForeignKey):
     def __init__(self, to=None, root_choices=None, **kwargs):
         if to is None:
             to = 'widgy.Node'
-        else:
-            raise ImproperlyConfigured("WidgyField only accepts Node as its to field")
 
         self.root_choices = root_choices
 
