@@ -1,6 +1,5 @@
 from operator import or_
 
-from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models import Q
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
