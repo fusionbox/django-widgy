@@ -55,6 +55,12 @@ class Node(MP_Node):
     content_id = models.PositiveIntegerField()
     content = generic.GenericForeignKey('content_type', 'content_id')
 
+    def save(self, *args, **kwargs):
+        created = not bool(self.pk)
+        super(Node, self).save(*args, **kwargs)
+        if created:
+            self.content.post_create()
+
     def delete(self, *args, **kwargs):
         content = self.content
         super(Node, self).delete(*args, **kwargs)
@@ -186,19 +192,6 @@ class Node(MP_Node):
         for child in self.get_children():
             allowed_classes.update(child.filter_child_classes(classes))
         return allowed_classes
-
-
-def call_content_post_save(sender, instance, created, **kwargs):
-    """
-    Auto-calls ``content.post_create()`` on the instance that this signal is
-    connected to.
-
-    This is intended for post_save triggers for :class:`Node`-like objects
-    """
-    if created:
-        instance.content.post_create()
-
-post_save.connect(call_content_post_save, sender=Node)
 
 
 class Content(models.Model):
