@@ -2,7 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.conf import settings
 
 urlpatterns = patterns('widgy.views',
-    url('^node/$', 'create_node'),
+    url('^node/$', 'node'),
     url('^node/(?P<node_pk>[^/]+)/$', 'node'),
     url('^node/(?P<node_pk>[^/]+)/available-children/$', 'children'),
     url('^node/(?P<node_pk>[^/]+)/available-children-recursive/$', 'recursive_children'),

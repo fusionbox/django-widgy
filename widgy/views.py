@@ -75,6 +75,20 @@ class NodeView(RestView):
     def auth(*args, **kwargs):
         pass
 
+    def post(self, request, node_pk=None):
+        data = self.data()
+        app_label, model = data['__class__'].split('.')
+        content_class = get_object_or_404(ContentType, model=model, app_label=app_label).model_class()
+
+        try:
+            right = get_object_or_404(Node, pk=extract_id(data['right_id']))
+            content = right.content.add_sibling(content_class)
+        except Http404:
+            parent = get_object_or_404(Node, pk=extract_id(data['parent_id']))
+            content = parent.content.add_child(content_class)
+
+        return self.render_to_response(content.node, status=201)
+
     def put(self, request, node_pk):
         """
         If you put with a right_id, then your node will be placed immediately
