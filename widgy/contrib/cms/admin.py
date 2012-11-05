@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from mezzanine.pages.admin import PageAdmin
 
-from widgy.models import ContentPage
+from widgy.contrib.cms.models import ContentPage
 from widgy.forms import WidgyFormMixin
 
 
