@@ -331,7 +331,7 @@ class Content(models.Model):
         """
         :Returns: a fully qualified classname including app_label and module_name
         """
-        return "%s.%s" % (self._meta.app_label, self._meta.module_name)
+        return "widgy.%s" % (self._meta.module_name)
 
     @property
     def component_name(self):
