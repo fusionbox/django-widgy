@@ -246,7 +246,6 @@ TEMPLATE_DIRS = (os.path.join(PROJECT_ROOT, "templates"),)
 ################
 
 INSTALLED_APPS = (
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.redirects",
@@ -261,6 +260,9 @@ INSTALLED_APPS = (
     #"mezzanine.blog",
     "mezzanine.forms",
     "mezzanine.pages",
+    'widgy',
+    'widgy.contrib.cms',
+    "django.contrib.admin",
     #"mezzanine.galleries",
     #"mezzanine.twitter",
     #"mezzanine.accounts",
@@ -274,10 +276,7 @@ INSTALLED_APPS = (
     'django_extensions',
 
     # widgy apps
-    'widgy',
     'urlconf_include',
-    'widgy.contrib.cms',
-    'widgy.contrib.list_content_widget',
 
     # local project
     'demo.demo_widgets'
