@@ -276,6 +276,7 @@ INSTALLED_APPS = (
     # widgy apps
     'widgy',
     'urlconf_include',
+    'widgy.contrib.cms',
     'widgy.contrib.list_content_widget',
 
     # local project

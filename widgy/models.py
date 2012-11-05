@@ -6,33 +6,14 @@ from collections import defaultdict
 from operator import attrgetter
 
 from django.db import models
-from django.db.models.signals import post_save
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.template.loader import render_to_string
-
-from mezzanine.pages.models import Page
-from mezzanine.core.fields import FileField
 
 from treebeard.mp_tree import MP_Node
 
 from widgy.exceptions import (InvalidTreeMovement, OhHellNo, BadChildRejection,
         BadParentRejection, ParentChildRejection, RootDisplacementError)
-
-from widgy.forms import WidgyField
-
-
-class ContentPage(Page):
-    root_node = WidgyField(
-        verbose_name='Widgy Content',
-        root_choices=(
-            'TwoColumnLayout',
-        ),
-    )
-
-    class Meta:
-        verbose_name = 'Widgy Page'
-
 
 from widgy.utils import exception_to_bool
 
@@ -386,100 +367,3 @@ class Content(models.Model):
         rendered_content = render_to_string(self.get_templates(), context)
         context.pop()
         return rendered_content
-
-
-class Bucket(Content):
-    title = models.CharField(max_length=255)
-    draggable = models.BooleanField(default=True)
-    deletable = models.BooleanField(default=True)
-
-    accepting_children = True
-
-    def valid_parent_of_class(self, cls):
-        return not issubclass(cls, Bucket)
-
-    def to_json(self):
-        json = super(Bucket, self).to_json()
-        json['title'] = self.title
-        return json
-
-
-class Layout(Content):
-    """
-    Base class for all layouts.
-    """
-    class Meta:
-        abstract = True
-
-    draggable = False
-    deletable = False
-
-    def valid_parent_of_instance(self, content):
-        return any(isinstance(content, bucket_meta[1]) for bucket_meta in self.buckets) and\
-                (content.id in [i.content.id for i in self.node.get_children()] or
-                        len(self.node.get_children()) < len(self.buckets))
-
-    def valid_parent_of_class(self, cls):
-        return any(issubclass(cls, bucket_meta[1]) for bucket_meta in self.buckets) and\
-                len(self.node.get_children()) < len(self.buckets)
-
-    @classmethod
-    def valid_child_class_of(cls, content):
-        return isinstance(content, ContentPage) or issubclass(content, Page)
-
-    def post_create(self):
-        for bucket_title, bucket_class, args, kwargs in self.buckets:
-            self.add_child(bucket_class, title=bucket_title, *args, **kwargs)
-
-
-class TwoColumnLayout(Layout):
-    """
-    On creation, creates a left and right bucket.
-    """
-
-    buckets = [
-            ('left', Bucket, (), {'draggable': False, 'deletable': False}),
-            ('right', Bucket, (), {'draggable': False, 'deletable': False}),
-            ]
-
-    @property
-    def left_bucket(self):
-        return self.node.get_children()[0]
-
-    @property
-    def right_bucket(self):
-        return self.node.get_children()[1]
-
-    class Meta:
-        verbose_name = 'Two Column Layout'
-
-
-class TextContent(Content):
-    content = models.TextField()
-
-    def to_json(self):
-        json = super(TextContent, self).to_json()
-        json['content'] = self.content
-        return json
-
-
-class CommonCallout(models.Model):
-    title = models.CharField(max_length=255)
-    content = models.TextField(blank=True, default='')
-    button_text = models.CharField(max_length=255, blank=True, default='')
-    button_href = models.CharField(max_length=255, blank=True, default='')
-
-
-class CommonCalloutContent(Content):
-    inherits_from = models.ForeignKey(CommonCallout, null=True, blank=True)
-
-
-class ImageContent(Content):
-    image = FileField(max_length=255, format="Image")
-
-    def to_json(self):
-        json = super(ImageContent, self).to_json()
-        if self.image:
-            json['image'] = self.image.path
-            json['image_url'] = self.image.url
-        return json
