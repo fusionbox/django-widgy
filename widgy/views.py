@@ -6,12 +6,12 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 
+from fusionbox.views.rest import RestView
+
 from widgy.models import Node, Content, InvalidTreeMovement
 
 
-def more_json(obj):
-    """
-    Allows decimals and objects with `to_json` methods to be serialized.
+class ContentView(RestView):
     """
     General purpose resource for :class:`widgy.models.Content` objects.
 
