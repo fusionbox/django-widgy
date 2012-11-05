@@ -9,7 +9,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.safestring import mark_safe
 
 from fusionbox.core.templatetags.fusionbox_tags import json
+from south.modelsinspector import add_introspection_rules
 
+add_introspection_rules([], ["^widgy\.forms\.WidgyField"])
 
 WIDGY_FIELD_TEMPLATE = u"""
 <input type="hidden" name="{name}" value="{value}">
@@ -85,7 +87,7 @@ class WidgyFieldObjectDescriptor(ReverseSingleRelatedObjectDescriptor):
 class WidgyField(models.ForeignKey):
     def __init__(self, to=None, root_choices=None, **kwargs):
         if to is None:
-            to = 'Node'
+            to = 'widgy.Node'
         else:
             raise ImproperlyConfigured("WidgyField only accepts Node as its to field")
 
