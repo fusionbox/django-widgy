@@ -9,6 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from fusionbox.views.rest import RestView
 
 from widgy.models import Node, Content, InvalidTreeMovement
+from widgy.utils import extract_id
 
 
 class ContentView(RestView):
@@ -52,9 +53,6 @@ class ContentView(RestView):
 
         return self.render_to_response(obj, status=200)
 
-
-def extract_id(url):
-    return url and url.split('/')[-2]
 
 class NodeView(RestView):
     """
