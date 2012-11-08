@@ -6,19 +6,14 @@
 Welcome to django-widgy's documentation!
 ========================================
 
-Contents
-========
-
 .. toctree::
    :maxdepth: 2
 
    intro
+   todo
    widgy/index
    cms/index
 
-TODO
-====
-.. todolist::
 
 Indices and tables
 ==================
