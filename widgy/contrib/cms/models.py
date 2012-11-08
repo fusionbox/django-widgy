@@ -4,9 +4,65 @@ Collection of widgy classes for building a content-driven website.
 from django.db import models
 from django.template.defaultfilters import escape
 from widgy.forms import WidgyField
+from widgy.utils import path_generator
 from widgy.models import Content
 from mezzanine.core.fields import FileField
 from mezzanine.pages.models import Page
+from mezzanine.utils.urls import path_to_slug
+
+
+class CMSContent(Content):
+
+    def get_render_templates(self, context):
+        """
+        :Returns: list of templates to search for the rendered template on the frontend.
+
+        -    ``widgy/{page_slug}/{page_model}/{module_name}.html``
+        -    ``widgy/{page_slug}/{module_name}.html``
+        -    ``widgy/{parent_slug}/{page_model}/{module_name}.html``
+        -    ``widgy/{module_name}.html``
+        -    ``widgy/{class_name}/{module_name}.html``
+        """
+        templates = []
+        template_path = path_generator(u'widgy/')
+
+        slug = path_to_slug(context['request'].path_info)
+        template_name = unicode(slug) if slug != "/" else "index"
+        page = context['page']
+
+        if page.content_model is not None:
+            templates.extend([
+                template_path(
+                    template_name,
+                    page.content_model,
+                    self._meta.module_name
+                ),
+                template_path(
+                    template_name,
+                    self._meta.module_name
+                )
+            ])
+            # Generate the possiblities from the parent pages.
+            templates.extend([
+                template_path(
+                    unicode(parent.slug),
+                    page.content_model,
+                    self._meta.module_name
+                ) for parent in page.get_ascendants()
+            ])
+        templates.extend([
+            template_path(
+                self._meta.module_name
+            ),
+            template_path(
+                self.class_name,
+                self._meta.module_name
+            )
+        ])
+        return templates
+
+    class Meta:
+        abstract = True
 
 
 class ContentPage(Page):
@@ -22,7 +78,7 @@ class ContentPage(Page):
         db_table = 'widgy_cms_contentpage'
 
 
-class Bucket(Content):
+class Bucket(CMSContent):
     title = models.CharField(max_length=255)
     draggable = models.BooleanField(default=True)
     deletable = models.BooleanField(default=True)
@@ -41,7 +97,7 @@ class Bucket(Content):
         db_table = 'widgy_cms_bucket'
 
 
-class Layout(Content):
+class Layout(CMSContent):
     """
     Base class for all layouts.
     """
@@ -74,10 +130,13 @@ class TwoColumnLayout(Layout):
     On creation, creates a left and right bucket.
     """
 
+    deletable = True
+    editable = True
+
     buckets = [
-            ('left', Bucket, (), {'draggable': False, 'deletable': False}),
-            ('right', Bucket, (), {'draggable': False, 'deletable': False}),
-            ]
+        ('left', Bucket, (), {'draggable': False, 'deletable': False}),
+        ('right', Bucket, (), {'draggable': False, 'deletable': False}),
+    ]
 
     class Meta:
         verbose_name = 'Two Column Layout'
@@ -92,11 +151,11 @@ class TwoColumnLayout(Layout):
         return self.node.get_children()[1]
 
 
-class TextContent(Content):
+class TextContent(CMSContent):
     content = models.TextField()
 
     class Meta:
-        verbose_name = 'Two Column Layout'
+        verbose_name = 'Text Content'
         db_table = 'widgy_cms_textcontent'
 
     def to_json(self):
@@ -115,7 +174,7 @@ class Callout(models.Model):
         return u'%s' % self.pk
 
 
-class CalloutContent(Content):
+class CalloutContent(CMSContent):
     inherits_from = models.ForeignKey(Callout, null=True, blank=True)
 
     def to_json(self):
@@ -123,14 +182,12 @@ class CalloutContent(Content):
 
         def add_option(acc, next_option):
             acc += '<option {selected} value="{value}">{label}</option>'\
-                    .format(
-                        selected=(
-                            u'selected'
-                            if self.inherits_from_id == next_option.pk
-                            else u''
-                        ),
-                        value=next_option.pk,
-                        label=escape(unicode(next_option)))
+                .format(
+                    selected=(
+                        u'selected'
+                        if self.inherits_from_id == next_option.pk else u''),
+                    value=next_option.pk,
+                    label=escape(unicode(next_option)))
             return acc
 
         options = reduce(add_option, Callout.objects.all(), u'')
@@ -149,7 +206,7 @@ class CalloutContent(Content):
         db_table = 'widgy_cms_calloutcontent'
 
 
-class ImageContent(Content):
+class ImageContent(CMSContent):
     image = FileField(max_length=255, format="Image")
 
     def to_json(self):

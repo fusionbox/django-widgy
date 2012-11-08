@@ -13,6 +13,7 @@ Welcome to django-widgy's documentation!
    todo
    widgy/index
    cms/index
+   plugins/index
 
 
 Indices and tables

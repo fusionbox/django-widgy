@@ -3,6 +3,14 @@ CMS Plugin
 
 To install add ``widgy.contrib.cms`` to ``INSTALLED_APPS``.
 
-.. toctree::
-    requirements
-    models
+Requirements
+------------
+
+Needs mezzanine, bro.
+
+Models
+------
+
+.. automodule:: widgy.contrib.cms.models
+    :members:
+

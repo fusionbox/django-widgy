@@ -1,5 +1,1 @@
-Requirements
-============
-
-Needs mezzanine, bro.
 

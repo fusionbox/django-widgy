@@ -5,7 +5,11 @@ Tasks and todo items should be listed here and organized.
 
 
 Implementation Tasks
-====================
+--------------------
+- Upgrade Django to 1.5
+
+    Some concerns are the new ``auth.models.User`` contract.
+
 - Fork ``filebrowser`` application to use file objects.
 
       ``Filebrowser`` does not store objects in the database.  The CMS needs to be
@@ -23,9 +27,11 @@ Implementation Tasks
       change.  When Page B is published, Page A needs to automatically update its
       reference to the new URL.
 
+- Different widget templates depending on page.  `done: 2012-11-11`
+
 
 Functional Requirement Tasks
-============================
+----------------------------
 - Text Replacements
 
       Admin users can add a list of ``{word} => {replacement}`` mappings.  Every
@@ -45,7 +51,13 @@ Functional Requirement Tasks
 
 
 Usability Concerns
-==================
+------------------
+- Widgy shelf needs to be contexual
+
+    Shelf should display what is available for the currently selected widget.
+    Hence, if I have a ``FormWidget`` selected, I should see only allowable
+    children for ``FormWidget`` in the shelf.
+
 - A few ``WidgyField`` field widget changes need to be made.
 
    1. Full width
@@ -65,5 +77,5 @@ Usability Concerns
 
 
 Source Code TODOs
-=================
+-----------------
 .. todolist::

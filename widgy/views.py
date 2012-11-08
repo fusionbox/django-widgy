@@ -3,6 +3,7 @@ Resource views that can be included to enable a REST style API
 for Widgy nodes and Content objects.
 """
 from django.http import Http404
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 
@@ -31,11 +32,10 @@ class ContentView(RestView):
         Resolves ``app_label``, ``object_name``, and ``object_pk`` to a
         :class:`widgy.models.Content` instance.
         """
-        return ContentType.objects.get(
-                    model=object_name,
-                    app_label=app_label
-                ).get_object_for_this_type(
-                    pk=object_pk)
+        return (
+            ContentType.objects.get(model=object_name, app_label=app_label)
+            .get_object_for_this_type(pk=object_pk)
+        )
 
     def get(self, request, app_label, object_name, object_pk):
         obj = self.get_object(app_label, object_name, object_pk)
@@ -44,14 +44,11 @@ class ContentView(RestView):
     def put(self, request, app_label, object_name, object_pk):
         obj = self.get_object(app_label, object_name, object_pk)
         data = self.data()
-        for field in obj._meta.fields:
-            if not field.editable:
-                continue
-            if field.attname in data:
-                setattr(obj, field.attname, data[field.attname])
-        obj.save()
-
-        return self.render_to_response(obj, status=200)
+        form = obj.get_form_class(request)(data=data or None, instance=obj)
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+        form.save()
+        return self.render_to_response(form.instance, status=200)
 
 
 class NodeView(RestView):

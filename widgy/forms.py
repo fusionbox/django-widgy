@@ -16,6 +16,7 @@ from widgy.models import Node
 
 add_introspection_rules([], ["^widgy\.forms\.WidgyField"])
 
+
 WIDGY_FIELD_TEMPLATE = u"""
 <input type="hidden" name="{name}" value="{value}">
 <script data-main="/static/widgy/js/main" src="/static/widgy/js/require/require.js"></script>
@@ -48,7 +49,7 @@ class WidgyFormField(forms.ModelChoiceField):
     Django form field that switches its widget based on the context of the
     Node.
     """
-    widget = WidgyWidget #: default widget
+    widget = WidgyWidget  #: default widget
 
     def conform_to_value(self, value):
         """

@@ -1,11 +1,7 @@
 define([ 'widgy.contents',
-    'text!./bucket.html'
-    ], function(contents,
-      bucket_template
-      ) {
+    ], function(contents) {
 
   var BucketView = contents.ContentView.extend({
-    template: bucket_template
   });
 
   var Bucket = contents.Content.extend({

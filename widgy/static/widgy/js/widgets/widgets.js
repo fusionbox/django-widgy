@@ -1,8 +1,13 @@
-define([ 'widgy.backbone', 'widgy.contents',
-    'text!./widget.html'
-    ], function(Backbone, contents,
-      widget_layout
-      ) {
+define([
+'widgy.backbone',
+'widgy.contents',
+'underscore',
+'text!./widget.html'
+    ], function(
+    Backbone,
+    contents,
+    _,
+    widget_layout) {
 
   // TODO: is Widget a good name?  We are trying to unify our vocabulary.
 
@@ -27,9 +32,8 @@ define([ 'widgy.backbone', 'widgy.contents',
     },
 
     initialize: function() {
-      Backbone.View.prototype.initialize.apply(this, arguments);
+      contents.ContentView.prototype.initialize.apply(this, arguments);
 
-      this.model.on('change', this.render);
     },
 
     getEditorClass: function() {
@@ -42,7 +46,7 @@ define([ 'widgy.backbone', 'widgy.contents',
       var editor_class = this.getEditorClass(),
           edit_view = new editor_class({model: this.model});
 
-      edit_view.on('close', this.render)
+      edit_view.on('close', this.render);
       this.$el.html(edit_view.render().el);
     }
   });
@@ -63,11 +67,53 @@ define([ 'widgy.backbone', 'widgy.contents',
       'click .cancel': 'close'
     },
 
+    initialize: function() {
+      Backbone.View.prototype.initialize.apply(this, arguments);
+      _.bindAll(this,
+        'handleSuccess',
+        'handleError'
+      );
+      this.template = this.model.get('edit_template');
+    },
+
+    handleError: function(model, xhr, options){
+      var response,
+          error_func = this['handleError' + parseInt(xhr.status, 3)];
+      if (!! error_func ) {
+        error_func(model, xhr, options);
+      }
+      response = $.parseJSON(xhr.responseText);
+      (function(self){
+        _.each(response, function(messages, field_name){
+          var field = self.$('form').find('[name="' + field_name + '"]'),
+              error_list = field.parent().find('ul.errors').first();
+          if ( error_list.length <= 0 ){
+            error_list = $('<ul class=errors>');
+            field.before(error_list);
+          } else {
+            error_list.html('');
+          }
+
+          _.each(messages, function(msg){
+            var message_li = $('<li class=error>');
+            message_li.text(msg);
+            error_list.append(message_li);
+          });
+        });
+      })(this);
+    },
+
     handleForm: function(event) {
       event.preventDefault();
       var values = this.hydrateForm();
 
-      this.model.save(values);
+      this.model.save(values, {
+        success: this.handleSuccess,
+        error: this.handleError
+      });
+    },
+
+    handleSuccess: function(model, response, options) {
       this.close();
     },
 

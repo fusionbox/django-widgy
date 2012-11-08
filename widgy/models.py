@@ -6,14 +6,21 @@ from collections import defaultdict
 from operator import attrgetter
 
 from django.db import models
+from django.forms.models import modelform_factory
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.template.loader import render_to_string
 
 from treebeard.mp_tree import MP_Node
 
-from widgy.exceptions import (InvalidTreeMovement, OhHellNo, BadChildRejection,
-        BadParentRejection, ParentChildRejection, RootDisplacementError)
+from widgy.exceptions import (
+    InvalidTreeMovement,
+    OhHellNo,
+    BadChildRejection,
+    BadParentRejection,
+    ParentChildRejection,
+    RootDisplacementError
+)
 
 from widgy.utils import exception_to_bool
 
@@ -54,11 +61,11 @@ class Node(MP_Node):
         # nodes
         children = [c.to_json() for c in self.get_children().reverse()]
         json = {
-                'url': self.get_api_url(),
-                'content': self.content.to_json(),
-                'children': children,
-                'available_children_url': self.get_available_children_url(),
-                }
+            'url': self.get_api_url(),
+            'content': self.content.to_json(),
+            'children': children,
+            'available_children_url': self.get_available_children_url()
+        }
         parent = self.get_parent()
         if parent:
             json['parent_id'] = parent.get_api_url()
@@ -195,8 +202,8 @@ class Content(models.Model):
                                    object_id_field='content_id')``
     """
     _nodes = generic.GenericRelation(Node,
-                               content_type_field='content_type',
-                               object_id_field='content_id')
+                                     content_type_field='content_type',
+                                     object_id_field='content_id')
 
     draggable = True            #: Set this content to be draggable
     deletable = True            #: Set this content instance to be deleteable
@@ -204,6 +211,27 @@ class Content(models.Model):
 
     class Meta:
         abstract = True
+
+    @models.permalink
+    def get_api_url(self):
+        return ('widgy.views.content', (), {
+            'object_name': self._meta.module_name,
+            'app_label': self._meta.app_label,
+            'object_pk': self.pk})
+
+    def to_json(self):
+        return {
+            'url': self.get_api_url(),
+            '__class__': self.class_name,
+            'component': self.component_name,
+            'model': self._meta.module_name,
+            'object_name': self._meta.object_name,
+            'draggable': self.draggable,
+            'deletable': self.deletable,
+            'accepting_children': self.accepting_children,
+            'edit_template': self.get_form_template(),
+            'preview_template': self.get_preview_template()
+        }
 
     @classmethod
     def valid_child_class_of(cls, content):
@@ -243,6 +271,60 @@ class Content(models.Model):
         return obj
 
     @property
+    def preview_templates(self):
+        """
+        List of templates to search for the content template that is displayed
+        in the editor to show a preview.
+
+        -   ``widgy/{class_name}/preview.html``
+        -   ``widgy/preview.html``
+        """
+        return (
+            'widgy/%s/preview.html' % self.class_name,
+            'widgy/preview.html',
+        )
+
+    @property
+    def edit_templates(self):
+        """
+        List of templates to search for the edit form.
+
+        -    ``widgy/{class_name}/edit_form.html``
+        -    ``widgy/edit_form.html``
+        """
+        return (
+            'widgy/%s/edit_form.html' % self.class_name,
+            'widgy/edit_form.html',
+        )
+
+    def get_render_templates(self, context):
+        """
+        List of templates to search for the rendered template on the frontend.
+
+        -    widgy/{module_name}.html
+        -    widgy/{class_name}/{module_name}.html'
+        """
+        return (
+            'widgy/%s.html' % self._meta.module_name,
+            'widgy/%s/%s.html' % (self.class_name, self._meta.module_name),
+        )
+
+    @property
+    def class_name(self):
+        """
+        :Returns: a fully qualified classname including app_label and module_name
+        """
+        return "widgy.%s" % (self._meta.module_name)
+
+    @property
+    def component_name(self):
+        """
+        :Returns: a string that will be used clientside to retrieve this
+        content's component.js resource.
+        """
+        return self.class_name
+
+    @property
     def node(self):
         """
         Settable property used by Node.prefetch_tree to optimize tree
@@ -255,6 +337,13 @@ class Content(models.Model):
     @node.setter
     def node(self, value):
         self._node = value
+
+    def get_form_class(self, request=None):
+        """
+        .. todo::
+            memoize
+        """
+        return modelform_factory(self.__class__)
 
     def valid_child_of(self, content):
         """
@@ -274,6 +363,9 @@ class Content(models.Model):
         Given a content instance, can we adopt them?
         """
         return self.valid_parent_of_class(type(content))
+
+    def meta(self):
+        return self._meta
 
     def validate_relationship(self, child):
         parent = self
@@ -300,9 +392,7 @@ class Content(models.Model):
             obj.delete()
             raise
 
-        self.node.add_child(
-                content=obj
-                )
+        self.node.add_child(content=obj)
         return obj
 
     def add_sibling(self, cls, **kwargs):
@@ -318,10 +408,7 @@ class Content(models.Model):
             obj.delete()
             raise
 
-        self.node.add_sibling(
-                content=obj,
-                pos='left'
-                )
+        self.node.add_sibling(content=obj, pos='left')
         return obj
 
     def post_create(self):
@@ -332,47 +419,30 @@ class Content(models.Model):
         """
         pass
 
-    @property
-    def class_name(self):
+    def get_form_template(self, template=None, context={}):
         """
-        :Returns: a fully qualified classname including app_label and module_name
+        :Returns: Rendered form template with the given context, if any.
         """
-        return "widgy.%s" % (self._meta.module_name)
+        context.update({'form': self.get_form_class()(instance=self)})
+        return render_to_string(template or self.edit_templates, context)
 
-    @property
-    def component_name(self):
+    def get_preview_template(self, template=None, context={}):
         """
-        :Returns: a string that will be used clientside to retrieve this content's component.js resource.
+        :Returns: Rendered preview template with the given context, if any.
         """
-        return self.class_name
+        context.update({'self': self})
+        return render_to_string(template or self.preview_templates, context)
 
-    def to_json(self):
-        return {
-                'url': self.get_api_url(),
-                '__class__': self.class_name,
-                'component': self.component_name,
-                'model': self._meta.module_name,
-                'object_name': self._meta.object_name,
-                'draggable': self.draggable,
-                'deletable': self.deletable,
-                'accepting_children': self.accepting_children,
-                }
+    def render(self, context={}, template=None):
+        """
+        Renders the node in the given context.
 
-    @models.permalink
-    def get_api_url(self):
-        return ('widgy.views.content', (), {
-            'object_name': self._meta.module_name,
-            'app_label': self._meta.app_label,
-            'object_pk': self.pk})
-
-    def get_templates(self):
-        templates = (
-                'widgy/{module_name}.html'.format(module_name=self._meta.module_name),
-                )
-        return templates
-
-    def render(self, context):
+        A ``template`` kwarg can be passed to use an explictly defined template
+        instead of the default template list.
+        """
         context.update({'content': self})
-        rendered_content = render_to_string(self.get_templates(), context)
+        rendered = render_to_string(
+            template or self.get_render_templates(context), context
+        )
         context.pop()
-        return rendered_content
+        return rendered

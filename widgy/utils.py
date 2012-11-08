@@ -3,6 +3,23 @@ Some utility functions used throughout the project.
 """
 
 
+def path_generator(prefix, ext='.html'):
+    """
+    :Returns: a function that will return a path.
+
+    >>> lol_genpath = path_generator('widgy/')
+    >>> lol_genpath(lol, internet)
+    'widgy/lol/internet.html'
+
+    >>> lol_extensions = path_generator('widgy/', '.txt')
+    >>> lol_extensions(lol, internet)
+    'widgy/lol/internet.txt'
+    """
+    def inner(*args):
+        return unicode(prefix) + u'/'.join(args) + ext
+    return inner
+
+
 def extract_id(url):
     """
     :Returns: the -2 index of a URL path.

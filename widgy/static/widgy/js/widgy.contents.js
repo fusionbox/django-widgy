@@ -36,7 +36,12 @@ define([ 'widgy.backbone' ], function(Backbone) {
    * view.  See `widgy.widgets.js`.
    */
   var ContentView = Backbone.View.extend({
-    className: 'content'
+    className: 'content',
+    initialize: function() {
+      Backbone.View.prototype.initialize.apply(this, arguments);
+      if (! this.template)
+        this.template = this.model.get('preview_template');
+    }
   });
 
 

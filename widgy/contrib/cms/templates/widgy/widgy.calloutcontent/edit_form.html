@@ -1,0 +1,10 @@
+<form>
+    <p class="callout-select">
+    {{ form.as_p }}
+    <button href="/admin/cms/callout/add/" id="add_{{ form.inherits_from.auto_id }}" data-add_button class="select action">Add New</button>
+    </p>
+    <p class="submit-row">
+      <button class="cancel" type="button">Cancel</button>
+      <input type="submit" value="Save">
+    </p>
+  </form>
