@@ -1,4 +1,4 @@
-define([ 'widgy.contents', 'widgets/widgets',
+define([ 'widgy.contents', 'widgets/widgets'
     ], function(
     contents,
     widgets) {

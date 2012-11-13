@@ -226,6 +226,9 @@ STATICFILES_DIRS = (
     os.path.join(PROJECT_PATH, 'public'),
 )
 
+SCSS_IMPORTS = (
+    os.path.join(PROJECT_ROOT, '..',  'widgy', 'static', 'widgy', 'css'),
+)
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
@@ -347,7 +350,9 @@ COMPRESS_PRECOMPILERS = (
     ('text/x-sass', 'sass {infile} {outfile}'),
 
     # requires pyScss
-    ('text/x-scss', 'pyscss {infile} -o {outfile} -I "%s"' % (STATICFILES_DIRS[0] + '/css')),
+    ('text/x-scss', 'pyscss {infile} -o {outfile} %s' %
+      '-I ' + ' '.join(['"%s"' % d for d in SCSS_IMPORTS])
+      ),
 )
 
 

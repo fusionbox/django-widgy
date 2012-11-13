@@ -7,7 +7,7 @@ from widgy.contrib.cms.models import Callout
 
 @staff_member_required
 def callout_browse(request):
-    results_var = {'results_total': 0, 'results_current': 0, 'delete_total': 0, 'images_total': 0, 'select_total': 0 }
+    results_var = {'results_total': 0, 'results_current': 0, 'delete_total': 0, 'images_total': 0, 'select_total': 0}
     callouts = Callout.objects.all()
     results_var['results_current'] = len(callouts)
 

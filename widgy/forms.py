@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from django import forms
 from django.contrib.contenttypes.models import ContentType
-from django.utils.safestring import mark_safe
+from django.template import Template, Context
 
 from fusionbox.core.templatetags.fusionbox_tags import json
 from south.modelsinspector import add_introspection_rules
@@ -18,13 +18,22 @@ add_introspection_rules([], ["^widgy\.forms\.WidgyField"])
 
 
 WIDGY_FIELD_TEMPLATE = u"""
-<input type="hidden" name="{name}" value="{value}">
+{% load compress %}
+{% compress css %}
+<link type="text/css" href="{% static "widgy/css/font-awesome.css" %}" rel="stylesheet">
+<link type="text/x-scss" href="{% static "widgy/css/common.scss" %}" rel="stylesheet">
+<link type="text/x-scss" href="{% static "widgy/css/widgy.scss" %}" rel="stylesheet">
+{% for sheet in stylesheets %}
+<link type="{{ sheet.type }}" href="{% static sheet.filename %}" rel="stylesheet">
+{% endfor %}
+{% endcompress %}
+<input type="hidden" name="{{ name }}" value="{{ value }}">
 <script data-main="/static/widgy/js/main" src="/static/widgy/js/require/require.js"></script>
-<div id="{html_id}" class="widgy"></div>
+<div id="{{ html_id }}" class="widgy"></div>
 <script>
-  require([ 'widgy' ], function(Widgy) {{
-    window.widgy = new Widgy('#{html_id}', {json});
-  }});
+  require([ 'widgy' ], function(Widgy) {
+    window.widgy = new Widgy('#{{ html_id }}', {{ json }});
+  });
 </script>
 """
 
@@ -36,12 +45,14 @@ class WidgyWidget(forms.HiddenInput):
     """
     def render(self, name, value, attrs=None):
         node_json = json(self.node.to_json())
-        return mark_safe(WIDGY_FIELD_TEMPLATE.format(
-            name=name,
-            value=value,
-            html_id=attrs['id'],
-            json=node_json,
-        ))
+        t = Template(WIDGY_FIELD_TEMPLATE)
+        return t.render(Context({
+            'name': name,
+            'value': value,
+            'stylesheets': self.stylesheets,
+            'html_id': attrs['id'],
+            'json': node_json
+        }))
 
 
 class WidgyFormField(forms.ModelChoiceField):
@@ -49,7 +60,7 @@ class WidgyFormField(forms.ModelChoiceField):
     Django form field that switches its widget based on the context of the
     Node.
     """
-    widget = WidgyWidget  #: default widget
+    widget = WidgyWidget
 
     def conform_to_value(self, value):
         """
@@ -59,6 +70,10 @@ class WidgyFormField(forms.ModelChoiceField):
         """
         if isinstance(value, Node):
             self.node = self.widget.node = value
+            try:
+                self.widget.stylesheets = self.node.content.editor_stylesheets
+            except AttributeError:
+                pass
             self.queryset = None
         else:
             self.widget = forms.Select(

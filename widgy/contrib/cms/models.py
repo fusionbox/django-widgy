@@ -10,6 +10,16 @@ from mezzanine.core.fields import FileField
 from mezzanine.pages.models import Page
 from mezzanine.utils.urls import path_to_slug
 
+import mimetypes
+
+
+def stylesheet(filename, mime=None):
+
+    return {
+        'filename': unicode(filename),
+        'type': mime or mimetypes.guess_type(filename)
+    }
+
 
 class CMSContent(Content):
 
@@ -66,12 +76,12 @@ class CMSContent(Content):
 
 
 class ContentPage(Page):
+
     root_node = WidgyField(
         verbose_name='Widgy Content',
         root_choices=(
             'TwoColumnLayout',
-        ),
-    )
+        ))
 
     class Meta:
         verbose_name = 'Widgy Page'
@@ -132,6 +142,10 @@ class TwoColumnLayout(Layout):
 
     deletable = True
     editable = True
+
+    editor_stylesheets = (
+        stylesheet('widgy/css/cms.scss', mime='text/x-scss'),
+    )
 
     buckets = [
         ('left', Bucket, (), {'draggable': False, 'deletable': False}),
@@ -215,3 +229,6 @@ class ImageContent(CMSContent):
             json['image'] = self.image.path
             json['image_url'] = self.image.url
         return json
+
+    class Meta:
+        verbose_name = 'Image'
