@@ -1,23 +1,13 @@
 from django.contrib import admin
+from widgy.admin import WidgyAdmin
 
 from mezzanine.pages.admin import PageAdmin
 
 from widgy.contrib.cms.models import ContentPage, Callout
-from widgy.forms import WidgyFormMixin
 
 
-class WidgyPageAdmin(PageAdmin):
-    """
-    Model Admin for models which will have a widgy tree under them
-    """
-    def get_form(self, request, obj=None, **kwargs):
-        form = super(WidgyPageAdmin, self).get_form(request, obj, **kwargs)
-
-        if not issubclass(form, WidgyFormMixin):
-            class form(WidgyFormMixin, form):
-                pass
-
-        return form
+class WidgyPageAdmin(PageAdmin, WidgyAdmin):
+    pass
 
 
 admin.site.register(ContentPage, WidgyPageAdmin)
