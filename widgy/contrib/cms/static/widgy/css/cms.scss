@@ -1,15 +1,13 @@
 @import "common";
-
   /* Node overwrites
   --------------------*/
-  section.node {
-    width: 966px;
-    float: left;
-  }
+  .node {
+  float: right;
+  width: 45%;
 
-  section.node > .node_children > .node {
-    float: left;
-    width: 400px;
+    &:first-child {
+      float: left;
+    }
   }
 
   /* Image Widget
