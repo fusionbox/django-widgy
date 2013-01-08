@@ -3,7 +3,6 @@ Collection of widgy classes for building a content-driven website.
 """
 from django.db import models
 from django.template.defaultfilters import escape
-from widgy.forms import WidgyField
 from widgy.utils import path_generator
 from widgy.models import Content
 from mezzanine.core.fields import FileField
