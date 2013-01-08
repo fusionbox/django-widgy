@@ -10,3 +10,4 @@ settings_local.py
 build/
 tags
 dist/
+*.egg-info/

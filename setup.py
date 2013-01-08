@@ -26,9 +26,14 @@ setup(
     version=version,
     description=__doc__,
     long_description=read('README'),
-    packages=['widgy'],
+    packages=[
+        'widgy',
+        'widgy.contrib',
+        'widgy.contrib.cms',
+    ],
     install_requires=install_requires,
     dependency_links=[
         'http://github.com/fusionbox/django-fusionbox/tarball/master#egg=django-fusionbox-0.0.2'
     ],
+    zip_safe=False,
 )
