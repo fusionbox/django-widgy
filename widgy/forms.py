@@ -8,34 +8,40 @@ from django.db.models import Q
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from django import forms
 from django.contrib.contenttypes.models import ContentType
-from django.template import Template, Context
+from django.template import Context
+from django.template.loader import get_template
+from django.utils.html import conditional_escape
+from django.utils.safestring import mark_safe
 
-from fusionbox.core.templatetags.fusionbox_tags import json
+try:
+    from django.utils.html import format_html
+except ImportError:
+    # Django < 1.5 doesn't have this
+
+    def format_html(format_string, *args, **kwargs): # NOQA
+        """
+        Similar to str.format, but passes all arguments through
+        conditional_escape, and calls 'mark_safe' on the result. This function
+        should be used instead of str.format or % interpolation to build up
+        small HTML fragments.
+        """
+        args_safe = map(conditional_escape, args)
+        kwargs_safe = dict([(k, conditional_escape(v)) for (k, v) in kwargs.iteritems()])
+        return mark_safe(format_string.format(*args_safe, **kwargs_safe))
+
 from south.modelsinspector import add_introspection_rules
 from widgy.models import Node
 
 add_introspection_rules([], ["^widgy\.forms\.WidgyField"])
 
 
-WIDGY_FIELD_TEMPLATE = u"""
-{% load compress %}
-{% compress css %}
-<link type="text/css" href="{% static "widgy/css/font-awesome.css" %}" rel="stylesheet">
-<link type="text/x-scss" href="{% static "widgy/css/common.scss" %}" rel="stylesheet">
-<link type="text/x-scss" href="{% static "widgy/css/widgy.scss" %}" rel="stylesheet">
-{% for sheet in stylesheets %}
-<link type="{{ sheet.type }}" href="{% static sheet.filename %}" rel="stylesheet">
-{% endfor %}
-{% endcompress %}
-<input type="hidden" name="{{ name }}" value="{{ value }}">
-<script data-main="/static/widgy/js/main" src="/static/widgy/js/require/require.js"></script>
-<div id="{{ html_id }}" class="widgy"></div>
-<script>
-  require([ 'widgy' ], function(Widgy) {
-    window.widgy = new Widgy('#{{ html_id }}', {{ json }});
-  });
-</script>
-"""
+class DisplayWidget(forms.Widget):
+    def __init__(self, display_name, *args, **kwargs):
+        super(DisplayWidget, self).__init__(*args, **kwargs)
+        self.display_name = display_name
+
+    def render(self, *args, **kwargs):
+        return format_html(u'<span>{name}</span>', name=self.display_name)
 
 
 class WidgyWidget(forms.HiddenInput):
@@ -43,15 +49,17 @@ class WidgyWidget(forms.HiddenInput):
     Django form widget that is used to load the backbone.js application code
     for a Widgy field.
     """
+    stylesheets = None
+
     def render(self, name, value, attrs=None):
-        node_json = json(self.node.to_json())
-        t = Template(WIDGY_FIELD_TEMPLATE)
+        t = get_template('widgy/widgy_field.html')
+        self.node.maybe_prefetch_tree()
         return t.render(Context({
             'name': name,
             'value': value,
             'stylesheets': self.stylesheets,
             'html_id': attrs['id'],
-            'json': node_json
+            'node': self.node,
         }))
 
 
@@ -68,6 +76,7 @@ class WidgyFormField(forms.ModelChoiceField):
         the list of choices.  Otherwise, we set the ``WidgyWidget`` class as
         the widget we use for this field instance.
         """
+        choices = list(self.choices)
         if isinstance(value, Node):
             self.node = self.widget.node = value
             try:
@@ -75,12 +84,18 @@ class WidgyFormField(forms.ModelChoiceField):
             except AttributeError:
                 pass
             self.queryset = None
+        elif len(choices) == 2:
+            self._value = choices[1][0]
+            self.widget = DisplayWidget(display_name=choices[1][1])
+            self.help_text = 'You must save before you can edit this.'
         else:
             self.widget = forms.Select(
-                choices=self.choices,
+                choices=choices,
             )
 
     def clean(self, value):
+        value = getattr(self, '_value', value)
+
         try:
             value = super(WidgyFormField, self).clean(value)
         except:

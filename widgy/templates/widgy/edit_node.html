@@ -1,0 +1,14 @@
+<!doctype html>{% load fusionbox_tags %}
+<html>
+  <head>
+    <title>Edit node</title>
+  </head>
+  <body>
+    {% include "widgy/widgy_field.html" %}
+    <script>
+      require(['widgy'], function(Widgy) {
+        Widgy.actAsPopOut();
+      });
+    </script>
+  </body>
+</html>

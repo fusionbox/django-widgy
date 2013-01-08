@@ -1,118 +1,158 @@
-@import "common";
+@import "widgy_common";
+@import "font-awesome.css";
 
+/* CMS
+-------------------*/
 .widgy {
-  -webkit-user-select: none;
-  -moz-user-select: none;
 
-  .editor {
-    width: 960px;
-    display: inline-block;
+  /* Node overwrites
+  --------------------*/
+  section.node {
+    width: 966px;
+    float: left;
+  }
 
-    .shelf {
-      position: absolute;
-      top: 0;
-      right: -210px;
+  /* Image Widget
+  -------------------*/
+
+  .vFileBrowseField {display:none;}
+  
+  p.image-thumbnail {
+    @include rounded(3px);
+    background: white;
+    display: block !important;
+    margin: 0px 0px 10px 0px;
+    padding: 15px;
+    text-align: center;
+    
+    img {
+      border: 0px;
+      margin: 0 auto;
+      padding: 0px;
+      width: 60%;
     }
   }
 
-  // Node Container
-  ul.nodeChildren {
-    margin: 0 !important;
-    padding: 0 !important;
+  /* Text Widget
+  -------------------*/
+  
+  p.text-input {
+    @include clearfix;
+    margin: 20px 0px 20px 0px;
     
-    li ul.nodeChildren {
-      margin: 0 !important;
-      padding: 0 !important;
+    input[type='text'], textarea {
+      width: 98%;
+    }
+  }
+  
+
+  /* File Select
+  -------------------*/
+  
+  p.file-select {
+    @include clearfix;
+    margin: 0px 0px 20px 0px;
+    
+    input[type='text'] {
+      float: left;
+      width: 70%;
+    }
+    
+    button {
+      float: right;
     }
   }
 
-  .node {
-    @include rounded(4px);
-    background: $black10;
-    list-style: none;
-    margin: 1em;
-    padding: 10px;
-    position: relative;
+  /* Submit Row
+  -------------------*/
+  
+  p.submit-row {
+    @include rounded(3px);
+    background: $white20;
+    margin: 0px;
+    padding: 4px;
+  }
+
+  /* Buttons
+  -------------------*/
+
+  button {
+    background: $blue;
+    height: auto;
     
-
-    .content {
-      -webkit-user-select: auto;
-      -moz-user-select: auto;
+    &:hover {
+      background-color: lighten($blue,10%);
     }
 
-    p.drag-row {
-      @include clearfix;
-    }
-
-    &.being_dragged {
-      background-color: blue;
-      margin: 0;
-      pointer-events: none; /* leave this per Rocky's request */
-      position: fixed;
-    }
-    
-    p.title {
-      font-size: 14px;
-      font-weight: bold;
-      line-height: 18px;
-      margin-bottom: 10px;
+    &.cancel {
+      background: $darkgrey;
+      opacity: 0.7;
       
-      &.bucket {
-        font-size: 18px;
-        line-height: 24px;
-        padding-top: 0px;
+      &:hover {
+        background-color: lighten($darkgrey,10%);
+        opacity: 1;
       }
     }
     
-    button.edit {
-      position: absolute;
-      right: 79px;
-      top: 10px;
-      z-index: 10;
-    }
-    
-    button.delete {
-      float: right;
-    }
-    
-    .dragHandle {
-      left: -5px;
-      float: left;
-      font-size: 20px;
-      position: relative;
-    }
-  }
+    &.edit {
+      padding: 2px;
+    }    
 
-  .node_drop_target {
-    width: 100%;
-    height: 25px;
-    background-color: yellow;
-
-    &.active {
-      height: 50px;
-      outline: 1px dashed red;
+    &.delete {
+      background-color: $red;
+      color: white;
+      height: auto;
+      padding: 2px;
+      &:hover {
+        background-color: lighten($red,10%);
+      }
     }
-  }
-
-  /* Inputs
-  -------------------*/
-  
-  input[type='text'], textarea {
-    @include inset-shadow($black10,0px,1px,2px);
-    border: 0px;
-    font-weight: normal !important;
-    padding: 6px 4px 5px;
   }
   
-  textarea {
-    height: 120px;
+  input[type='submit'] {
+    background: $green;
+    height: auto;
+    
+    &:hover {
+      background-color: lighten($green,5%);
+    }
   }
 }
 
+.overlay {
+  position: fixed;
+  background-color: rgba(255, 255, 255, .3);
+  z-index: 100;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
 
+.modal {
+  display: block;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  box-shadow: 0px 0px 10px #999999;
+  -moz-box-shadow: 0px 0px 10px #999999;
+  -webkit-box-shadow: 0px 0px 10px #999999;
+  position: fixed;
+  width: 300px;
+  z-index: 101;
+  top: 50vh;
+  margin-top: -50px;
+  left: 50vw;
+  margin-left: -150px;
+}
 
-/* Global
------------------------------------------------*/
-.change-form div.submit-row {
-  z-index: 1000;
+.errorMessage {
+  .modal {
+    .serverResponse {
+      font-weight: bold;
+      font-family: monospace;
+    }
+  }
 }

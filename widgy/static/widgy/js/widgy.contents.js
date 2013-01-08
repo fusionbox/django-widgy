@@ -14,7 +14,7 @@ define([ 'widgy.backbone' ], function(Backbone) {
   var Content = Backbone.Model.extend({
     viewClass: false,
 
-    initialize: function() {
+    initialize: function(options) {
       // debugging: this will go away later probably.
       this.type = this.get('model');
     },

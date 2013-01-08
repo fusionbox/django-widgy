@@ -37,7 +37,8 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
       Backbone.View.prototype.initialize.apply(this, arguments);
       _.bindAll(this,
         'addOne',
-        'addAll'
+        'addAll',
+        'refresh'
       );
 
       this.collection
@@ -46,7 +47,7 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
 
       this.app = options.app;
 
-      this.list = new Backbone.ViewList;
+      this.list = new Backbone.ViewList();
     },
 
     addAll: function() {
@@ -71,6 +72,10 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
       this.$list = this.$el.children('.list');
 
       return this;
+    },
+
+    refresh: function() {
+      this.collection.update();
     }
   });
 

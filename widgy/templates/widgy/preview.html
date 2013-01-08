@@ -1,5 +1,20 @@
+<p class="drag-row">
+<%# draggable %>
+  <span class="drag_handle dragHandle icon-move"></span>
+  <%/ draggable %>
+  <%# deletable %>
+  <button class="delete"><span class="icon-remove"></span> Delete</button>
+  <%/ deletable %>
+  <%# pop_out %>
+  <a href="<% edit_url %>" class="pop_out">pop out</a>
+  <%/ pop_out %>
+</p>
 <p class="{{ self.class_name }} title">{{ self.meta.verbose_name }}</p>
 <div class="preview">
-  <p>{% templatetag openvariable %} content {% templatetag closevariable %}
+  {% block content %}
+  <p><% content %>
   </p>
+  {% endblock %}
 </div>
+{% block after-preview %}
+{% endblock %}

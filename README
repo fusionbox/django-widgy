@@ -66,7 +66,7 @@ Working:
   - Admin chrome around the widgy editor
   - Editing of the [mezzanine] page metadata (title, published)
   - Nice drag and drop: retain the inside node offset (ask Gavin), snap into
-    drop targets on mouseover.  
+    drop targets on mouseover.
   - Follow mouse on scroll while dragging.
 
 Not Working Yet:
@@ -90,7 +90,7 @@ file and then you will have zippier page loads.
 Steps:
 
   1.  Install the RequireJS command line tool.
-      
+
       $ [sudo] npm install -g requirejs
 
   2.  From the project path root, run the optimizer.
@@ -105,3 +105,8 @@ Steps:
       <script data-main="/static/widgy/js/widgy-built" src="/static/widgy/js/require/require.js"></script>
 
 **Note:** Please avoid committing the change in step 3.
+
+# testing
+
+    cd tests/
+    PYTHONPATH=../../ ./runtests.py --settings=test_sqlite --verbosity=2

@@ -31,7 +31,8 @@ class CMSContent(Content):
         -    ``widgy/{page_slug}/{module_name}.html``
         -    ``widgy/{parent_slug}/{page_model}/{module_name}.html``
         -    ``widgy/{module_name}.html``
-        -    ``widgy/{class_name}/{module_name}.html``
+        -    ``widgy/{module_parent_name}.html``
+        -    ``widgy/{module_parent_parent_name}.html``
         """
         templates = []
         template_path = path_generator(u'widgy/')
@@ -60,51 +61,48 @@ class CMSContent(Content):
                     self._meta.module_name
                 ) for parent in page.get_ascendants()
             ])
-        templates.extend([
-            template_path(
-                self._meta.module_name
-            ),
-            template_path(
-                self.class_name,
-                self._meta.module_name
-            )
-        ])
+        for cls in filter(lambda c: issubclass(c, Content), self.__class__.__mro__):
+            templates.extend([
+                template_path(
+                    cls._meta.module_name
+                ),
+            ])
         return templates
 
     class Meta:
         abstract = True
 
 
-class ContentPage(Page):
+#class ContentPage(Page):
+#
+#    root_node = WidgyField(
+#        verbose_name='Widgy Content',
+#        root_choices=(
+#            'TwoColumnLayout',
+#        ))
+#
+#    class Meta:
+#        verbose_name = 'Widgy Page'
+#        db_table = 'widgy_cms_contentpage'
 
-    root_node = WidgyField(
-        verbose_name='Widgy Content',
-        root_choices=(
-            'TwoColumnLayout',
-        ))
 
-    class Meta:
-        verbose_name = 'Widgy Page'
-        db_table = 'widgy_cms_contentpage'
-
-
-class Bucket(CMSContent):
-    title = models.CharField(max_length=255)
-    draggable = models.BooleanField(default=True)
-    deletable = models.BooleanField(default=True)
-
-    accepting_children = True
-
-    def valid_parent_of_class(self, cls):
-        return not issubclass(cls, Bucket)
-
-    def to_json(self):
-        json = super(Bucket, self).to_json()
-        json['title'] = self.title
-        return json
-
-    class Meta:
-        db_table = 'widgy_cms_bucket'
+#class Bucket(CMSContent):
+#    title = models.CharField(max_length=255)
+#    draggable = models.BooleanField(default=True)
+#    deletable = models.BooleanField(default=True)
+#
+#    accepting_children = True
+#
+#    def valid_parent_of_class(self, cls):
+#        return not issubclass(cls, Bucket)
+#
+#    def to_json(self):
+#        json = super(Bucket, self).to_json()
+#        json['title'] = self.title
+#        return json
+#
+#    class Meta:
+#        db_table = 'widgy_cms_bucket'
 
 
 class Layout(CMSContent):
@@ -135,47 +133,47 @@ class Layout(CMSContent):
             self.add_child(bucket_class, title=bucket_title, *args, **kwargs)
 
 
-class TwoColumnLayout(Layout):
-    """
-    On creation, creates a left and right bucket.
-    """
+#class TwoColumnLayout(Layout):
+#    """
+#    On creation, creates a left and right bucket.
+#    """
+#
+#    deletable = True
+#    editable = True
+#
+#    editor_stylesheets = (
+#        stylesheet('widgy/css/cms.scss', mime='text/x-scss'),
+#    )
+#
+#    buckets = [
+#        ('left', Bucket, (), {'draggable': False, 'deletable': False}),
+#        ('right', Bucket, (), {'draggable': False, 'deletable': False}),
+#    ]
+#
+#    class Meta:
+#        verbose_name = 'Two Column Layout'
+#        db_table = 'widgy_cms_twocolumnlayout'
+#
+#    @property
+#    def left_bucket(self):
+#        return self.node.get_children()[0]
+#
+#    @property
+#    def right_bucket(self):
+#        return self.node.get_children()[1]
 
-    deletable = True
-    editable = True
 
-    editor_stylesheets = (
-        stylesheet('widgy/css/cms.scss', mime='text/x-scss'),
-    )
-
-    buckets = [
-        ('left', Bucket, (), {'draggable': False, 'deletable': False}),
-        ('right', Bucket, (), {'draggable': False, 'deletable': False}),
-    ]
-
-    class Meta:
-        verbose_name = 'Two Column Layout'
-        db_table = 'widgy_cms_twocolumnlayout'
-
-    @property
-    def left_bucket(self):
-        return self.node.get_children()[0]
-
-    @property
-    def right_bucket(self):
-        return self.node.get_children()[1]
-
-
-class TextContent(CMSContent):
-    content = models.TextField()
-
-    class Meta:
-        verbose_name = 'Text Content'
-        db_table = 'widgy_cms_textcontent'
-
-    def to_json(self):
-        json = super(TextContent, self).to_json()
-        json['content'] = self.content
-        return json
+#class TextContent(CMSContent):
+#    content = models.TextField()
+#
+#    class Meta:
+#        verbose_name = 'Text Content'
+#        db_table = 'widgy_cms_textcontent'
+#
+#    def to_json(self):
+#        json = super(TextContent, self).to_json()
+#        json['content'] = self.content
+#        return json
 
 
 class Callout(models.Model):
@@ -218,17 +216,3 @@ class CalloutContent(CMSContent):
     class Meta:
         verbose_name = 'Callout Content'
         db_table = 'widgy_cms_calloutcontent'
-
-
-class ImageContent(CMSContent):
-    image = FileField(max_length=255, format="Image")
-
-    def to_json(self):
-        json = super(ImageContent, self).to_json()
-        if self.image:
-            json['image'] = self.image.path
-            json['image_url'] = self.image.url
-        return json
-
-    class Meta:
-        verbose_name = 'Image'

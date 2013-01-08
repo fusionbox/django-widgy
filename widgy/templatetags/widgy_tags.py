@@ -35,12 +35,13 @@ def verbatim(parser, token):
 
 
 @register.simple_tag(takes_context=True)
-def render(context, content):
-    # AttributeError is consumed by the templating engine so we make it an
-    # AssertionError
-    assert hasattr(content, 'render')
-    assert 'request' in context, "Widgy rendering requires that request is in context."
-    if not hasattr(content, '_children'):
-        content.prefetch_tree()
+def render(context, node):
+    from widgy.models import Node
 
-    return content.render(context)
+    if not isinstance(node, Node):
+        node = node.node
+
+    assert 'request' in context, "Widgy rendering requires that request is in context."
+    node.maybe_prefetch_tree()
+
+    return node.render(context)

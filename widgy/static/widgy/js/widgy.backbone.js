@@ -1,5 +1,11 @@
 define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbone, Mustache) {
 
+  Mustache.tags = ['<%', '%>'];
+
+  var renderTemplate = function(template, context) {
+      return Mustache.render(template, context);
+  };
+
   /**
    * Our base Backbone classes.
    */
@@ -31,8 +37,10 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
       _.each(this.triggers, function(value, key) {
         events[key] = function(event) {
           if ( event ) {
-            event.preventDefault && event.preventDefault();
-            event.stopPropagation && event.stopPropagation();
+            if ( event instanceof $.Event ) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
             this.trigger(value, this);
           }
         };
@@ -47,7 +55,9 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
      */
     delegateEvents: function(events) {
       events = events || this.events;
-      if (_.isFunction(events)){ events = events.call(this)}
+      if (_.isFunction(events)) {
+        events = events.call(this);
+      }
 
       var combinedEvents = {};
       var triggers = this.configureTriggers();
@@ -63,8 +73,8 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
      * http://lostechies.com/derickbailey/2011/09/15/zombies-run-managing-page-transitions-in-backbone-apps/
      */
     close: function(event) {
-      if ( event ) {
-        event.preventDefault && event.preventDefault();
+      if ( event && event.preventDefault ) {
+        event.preventDefault();
       }
 
       this.remove();
@@ -82,36 +92,16 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
      */
     template: false,
 
-    /**
-     * If your subclass has a layout property, render will use Mustache to
-     * render the output of the template in a layout.  It will pass in the
-     * context retrieved using `View.toJSON` with an additional `yield`
-     * property which is the return of html.
-     */
-    layout: false,
-
     render: function() {
-      var context = this.toJSON(),
-          html;
+      var context = this.toJSON();
 
-      if (this.template) {
-        html = this.renderTemplate(this.template, context);
-      }
-
-      if (this.layout) {
-        context.yield = html;
-        html = this.renderTemplate(this.layout, context);
-      }
-
-      this.$el.html(html);
+      this.$el.html(this.renderTemplate(this.template, context));
 
       return this;
     },
 
     // TODO: caching templates?
-    renderTemplate: function(template, context) {
-      return Mustache.render(template, context);
-    },
+    renderTemplate: renderTemplate,
 
     toJSON: function() {
       return this.model ? this.model.toJSON() : {};
@@ -150,7 +140,7 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
    * This is analogous to a Collection for Views.
    */
   function ViewList() {
-    this.list = []
+    this.list = [];
 
     _.bindAll(this,
       'remove',
@@ -210,6 +200,7 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
   return _.extend({}, Backbone, {
     Model: Model,
     View: View,
-    ViewList: ViewList
+    ViewList: ViewList,
+    renderTemplate: renderTemplate
   });
 });

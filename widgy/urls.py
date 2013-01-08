@@ -6,6 +6,8 @@ urlpatterns = patterns('widgy.views',
     url('^node/(?P<node_pk>[^/]+)/$', 'node'),
     url('^node/(?P<node_pk>[^/]+)/available-children/$', 'children'),
     url('^node/(?P<node_pk>[^/]+)/available-children-recursive/$', 'recursive_children'),
+    url('^node/(?P<node_pk>[^/]+)/edit/$', 'edit_node'),
+    url('^node/(?P<node_pk>[^/]+)/templates/$', 'node_templates'),
     url('^widgets/$', 'children'),
     url('^contents/(?P<app_label>[A-z_-]+)/(?P<object_name>[A-z_-]+)/(?P<object_pk>[^/]+)/$', 'content'),
     url(r'^cms/', include('widgy.contrib.cms.urls'))

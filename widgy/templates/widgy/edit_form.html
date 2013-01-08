@@ -1,7 +1,16 @@
 <form>
-  {{ form.as_p }}
+  {{ form.media }}
+
+  {% block form-inner %}
+    {{ form.as_p }}
+  {% endblock %}
+
+  {% block submit-row-outer %}
     <p class="submit-row">
-      <button class="cancel" type="button">Cancel</button>
-      <input type="submit" value="Save">
+      {% block submit-row-inner %}
+        <button class="cancel" type="button">Cancel</button>
+        <input type="submit" value="Save">
+      {% endblock %}
     </p>
-  </form>
+  {% endblock %}
+</form>

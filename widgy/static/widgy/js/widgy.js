@@ -24,7 +24,8 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
       var root_node_view = this.root_node_view = new nodes.NodeView({
         model: new nodes.Node(options.root_node),
         app: this,
-        tagName: 'section'
+        tagName: 'section',
+        rootNode: true
       });
 
       this.node_view_list.push(root_node_view);
@@ -63,7 +64,14 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
     this.app.render();
   }
 
+  function actAsPopOut() {
+    if ( window.widgyCloseCallback ) {
+      $(window).on('unload', window.widgyCloseCallback);
+    }
+  }
+
   return _.extend(Widgy, {
-    AppView: AppView
+    AppView: AppView,
+    actAsPopOut: actAsPopOut
   });
 });

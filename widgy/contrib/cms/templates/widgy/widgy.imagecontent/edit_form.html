@@ -1,13 +1,13 @@
 {% load verbatim from widgy_tags %}
-<p class="help mezz-fb-thumbnail image-thumbnail" id="help_{% templatetag openvariable %} input_id {% templatetag closevariable %}">
-    <a href="{% templatetag openvariable %} image_url  {% templatetag closevariable %}" target="_blank" id="link_{% templatetag openvariable %} input_id {% templatetag closevariable %}">
-        <img id="image_{% templatetag openvariable %} input_id {% templatetag closevariable %}" src="{% templatetag openvariable %} image_url {% templatetag closevariable %}" class="preview">
+<p class="help mezz-fb-thumbnail image-thumbnail" id="help_<% input_id %>">
+    <a href="<% image_url  %>" target="_blank" id="link_<% input_id %>">
+        <img id="image_<% input_id %>" src="<% image_url %>" class="preview">
     </a>
 </p>
 
 <form>
   <p class="file-select">
-    <input id="{% templatetag openvariable %} input_id {% templatetag closevariable %}" type="text" name="image" value="{% templatetag openvariable %} image {% templatetag closevariable %}">
+    <input id="<% input_id %>" type="text" name="image" value="<% image %>">
     <button class="upload action">Select Image</button>
   </p>
   <p class="submit-row">

@@ -1,11 +1,13 @@
-define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 'shelves/shelves',
+define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 'shelves/shelves', 'modal/modal',
     'text!./node.html',
     'text!./preview.html',
-    'text!./drop_target.html'
-    ], function(exports, $, _, Backbone, contents, shelves,
+    'text!./drop_target.html',
+    'text!./popped_out.html'
+    ], function(exports, $, _, Backbone, contents, shelves, modal,
       node_view_template,
       node_preview_view_template,
-      drop_target_view_template
+      drop_target_view_template,
+      popped_out_template
       ) {
 
   var debug = function(where) {
@@ -14,7 +16,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
   /**
    * Nodes provide structure in the tree.  Nodes only hold data that deals with
-   * structure.  Any other data lives in it's content.
+   * structure.  Any other data lives in its content.
    *
    * A node will have two properties: `children` and `content`.  `children` is
    * a NodeCollection which is basically just a list of child nodes. `content`
@@ -25,21 +27,45 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
   var Node = Backbone.Model.extend({
     urlRoot: '/admin/widgy/node/',
 
+    constructor: function(attrs, options) {
+      this.children = new NodeCollection();
+
+      Backbone.Model.call(this, attrs, options);
+    },
+
     initialize: function() {
       Backbone.Model.prototype.initialize.apply(this, arguments);
 
       _.bindAll(this,
         'instantiateContent'
         );
+    },
 
-      this
-        .on('change:content', this.loadContent);
+    set: function(key, val, options) {
+      var attr, attrs;
 
-      // same as content.  We need to actually instantiate the NodeCollection
-      // and set it as a property, not an attribute.
-      var children = this.get('children');
-      this.children = new NodeCollection(children);
-      this.unset('children');
+      // Handle both `"key", value` and `{key: value}` -style arguments.
+      if (_.isObject(key)) {
+        attrs = key;
+        options = val;
+      } else {
+        (attrs = {})[key] = val;
+      }
+
+      var children = attrs.children,
+          content = attrs.content;
+
+      delete attrs.children;
+      delete attrs.content;
+
+      var ret = Backbone.Model.prototype.set.call(this, attrs, options);
+
+      if (ret) {
+        if (children) this.children.update(children);
+        if (content) this.loadContent(content);
+      }
+
+      return ret;
     },
 
     url: function() {
@@ -49,15 +75,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       return this.urlRoot;
     },
 
-    checkIsContentLoaded: function() {
-      if ( this.content && this.content instanceof contents.Content ) {
-        this.trigger('load:content', this.content);
-      } else {
-        this.loadContent(this, this.get('content'));
-      }
-    },
-
-    loadContent: function(model, content) {
+    loadContent: function(content) {
+      debug.call(this, 'loadContent', content);
       if ( content ) {
         // This is asynchronous because of requirejs.
         contents.getModel(content.component, _.bind(this.instantiateContent, this, content));
@@ -65,14 +84,21 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     instantiateContent: function(content, model_class) {
-      this.content = new model_class(content);
+      debug.call(this, 'instantiateContent', content, model_class);
 
-      // content gets set because it is in the JSON for the node.  We need to
-      // unset it as it is not an attribute, but a property.  We also need to
-      // instantiate it as a real Content Model.
-      this.unset('content');
+      this.content = new model_class(content, {
+        node: this
+      });
 
       this.trigger('load:content', this.content);
+    },
+
+    sync: function(method, model, options) {
+      debug.call(this, 'Node#sync', arguments);
+      Backbone.sync.apply(this, arguments);
+
+      if (!options.silent)
+        this.trigger('node:sync', this);
     }
   });
 
@@ -96,7 +122,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
   var NodeViewBase = Backbone.View.extend({
     tagName: 'li',
     className: 'node',
-    
+
     events: {
       'mousedown .drag_handle': 'startBeingDragged'
     },
@@ -114,14 +140,12 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         'clearDropTargets'
       );
 
-      this.model
-        .on('remove', this.close)
-        .on('destroy', this.close)
-        .on('reposition', this.reposition);
+      this
+        .listenTo(this.model, 'destroy', this.close)
+        .listenTo(this.model, 'remove', this.close)
+        .listenTo(this.model, 'reposition', this.reposition);
 
       this.app = options.app;
-
-      this.drop_targets_list = new Backbone.ViewList();
     },
 
     checkDidReposition: function(model, resp, options) {
@@ -250,7 +274,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
     events: function() {
       return _.extend({}, NodeViewBase.prototype.events , {
-        'click .delete': 'delete'
+        'click .delete': 'delete',
+        'click .pop_out': 'popOut',
+        'click .pop_in': 'popIn'
       });
     },
 
@@ -258,8 +284,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       NodeViewBase.prototype.initialize.apply(this, arguments);
 
       _.bindAll(this,
-        'addAll',
-        'addOne',
+        'renderChildren',
+        'addChild',
         'position',
         'createDropTarget',
         'startDrag',
@@ -267,44 +293,50 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         'stopDragging',
         'dropChildView',
         'receiveChildView',
-        'renderContent'
+        'renderContent',
+        'nodeSync',
+        'popOut',
+        'popIn'
         );
 
-      this.model
-        .on('load:content', this.renderContent);
-
       this.collection = this.model.children;
+      this.drop_targets_list = new Backbone.ViewList();
 
-      this.collection
-        .on('reset', this.addAll)
-        .on('add', this.addOne);
+      this
+        .listenTo(this.model, 'load:content', this.renderContent)
+        .listenTo(this.model, 'node:sync', this.nodeSync)
+        .listenTo(this.collection, 'add', this.addChild)
+        .listenTo(this.collection, 'reset', this.renderChildren);
 
       this.list = new Backbone.ViewList();
     },
 
-    addAll: function() {
-      this.collection.each(this.addOne);
+    renderChildren: function() {
+      debug.call(this, 'renderChildren');
+
+      this.list.closeAll();
+      this.collection.each(this.addChild);
     },
 
-    addOne: function(node) {
+    addChild: function(node) {
       var node_view = new NodeView({
         model: node,
         app: this.app
       });
 
-      node_view
-        .on('startDrag', this.startDrag)
-        .on('stopDrag', this.stopDrag);
+      this
+        .listenTo(node_view, 'startDrag', this.startDrag)
+        .listenTo(node_view, 'stopDrag', this.stopDrag)
+        .listenTo(node_view, 'node:sync', this.nodeSync);
 
       this.app.node_view_list.push(node_view);
       this.list.push(node_view);
-
       this.position(node_view.render());
     },
 
     'delete': function(event) {
-      event.stopPropagation();
       this.model.destroy();
+      return false;
     },
 
     startDrag: function(dragged_view) {
@@ -336,6 +368,24 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       return dragged_view;
     },
 
+    /**
+     * `nodeSync` allows us to refresh the shelf every time a node is moved or
+     * deleted.  It doesn't refresh the shelf every time a new node is created,
+     * but that is already handled by the shelf.  That would work only if the
+     * events from preview nodes bubbled up through the shelf and hit the
+     * NodeViews that are already in the tree.  If this node doesn't have a
+     * shelf, it will just bubble the event.
+     */
+    nodeSync: function(node) {
+      debug.call(this, 'nodeSync', node);
+
+      if ( this.hasShelf() && node !== this.model ) {
+        this.shelf.refresh();
+      } else {
+        this.trigger('node:sync', node);
+      }
+    },
+
     stopDrag: function(callback) {
       debug.call(this, 'stopDrag', callback);
 
@@ -365,7 +415,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       // do nothing if it's me or I'm not accepting children.
       if ( this === view ||
-          (! mine && this.model.content && !this.model.content.get('accepting_children')) )
+          (! mine && this.model.content && !this.model.content.get('accepting_children')) ||
+          (view.model.get('possible_parent_nodes') && ! _.contains(view.model.get('possible_parent_nodes'), this.model.id))
+          )
       {
         return;
       }
@@ -448,38 +500,45 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       }
 
       dragged_view.model.save(attributes, {
-        success: dragged_view.checkDidReposition
+        success: dragged_view.checkDidReposition,
+        error: modal.raiseError
       });
     },
 
     hasShelf: function() {
-      return ! this.model.get('parent_id') || this.model.content.get('shelf');
+      return this.model.content.get('shelf') || this.options.rootNode;
     },
 
     render: function() {
+      debug.call(this, 'render');
       Backbone.View.prototype.render.apply(this, arguments);
 
       this.$children = this.$el.children('.node_children');
       this.$content = this.$el.children('.content');
 
-      // TODO: this could be like a document.ready sorta?
-      this.model.checkIsContentLoaded();
+      if ( this.model.content ) {
+        this.renderContent(this.model.content);
+      }
 
-      // TODO: investigate possible problems with this.
-      this.addAll();
+      this.renderChildren();
 
       return this;
     },
 
     renderContent: function(content) {
+      debug.call(this, 'renderContent', content);
+
       var view_class = content.getViewClass();
 
       content_view = new view_class({
         model: content,
         el: this.$content
       });
-      
+
       content_view.render();
+
+      if ( content.get('pop_out') == 2 && ! this.options.rootNode )
+        return;
 
       if ( this.hasShelf() ) {
         this.renderShelf();
@@ -487,17 +546,19 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     renderShelf: function() {
-      var shelf_view = this.shelf_view = new shelves.ShelfView({
+      if (this.shelf) return false;
+
+      var shelf = this.shelf = new shelves.ShelfView({
         collection: new shelves.ShelfCollection({
             node: this.model
           }),
         app: this.app
       });
 
-      shelf_view.on('startDrag', this.startDrag);
-      shelf_view.collection.fetch();
+      this.listenTo(shelf, 'startDrag', this.startDrag);
+      shelf.collection.fetch();
 
-      this.$el.append(shelf_view.render().el);
+      this.$el.append(shelf.render().el);
     },
 
     toJSON: function() {
@@ -506,7 +567,37 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         json.content = this.model.content.toJSON();
 
       return json;
+    },
+
+    popOut: function(event) {
+      debug.call(this, 'popOut');
+
+      event.preventDefault();
+      event.stopPropagation(); // our parent nodes
+
+      this.subwindow = window.open(event.target.href, '', 'height=500,width=800,resizable=yes,scrollbars=yes');
+      this.subwindow.widgyCloseCallback = this.popIn;
+
+      this.collection.reset();
+      this.$content.html(this.renderTemplate(popped_out_template, this.toJSON()));
+    },
+
+    popIn: function(event) {
+      debug.call(this, 'popIn');
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      if ( ! this.subwindow.closed ) {
+        $(this.subwindow).off('unload', this.popIn);
+        this.subwindow.close();
+      }
+
+      this.model.fetch();
+
+      return false;
     }
+
   });
 
 

@@ -1,0 +1,5 @@
+mezzanine >= 1.3.0
+django-fusionbox
+django-treebeard
+South
+PyScss==1.1.3

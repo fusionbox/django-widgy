@@ -29,18 +29,18 @@ class BadParentRejection(ParentChildRejection):
     """
     Raised by child to reject the requested parent.
     """
-    message = "You can't put me in that"
+    message = "This content does not accept being a child of that parent."
 
 
 class BadChildRejection(ParentChildRejection):
     """
     Raised by parents to reject children that don't belong.
     """
-    message = "You can't put that in me"
+    message = "The parent does not accept this content as a child."
 
 
-class OhHellNo(BadParentRejection, BadChildRejection):
+class MutualRejection(BadParentRejection, BadChildRejection):
     """
     For instances where both child and parent reject the movement request.
     """
-    message = "Everyone hates everything"
+    message = "Neither the parent or child accept this parent-child relationship."
