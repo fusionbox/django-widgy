@@ -17,6 +17,7 @@ install_requires = [
     'django-treebeard',
     'South',
     'PyScss==1.1.3',
+    'six',
 ]
 
 version = '0.0.1'
