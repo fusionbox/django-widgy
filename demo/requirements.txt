@@ -1,13 +1,13 @@
 -e git://github.com/fusionbox/django-fusionbox.git#egg=django_fusionbox
-Django==1.4.2
+Django
 South
 Werkzeug
 django-cachebuster
 django-compressor
 django-debug-toolbar
 django-extensions
-Mezzanine==1.2.0
+Mezzanine
 pyScss==1.1.3
-django-treebeard==1.61
+django-treebeard
 psycopg2==2.4.5
 Sphinx==1.1.3

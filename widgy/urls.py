@@ -10,5 +10,4 @@ urlpatterns = patterns('widgy.views',
     url('^node/(?P<node_pk>[^/]+)/templates/$', 'node_templates'),
     url('^widgets/$', 'children'),
     url('^contents/(?P<app_label>[A-z_-]+)/(?P<object_name>[A-z_-]+)/(?P<object_pk>[^/]+)/$', 'content'),
-    url(r'^cms/', include('widgy.contrib.cms.urls'))
     )

@@ -99,8 +99,8 @@ USE_SOUTH = True
 # In the format (('Full Name', 'email@example.com'),
 #                ('Full Name', 'anotheremail@example.com'))
 ADMINS = (
-    ('Aaron Merriam', 'amerriam@fusionbox.com'),
-    #('Programmers', 'programmers@fusionbox.com'),
+    #('Aaron Merriam', 'amerriam@fusionbox.com'),
+    ('Programmers', 'programmers@fusionbox.com'),
 )
 MANAGERS = ADMINS
 
@@ -256,15 +256,17 @@ INSTALLED_APPS = (
     "django.contrib.sites",
     "django.contrib.sitemaps",
     "django.contrib.staticfiles",
+    "django.contrib.markup",
     "mezzanine.boot",
     "mezzanine.conf",
     "mezzanine.core",
     "mezzanine.generic",
     #"mezzanine.blog",
-    "mezzanine.forms",
+    #"mezzanine.forms",
     "mezzanine.pages",
     'widgy',
-    'widgy.contrib.cms',
+    'widgy.contrib.page_builder',
+    'widgy.contrib.widgy_mezzanine',
     "django.contrib.admin",
     #"mezzanine.galleries",
     #"mezzanine.twitter",

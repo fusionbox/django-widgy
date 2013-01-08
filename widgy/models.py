@@ -98,10 +98,10 @@ class Node(MP_Node):
             return self._children
         return super(Node, self).get_children()
 
-    def get_parent(self):
+    def get_parent(self, *args, **kwargs):
         if hasattr(self, '_parent'):
             return self._parent
-        return super(Node, self).get_parent()
+        return super(Node, self).get_parent(*args, **kwargs)
 
     def get_next_sibling(self):
         if hasattr(self, '_next_sibling'):
@@ -512,7 +512,8 @@ class Content(models.Model):
         """
         context.update({'content': self})
         rendered = render_to_string(
-            template or self.get_render_templates(context), context
+            template or self.get_render_templates(context),
+            context
         )
         context.pop()
         return rendered
@@ -532,10 +533,9 @@ class Content(models.Model):
             related_modeladmin = admin_site._registry.get(db_field.rel.to)
             can_add_related = bool(related_modeladmin and related_modeladmin.has_add_permission(request))
             formfield.widget = widgets.RelatedFieldWidgetWrapper(
-                        formfield.widget, db_field.rel, admin_site,
-                        can_add_related=can_add_related)
+                formfield.widget, db_field.rel, admin_site,
+                can_add_related=can_add_related)
         return formfield
-
 
     def get_templates(self, request):
         return {
