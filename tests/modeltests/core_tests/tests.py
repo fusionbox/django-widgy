@@ -17,7 +17,7 @@ class RootNodeTestCase(TestCase):
     urls = 'modeltests.core_tests.urls'
 
     def setUp(self):
-        self.root_node = Layout.add_root().node
+        self.root_node = Layout.add_root(widgy_site).node
 
 
 def tree_to_dot(node):
@@ -39,20 +39,27 @@ def display_node(node):
 
 def make_a_nice_tree(root_node):
     left, right = root_node.content.get_children()
-    left.add_child(RawTextWidget,
+    left.add_child(widgy_site,
+                   RawTextWidget,
                    text='left_1')
-    left.add_child(RawTextWidget,
+    left.add_child(widgy_site,
+                   RawTextWidget,
                    text='left_2')
 
-    subbucket = left.add_child(Bucket)
-    subbucket.add_child(RawTextWidget,
+    subbucket = left.add_child(widgy_site,
+                               Bucket)
+    subbucket.add_child(widgy_site,
+                        RawTextWidget,
                         text='subbucket_1')
-    subbucket.add_child(RawTextWidget,
+    subbucket.add_child(widgy_site,
+                        RawTextWidget,
                         text='subbucket_2')
 
-    right.add_child(RawTextWidget,
+    right.add_child(widgy_site,
+                    RawTextWidget,
                     text='right_1')
-    right.add_child(RawTextWidget,
+    right.add_child(widgy_site,
+                    RawTextWidget,
                     text='right_2')
 
     return left.node, right.node
@@ -71,46 +78,51 @@ class TestCore(RootNodeTestCase):
         """
         content = self.root_node.content
         for i in range(50):
-            content = content.add_child(Bucket)
+            content = content.add_child(widgy_site,
+                                        Bucket)
 
         # + 2 -- original buckets
         self.assertEqual(len(self.root_node.get_descendants()), 50 + 2)
 
     def test_validate_relationship_cls(self):
         with self.assertRaises(BadChildRejection):
-            self.root_node.content.validate_relationship(RawTextWidget)
+            widgy_site.validate_relationship(self.root_node.content, RawTextWidget)
 
         bucket = list(self.root_node.content.get_children())[0]
         with self.assertRaises(BadParentRejection):
-            bucket.validate_relationship(CantGoAnywhereWidget)
+            widgy_site.validate_relationship(bucket, CantGoAnywhereWidget)
 
         with self.assertRaises(MutualRejection):
-            self.root_node.content.validate_relationship(CantGoAnywhereWidget)
+            widgy_site.validate_relationship(self.root_node.content, CantGoAnywhereWidget)
 
     def test_validate_relationship_instance(self):
-        picky_bucket = self.root_node.content.add_child(PickyBucket)
+        picky_bucket = self.root_node.content.add_child(widgy_site,
+                                                        PickyBucket)
 
         with self.assertRaises(BadChildRejection):
-            picky_bucket.add_child(RawTextWidget,
+            picky_bucket.add_child(widgy_site,
+                                   RawTextWidget,
                                    text='aasdf')
 
-        picky_bucket.add_child(RawTextWidget,
+        picky_bucket.add_child(widgy_site,
+                               RawTextWidget,
                                text='hello')
 
         with self.assertRaises(BadChildRejection):
-            picky_bucket.add_child(Layout)
+            picky_bucket.add_child(widgy_site,
+                                   Layout)
 
     def test_reposition(self):
         left, right = make_a_nice_tree(self.root_node)
 
         with self.assertRaises(InvalidTreeMovement):
-            self.root_node.reposition(parent=left)
+            self.root_node.reposition(widgy_site, parent=left)
 
         with self.assertRaises(InvalidTreeMovement):
-            left.reposition(right=self.root_node)
+            left.reposition(widgy_site, right=self.root_node)
 
         # swap left and right
-        right.reposition(right=left)
+        right.reposition(widgy_site, right=left)
 
         new_left, new_right = self.root_node.get_children()
         self.assertEqual(right, new_left)
@@ -118,19 +130,19 @@ class TestCore(RootNodeTestCase):
 
         raw_text = new_right.get_first_child()
         with self.assertRaises(BadChildRejection):
-            raw_text.reposition(parent=self.root_node, right=new_left)
+            raw_text.reposition(widgy_site, parent=self.root_node, right=new_left)
 
         subbucket = list(new_right.get_children())[-1]
-        subbucket.reposition(parent=self.root_node, right=new_left)
+        subbucket.reposition(widgy_site, parent=self.root_node, right=new_left)
         new_subbucket, new_left, new_right = self.root_node.get_children()
         self.assertEqual(new_subbucket, subbucket)
 
     def test_reposition_immovable(self):
         left, right = make_a_nice_tree(self.root_node)
-        bucket = left.content.add_child(ImmovableBucket)
+        bucket = left.content.add_child(widgy_site, ImmovableBucket)
 
         with self.assertRaises(InvalidTreeMovement):
-            bucket.node.reposition(parent=self.root_node,
+            bucket.node.reposition(widgy_site, parent=self.root_node,
                                    right=left)
 
 

@@ -90,10 +90,10 @@ class NodeView(WidgyView):
 
         try:
             right = get_object_or_404(Node, pk=extract_id(data['right_id']))
-            content = right.content.add_sibling(content_class)
+            content = right.content.add_sibling(self.site, content_class)
         except Http404:
             parent = get_object_or_404(Node, pk=extract_id(data['parent_id']))
-            content = parent.content.add_child(content_class)
+            content = parent.content.add_child(self.site, content_class)
 
         return self.render_to_response(content.node.to_json(self.site),
                                        status=201)
@@ -114,11 +114,11 @@ class NodeView(WidgyView):
 
         try:
             right = Node.objects.get(pk=extract_id(data['right_id']))
-            node.reposition(right=right)
+            node.reposition(self.site, right=right)
         except Node.DoesNotExist:
             try:
                 parent = Node.objects.get(pk=extract_id(data['parent_id']))
-                node.reposition(parent=parent)
+                node.reposition(self.site, parent=parent)
             except Node.DoesNotExist:
                 raise Http404
 
@@ -155,7 +155,7 @@ class ShelfView(WidgyView):
     def get(self, request, node_pk):
         content_classes = Content.all_concrete_subclasses()
         node = get_object_or_404(Node, pk=node_pk)
-        content_classes = node.filter_child_classes_recursive(content_classes)
+        content_classes = node.filter_child_classes_recursive(self.site, content_classes)
         res_dict = {}
         for node, class_list in content_classes.iteritems():
             if node.content.pop_out != 2 or str(node.pk) == node_pk:

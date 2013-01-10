@@ -87,7 +87,7 @@ class WidgyFormField(forms.ModelChoiceField):
                 choices=choices,
             )
 
-        self.widget.site = site
+        self.site = self.widget.site = site
 
     def clean(self, value):
         value = getattr(self, '_value', value)

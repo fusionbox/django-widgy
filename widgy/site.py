@@ -10,6 +10,11 @@ from widgy.views import (
     NodeEditView,
     NodeTemplatesView,
 )
+from widgy.exceptions import (
+    MutualRejection,
+    BadChildRejection,
+    BadParentRejection,
+)
 
 
 class WidgySite(object):
@@ -34,10 +39,6 @@ class WidgySite(object):
         )
         return urlpatterns
 
-    def authorize(self, request):
-        if not request.user.is_authenticated():
-            raise PermissionDenied
-
     @property
     def urls(self):
         return self.get_urls()
@@ -55,6 +56,10 @@ class WidgySite(object):
         """
         return reverse(*args, **kwargs)
 
+    def authorize(self, request):
+        if not request.user.is_authenticated():
+            raise PermissionDenied
+
     def get_node_view(self):
         return NodeView.as_view(site=self)
 
@@ -69,3 +74,18 @@ class WidgySite(object):
 
     def get_node_templates_view(self):
         return NodeTemplatesView.as_view(site=self)
+
+    def validate_relationship(self, parent, child):
+        if isinstance(child, type):
+            bad_parent = not child.valid_child_class_of(parent)
+            bad_child = not parent.valid_parent_of_class(child)
+        else:
+            bad_parent = not child.valid_child_of(parent)
+            bad_child = not parent.valid_parent_of_instance(child)
+
+        if bad_parent and bad_child:
+            raise MutualRejection
+        elif bad_parent:
+            raise BadParentRejection
+        elif bad_child:
+            raise BadChildRejection

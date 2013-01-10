@@ -38,9 +38,9 @@ class Layout(PageBuilderContent):
 
     default_children = tuple()
 
-    def post_create(self):
+    def post_create(self, site):
         for cls, args, kwargs in self.default_children:
-            self.add_child(cls, *args, **kwargs)
+            self.add_child(site, cls, *args, **kwargs)
 
     def valid_parent_of_instance(self, content):
         return any(isinstance(content, bucket_meta[0]) for bucket_meta in self.default_children) and\

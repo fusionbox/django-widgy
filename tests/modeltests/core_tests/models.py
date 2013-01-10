@@ -13,9 +13,9 @@ class Layout(Content):
     def valid_parent_of_class(self, cls):
         return issubclass(cls, Bucket)
 
-    def post_create(self):
-        self.add_child(Bucket)
-        self.add_child(Bucket)
+    def post_create(self, site):
+        self.add_child(site, Bucket)
+        self.add_child(site, Bucket)
 
 
 class Bucket(Content):

@@ -65,7 +65,7 @@ class WidgyField(models.ForeignKey):
         if hasattr(value, '_ct'):
             ct = value._ct
 
-            node = ct.model_class().add_root().node
+            node = ct.model_class().add_root(self.site).node
             setattr(model_instance, self.name, node)
             setattr(model_instance, self.attname, node.pk)
 
