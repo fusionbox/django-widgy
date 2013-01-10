@@ -11,7 +11,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 from fusionbox.views.rest import RestView
 
-from widgy.models import Node, Content, InvalidTreeMovement
+from widgy.models import Node, InvalidTreeMovement
 from widgy.utils import extract_id
 
 
@@ -153,7 +153,7 @@ class ShelfView(WidgyView):
             children.
     """
     def get(self, request, node_pk):
-        content_classes = Content.all_concrete_subclasses()
+        content_classes = self.site.get_all_content_classes()
         node = get_object_or_404(Node, pk=node_pk)
         content_classes = node.filter_child_classes_recursive(self.site, content_classes)
         res_dict = {}

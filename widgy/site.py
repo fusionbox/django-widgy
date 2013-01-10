@@ -28,6 +28,9 @@ class WidgySite(object):
     def get_registry(self):
         return registry
 
+    def get_all_content_classes(self):
+        return registry.keys()
+
     def get_urls(self):
         urlpatterns = patterns('',
             url('^node/$', self.node_view),

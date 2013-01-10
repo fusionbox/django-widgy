@@ -5,6 +5,7 @@ from widgy.models import Content
 from widgy.db.fields import WidgyField
 from widgy.contrib.page_builder.db.fields import MarkdownField
 from widgy.utils import path_generator
+from widgy import registry
 
 
 class PageBuilderContent(Content):
@@ -93,6 +94,8 @@ class MainContent(Bucket):
     def valid_child_class_of(cls, parent):
         return isinstance(parent, Layout)
 
+registry.register(MainContent)
+
 
 class Sidebar(Bucket):
     pop_out = 1
@@ -109,6 +112,8 @@ class Sidebar(Bucket):
     @classmethod
     def valid_child_class_of(cls, parent):
         return isinstance(parent, Layout)
+
+registry.register(Sidebar)
 
 
 class DefaultLayout(Layout):
@@ -128,12 +133,16 @@ class DefaultLayout(Layout):
         (Sidebar, (), {}),
     ]
 
+registry.register(DefaultLayout)
+
 
 class Markdown(Widget):
     content = MarkdownField(blank=True)
     rendered = models.TextField(editable=False)
 
     component_name = 'markdown'
+
+registry.register(Markdown)
 
 
 class CalloutBucket(Bucket):
@@ -143,6 +152,8 @@ class CalloutBucket(Bucket):
 
     def valid_parent_of_class(self, cls):
         return cls in (Markdown,)
+
+registry.register(CalloutBucket)
 
 
 class Callout(models.Model):
@@ -165,6 +176,8 @@ class CalloutWidget(Widget):
     def valid_child_class_of(cls, parent):
         return isinstance(parent, Sidebar)
 
+registry.register(CalloutWidget)
+
 
 class Accordion(Bucket):
     draggable = True
@@ -172,6 +185,8 @@ class Accordion(Bucket):
 
     def valid_parent_of_class(self, cls):
         return issubclass(cls, Section)
+
+registry.register(Accordion)
 
 
 class Section(Widget):
@@ -182,3 +197,5 @@ class Section(Widget):
     @classmethod
     def valid_child_class_of(cls, parent):
         return isinstance(parent, Accordion)
+
+registry.register(Section)

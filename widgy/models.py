@@ -283,16 +283,6 @@ class Content(models.Model):
                 'title': cls._meta.verbose_name.title(),
                 }
 
-    @classmethod
-    def all_concrete_subclasses(cls):
-        """
-        Recursively gathers all the non-abstract subclasses.
-        """
-        classes = set(c for c in cls.__subclasses__() if not c._meta.abstract)
-        for c in cls.__subclasses__():
-            classes.update(c.all_concrete_subclasses())
-        return classes
-
     @property
     def class_name(self):
         """
