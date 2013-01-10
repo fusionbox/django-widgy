@@ -2,8 +2,7 @@
 A collection of model and form field classes.
 """
 from django import forms
-from django.template import Context
-from django.template.loader import get_template
+from django.template.loader import render_to_string
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
@@ -12,7 +11,7 @@ try:
 except ImportError:
     # Django < 1.5 doesn't have this
 
-    def format_html(format_string, *args, **kwargs): # NOQA
+    def format_html(format_string, *args, **kwargs):  # NOQA
         """
         Similar to str.format, but passes all arguments through
         conditional_escape, and calls 'mark_safe' on the result. This function
@@ -23,10 +22,7 @@ except ImportError:
         kwargs_safe = dict([(k, conditional_escape(v)) for (k, v) in kwargs.iteritems()])
         return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
-from south.modelsinspector import add_introspection_rules
 from widgy.models import Node
-
-add_introspection_rules([], ["^widgy\.forms\.WidgyField"])
 
 
 class DisplayWidget(forms.Widget):
@@ -46,15 +42,14 @@ class WidgyWidget(forms.HiddenInput):
     stylesheets = None
 
     def render(self, name, value, attrs=None):
-        t = get_template('widgy/widgy_field.html')
         self.node.maybe_prefetch_tree()
-        return t.render(Context({
-            'name': name,
+        return render_to_string('widgy/widgy_field.html', {
+            'html_name': name,
             'value': value,
             'stylesheets': self.stylesheets,
             'html_id': attrs['id'],
             'node_dict': self.node.to_json(self.site),
-        }))
+        })
 
 
 class WidgyFormField(forms.ModelChoiceField):
@@ -64,7 +59,11 @@ class WidgyFormField(forms.ModelChoiceField):
     """
     widget = WidgyWidget
 
-    def conform_to_value(self, value, site):
+    def __init__(self, *args, **kwargs):
+        self.site = kwargs.pop('site')
+        super(WidgyFormField, self).__init__(*args, **kwargs)
+
+    def conform_to_value(self, value):
         """
         When no root node has been set, we prompt the user to choose one from
         the list of choices.  Otherwise, we set the ``WidgyWidget`` class as
@@ -87,7 +86,7 @@ class WidgyFormField(forms.ModelChoiceField):
                 choices=choices,
             )
 
-        self.site = self.widget.site = site
+        self.widget.site = self.site
 
     def clean(self, value):
         value = getattr(self, '_value', value)
@@ -114,4 +113,4 @@ class WidgyFormMixin(object):
         for name, field in self.fields.iteritems():
             if isinstance(field, WidgyFormField):
                 value = getattr(self.instance, name)
-                field.conform_to_value(value, self.site)
+                field.conform_to_value(value)

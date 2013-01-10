@@ -6,6 +6,11 @@ from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from django.contrib.contenttypes.models import ContentType
 
 from widgy.forms import WidgyFormField
+from widgy.utils import fancy_import
+
+from south.modelsinspector import add_introspection_rules
+
+add_introspection_rules([], ["^widgy\.db.fields\.WidgyField"])
 
 
 class WidgyFieldObjectDescriptor(ReverseSingleRelatedObjectDescriptor):
@@ -29,7 +34,7 @@ class WidgyField(models.ForeignKey):
     Model field that inherits from ``models.ForeignKey``.  Contains validation
     and context switching that is needed for Widgy fields.
     """
-    def __init__(self, to=None, root_choices=None, **kwargs):
+    def __init__(self, site=None, to=None, root_choices=None, **kwargs):
         if to is None:
             to = 'widgy.Node'
 
@@ -41,6 +46,10 @@ class WidgyField(models.ForeignKey):
             'on_delete': models.SET_NULL
         }
         defaults.update(kwargs)
+
+        if isinstance(site, str):
+            site = fancy_import(site)
+        self.site = site
 
         super(WidgyField, self).__init__(to, **defaults)
 
@@ -77,6 +86,7 @@ class WidgyField(models.ForeignKey):
         defaults = {
             'form_class': WidgyFormField,
             'queryset': self.get_layout_contenttypes(self.root_choices),
+            'site': self.site,
         }
         defaults.update(kwargs)
         return super(WidgyField, self).formfield(**defaults)

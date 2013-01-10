@@ -5,8 +5,8 @@
 <link type="{{ sheet.type }}" href="{% static sheet.filename %}" rel="stylesheet">
 {% endfor %}
 {% endcompress %}
-{% if name %}
-<input type="hidden" name="{{ name }}" value="{{ value }}">
+{% if html_name %}
+<input type="hidden" name="{{ html_name }}" value="{{ value }}">
 {% endif %}
 <script data-main="/static/widgy/js/main" src="/static/widgy/js/require/require.js"></script>
 <div id="{{ html_id }}" class="widgy"></div>

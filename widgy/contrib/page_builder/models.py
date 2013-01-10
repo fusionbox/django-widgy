@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 from widgy.models import Content
 from widgy.db.fields import WidgyField
@@ -147,6 +148,7 @@ class CalloutBucket(Bucket):
 class Callout(models.Model):
     name = models.CharField(max_length=255)
     root_node = WidgyField(
+        site=settings.WIDGY_MEZZANINE_SITE,
         verbose_name='Widgy Content',
         root_choices=(
             'CalloutBucket',

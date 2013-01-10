@@ -11,7 +11,7 @@ class Migration(SchemaMigration):
         # Adding model 'WidgyPage'
         db.create_table('widgy_mezzanine_widgypage', (
             ('page_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['pages.Page'], unique=True, primary_key=True)),
-            ('root_node', self.gf('widgy.forms.WidgyField')(to=orm['widgy.Node'], null=True, on_delete=models.SET_NULL, blank=True)),
+            ('root_node', self.gf('widgy.db.fields.WidgyField')(to=orm['widgy.Node'], null=True, on_delete=models.SET_NULL, blank=True)),
         ))
         db.send_create_signal('widgy_mezzanine', ['WidgyPage'])
 
@@ -54,7 +54,6 @@ class Migration(SchemaMigration):
             'gen_description': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'in_menus': ('mezzanine.pages.fields.MenusField', [], {'default': '[1, 2, 3]', 'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'in_sitemap': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'keywords': ('mezzanine.generic.fields.KeywordsField', [], {'object_id_field': "'object_pk'", 'to': "orm['generic.AssignedKeyword']", 'frozen_by_south': 'True'}),
             'keywords_string': ('django.db.models.fields.CharField', [], {'max_length': '500', 'blank': 'True'}),
             'login_required': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
@@ -85,7 +84,7 @@ class Migration(SchemaMigration):
         'widgy_mezzanine.widgypage': {
             'Meta': {'ordering': "('_order',)", 'object_name': 'WidgyPage', '_ormbases': ['pages.Page']},
             'page_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['pages.Page']", 'unique': 'True', 'primary_key': 'True'}),
-            'root_node': ('widgy.forms.WidgyField', [], {'to': "orm['widgy.Node']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'})
+            'root_node': ('widgy.db.fields.WidgyField', [], {'to': "orm['widgy.Node']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'})
         }
     }
 

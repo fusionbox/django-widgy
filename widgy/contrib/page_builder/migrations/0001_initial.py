@@ -44,7 +44,7 @@ class Migration(SchemaMigration):
         db.create_table('page_builder_callout', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('callout', self.gf('widgy.forms.WidgyField')(to=orm['widgy.Node'], null=True, on_delete=models.SET_NULL, blank=True)),
+            ('root_node', self.gf('widgy.db.fields.WidgyField')(to=orm['widgy.Node'], null=True, on_delete=models.SET_NULL, blank=True)),
         ))
         db.send_create_signal('page_builder', ['Callout'])
 
@@ -112,9 +112,9 @@ class Migration(SchemaMigration):
         },
         'page_builder.callout': {
             'Meta': {'object_name': 'Callout'},
-            'callout': ('widgy.forms.WidgyField', [], {'to': "orm['widgy.Node']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'root_node': ('widgy.db.fields.WidgyField', [], {'to': "orm['widgy.Node']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'})
         },
         'page_builder.calloutbucket': {
             'Meta': {'object_name': 'CalloutBucket'},
