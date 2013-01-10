@@ -3,7 +3,6 @@ Resource views that can be included to enable a REST style API
 for Widgy nodes and Content objects.
 """
 from django.http import Http404
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from django.contrib.contenttypes.models import ContentType
@@ -13,16 +12,21 @@ from django.views.generic.detail import SingleObjectMixin
 from fusionbox.views.rest import RestView
 
 from widgy.models import Node, Content, InvalidTreeMovement
-from widgy.utils import extract_id, fancy_import
+from widgy.utils import extract_id
 
 
-class AuthorizedRestView(RestView):
+class WidgyViewMixin(object):
+    site = None
+
     def auth(self, request, *args, **kwargs):
-        if getattr(settings, 'WIDGY_AUTH_MODULE', None):
-            fancy_import(settings.WIDGY_AUTH_MODULE).authorize(request)
+        self.site.authorize(request)
 
 
-class ContentView(AuthorizedRestView):
+class WidgyView(WidgyViewMixin, RestView):
+    pass
+
+
+class ContentView(WidgyView):
     """
     General purpose resource for :class:`widgy.models.Content` objects.
 
@@ -46,7 +50,7 @@ class ContentView(AuthorizedRestView):
 
     def get(self, request, app_label, object_name, object_pk):
         obj = self.get_object(app_label, object_name, object_pk)
-        return self.render_to_response(obj)
+        return self.render_to_response(obj.to_json(self.site))
 
     def put(self, request, app_label, object_name, object_pk):
         obj = self.get_object(app_label, object_name, object_pk)
@@ -55,10 +59,11 @@ class ContentView(AuthorizedRestView):
         if not form.is_valid():
             raise ValidationError(form.errors)
         form.save()
-        return self.render_to_response(form.instance, status=200)
+        return self.render_to_response(form.instance.to_json(self.site),
+                                       status=200)
 
 
-class NodeView(AuthorizedRestView):
+class NodeView(WidgyView):
     """
     General purpose resource for updating, deleting, and repositioning
     :class:`widgy.models.Node` objects.
@@ -76,7 +81,7 @@ class NodeView(AuthorizedRestView):
     """
     def get(self, request, node_pk):
         node = get_object_or_404(Node, pk=node_pk)
-        return self.render_to_response(node)
+        return self.render_to_response(node.to_json(self.site))
 
     def post(self, request, node_pk=None):
         data = self.data()
@@ -90,7 +95,8 @@ class NodeView(AuthorizedRestView):
             parent = get_object_or_404(Node, pk=extract_id(data['parent_id']))
             content = parent.content.add_child(content_class)
 
-        return self.render_to_response(content.node, status=201)
+        return self.render_to_response(content.node.to_json(self.site),
+                                       status=201)
 
     def put(self, request, node_pk):
         """
@@ -128,24 +134,16 @@ class NodeView(AuthorizedRestView):
 
         return self.render_to_response(None)
 
+    def options(self, request, node_pk=None):
+        response = super(NodeView, self).options(request, node_pk)
 
-class ChildrenView(AuthorizedRestView):
-    """
-    Resource that retrieves all the valid children classes for the given node
-    instance.
+        if not node_pk:
+            response['Allow'] = 'POST'
 
-    **Supported Methods**:
-        :get: Get all the valid content classes for the given node instance.
-    """
-    def get(self, request, node_pk):
-        node = get_object_or_404(Node, pk=node_pk)
-        content_classes = Content.all_concrete_subclasses()
-        content_classes = node.filter_child_classes(content_classes)
-
-        return self.render_to_response([i.class_to_json() for i in content_classes])
+        return response
 
 
-class RecursiveChildrenView(AuthorizedRestView):
+class ShelfView(WidgyView):
     """
     Resource that retrieves not only the valid content classes, but also the
     valid content classes of the node's children.
@@ -162,37 +160,32 @@ class RecursiveChildrenView(AuthorizedRestView):
         for node, class_list in content_classes.iteritems():
             if node.content.pop_out != 2 or str(node.pk) == node_pk:
                 for cls in class_list:
-                    res_dict.setdefault(cls, cls.class_to_json())
+                    res_dict.setdefault(cls, cls.class_to_json(self.site))
                     res_dict[cls].setdefault('possible_parent_nodes', [])
-                    res_dict[cls]['possible_parent_nodes'].append(node.get_api_url())
+                    res_dict[cls]['possible_parent_nodes'].append(node.get_api_url(self.site))
 
         return self.render_to_response(res_dict.values())
 
-children = ChildrenView.as_view()
-recursive_children = RecursiveChildrenView.as_view()
-content = ContentView.as_view()
-node = NodeView.as_view()
 
-
-class NodeEditView(DetailView):
+class NodeEditView(WidgyViewMixin, DetailView):
     template_name = 'widgy/edit_node.html'
     model = Node
     pk_url_kwarg = 'node_pk'
+
+    def dispatch(self, *args, **kwargs):
+        self.auth(*args, **kwargs)
+        return super(NodeEditView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super(NodeEditView, self).get_context_data(**kwargs)
         kwargs['html_id'] = 'node_%s' % (self.object.pk)
         return kwargs
 
-edit_node = NodeEditView.as_view()
 
-
-class NodeTemplateView(SingleObjectMixin, AuthorizedRestView):
+class NodeTemplatesView(SingleObjectMixin, WidgyView):
     model = Node
     pk_url_kwarg = 'node_pk'
 
     def get(self, request, *args, **kwargs):
         node = self.object = self.get_object()
         return self.render_to_response(node.content.get_templates(request))
-
-node_templates = NodeTemplateView.as_view()

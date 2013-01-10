@@ -4,13 +4,16 @@ from widgy.forms import WidgyFormMixin
 
 class WidgyAdmin(ModelAdmin):
     """
-    Model Admin for models which will have a widgy tree under them
+    Abstract base class for ModelAdmins whose models contain WidgyFields.
     """
+    # You must provide a site when declaring your WidgyAdmin
+    # site = None
+
     def get_form(self, request, obj=None, **kwargs):
         form = super(WidgyAdmin, self).get_form(request, obj, **kwargs)
 
         if not issubclass(form, WidgyAdmin):
             class form(WidgyFormMixin, form):
-                pass
+                site = self.site
 
         return form

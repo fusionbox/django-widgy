@@ -4,6 +4,8 @@ from django.contrib import admin
 
 from mezzanine.core.views import direct_to_template
 
+from demo.widgy import widgy_site
+
 admin.autodiscover()
 
 # Add the urlpatterns for any custom Django applications here.
@@ -11,7 +13,7 @@ admin.autodiscover()
 # to the project's homepage.
 
 urlpatterns = patterns("",
-    ('^admin/widgy/', include('widgy.urls')),
+    ('^admin/widgy/', include(widgy_site.urls)),
     ("^admin/", include(admin.site.urls)),
 
     # We don't want to presume how your homepage works, so here are a

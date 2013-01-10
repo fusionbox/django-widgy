@@ -10,7 +10,6 @@ from django.forms.models import modelform_factory, ModelForm
 from django.forms import model_to_dict
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.contrib.admin.options import FORMFIELD_FOR_DBFIELD_DEFAULTS
@@ -64,22 +63,22 @@ class Node(MP_Node):
         super(Node, self).delete(*args, **kwargs)
         content.delete()
 
-    def to_json(self):
+    def to_json(self, site):
         # reversed because we use 'right_id' and how backbone instantiates
         # nodes
-        children = [c.to_json() for c in reversed(self.get_children())]
+        children = [c.to_json(site) for c in reversed(self.get_children())]
         json = {
-            'url': self.get_api_url(),
-            'content': self.content.to_json(),
+            'url': self.get_api_url(site),
+            'content': self.content.to_json(site),
             'children': children,
-            'available_children_url': self.get_available_children_url(),
+            'available_children_url': self.get_available_children_url(site),
         }
         parent = self.get_parent()
         if parent:
-            json['parent_id'] = parent.get_api_url()
+            json['parent_id'] = parent.get_api_url(site)
 
         right = self.get_next_sibling()
-        json['right_id'] = right and right.get_api_url()
+        json['right_id'] = right and right.get_api_url(site)
 
         return json
 
@@ -178,11 +177,11 @@ class Node(MP_Node):
             else:
                 break
 
-    def get_api_url(self):
-        return reverse('widgy.views.node', kwargs={'node_pk': self.pk})
+    def get_api_url(self, site):
+        return site.reverse(site.node_view, kwargs={'node_pk': self.pk})
 
-    def get_available_children_url(self):
-        return reverse('widgy.views.recursive_children', kwargs={'node_pk': self.pk})
+    def get_available_children_url(self, site):
+        return site.reverse(site.shelf_view, kwargs={'node_pk': self.pk})
 
     def reposition(self, right=None, parent=None):
         """
@@ -256,15 +255,15 @@ class Content(models.Model):
         overrides.update(self.formfield_overrides)
         self.formfield_overrides = overrides
 
-    def get_api_url(self):
-        return reverse('widgy.views.content', kwargs={
+    def get_api_url(self, site):
+        return site.reverse(site.content_view, kwargs={
             'object_name': self._meta.module_name,
             'app_label': self._meta.app_label,
             'object_pk': self.pk})
 
-    def to_json(self):
+    def to_json(self, site):
         data = {
-            'url': self.get_api_url(),
+            'url': self.get_api_url(site),
             '__class__': self.class_name,
             'component': self.component_name,
             'model': self._meta.module_name,
@@ -272,10 +271,10 @@ class Content(models.Model):
             'draggable': self.draggable,
             'deletable': self.deletable,
             'accepting_children': self.accepting_children,
-            'template_url': reverse('widgy.views.node_templates', kwargs={'node_pk': self.node.pk}),
+            'template_url': site.reverse(site.node_templates_view, kwargs={'node_pk': self.node.pk}),
             'preview_template': self.get_preview_template(),
             'pop_out': self.pop_out,
-            'edit_url': reverse('widgy.views.edit_node', kwargs={'node_pk': self.node.pk}),
+            'edit_url': site.reverse(site.node_edit_view, kwargs={'node_pk': self.node.pk}),
         }
         model_data = model_to_dict(self)
         del model_data[self._meta.pk.attname]
@@ -283,7 +282,7 @@ class Content(models.Model):
         return data
 
     @classmethod
-    def class_to_json(cls):
+    def class_to_json(cls, site):
         """
         :Returns: a json-able python object that represents the class type.
         """

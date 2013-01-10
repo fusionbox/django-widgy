@@ -53,7 +53,7 @@ class WidgyWidget(forms.HiddenInput):
             'value': value,
             'stylesheets': self.stylesheets,
             'html_id': attrs['id'],
-            'node': self.node,
+            'node_dict': self.node.to_json(self.site),
         }))
 
 
@@ -64,7 +64,7 @@ class WidgyFormField(forms.ModelChoiceField):
     """
     widget = WidgyWidget
 
-    def conform_to_value(self, value):
+    def conform_to_value(self, value, site):
         """
         When no root node has been set, we prompt the user to choose one from
         the list of choices.  Otherwise, we set the ``WidgyWidget`` class as
@@ -86,6 +86,8 @@ class WidgyFormField(forms.ModelChoiceField):
             self.widget = forms.Select(
                 choices=choices,
             )
+
+        self.widget.site = site
 
     def clean(self, value):
         value = getattr(self, '_value', value)
@@ -112,4 +114,4 @@ class WidgyFormMixin(object):
         for name, field in self.fields.iteritems():
             if isinstance(field, WidgyFormField):
                 value = getattr(self.instance, name)
-                field.conform_to_value(value)
+                field.conform_to_value(value, self.site)

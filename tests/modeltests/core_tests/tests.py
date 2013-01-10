@@ -2,18 +2,20 @@ import json
 
 from django.test import TestCase
 from django.contrib.auth.models import User
-from django.core import urlresolvers
 
 from widgy.models import Node
 from widgy.views import extract_id
 from widgy.exceptions import (BadParentRejection, BadChildRejection,
                               MutualRejection, InvalidTreeMovement)
 
+from .widgy_config import widgy_site
 from .models import (Layout, Bucket, RawTextWidget, CantGoAnywhereWidget,
                      PickyBucket, ImmovableBucket)
 
 
 class RootNodeTestCase(TestCase):
+    urls = 'modeltests.core_tests.urls'
+
     def setUp(self):
         self.root_node = Layout.add_root().node
 
@@ -190,7 +192,7 @@ class TestPrefetchTree(RootNodeTestCase):
 
         # to_json shouldn't do any more queries either
         with self.assertNumQueries(0):
-            root_node.to_json()
+            root_node.to_json(widgy_site)
 
     def test_works_on_not_root_node(self):
         left_node = self.root_node.get_first_child()
@@ -234,16 +236,16 @@ class HttpTestCase(TestCase):
         self.client.login(username=u.username, password='asdfasdf')
         self.user = u
 
-    def json_request(self, method, url, data=None):
+    def json_request(self, method, url, data=None, *args, **kwargs):
         method = getattr(self.client, method)
         if method == self.client.get:
             encode = lambda x: x
         else:
             encode = json.dumps
         if data:
-            resp = method(url, encode(data), content_type='application/json')
+            resp = method(url, encode(data), content_type='application/json', *args, **kwargs)
         else:
-            resp = method(url, content_type='application/json')
+            resp = method(url, content_type='application/json', *args, **kwargs)
 
         self.assertEqual(resp['Content-Type'], 'application/json')
 
@@ -259,15 +261,15 @@ class HttpTestCase(TestCase):
 class TestApi(RootNodeTestCase, HttpTestCase):
     def setUp(self):
         super(TestApi, self).setUp()
-        self.node_url = urlresolvers.reverse('widgy.views.node')
+        self.node_url = widgy_site.reverse(widgy_site.node_view)
 
     def test_textcontent_available(self):
         available_children = json.loads(
-            self.get(self.root_node.to_json()['available_children_url']).content)
+            self.get(self.root_node.to_json(widgy_site)['available_children_url']).content)
         self.assertIn('core_tests.rawtextwidget', [i['__class__'] for i in available_children])
 
     def test_add_child(self):
-        bucket = self.root_node.to_json()['children'][0]
+        bucket = self.root_node.to_json(widgy_site)['children'][0]
         db_bucket = Node.objects.get(id=extract_id(bucket['url']))
         self.assertEqual(db_bucket.get_children_count(), 0)
 
@@ -295,7 +297,7 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         self.assertEqual(textcontent['text'], 'foobar')
 
         # move the node to the other bucket
-        new_child['parent_id'] = self.root_node.to_json()['children'][1]['url']
+        new_child['parent_id'] = self.root_node.to_json(widgy_site)['children'][1]['url']
         r = self.put(new_child['url'], new_child)
         self.assertEqual(r.status_code, 200)
 
@@ -303,7 +305,7 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         left, right = make_a_nice_tree(self.root_node)
         number_of_nodes = Node.objects.count()
         number_of_right_nodes = len(right.get_descendants()) + 1
-        r = self.delete(right.get_api_url())
+        r = self.delete(right.get_api_url(widgy_site))
         self.assertEqual(r.status_code, 200)
 
         with self.assertRaises(Node.DoesNotExist):
@@ -314,7 +316,7 @@ class TestApi(RootNodeTestCase, HttpTestCase):
     def test_available_children(self):
         left, right = make_a_nice_tree(self.root_node)
         subbucket = list(left.get_children())[-1]
-        resp = self.get(self.root_node.to_json()['available_children_url'])
+        resp = self.get(self.root_node.to_json(widgy_site)['available_children_url'])
         self.assertEqual(resp.status_code, 200)
         available_children = json.loads(resp.content)
 
@@ -332,7 +334,7 @@ class TestApi(RootNodeTestCase, HttpTestCase):
 
         def lists_equal(instances, urls):
             urls = sorted(map(str, urls))
-            instance_urls = sorted(str(i.get_api_url()) for i in instances)
+            instance_urls = sorted(str(i.get_api_url(widgy_site)) for i in instances)
             self.assertEqual(instance_urls, urls)
 
         lists_equal([right, left, subbucket, self.root_node],
@@ -343,3 +345,33 @@ class TestApi(RootNodeTestCase, HttpTestCase):
                     pickybucket_data['possible_parent_nodes'])
         lists_equal([right, left, subbucket],
                     rawtext_data['possible_parent_nodes'])
+
+    def test_unauthorized_access(self):
+        """
+        Verify each URL defined in the WidgySite uses the WidgySite.authorize
+        method.  Figures out how to reverse the URL (hackily) using the
+        RegexURLPattern and also tries to determine which methods a view
+        supports using HTTP OPTIONS.  The kwargs passed into reverse, probably
+        won't pass any validation, but if they are reaching validation, the
+        test has failed already.
+        """
+        for url_obj in widgy_site.get_urls():
+            regex = url_obj.regex
+
+            # Creates as many positional arguments as needed.
+            args = ('a',) * (regex.groups - len(regex.groupindex))
+
+            # Creates all the keyword arguments
+            kwargs = dict((key, 'a') for key in regex.groupindex.keys())
+
+            url = widgy_site.reverse(url_obj.callback, args=args, kwargs=kwargs)
+
+            for method in self.client.options(url)['Allow'].lower().split(','):
+                method = method.strip()
+
+                # The view should call widgy_site.authorize before doing
+                # anything.  If there is an exception raised here, it is likely
+                # that the view didn't call widgy_site.authorize.
+                resp = getattr(self.client, method)(url, HTTP_COOKIE='unauthorized_access=1')
+
+                self.assertEqual(resp.status_code, 403)

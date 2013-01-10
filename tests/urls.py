@@ -4,6 +4,6 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url('^admin/widgy/', include('widgy.urls')),
+    url('^core_tests/', include('modeltests.core_tests.urls')),
     url("^admin/", include(admin.site.urls)),
 )

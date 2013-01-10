@@ -96,9 +96,9 @@ class MainContent(Bucket):
 class Sidebar(Bucket):
     pop_out = 1
 
-    def to_json(self):
+    def to_json(self, site):
         from datetime import datetime
-        json = super(Sidebar, self).to_json()
+        json = super(Sidebar, self).to_json(site)
         json['content'] = str(datetime.now())
         return json
 
