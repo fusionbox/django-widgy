@@ -316,6 +316,9 @@ class Content(models.Model):
     def children(self):
         return [child.content for child in self.node.get_children()]
 
+    def get_root(self):
+        return self.node.get_root().content
+
     def meta(self):
         return self._meta
 
@@ -330,31 +333,19 @@ class Content(models.Model):
         }
         return modelform_factory(self.__class__, **defaults)
 
-    def valid_child_of(self, content):
-        """
-        Given a content instance, will we consent to be adopted by them?
-        """
-        return self.valid_child_class_of(content)
-
-    @classmethod
-    def valid_child_class_of(cls, content):
-        """
-        Given a `Content` instance, does our class consent to be adopted by them?
-        """
-        return True
-
-    def valid_parent_of_class(self, cls):
+    def valid_parent_of(self, cls, obj=None):
         """
         Given a content class, can it be _added_ as our child?
         Note: this does not apply to _existing_ children (adoption)
         """
         return self.accepting_children
 
-    def valid_parent_of_instance(self, content):
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
         """
-        Given a content instance, can we adopt them?
+        Given a `Content` instance, does our class consent to be adopted by them?
         """
-        return self.valid_parent_of_class(type(content))
+        return True
 
     @classmethod
     def add_root(cls, site, **kwargs):

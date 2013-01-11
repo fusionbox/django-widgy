@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from widgy.models import Node
 from widgy.views import extract_id
-from widgy.exceptions import (BadParentRejection, BadChildRejection,
+from widgy.exceptions import (ParentWasRejected, ChildWasRejected,
                               MutualRejection, InvalidTreeMovement)
 
 from .widgy_config import widgy_site
@@ -88,11 +88,11 @@ class TestCore(RootNodeTestCase):
         self.assertEqual(len(self.root_node.get_descendants()), 50 + 2)
 
     def test_validate_relationship_cls(self):
-        with self.assertRaises(BadChildRejection):
+        with self.assertRaises(ChildWasRejected):
             widgy_site.validate_relationship(self.root_node.content, RawTextWidget)
 
         bucket = list(self.root_node.content.get_children())[0]
-        with self.assertRaises(BadParentRejection):
+        with self.assertRaises(ParentWasRejected):
             widgy_site.validate_relationship(bucket, CantGoAnywhereWidget)
 
         with self.assertRaises(MutualRejection):
@@ -102,7 +102,7 @@ class TestCore(RootNodeTestCase):
         picky_bucket = self.root_node.content.add_child(widgy_site,
                                                         PickyBucket)
 
-        with self.assertRaises(BadChildRejection):
+        with self.assertRaises(ChildWasRejected):
             picky_bucket.add_child(widgy_site,
                                    RawTextWidget,
                                    text='aasdf')
@@ -111,7 +111,7 @@ class TestCore(RootNodeTestCase):
                                RawTextWidget,
                                text='hello')
 
-        with self.assertRaises(BadChildRejection):
+        with self.assertRaises(ChildWasRejected):
             picky_bucket.add_child(widgy_site,
                                    Layout)
 
@@ -132,7 +132,7 @@ class TestCore(RootNodeTestCase):
         self.assertEqual(left, new_right)
 
         raw_text = new_right.get_first_child()
-        with self.assertRaises(BadChildRejection):
+        with self.assertRaises(ChildWasRejected):
             raw_text.reposition(widgy_site, parent=self.root_node, right=new_left)
 
         subbucket = list(new_right.get_children())[-1]

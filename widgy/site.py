@@ -12,8 +12,8 @@ from widgy.views import (
 )
 from widgy.exceptions import (
     MutualRejection,
-    BadChildRejection,
-    BadParentRejection,
+    ParentWasRejected,
+    ChildWasRejected,
 )
 
 
@@ -29,7 +29,7 @@ class WidgySite(object):
         return registry
 
     def get_all_content_classes(self):
-        return registry.keys()
+        return self.get_registry().keys()
 
     def get_urls(self):
         urlpatterns = patterns('',
@@ -78,17 +78,25 @@ class WidgySite(object):
     def get_node_templates_view(self):
         return NodeTemplatesView.as_view(site=self)
 
+    def valid_parent_of(self, parent, child_class, child=None):
+        return parent.valid_parent_of(child_class, child)
+
+    def valid_child_of(self, parent, child_class, child=None):
+        return child_class.valid_child_of(parent, child)
+
     def validate_relationship(self, parent, child):
         if isinstance(child, type):
-            bad_parent = not child.valid_child_class_of(parent)
-            bad_child = not parent.valid_parent_of_class(child)
+            child_class = child
+            child = None
         else:
-            bad_parent = not child.valid_child_of(parent)
-            bad_child = not parent.valid_parent_of_instance(child)
+            child_class = type(child)
+
+        bad_child = not self.valid_parent_of(parent, child_class, child)
+        bad_parent = not self.valid_child_of(parent, child_class, child)
 
         if bad_parent and bad_child:
             raise MutualRejection
         elif bad_parent:
-            raise BadParentRejection
+            raise ParentWasRejected
         elif bad_child:
-            raise BadChildRejection
+            raise ChildWasRejected

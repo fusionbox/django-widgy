@@ -11,10 +11,10 @@ class Layout(Content):
     accepting_children = True
 
     @classmethod
-    def valid_child_class_of(self, cls):
+    def valid_child_of(self, parent, obj=None):
         return False
 
-    def valid_parent_of_class(self, cls):
+    def valid_parent_of(self, cls, obj=None):
         return issubclass(cls, Bucket)
 
     def post_create(self, site):
@@ -35,20 +35,19 @@ class RawTextWidget(Content):
 
 class CantGoAnywhereWidget(Content):
     @classmethod
-    def valid_child_class_of(self, content):
+    def valid_child_of(cls, parent, obj=None):
         return False
 
-    def valid_parent_of_class(self, cls):
+    def valid_parent_of(self, cls, obj=None):
         return False
 
 
 class PickyBucket(Bucket):
-    def valid_parent_of_class(self, cls):
+    def valid_parent_of(self, cls, obj=None):
+        if obj:
+            return (self.valid_parent_of(cls) and
+                    obj.text == 'hello')
         return issubclass(cls, RawTextWidget)
-
-    def valid_parent_of_instance(self, content):
-        return (self.valid_parent_of_class(type(content)) and
-                content.text == 'hello')
 
 
 class ImmovableBucket(Bucket):

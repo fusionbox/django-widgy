@@ -37,6 +37,9 @@ class Layout(PageBuilderContent):
 
     draggable = False
     deletable = False
+    editable = True
+
+    component_name = 'layout'
 
     default_children = tuple()
 
@@ -44,17 +47,15 @@ class Layout(PageBuilderContent):
         for cls, args, kwargs in self.default_children:
             self.add_child(site, cls, *args, **kwargs)
 
-    def valid_parent_of_instance(self, content):
-        return any(isinstance(content, bucket_meta[0]) for bucket_meta in self.default_children) and\
-                (content.id in [i.content.id for i in self.node.get_children()] or
-                        len(self.node.get_children()) < len(self.default_children))
+    def valid_parent_of(self, cls, obj=None):
+        if obj:
+            return obj in self.children or self.valid_parent_of(cls)
 
-    def valid_parent_of_class(self, cls):
-        return any(issubclass(cls, bucket_meta[0]) for bucket_meta in self.default_children) and\
-                len(self.node.get_children()) < len(self.default_children)
+        return (any(issubclass(cls, bucket_meta[0]) for bucket_meta in self.default_children) and
+                len(self.children) < len(self.default_children))
 
     @classmethod
-    def valid_child_class_of(cls, content):
+    def valid_child_of(cls, content, obj=None):
         return False
 
 
@@ -67,9 +68,6 @@ class Bucket(PageBuilderContent):
 
     class Meta:
         abstract = True
-
-    def valid_parent_of_class(self, cls):
-        return True
 
 
 class Widget(PageBuilderContent):
@@ -87,11 +85,11 @@ class Widget(PageBuilderContent):
 
 
 class MainContent(Bucket):
-    def valid_parent_of_class(self, cls):
-        return not issubclass(cls, MainContent) and not issubclass(cls, Sidebar)
+    def valid_parent_of(self, cls, obj=None):
+        return not issubclass(cls, (MainContent, Sidebar))
 
     @classmethod
-    def valid_child_class_of(cls, parent):
+    def valid_child_of(cls, parent, obj=None):
         return isinstance(parent, Layout)
 
 registry.register(MainContent)
@@ -106,11 +104,11 @@ class Sidebar(Bucket):
         json['content'] = str(datetime.now())
         return json
 
-    def valid_parent_of_class(self, cls):
-        return not issubclass(cls, MainContent) and not issubclass(cls, Sidebar)
+    def valid_parent_of(self, cls, obj=None):
+        return not issubclass(cls, (MainContent, Sidebar))
 
     @classmethod
-    def valid_child_class_of(cls, parent):
+    def valid_child_of(cls, parent, obj=None):
         return isinstance(parent, Layout)
 
 registry.register(Sidebar)
@@ -120,11 +118,6 @@ class DefaultLayout(Layout):
     """
     On creation, creates a left and right bucket.
     """
-
-    deletable = False
-    editable = True
-    component_name = 'layout'
-
     class Meta:
         verbose_name = 'Default layout'
 
@@ -147,11 +140,11 @@ registry.register(Markdown)
 
 class CalloutBucket(Bucket):
     @classmethod
-    def valid_child_class_of(cls, parent):
+    def valid_child_of(cls, parent, obj=None):
         return False
 
-    def valid_parent_of_class(self, cls):
-        return cls in (Markdown,)
+    def valid_parent_of(self, cls, obj=None):
+        return issubclass(cls, (Markdown,))
 
 registry.register(CalloutBucket)
 
@@ -173,7 +166,7 @@ class CalloutWidget(Widget):
     callout = models.ForeignKey(Callout, null=True, blank=True)
 
     @classmethod
-    def valid_child_class_of(cls, parent):
+    def valid_child_of(cls, parent, obj=None):
         return isinstance(parent, Sidebar)
 
 registry.register(CalloutWidget)
@@ -183,7 +176,7 @@ class Accordion(Bucket):
     draggable = True
     deletable = True
 
-    def valid_parent_of_class(self, cls):
+    def valid_parent_of(self, cls, obj=None):
         return issubclass(cls, Section)
 
 registry.register(Accordion)
@@ -195,7 +188,7 @@ class Section(Widget):
     title = models.CharField(max_length=1023)
 
     @classmethod
-    def valid_child_class_of(cls, parent):
+    def valid_child_of(cls, parent, obj=None):
         return isinstance(parent, Accordion)
 
 registry.register(Section)
