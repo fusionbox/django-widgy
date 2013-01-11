@@ -3,6 +3,7 @@ from operator import or_
 from django.db import models
 from django.db.models import Q
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
+from django.db.models.loading import get_app
 from django.contrib.contenttypes.models import ContentType
 
 from widgy.forms import WidgyFormField
@@ -92,9 +93,7 @@ class WidgyField(models.ForeignKey):
         return super(WidgyField, self).formfield(**defaults)
 
     def get_layout_contenttypes(self, layouts):
-        qs = []
-
-        for layout in layouts:
+        def normalize(layout):
             try:
                 app_label, model_name = layout.split(".")
             except ValueError:
@@ -104,8 +103,14 @@ class WidgyField(models.ForeignKey):
                 app_label = layout._meta.app_label
                 model_name = layout._meta.object_name
 
-            cls = models.get_model(app_label, model_name, seed_cache=False, only_installed=False)
+            # we cannot use models.get_model because this class could be
+            # abstract.
+            return getattr(get_app(app_label), model_name)
 
-            qs.append(Q(app_label=app_label, model=cls._meta.module_name))
+        layouts = tuple(map(normalize, layouts))
+        classes = (cls for cls in self.site.get_all_content_classes() if issubclass(cls, layouts))
 
-        return ContentType.objects.filter(reduce(or_, qs))
+        qs = reduce(or_, (Q(app_label=cls._meta.app_label, model=cls._meta.module_name) for cls in classes))
+
+        # we need to return a queryset, not a list.
+        return ContentType.objects.filter(qs)

@@ -11,7 +11,7 @@ class WidgyPage(Page):
         site=settings.WIDGY_MEZZANINE_SITE,
         verbose_name=_('widgy content'),
         root_choices=(
-            'page_builder.DefaultLayout',
+            'page_builder.Layout',
         ))
 
     class Meta:
