@@ -53,12 +53,16 @@ class PickyBucket(Bucket):
 class ImmovableBucket(Bucket):
     draggable = False
 
+class AnotherLayout(Layout):
+    pass
+
 registry.register(Layout)
 registry.register(Bucket)
 registry.register(RawTextWidget)
 registry.register(CantGoAnywhereWidget)
 registry.register(PickyBucket)
 registry.register(ImmovableBucket)
+registry.register(AnotherLayout)
 
 
 class HasAWidgy(models.Model):
@@ -66,3 +70,14 @@ class HasAWidgy(models.Model):
         root_choices=[Layout],
         site=widgy_site
     )
+
+
+class HasAWidgyOnlyAnotherLayout(models.Model):
+    widgy = WidgyField(
+        root_choices=[AnotherLayout],
+        site=widgy_site
+    )
+
+
+class UnregisteredLayout(Layout):
+    pass
