@@ -13,7 +13,8 @@ from widgy.exceptions import (BadParentRejection, BadChildRejection,
 
 from .widgy_config import widgy_site
 from .models import (Layout, Bucket, RawTextWidget, CantGoAnywhereWidget,
-                     PickyBucket, ImmovableBucket, HasAWidgy)
+                     PickyBucket, ImmovableBucket, HasAWidgy, AnotherLayout,
+                     HasAWidgyOnlyAnotherLayout)
 
 
 class RootNodeTestCase(TestCase):
@@ -148,6 +149,7 @@ class TestCore(RootNodeTestCase):
             bucket.node.reposition(widgy_site, parent=self.root_node,
                                    right=left)
 
+
 class TestWidgyField(TestCase):
     def test_it_acts_like_a_foreignkey(self):
         x = HasAWidgy()
@@ -165,13 +167,25 @@ class TestWidgyField(TestCase):
         the_layout_contenttype = ContentType.objects.get_for_model(Layout)
         x = TheForm({'widgy': the_layout_contenttype.id})
         layout_contenttypes = x.fields['widgy'].queryset.all()
-        self.assertEqual(len(layout_contenttypes), 1)
+        self.assertEqual(len(layout_contenttypes), 2)
         self.assertIn(the_layout_contenttype, layout_contenttypes)
+        self.assertIn(ContentType.objects.get_for_model(AnotherLayout),
+                      layout_contenttypes)
 
         self.assertTrue(x.is_valid())
         obj = x.save()
         self.assertIsInstance(obj.widgy.content, Layout)
 
+    def test_sublayout(self):
+        class TheForm(forms.ModelForm):
+            class Meta:
+                model = HasAWidgyOnlyAnotherLayout
+
+        the_layout_contenttype = ContentType.objects.get_for_model(AnotherLayout)
+        x = TheForm({'widgy': the_layout_contenttype.id})
+        layout_contenttypes = x.fields['widgy'].queryset.all()
+        self.assertEqual(len(layout_contenttypes), 1)
+        self.assertIn(the_layout_contenttype, layout_contenttypes)
 
 
 class TestPrefetchTree(RootNodeTestCase):
