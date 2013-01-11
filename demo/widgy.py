@@ -9,7 +9,8 @@ class DemoWidgySite(WidgySite):
         from demo.demo_widgets.models import TwoContentLayout
 
         if isinstance(parent, Accordion) and isinstance(parent.get_root(), TwoContentLayout) and issubclass(child_class, Section) and len(parent.children) >= 2:
-            return False
+            if not child or child not in parent.children:
+                return False
         return super(DemoWidgySite, self).valid_parent_of(parent, child_class, child)
 
 widgy_site = DemoWidgySite()
