@@ -110,7 +110,8 @@ class WidgyField(models.ForeignKey):
         layouts = tuple(map(normalize, layouts))
         classes = (cls for cls in self.site.get_all_content_classes() if issubclass(cls, layouts))
 
-        qs = reduce(or_, (Q(app_label=cls._meta.app_label, model=cls._meta.module_name) for cls in classes))
+        qs = reduce(or_, (Q(app_label=cls._meta.app_label, model=cls._meta.module_name)
+                          for cls in classes))
 
         # we need to return a queryset, not a list.
         return ContentType.objects.filter(qs)

@@ -1,7 +1,10 @@
 import json
+from pprint import pprint
 
 from django.test import TestCase
 from django.contrib.auth.models import User
+from django import forms
+from django.contrib.contenttypes.models import ContentType
 
 from widgy.models import Node
 from widgy.views import extract_id
@@ -10,7 +13,7 @@ from widgy.exceptions import (BadParentRejection, BadChildRejection,
 
 from .widgy_config import widgy_site
 from .models import (Layout, Bucket, RawTextWidget, CantGoAnywhereWidget,
-                     PickyBucket, ImmovableBucket)
+                     PickyBucket, ImmovableBucket, HasAWidgy)
 
 
 class RootNodeTestCase(TestCase):
@@ -144,6 +147,31 @@ class TestCore(RootNodeTestCase):
         with self.assertRaises(InvalidTreeMovement):
             bucket.node.reposition(widgy_site, parent=self.root_node,
                                    right=left)
+
+class TestWidgyField(TestCase):
+    def test_it_acts_like_a_foreignkey(self):
+        x = HasAWidgy()
+        x.widgy = Layout.add_root(widgy_site).node
+        x.save()
+
+        x = HasAWidgy.objects.get(pk=x.pk)
+        self.assertIsInstance(x.widgy.content, Layout)
+
+    def test_formfield(self):
+        class TheForm(forms.ModelForm):
+            class Meta:
+                model = HasAWidgy
+
+        the_layout_contenttype = ContentType.objects.get_for_model(Layout)
+        x = TheForm({'widgy': the_layout_contenttype.id})
+        layout_contenttypes = x.fields['widgy'].queryset.all()
+        self.assertEqual(len(layout_contenttypes), 1)
+        self.assertIn(the_layout_contenttype, layout_contenttypes)
+
+        self.assertTrue(x.is_valid())
+        obj = x.save()
+        self.assertIsInstance(obj.widgy.content, Layout)
+
 
 
 class TestPrefetchTree(RootNodeTestCase):
@@ -336,13 +364,14 @@ class TestApi(RootNodeTestCase, HttpTestCase):
             for i in available_children:
                 if i['__class__'] == cls_name:
                     return i
+            assert False, "Couldn't find %r" % cls_name
 
         bucket_data = select('core_tests.bucket')
         immovablebucket_data = select('core_tests.immovablebucket')
         pickybucket_data = select('core_tests.pickybucket')
         rawtext_data = select('core_tests.rawtextwidget')
 
-        self.assertEqual(select('core_tests.cantgoanywherewidget'), None)
+        self.assertRaises(AssertionError, select, 'core_tests.cantgoanywherewidget')
 
         def lists_equal(instances, urls):
             urls = sorted(map(str, urls))

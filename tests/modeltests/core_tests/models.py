@@ -1,6 +1,10 @@
 from django.db import models
 
 from widgy.models import Content
+from widgy.db.fields import WidgyField
+from widgy import registry
+
+from .widgy_config import widgy_site
 
 
 class Layout(Content):
@@ -49,3 +53,17 @@ class PickyBucket(Bucket):
 
 class ImmovableBucket(Bucket):
     draggable = False
+
+registry.register(Layout)
+registry.register(Bucket)
+registry.register(RawTextWidget)
+registry.register(CantGoAnywhereWidget)
+registry.register(PickyBucket)
+registry.register(ImmovableBucket)
+
+
+class HasAWidgy(models.Model):
+    widgy = WidgyField(
+        root_choices=[Layout],
+        site=widgy_site
+    )
