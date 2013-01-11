@@ -25,21 +25,21 @@ class ParentChildRejection(InvalidTreeMovement):
         super(ParentChildRejection, self).__init__({'message': self.message})
 
 
-class BadParentRejection(ParentChildRejection):
+class ParentWasRejected(ParentChildRejection):
     """
     Raised by child to reject the requested parent.
     """
     message = "This content does not accept being a child of that parent."
 
 
-class BadChildRejection(ParentChildRejection):
+class ChildWasRejected(ParentChildRejection):
     """
     Raised by parents to reject children that don't belong.
     """
     message = "The parent does not accept this content as a child."
 
 
-class MutualRejection(BadParentRejection, BadChildRejection):
+class MutualRejection(ParentWasRejected, ChildWasRejected):
     """
     For instances where both child and parent reject the movement request.
     """

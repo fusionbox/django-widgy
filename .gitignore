@@ -11,3 +11,4 @@ build/
 tags
 dist/
 *.egg-info/
+CACHE/

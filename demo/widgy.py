@@ -1,17 +1,16 @@
 from __future__ import absolute_import
 
-from django.contrib import admin
-
 from widgy.site import WidgySite
-from widgy.contrib.widgy_mezzanine.models import WidgyPage
-from widgy.contrib.widgy_mezzanine.admin import WidgyPageAdmin
 
 
-widgy_site = WidgySite()
+class DemoWidgySite(WidgySite):
+    def valid_parent_of(self, parent, child_class, child=None):
+        from widgy.contrib.page_builder.models import Accordion, Section
+        from demo.demo_widgets.models import TwoContentLayout
 
+        if isinstance(parent, Accordion) and isinstance(parent.get_root(), TwoContentLayout) and issubclass(child_class, Section) and len(parent.children) >= 2:
+            if not child or child not in parent.children:
+                return False
+        return super(DemoWidgySite, self).valid_parent_of(parent, child_class, child)
 
-class WidgyPageAdmin(WidgyPageAdmin):
-    site = widgy_site
-
-
-admin.site.register(WidgyPage, WidgyPageAdmin)
+widgy_site = DemoWidgySite()

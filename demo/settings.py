@@ -362,6 +362,7 @@ FORCE_SCRIPT_NAME = ''
 
 REPLACEMENTS_APP_BLACKLIST = ('admin',)
 
+WIDGY_MEZZANINE_SITE = 'demo.widgy.widgy_site'
 
 ###################
 # DEPLOY SETTINGS #

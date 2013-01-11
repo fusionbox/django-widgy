@@ -19,9 +19,6 @@ from treebeard.mp_tree import MP_Node
 
 from widgy.exceptions import (
     InvalidTreeMovement,
-    MutualRejection,
-    BadChildRejection,
-    BadParentRejection,
     ParentChildRejection,
     RootDisplacementError
 )
@@ -51,12 +48,6 @@ class Node(MP_Node):
 
     def __unicode__(self):
         return str(self.content)
-
-    def save(self, *args, **kwargs):
-        created = not bool(self.pk)
-        super(Node, self).save(*args, **kwargs)
-        if created:
-            self.content.post_create()
 
     def delete(self, *args, **kwargs):
         content = self.content
@@ -183,7 +174,7 @@ class Node(MP_Node):
     def get_available_children_url(self, site):
         return site.reverse(site.shelf_view, kwargs={'node_pk': self.pk})
 
-    def reposition(self, right=None, parent=None):
+    def reposition(self, site, right=None, parent=None):
         """
         Validates the requested node restructering and executes by calling :meth:`~Node.move` on
         the instance.
@@ -199,23 +190,24 @@ class Node(MP_Node):
             if right.is_root():
                 raise InvalidTreeMovement({'message': 'You can\'t move the root'})
 
-            right.get_parent().content.validate_relationship(self.content)
+            site.validate_relationship(right.get_parent().content, self.content)
             self.move(right, pos='left')
         elif parent:
-            parent.content.validate_relationship(self.content)
+            site.validate_relationship(parent.content, self.content)
             self.move(parent, pos='last-child')
         else:
             assert right or parent
 
-    def filter_child_classes(self, classes):
+    def filter_child_classes(self, site, classes):
+        validator = partial(site.validate_relationship, self.content)
         return filter(
-            exception_to_bool(self.content.validate_relationship, ParentChildRejection),
+            exception_to_bool(validator, ParentChildRejection),
             classes)
 
-    def filter_child_classes_recursive(self, classes):
-        allowed_classes = {self: self.filter_child_classes(classes)}
+    def filter_child_classes_recursive(self, site, classes):
+        allowed_classes = {self: self.filter_child_classes(site, classes)}
         for child in self.get_children():
-            allowed_classes.update(child.filter_child_classes_recursive(classes))
+            allowed_classes.update(child.filter_child_classes_recursive(site, classes))
         return allowed_classes
 
 
@@ -291,16 +283,6 @@ class Content(models.Model):
                 'title': cls._meta.verbose_name.title(),
                 }
 
-    @classmethod
-    def all_concrete_subclasses(cls):
-        """
-        Recursively gathers all the non-abstract subclasses.
-        """
-        classes = set(c for c in cls.__subclasses__() if not c._meta.abstract)
-        for c in cls.__subclasses__():
-            classes.update(c.all_concrete_subclasses())
-        return classes
-
     @property
     def class_name(self):
         """
@@ -334,6 +316,9 @@ class Content(models.Model):
     def children(self):
         return [child.content for child in self.node.get_children()]
 
+    def get_root(self):
+        return self.node.get_root().content
+
     def meta(self):
         return self._meta
 
@@ -348,71 +333,45 @@ class Content(models.Model):
         }
         return modelform_factory(self.__class__, **defaults)
 
-    def valid_child_of(self, content):
-        """
-        Given a content instance, will we consent to be adopted by them?
-        """
-        return self.valid_child_class_of(content)
-
-    @classmethod
-    def valid_child_class_of(cls, content):
-        """
-        Given a `Content` instance, does our class consent to be adopted by them?
-        """
-        return True
-
-    def valid_parent_of_class(self, cls):
+    def valid_parent_of(self, cls, obj=None):
         """
         Given a content class, can it be _added_ as our child?
         Note: this does not apply to _existing_ children (adoption)
         """
         return self.accepting_children
 
-    def valid_parent_of_instance(self, content):
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
         """
-        Given a content instance, can we adopt them?
+        Given a `Content` instance, does our class consent to be adopted by them?
         """
-        return self.valid_parent_of_class(type(content))
-
-    def validate_relationship(self, child):
-        parent = self
-        if isinstance(child, Content):
-            bad_parent = not child.valid_child_of(parent)
-            bad_child = not parent.valid_parent_of_instance(child)
-        else:
-            bad_parent = not child.valid_child_class_of(parent)
-            bad_child = not parent.valid_parent_of_class(child)
-
-        if bad_parent and bad_child:
-            raise MutualRejection
-        elif bad_parent:
-            raise BadParentRejection
-        elif bad_child:
-            raise BadChildRejection
+        return True
 
     @classmethod
-    def add_root(cls, **kwargs):
+    def add_root(cls, site, **kwargs):
         """
         Creates a new Content instance, stores it in the database, and calls
         ``Node.add_root``
         """
         obj = cls.objects.create(**kwargs)
         Node.add_root(content=obj)
+        obj.post_create(site)
         return obj
 
-    def add_child(self, cls, **kwargs):
+    def add_child(self, site, cls, **kwargs):
         obj = cls.objects.create(**kwargs)
 
         try:
-            self.validate_relationship(obj)
+            site.validate_relationship(self, obj)
         except ParentChildRejection:
             obj.delete()
             raise
 
         self.node.add_child(content=obj)
+        obj.post_create(site)
         return obj
 
-    def add_sibling(self, cls, **kwargs):
+    def add_sibling(self, site, cls, **kwargs):
         if self.node.is_root():
             raise RootDisplacementError({'message': 'You can\'t put things next to me'})
 
@@ -420,12 +379,13 @@ class Content(models.Model):
         parent = self.node.get_parent().content
 
         try:
-            parent.validate_relationship(obj)
+            site.validate_relationship(parent, obj)
         except ParentChildRejection:
             obj.delete()
             raise
 
         self.node.add_sibling(content=obj, pos='left')
+        obj.post_create(site)
         return obj
 
     def get_children(self):
@@ -439,7 +399,7 @@ class Content(models.Model):
         parent = self.node.get_parent()
         return parent and parent.content
 
-    def post_create(self):
+    def post_create(self, site):
         """
         Hook for custom code which needs to be run after creation.  Since the
         `Node` must be created after the content, any tree based actions

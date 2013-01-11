@@ -3,9 +3,15 @@ from operator import or_
 from django.db import models
 from django.db.models import Q
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
+from django.db.models.loading import get_app
 from django.contrib.contenttypes.models import ContentType
 
 from widgy.forms import WidgyFormField
+from widgy.utils import fancy_import
+
+from south.modelsinspector import add_introspection_rules
+
+add_introspection_rules([], ["^widgy\.db.fields\.WidgyField"])
 
 
 class WidgyFieldObjectDescriptor(ReverseSingleRelatedObjectDescriptor):
@@ -29,7 +35,7 @@ class WidgyField(models.ForeignKey):
     Model field that inherits from ``models.ForeignKey``.  Contains validation
     and context switching that is needed for Widgy fields.
     """
-    def __init__(self, to=None, root_choices=None, **kwargs):
+    def __init__(self, site=None, to=None, root_choices=None, **kwargs):
         if to is None:
             to = 'widgy.Node'
 
@@ -41,6 +47,10 @@ class WidgyField(models.ForeignKey):
             'on_delete': models.SET_NULL
         }
         defaults.update(kwargs)
+
+        if isinstance(site, str):
+            site = fancy_import(site)
+        self.site = site
 
         super(WidgyField, self).__init__(to, **defaults)
 
@@ -65,7 +75,7 @@ class WidgyField(models.ForeignKey):
         if hasattr(value, '_ct'):
             ct = value._ct
 
-            node = ct.model_class().add_root().node
+            node = ct.model_class().add_root(self.site).node
             setattr(model_instance, self.name, node)
             setattr(model_instance, self.attname, node.pk)
 
@@ -77,14 +87,13 @@ class WidgyField(models.ForeignKey):
         defaults = {
             'form_class': WidgyFormField,
             'queryset': self.get_layout_contenttypes(self.root_choices),
+            'site': self.site,
         }
         defaults.update(kwargs)
         return super(WidgyField, self).formfield(**defaults)
 
     def get_layout_contenttypes(self, layouts):
-        qs = []
-
-        for layout in layouts:
+        def normalize(layout):
             try:
                 app_label, model_name = layout.split(".")
             except ValueError:
@@ -94,8 +103,15 @@ class WidgyField(models.ForeignKey):
                 app_label = layout._meta.app_label
                 model_name = layout._meta.object_name
 
-            cls = models.get_model(app_label, model_name, seed_cache=False, only_installed=False)
+            # we cannot use models.get_model because this class could be
+            # abstract.
+            return getattr(get_app(app_label), model_name)
 
-            qs.append(Q(app_label=app_label, model=cls._meta.module_name))
+        layouts = tuple(map(normalize, layouts))
+        classes = (cls for cls in self.site.get_all_content_classes() if issubclass(cls, layouts))
 
-        return ContentType.objects.filter(reduce(or_, qs))
+        qs = reduce(or_, (Q(app_label=cls._meta.app_label, model=cls._meta.module_name)
+                          for cls in classes))
+
+        # we need to return a queryset, not a list.
+        return ContentType.objects.filter(qs)

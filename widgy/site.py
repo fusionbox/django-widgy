@@ -10,6 +10,11 @@ from widgy.views import (
     NodeEditView,
     NodeTemplatesView,
 )
+from widgy.exceptions import (
+    MutualRejection,
+    ParentWasRejected,
+    ChildWasRejected,
+)
 
 
 class WidgySite(object):
@@ -23,6 +28,9 @@ class WidgySite(object):
     def get_registry(self):
         return registry
 
+    def get_all_content_classes(self):
+        return self.get_registry().keys()
+
     def get_urls(self):
         urlpatterns = patterns('',
             url('^node/$', self.node_view),
@@ -33,10 +41,6 @@ class WidgySite(object):
             url('^contents/(?P<app_label>[A-z_][\w_]*)/(?P<object_name>[A-z_][\w_]*)/(?P<object_pk>[^/]+)/$', self.content_view),
         )
         return urlpatterns
-
-    def authorize(self, request):
-        if not request.user.is_authenticated():
-            raise PermissionDenied
 
     @property
     def urls(self):
@@ -55,6 +59,10 @@ class WidgySite(object):
         """
         return reverse(*args, **kwargs)
 
+    def authorize(self, request):
+        if not request.user.is_authenticated():
+            raise PermissionDenied
+
     def get_node_view(self):
         return NodeView.as_view(site=self)
 
@@ -69,3 +77,26 @@ class WidgySite(object):
 
     def get_node_templates_view(self):
         return NodeTemplatesView.as_view(site=self)
+
+    def valid_parent_of(self, parent, child_class, child=None):
+        return parent.valid_parent_of(child_class, child)
+
+    def valid_child_of(self, parent, child_class, child=None):
+        return child_class.valid_child_of(parent, child)
+
+    def validate_relationship(self, parent, child):
+        if isinstance(child, type):
+            child_class = child
+            child = None
+        else:
+            child_class = type(child)
+
+        bad_child = not self.valid_parent_of(parent, child_class, child)
+        bad_parent = not self.valid_child_of(parent, child_class, child)
+
+        if bad_parent and bad_child:
+            raise MutualRejection
+        elif bad_parent:
+            raise ParentWasRejected
+        elif bad_child:
+            raise ChildWasRejected
