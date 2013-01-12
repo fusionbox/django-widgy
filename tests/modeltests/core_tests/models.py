@@ -8,8 +8,6 @@ from .widgy_config import widgy_site
 
 
 class Layout(Content):
-    accepting_children = True
-
     @classmethod
     def valid_child_of(self, parent, obj=None):
         return False
@@ -23,7 +21,7 @@ class Layout(Content):
 
 
 class Bucket(Content):
-    accepting_children = True
+    pass
 
 
 class RawTextWidget(Content):

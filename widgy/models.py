@@ -227,7 +227,7 @@ class Content(models.Model):
 
     draggable = True            #: Set this content to be draggable
     deletable = True            #: Set this content instance to be deleteable
-    accepting_children = False  #: Sets this content instance to be able to have children.
+    max_number_of_children = float('infinity')
     # 0: can not pop out
     # 1: can pop out
     # 2: must pop out
@@ -262,7 +262,6 @@ class Content(models.Model):
             'object_name': self._meta.object_name,
             'draggable': self.draggable,
             'deletable': self.deletable,
-            'accepting_children': self.accepting_children,
             'template_url': site.reverse(site.node_templates_view, kwargs={'node_pk': self.node.pk}),
             'preview_template': self.get_preview_template(),
             'pop_out': self.pop_out,
@@ -338,7 +337,7 @@ class Content(models.Model):
         Given a content class, can it be _added_ as our child?
         Note: this does not apply to _existing_ children (adoption)
         """
-        return self.accepting_children
+        return len(self.children) < self.max_number_of_children
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
