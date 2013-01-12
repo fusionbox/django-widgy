@@ -407,18 +407,22 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     canAcceptChild: function(view) {
-      // it is me.
-      if ( this === view )
-        return false;
+      if ( view instanceof NodePreviewView ) {
+        return _.contains(view.model.get('possible_parent_nodes'), this.model.id)
+      } else {
+        // it is me.
+        if ( this === view )
+          return false;
 
-      // it is already my child.
-      if ( this.list.contains(view) )
-        return true;
+        // it is already my child.
+        if ( this.list.contains(view) )
+          return true;
 
-      return this.getShelf().validParentOf(
-          this.model.id,
-          view.model.content.get('__class__')
-          );
+        return this.getShelf().validParentOf(
+            this.model.id,
+            view.model.content.get('__class__')
+            );
+      }
     },
 
     /**
