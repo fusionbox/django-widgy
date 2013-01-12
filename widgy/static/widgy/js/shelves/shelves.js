@@ -76,6 +76,12 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
 
     refresh: function() {
       this.collection.update();
+    },
+
+    validParentOf: function(parent_id, child_class) {
+      var data = this.collection.where({'__class__': child_class});
+      console.log(data);
+      return data.length && _.contains(data[0].get('possible_parent_nodes'), parent_id);
     }
   });
 

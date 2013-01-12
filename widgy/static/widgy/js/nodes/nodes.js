@@ -146,6 +146,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         .listenTo(this.model, 'reposition', this.reposition);
 
       this.app = options.app;
+      this.parent = options.parent;
     },
 
     checkDidReposition: function(model, resp, options) {
@@ -321,6 +322,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     addChild: function(node) {
       var node_view = new NodeView({
         model: node,
+        parent: this,
         app: this.app
       });
 
@@ -397,6 +399,28 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       }
     },
 
+    getShelf: function() {
+      if ( this.hasShelf() )
+        return this.shelf;
+      else
+        return this.parent.getShelf();
+    },
+
+    canAcceptChild: function(view) {
+      // it is me.
+      if ( this === view )
+        return false;
+
+      // it is already my child.
+      if ( this.list.contains(view) )
+        return true;
+
+      return this.getShelf().validParentOf(
+          this.model.id,
+          view.model.content.get('__class__')
+          );
+    },
+
     /**
      * `addDropTargets`, `createDropTarget`, `clearDropTargets`, `position`,
      * and `dropChildView` all deal with a possible child NodeView being
@@ -409,26 +433,23 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
           that = this,
           mine = this.list.contains(view);
 
-      this.list.each(function(node_view) {
-        node_view.addDropTargets(view);
-      });
-
-      // do nothing if it's me or I'm not accepting children.
-      if ( this === view ||
-          (! mine && this.model.content && !this.model.content.get('accepting_children')) ||
-          (view.model.get('possible_parent_nodes') && ! _.contains(view.model.get('possible_parent_nodes'), this.model.id))
-          )
-      {
-        return;
+      // I can't be my own grandfather.
+      if (this !== view) {
+        this.list.each(function(node_view) {
+          node_view.addDropTargets(view);
+        });
       }
 
-      $children.prepend(this.createDropTarget().el);
-      $children.children('.node').each(function(index, elem) {
-        var drop_target = that.createDropTarget().$el.insertAfter(elem);
+      if (this.canAcceptChild(view))
+      {
+        $children.prepend(this.createDropTarget().el);
+        $children.children('.node').each(function(index, elem) {
+          var drop_target = that.createDropTarget().$el.insertAfter(elem);
 
-        if ( mine && view.el == elem )
-          drop_target.hide();
-      });
+          if ( mine && view.el == elem )
+            drop_target.hide();
+        });
+      }
     },
 
     createDropTarget: function() {
