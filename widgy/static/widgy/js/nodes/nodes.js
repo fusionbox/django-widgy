@@ -312,6 +312,12 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.list = new Backbone.ViewList();
     },
 
+    onClose: function() {
+      NodeViewBase.prototype.onClose.apply(this, arguments);
+
+      this.list.closeAll();
+    },
+
     renderChildren: function() {
       debug.call(this, 'renderChildren');
 
