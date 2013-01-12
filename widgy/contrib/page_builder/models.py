@@ -47,12 +47,15 @@ class Layout(PageBuilderContent):
         for cls, args, kwargs in self.default_children:
             self.add_child(site, cls, *args, **kwargs)
 
-    def valid_parent_of(self, cls, obj=None):
-        if obj:
-            return obj in self.children or self.valid_parent_of(cls)
+    @property
+    def max_number_of_children(self):
+        return len(self.default_children)
 
+    def valid_parent_of(self, cls, obj=None):
+        if obj and obj in self.children:
+            return True
         return (any(issubclass(cls, bucket_meta[0]) for bucket_meta in self.default_children) and
-                len(self.children) < len(self.default_children))
+                super(Layout, self).valid_parent_of(cls, obj))
 
     @classmethod
     def valid_child_of(cls, content, obj=None):
@@ -62,7 +65,6 @@ class Layout(PageBuilderContent):
 class Bucket(PageBuilderContent):
     draggable = False
     deletable = False
-    accepting_children = True
 
     component_name = 'bucket'
 
@@ -130,6 +132,8 @@ registry.register(DefaultLayout)
 
 
 class Markdown(Widget):
+    max_number_of_children = 0
+
     content = MarkdownField(blank=True)
     rendered = models.TextField(editable=False)
 
@@ -177,14 +181,12 @@ class Accordion(Bucket):
     deletable = True
 
     def valid_parent_of(self, cls, obj=None):
-        return issubclass(cls, Section)
+        return issubclass(cls, Section) and super(Accordion, self).valid_parent_of(cls, obj)
 
 registry.register(Accordion)
 
 
 class Section(Widget):
-    accepting_children = True
-
     title = models.CharField(max_length=1023)
 
     @classmethod

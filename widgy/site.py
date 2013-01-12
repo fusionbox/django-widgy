@@ -78,8 +78,15 @@ class WidgySite(object):
     def get_node_templates_view(self):
         return NodeTemplatesView.as_view(site=self)
 
+    def get_config_for_class(self, cls):
+        return self.get_registry()[cls]
+
+    def get_config(self, obj):
+        cls = self.get_config_for_class(type(obj))
+        return cls(model=obj)
+
     def valid_parent_of(self, parent, child_class, child=None):
-        return parent.valid_parent_of(child_class, child)
+        return self.get_config(parent).valid_parent_of(child_class, child)
 
     def valid_child_of(self, parent, child_class, child=None):
         return child_class.valid_child_of(parent, child)
