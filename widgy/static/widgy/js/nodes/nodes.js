@@ -647,8 +647,41 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     events: {
-      'mouseenter': 'activate',
-      'mouseleave': 'deactivate'
+      'mouseenter .pointer_event_catcher': 'activate',
+      'mouseleave .pointer_event_catcher': 'deactivate'
+    },
+
+    render: function() {
+      Backbone.View.prototype.render.apply(this, arguments);
+
+      // In a perfect world, the CSS pointer-events property would be supported
+      // by all browsers and every version of each browser and we would set
+      // pointer-events to none for .node.being_dragged.  But even since we
+      // can't use that, we are going to use this method to capture all of the
+      // events.
+      //
+      // Above the drop targets, we put an invisible div that has a z-index
+      // high enough to be above the dragged_node.  This allows us to catch the
+      // pointer events (mouseup, mouseenter, mouseleave) that we need drop
+      // targets to receive.
+      //
+      // Normally I don't like putting CSS in the JavaScript, but this CSS
+      // creates functionality and not prettiness, so I have to.
+      this.$el.css({ 'position': 'relative' });
+
+      var $pointerEventsCatcher = $('<div class="pointer_event_catcher">')
+        .css({
+          'z-index': 1000,
+          'opacity': 0,
+          'width': '100%',
+          'height': '100%',
+          'position': 'absolute',
+          'top': 0,
+          'left': 0
+        });
+      this.$el.prepend($pointerEventsCatcher);
+
+      return this;
     },
 
     activate: function(event) {
