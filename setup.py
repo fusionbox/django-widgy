@@ -16,7 +16,7 @@ install_requires = [
     'django-fusionbox',
     'django-treebeard',
     'South',
-    'PyScss==1.1.3',
+    'PyScss >= 1.1.4',
     'six',
 ]
 
@@ -34,7 +34,8 @@ setup(
     ],
     install_requires=install_requires,
     dependency_links=[
-        'http://github.com/fusionbox/django-fusionbox/tarball/master#egg=django-fusionbox-0.0.2'
+        'http://github.com/fusionbox/django-fusionbox/tarball/master#egg=django-fusionbox-0.0.2',
+        'http://github.com/Kronuz/pyScss/tarball/master#egg=pyscss-1.1.4',
     ],
     zip_safe=False,
 )
