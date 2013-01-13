@@ -589,7 +589,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.listenTo(shelf, 'startDrag', this.startDrag);
       shelf.collection.fetch();
 
-      this.$el.append(shelf.render().el);
+      this.$children.before(shelf.render().el);
     },
 
     toJSON: function() {

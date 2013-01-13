@@ -228,6 +228,7 @@ class Content(models.Model):
     draggable = True            #: Set this content to be draggable
     deletable = True            #: Set this content instance to be deleteable
     accepting_children = False  #: Sets this content instance to be able to have children.
+    shelf = False
     # 0: can not pop out
     # 1: can pop out
     # 2: must pop out
@@ -267,6 +268,7 @@ class Content(models.Model):
             'preview_template': self.get_preview_template(),
             'pop_out': self.pop_out,
             'edit_url': site.reverse(site.node_edit_view, kwargs={'node_pk': self.node.pk}),
+            'shelf': self.shelf,
         }
         model_data = model_to_dict(self)
         del model_data[self._meta.pk.attname]

@@ -156,3 +156,22 @@
     }
   }
 }
+
+.node {
+  .node {
+    .shelf {
+      position: static;
+      h2 {
+        display: inline-block;
+        -webkit-transform: rotate(-90deg);
+      }
+
+      ul {
+        display: inline;
+        li {
+          display: inline-block;
+        }
+      }
+    }
+  }
+}
