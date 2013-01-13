@@ -266,6 +266,7 @@ INSTALLED_APPS = (
     "mezzanine.pages",
     'widgy',
     'widgy.contrib.page_builder',
+    'widgy.contrib.form_builder',
     'widgy.contrib.widgy_mezzanine',
     "django.contrib.admin",
     #"mezzanine.galleries",

@@ -319,6 +319,9 @@ class Content(models.Model):
     def get_root(self):
         return self.node.get_root().content
 
+    def get_ancestors(self):
+        return [ancestor.content for ancestor in self.node.get_ancestors()]
+
     def meta(self):
         return self._meta
 
