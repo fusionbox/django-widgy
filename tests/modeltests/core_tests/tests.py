@@ -14,7 +14,7 @@ from widgy.exceptions import (ParentWasRejected, ChildWasRejected,
 from .widgy_config import widgy_site
 from .models import (Layout, Bucket, RawTextWidget, CantGoAnywhereWidget,
                      PickyBucket, ImmovableBucket, HasAWidgy, AnotherLayout,
-                     HasAWidgyOnlyAnotherLayout)
+                     HasAWidgyOnlyAnotherLayout, VowelBucket)
 
 
 class RootNodeTestCase(TestCase):
@@ -148,6 +148,20 @@ class TestCore(RootNodeTestCase):
         with self.assertRaises(InvalidTreeMovement):
             bucket.node.reposition(widgy_site, parent=self.root_node,
                                    right=left)
+
+    def test_proxy_model(self):
+        bucket = VowelBucket.add_root(widgy_site)
+        bucket = Node.objects.get(pk=bucket.node.pk).content
+        bucket.add_child(widgy_site, ImmovableBucket)
+
+        with self.assertRaises(ChildWasRejected):
+            bucket.add_child(widgy_site, Bucket)
+
+
+        bucket.add_child(widgy_site, ImmovableBucket)
+        with self.assertRaises(ChildWasRejected):
+            bucket.add_child(widgy_site, Bucket)
+
 
 
 class TestWidgyField(TestCase):

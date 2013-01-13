@@ -22,7 +22,7 @@ from widgy.exceptions import (
     ParentChildRejection,
     RootDisplacementError
 )
-
+from widgy.generic import ProxyGenericForeignKey, ProxyGenericRelation
 from widgy.utils import exception_to_bool
 
 
@@ -44,7 +44,7 @@ class Node(MP_Node):
     """
     content_type = models.ForeignKey(ContentType)
     content_id = models.PositiveIntegerField()
-    content = generic.GenericForeignKey('content_type', 'content_id')
+    content = ProxyGenericForeignKey('content_type', 'content_id')
 
     def __unicode__(self):
         return str(self.content)
@@ -221,9 +221,9 @@ class Content(models.Model):
                                    content_type_field='content_type',
                                    object_id_field='content_id')``
     """
-    _nodes = generic.GenericRelation(Node,
-                                     content_type_field='content_type',
-                                     object_id_field='content_id')
+    _nodes = ProxyGenericRelation(Node,
+                                  content_type_field='content_type',
+                                  object_id_field='content_id')
 
     draggable = True            #: Set this content to be draggable
     deletable = True            #: Set this content instance to be deleteable

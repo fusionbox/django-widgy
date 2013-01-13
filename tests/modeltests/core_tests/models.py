@@ -56,6 +56,13 @@ class ImmovableBucket(Bucket):
 class AnotherLayout(Layout):
     pass
 
+class VowelBucket(Bucket):
+    class Meta:
+        proxy = True
+
+    def valid_parent_of(self, cls, obj=None):
+        return cls.__name__[0].lower() in 'aeiou'
+
 registry.register(Layout)
 registry.register(Bucket)
 registry.register(RawTextWidget)
@@ -63,6 +70,7 @@ registry.register(CantGoAnywhereWidget)
 registry.register(PickyBucket)
 registry.register(ImmovableBucket)
 registry.register(AnotherLayout)
+registry.register(VowelBucket)
 
 
 class HasAWidgy(models.Model):

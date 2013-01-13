@@ -1,7 +1,7 @@
 from django.contrib.sites.models import Site
 
 from widgy.contrib.list_content_widget.models import ListContentBase
-from widgy.contrib.page_builder.models import Layout, MainContent
+from widgy.contrib.page_builder.models import Layout, MainContent, Accordion
 from widgy import registry
 
 
@@ -19,3 +19,21 @@ class TwoContentLayout(Layout):
         verbose_name = 'Two Content Layout'
 
 registry.register(TwoContentLayout)
+
+class DemoAccordion(Accordion):
+    class Meta:
+        proxy = True
+        verbose_name = 'Accordion'
+
+    def valid_parent_of(self, cls, obj=None):
+        if obj and obj in self.children:
+            return True
+        else:
+            sup = super(DemoAccordion, self).valid_parent_of(cls)
+            if isinstance(self.get_root(), TwoContentLayout):
+                return sup and len(self.children) < 2
+            else:
+                return sup
+
+registry.unregister(Accordion)
+registry.register(DemoAccordion)
