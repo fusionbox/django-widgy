@@ -200,6 +200,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       // yet.
       this.followMouse(event);
 
+      this.$el.css({
+        width: this.$el.width(),
+        'z-index': 50
+      });
       this.$el.addClass('being_dragged');
 
       this.trigger('startDrag', this);
@@ -207,8 +211,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
     stopBeingDragged: function() {
       this.$el.css({
-        top: 0,
-        left: 0
+        top: '',
+        left: '',
+        width: ''
       });
 
       this.$el.removeClass('being_dragged');
@@ -668,11 +673,13 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       //
       // Normally I don't like putting CSS in the JavaScript, but this CSS
       // creates functionality and not prettiness, so I have to.
-      this.$el.css({ 'position': 'relative' });
+      this.$el.css({
+        'position': 'relative'
+      });
 
       var $pointerEventsCatcher = $('<div class="pointer_event_catcher">')
         .css({
-          'z-index': 1000,
+          'z-index': 51,
           'opacity': 0,
           'width': '100%',
           'height': '100%',
