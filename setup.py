@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from setuptools import setup
+from setuptools import setup, find_packages
 import subprocess
 import os
 
@@ -23,6 +23,7 @@ install_requires = [
 
 version = (0, 0, 1, 'alpha')
 
+
 def get_version():
     number = '.'.join(map(str, version[:3]))
     stage = version[3]
@@ -38,26 +39,7 @@ setup(
     version=get_version(),
     description=__doc__,
     long_description=read('README'),
-    packages=[
-        'widgy',
-        'widgy.templatetags',
-        'widgy.db',
-        'widgy.migrations',
-        'widgy.contrib',
-        'widgy.contrib.form_builder',
-        'widgy.contrib.widgy_mezzanine',
-        'widgy.contrib.list_content_widget',
-        'widgy.contrib.replacements',
-        'widgy.contrib.cms',
-        'widgy.contrib.page_builder',
-        'widgy.contrib.form_builder.migrations',
-        'widgy.contrib.widgy_mezzanine.migrations',
-        'widgy.contrib.replacements.migrations',
-        'widgy.contrib.cms.migrations',
-        'widgy.contrib.page_builder.db',
-        'widgy.contrib.page_builder.migrations',
-        'widgy.contrib.page_builder.forms'
-    ],
+    packages=[package for package in find_packages() if package.startswith('widgy')],
     install_requires=install_requires,
     dependency_links=[
         'http://github.com/fusionbox/django-fusionbox/tarball/master#egg=django-fusionbox-0.0.2',
