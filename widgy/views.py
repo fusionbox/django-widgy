@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 from django.views.generic import DetailView
 from django.views.generic.detail import SingleObjectMixin
+from django.db.models import get_model
 
 from fusionbox.views.rest import RestView
 
@@ -86,7 +87,9 @@ class NodeView(WidgyView):
     def post(self, request, node_pk=None):
         data = self.data()
         app_label, model = data['__class__'].split('.')
-        content_class = get_object_or_404(ContentType, model=model, app_label=app_label).model_class()
+        content_class = get_model(app_label, model)
+        if not content_class:
+            raise Http404
 
         try:
             right = get_object_or_404(Node, pk=extract_id(data['right_id']))
@@ -180,6 +183,7 @@ class NodeEditView(WidgyViewMixin, DetailView):
     def get_context_data(self, **kwargs):
         kwargs = super(NodeEditView, self).get_context_data(**kwargs)
         kwargs['html_id'] = 'node_%s' % (self.object.pk)
+        kwargs['node_dict'] = self.object.to_json(self.site)
         return kwargs
 
 
