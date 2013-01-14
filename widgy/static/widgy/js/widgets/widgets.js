@@ -47,13 +47,12 @@ define([
       response = $.parseJSON(xhr.responseText);
       $('ul.errorlist').remove();
       _.each(response, function(messages, field_name){
-        var field = this.$('[name="' + field_name + '"]'),
-            error_list = field.parent().find('ul.errorlist');
-        if ( error_list.length <= 0 ){
-          error_list = $('<ul class=errorlist>');
-          field.after(error_list);
+        var error_list = $('<ul class="errorlist">');
+
+        if ( field_name === '__all__' ) {
+          this.$el.prepend(error_list);
         } else {
-          error_list.html('');
+          this.$('[name="' + field_name + '"]').parent().prepend(error_list);
         }
 
         _.each(messages, function(msg){

@@ -63,7 +63,7 @@ class FormInputForm(forms.ModelForm):
 
 
 class FormInput(FormField):
-    #form = FormInputForm
+    form = FormInputForm
 
     type = models.CharField(choices=FORM_INPUT_TYPES, max_length=255)
 
