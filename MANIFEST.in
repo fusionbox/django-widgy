@@ -1,1 +1,3 @@
 recursive-include widgy *
+include Makefile
+include tox.ini

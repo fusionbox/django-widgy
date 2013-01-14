@@ -12,3 +12,4 @@ tags
 dist/
 *.egg-info/
 CACHE/
+.tox/
