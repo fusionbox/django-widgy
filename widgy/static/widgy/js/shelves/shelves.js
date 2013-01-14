@@ -7,25 +7,22 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
   var ShelfCollection = Backbone.Collection.extend({
     initialize: function(options) {
       _.bindAll(this,
-        'update'
+        'refresh'
       );
 
       this.model = nodes.Node;
 
       this.node = options.node;
-      this.on('remove', this.update);
+      this.on('remove', this.refresh);
     },
 
     url: function() {
       return this.node.get('available_children_url');
     },
 
-    update: function() {
-      // TODO: instead of a destructive overwriting, we need to merge the
-      // things on the shelf.  With the return, we need to delete any widgets
-      // that are no longer acceptable children and add the new widgets,
-      // without modifying ones that haven't changed.
-      this.fetch();
+    refresh: function() {
+      // IE tries to cache this
+      this.fetch({cache: false});
     }
   });
 
@@ -75,7 +72,7 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
     },
 
     refresh: function() {
-      this.collection.update();
+      this.collection.refresh();
     },
 
     validParentOf: function(parent_id, child_class) {

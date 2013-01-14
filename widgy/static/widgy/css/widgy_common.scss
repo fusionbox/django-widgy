@@ -164,7 +164,6 @@ $green:       #559911;
     &.being_dragged {
       background-color: blue;
       margin: 0;
-      pointer-events: none; /* leave this per Rocky's request */
       position: fixed;
     }
     
