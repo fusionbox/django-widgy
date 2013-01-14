@@ -45,24 +45,23 @@ define([
         error_func(model, xhr, options);
       }
       response = $.parseJSON(xhr.responseText);
-      (function(self){
-        _.each(response, function(messages, field_name){
-          var field = self.$('form').find('[name="' + field_name + '"]'),
-              error_list = field.parent().find('ul.errors').first();
-          if ( error_list.length <= 0 ){
-            error_list = $('<ul class=errors>');
-            field.before(error_list);
-          } else {
-            error_list.html('');
-          }
+      $('ul.errorlist').remove();
+      _.each(response, function(messages, field_name){
+        var field = this.$('[name="' + field_name + '"]'),
+            error_list = field.parent().find('ul.errorlist');
+        if ( error_list.length <= 0 ){
+          error_list = $('<ul class=errorlist>');
+          field.after(error_list);
+        } else {
+          error_list.html('');
+        }
 
-          _.each(messages, function(msg){
-            var message_li = $('<li class=error>');
-            message_li.text(msg);
-            error_list.append(message_li);
-          });
+        _.each(messages, function(msg){
+          var message_li = $('<li class=error>');
+          message_li.text(msg);
+          error_list.append(message_li);
         });
-      })(this);
+      }, this);
     },
 
     render: function(event) {
