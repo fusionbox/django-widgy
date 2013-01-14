@@ -186,7 +186,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       event.stopPropagation();
 
       // only on a left click.
-      if ( event.button !== 0 )
+      if ( event.which !== 1 )
         return;
 
       // Store the mouse offset in this container for followMouse to use.  We
@@ -355,6 +355,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
         $(document).on('mouseup.' + dragged_view.cid, this.stopDragging);
         $(document).on('mousemove.' + dragged_view.cid, dragged_view.followMouse);
+        $(document).on('selectstart.' + dragged_view.cid, function(){ return false; });
 
         this.addDropTargets(dragged_view);
       } else {
@@ -587,7 +588,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       });
 
       this.listenTo(shelf, 'startDrag', this.startDrag);
-      shelf.collection.fetch();
+      shelf.collection.refresh();
 
       this.$children.before(shelf.render().el);
     },
@@ -647,8 +648,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     events: {
-      'mouseenter .pointer_event_catcher': 'activate',
-      'mouseleave .pointer_event_catcher': 'deactivate'
+      'mouseenter': 'activate',
+      'mouseleave': 'deactivate'
     },
 
     render: function() {
