@@ -103,6 +103,14 @@ class Node(MP_Node):
             return self._ancestors
         return super(Node, self).get_ancestors()
 
+    def get_root(self):
+        if hasattr(self, '_ancestors'):
+            if self._ancestors:
+                return self._ancestors[0]
+            else:
+                return self
+        return super(Node, self).get_root()
+
     def maybe_prefetch_tree(self):
         """
         Prefetch the tree unless it has already been prefetched

@@ -241,6 +241,10 @@ class TestPrefetchTree(RootNodeTestCase):
                 left.children[2].children[0].get_ancestors(),
                 [root_node.content, left, left.children[2]])
 
+            self.assertEqual(left.get_root(), left.get_parent())
+            self.assertEqual(left.children[0].get_root(), left.get_parent())
+            self.assertEqual(root_node.get_root(), root_node)
+
             # on the Node
             left, right = root_node.get_children()
             self.assertEqual(left.get_parent(), root_node)
@@ -252,6 +256,9 @@ class TestPrefetchTree(RootNodeTestCase):
             self.assertEqual(list(root_node.get_ancestors()), [])
             self.assertEqual(list(left.get_ancestors()), [root_node])
             self.assertEqual(list(list(left.get_children())[0].get_ancestors()), [root_node, left])
+
+            self.assertEqual(left.get_root(), left.get_parent())
+            self.assertEqual(list(left.get_children())[0].get_root(), left.get_parent())
 
         # to_json shouldn't do any more queries either
         with self.assertNumQueries(0):
@@ -290,6 +297,9 @@ class TestPrefetchTree(RootNodeTestCase):
         # prefetched
         self.assertEqual(left.get_ancestors(), [left.get_parent()])
         self.assertEqual(left.children[0].get_ancestors(), [left.get_parent(), left])
+
+        self.assertEqual(left.get_root(), left.get_parent())
+        self.assertEqual(left.children[0].get_root(), left.get_parent())
 
 
 class HttpTestCase(TestCase):
