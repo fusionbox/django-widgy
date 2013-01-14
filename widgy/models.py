@@ -98,6 +98,11 @@ class Node(MP_Node):
             return self._next_sibling
         return super(Node, self).get_next_sibling()
 
+    def get_ancestors(self):
+        if hasattr(self, '_ancestors'):
+            return self._ancestors
+        return super(Node, self).get_ancestors()
+
     def maybe_prefetch_tree(self):
         """
         Prefetch the tree unless it has already been prefetched
@@ -123,6 +128,7 @@ class Node(MP_Node):
         if self.depth == 1:
             self._parent = None
             self._next_sibling = None
+            self._ancestors = []
 
         # Build a mapping of content_types -> ids
         contents = defaultdict(list)
@@ -164,6 +170,8 @@ class Node(MP_Node):
                 self._children.append(descendants.pop(0))
                 child._next_sibling = None
                 child._parent = self
+                if hasattr(self, '_ancestors'):
+                    child._ancestors = self._ancestors + [self]
                 child.consume_children(descendants)
             else:
                 break
