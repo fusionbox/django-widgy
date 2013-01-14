@@ -1,14 +1,12 @@
 from operator import or_
 
-from django.db import models
+from django.db import models, DEFAULT_DB_ALIAS, connection
 from django.db.models import Q
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from django.db.models.loading import get_app
-from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import SimpleLazyObject
+from django.contrib.contenttypes.models import ContentType
 
-from widgy.site import WidgySite
-from widgy.forms import WidgyFormField
 from widgy.utils import fancy_import
 
 from south.modelsinspector import add_introspection_rules
@@ -50,11 +48,11 @@ class WidgyField(models.ForeignKey):
         }
         defaults.update(kwargs)
 
-        if isinstance(site, WidgySite):
-            self.site = site
-        else:
+        if isinstance(site, basestring):
             # prevent a circular import by lazily importing the site
             self.site = SimpleLazyObject(lambda: fancy_import(site))
+        else:
+            self.site = site
 
         super(WidgyField, self).__init__(to, **defaults)
 
@@ -88,6 +86,7 @@ class WidgyField(models.ForeignKey):
         return super(WidgyField, self).pre_save(model_instance, add)
 
     def formfield(self, **kwargs):
+        from widgy.forms import WidgyFormField
         defaults = {
             'form_class': WidgyFormField,
             'queryset': self.get_layout_contenttypes(self.root_choices),
