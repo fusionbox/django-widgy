@@ -36,7 +36,6 @@ define([
         'handleError',
         'renderHTML'
       );
-      this.template = this.model.get('edit_template');
     },
 
     handleError: function(model, xhr, options){
@@ -67,6 +66,7 @@ define([
     },
 
     render: function(event) {
+      // asychronous (possibly) template rendering.
       templates.render(
           this.model.get('template_url'),
           'edit_template',
@@ -91,7 +91,7 @@ define([
     },
 
     handleSuccess: function(model, response, options) {
-      // kill the cache.
+      // kill the template cache.
       templates.remove(model.get('template_url'));
       this.close();
     }
