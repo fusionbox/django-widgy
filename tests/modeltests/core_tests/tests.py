@@ -249,6 +249,15 @@ class TestPrefetchTree(RootNodeTestCase):
             self.assertEqual(right.get_parent(), root_node.content)
             self.assertEqual(root_node.content.get_parent(), None)
             self.assertEqual(root_node.content.get_next_sibling(), None)
+            self.assertEqual(left.get_ancestors(), [root_node.content])
+            self.assertEqual(left.children[0].get_ancestors(), [root_node.content, left])
+            self.assertEqual(
+                left.children[2].children[0].get_ancestors(),
+                [root_node.content, left, left.children[2]])
+
+            self.assertEqual(left.get_root(), left.get_parent())
+            self.assertEqual(left.children[0].get_root(), left.get_parent())
+            self.assertEqual(root_node.get_root(), root_node)
 
             # on the Node
             left, right = root_node.get_children()
@@ -257,6 +266,13 @@ class TestPrefetchTree(RootNodeTestCase):
             self.assertEqual(right.get_next_sibling(), None)
             self.assertEqual(root_node.get_parent(), None)
             self.assertEqual(root_node.get_next_sibling(), None)
+            # list() because get_ancestors() returns a querysetish thing
+            self.assertEqual(list(root_node.get_ancestors()), [])
+            self.assertEqual(list(left.get_ancestors()), [root_node])
+            self.assertEqual(list(list(left.get_children())[0].get_ancestors()), [root_node, left])
+
+            self.assertEqual(left.get_root(), left.get_parent())
+            self.assertEqual(list(left.get_children())[0].get_root(), left.get_parent())
 
         # to_json shouldn't do any more queries either
         with self.assertNumQueries(0):
@@ -284,12 +300,20 @@ class TestPrefetchTree(RootNodeTestCase):
             self.assertEqual(subbucket_children[1].text, 'subbucket_2')
 
         # For a non-root node, the parent and next sibling can't be computed by
-        # prefetch_tree without another query for each one, so the may as well
+        # prefetch_tree without another query for each one, so they may as well
         # be lazy
         right_node = list(self.root_node.get_children())[1]
         with self.assertNumQueries(2):
             self.assertEqual(left_node.get_parent(), self.root_node)
             self.assertEqual(left_node.get_next_sibling(), right_node)
+
+        # get_ancestors must work correctly for non-root nodes, but it can't be
+        # prefetched
+        self.assertEqual(left.get_ancestors(), [left.get_parent()])
+        self.assertEqual(left.children[0].get_ancestors(), [left.get_parent(), left])
+
+        self.assertEqual(left.get_root(), left.get_parent())
+        self.assertEqual(left.children[0].get_root(), left.get_parent())
 
 
 class HttpTestCase(TestCase):

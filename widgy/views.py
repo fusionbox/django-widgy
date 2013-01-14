@@ -158,6 +158,7 @@ class ShelfView(WidgyView):
     def get(self, request, node_pk):
         content_classes = self.site.get_all_content_classes()
         node = get_object_or_404(Node, pk=node_pk)
+        node.prefetch_tree()
         content_classes = node.filter_child_classes_recursive(self.site, content_classes)
         res_dict = {}
         for node, class_list in content_classes.iteritems():

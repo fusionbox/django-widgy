@@ -34,7 +34,8 @@ define([
         success: function(model) {
           templates.add(model);
           callback(model.render(type, context));
-        }
+        },
+        cache: false
       });
     }
   };

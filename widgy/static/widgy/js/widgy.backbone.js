@@ -97,9 +97,12 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
     },
 
     render: function() {
-      var context = this.toJSON();
+      var context = this.toJSON(),
+          template = this.getTemplate();
 
-      this.$el.html(this.renderTemplate(this.getTemplate(), context));
+      if (template) {
+        this.$el.html(this.renderTemplate(template, context));
+      }
 
       return this;
     },

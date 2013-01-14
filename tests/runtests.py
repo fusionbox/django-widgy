@@ -69,7 +69,8 @@ def get_test_modules():
                 f.startswith('sql') or
                 os.path.basename(f) in REGRESSION_SUBDIRS_TO_SKIP):
                 continue
-            modules.append((loc, f))
+            if os.listdir(os.path.join(dirpath, f)):
+                modules.append((loc, f))
     return modules
 
 def setup(verbosity, test_labels):

@@ -36,7 +36,6 @@ define([
         'handleError',
         'renderHTML'
       );
-      this.template = this.model.get('edit_template');
     },
 
     handleError: function(model, xhr, options){
@@ -46,27 +45,26 @@ define([
         error_func(model, xhr, options);
       }
       response = $.parseJSON(xhr.responseText);
-      (function(self){
-        _.each(response, function(messages, field_name){
-          var field = self.$('form').find('[name="' + field_name + '"]'),
-              error_list = field.parent().find('ul.errors').first();
-          if ( error_list.length <= 0 ){
-            error_list = $('<ul class=errors>');
-            field.before(error_list);
-          } else {
-            error_list.html('');
-          }
+      $('ul.errorlist').remove();
+      _.each(response, function(messages, field_name){
+        var error_list = $('<ul class="errorlist">');
 
-          _.each(messages, function(msg){
-            var message_li = $('<li class=error>');
-            message_li.text(msg);
-            error_list.append(message_li);
-          });
+        if ( field_name === '__all__' ) {
+          this.$el.prepend(error_list);
+        } else {
+          this.$('[name="' + field_name + '"]').parent().prepend(error_list);
+        }
+
+        _.each(messages, function(msg){
+          var message_li = $('<li class=error>');
+          message_li.text(msg);
+          error_list.append(message_li);
         });
-      })(this);
+      }, this);
     },
 
     render: function(event) {
+      // asychronous (possibly) template rendering.
       templates.render(
           this.model.get('template_url'),
           'edit_template',
@@ -91,7 +89,7 @@ define([
     },
 
     handleSuccess: function(model, response, options) {
-      // kill the cache.
+      // kill the template cache.
       templates.remove(model.get('template_url'));
       this.close();
     }

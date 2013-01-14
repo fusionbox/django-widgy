@@ -226,9 +226,10 @@ STATICFILES_DIRS = (
     os.path.join(PROJECT_PATH, 'public'),
 )
 
-SCSS_IMPORTS = (
-    os.path.join(PROJECT_ROOT, '..',  'widgy', 'static', 'widgy', 'css'),
-)
+SCSS_IMPORTS = [os.path.join(d, 'css') for d in STATICFILES_DIRS]
+SCSS_IMPORTS.extend([
+    os.path.join(PROJECT_PATH, '..', 'widgy', 'static', 'widgy', 'css'),
+])
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
@@ -266,6 +267,7 @@ INSTALLED_APPS = (
     "mezzanine.pages",
     'widgy',
     'widgy.contrib.page_builder',
+    'widgy.contrib.form_builder',
     'widgy.contrib.widgy_mezzanine',
     "django.contrib.admin",
     #"mezzanine.galleries",
@@ -352,9 +354,9 @@ COMPRESS_PRECOMPILERS = (
     ('text/x-sass', 'sass {infile} {outfile}'),
 
     # requires pyScss
-    ('text/x-scss', 'pyscss {infile} -o {outfile} %s' %
-      '-I ' + ' '.join(['"%s"' % d for d in SCSS_IMPORTS])
-      ),
+    ('text/x-scss', 'python -mscss.tool -C -o {outfile} %s' %
+     ' '.join(['-I "%s"' % d for d in SCSS_IMPORTS])
+     )
 )
 
 

@@ -37,6 +37,9 @@ define([
 
     handleClick: function(event) {
       switch(event.which) {
+        case 0:
+          // this is 0 in ie sometimes. http://bugs.jquery.com/ticket/13209
+          /* falls through */
         case 1:
           // left click, submit the form
           this.submit();

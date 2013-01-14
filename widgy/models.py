@@ -98,6 +98,19 @@ class Node(MP_Node):
             return self._next_sibling
         return super(Node, self).get_next_sibling()
 
+    def get_ancestors(self):
+        if hasattr(self, '_ancestors'):
+            return self._ancestors
+        return super(Node, self).get_ancestors()
+
+    def get_root(self):
+        if hasattr(self, '_ancestors'):
+            if self._ancestors:
+                return self._ancestors[0]
+            else:
+                return self
+        return super(Node, self).get_root()
+
     def maybe_prefetch_tree(self):
         """
         Prefetch the tree unless it has already been prefetched
@@ -123,6 +136,7 @@ class Node(MP_Node):
         if self.depth == 1:
             self._parent = None
             self._next_sibling = None
+            self._ancestors = []
 
         # Build a mapping of content_types -> ids
         contents = defaultdict(list)
@@ -164,6 +178,8 @@ class Node(MP_Node):
                 self._children.append(descendants.pop(0))
                 child._next_sibling = None
                 child._parent = self
+                if hasattr(self, '_ancestors'):
+                    child._ancestors = self._ancestors + [self]
                 child.consume_children(descendants)
             else:
                 break
@@ -228,6 +244,7 @@ class Content(models.Model):
     draggable = True            #: Set this content to be draggable
     deletable = True            #: Set this content instance to be deleteable
     accepting_children = False  #: Sets this content instance to be able to have children.
+    shelf = False
     # 0: can not pop out
     # 1: can pop out
     # 2: must pop out
@@ -267,6 +284,7 @@ class Content(models.Model):
             'preview_template': self.get_preview_template(),
             'pop_out': self.pop_out,
             'edit_url': site.reverse(site.node_edit_view, kwargs={'node_pk': self.node.pk}),
+            'shelf': self.shelf,
         }
         model_data = model_to_dict(self)
         del model_data[self._meta.pk.attname]
@@ -318,6 +336,9 @@ class Content(models.Model):
 
     def get_root(self):
         return self.node.get_root().content
+
+    def get_ancestors(self):
+        return [ancestor.content for ancestor in self.node.get_ancestors()]
 
     def meta(self):
         return self._meta
