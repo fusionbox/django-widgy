@@ -1,5 +1,7 @@
 from django.test import TestCase
 
+from widgy.generic.models import ContentType
+
 from .models import Base, Related, Proxy
 
 
@@ -29,3 +31,7 @@ class TestPGFK(TestCase):
         base = Base.objects.get(pk=base.pk)
         rel = Proxy.objects.get(pk=base.obj.pk)
         self.assertTrue(base in rel.bases.all())
+
+    def test_fake_contenttype(self):
+        self.assertEqual(Proxy, ContentType.objects.get_for_model(Proxy, for_concrete_model=False).model_class())
+        self.assertEqual(Proxy, ContentType.objects.get_for_models(Proxy, for_concrete_models=False).values()[0].model_class())

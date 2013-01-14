@@ -1,6 +1,6 @@
 from django.contrib.contenttypes import generic
 from django.db import DEFAULT_DB_ALIAS, connection
-from django.contrib.contenttypes.models import ContentType
+from widgy.generic.models import ContentType
 
 from south.modelsinspector import add_introspection_rules
 
@@ -30,7 +30,6 @@ class ProxyGenericRelation(generic.GenericRelation):
         """
         if negate:
             return []
-        ContentType = get_model("contenttypes", "contenttype")
         content_type = ContentType.objects.get_for_model(self.model, for_concrete_model=False)
         prefix = "__".join(pieces[:pos + 1])
         return [("%s__%s" % (prefix, self.content_type_field_name),
