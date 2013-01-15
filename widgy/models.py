@@ -119,6 +119,12 @@ class Node(MP_Node):
         if not hasattr(self, '_children'):
             self.prefetch_tree()
 
+    def depth_first_order(self):
+        """
+        All of the nodes in my tree (including myself) in depth-first order.
+        """
+        return [self] + list(self.get_descendants().order_by('path'))
+
     def prefetch_tree(self):
         """
         Builds the entire tree using python.  Each node has its Content
@@ -129,8 +135,7 @@ class Node(MP_Node):
 
             Maybe use in_bulk here to avoid doing a query for every content
         """
-        # Build a list with the current node and all descendants
-        tree = [self] + list(self.get_descendants().order_by('path'))
+        tree = self.depth_first_order()
 
         # This should get_depth() or is_root(), but both of those do another
         # query
@@ -148,7 +153,8 @@ class Node(MP_Node):
         content_types = ContentType.objects.in_bulk(contents.iterkeys())
         for content_type_id, content_ids in contents.iteritems():
             ct = content_types[content_type_id]
-            contents[content_type_id] = dict([(i.id, i) for i in ct.model_class().objects.filter(pk__in=content_ids)])
+            instances = ct.model_class().objects.filter(pk__in=content_ids)
+            contents[content_type_id] = dict([(i.id, i) for i in instances])
 
         # Loop through the nodes both assigning the content instance and the
         # node instance onto the content
@@ -165,9 +171,6 @@ class Node(MP_Node):
         """
         Helper method to assign the proper children in the proper order to each
         node
-
-        .. todo::
-            fix the error messages
         """
         self._children = []
 
@@ -238,11 +241,9 @@ class Node(MP_Node):
         validator = exception_to_bool(
             partial(site.validate_relationship, child=self.content),
             ParentChildRejection)
-        all_nodes = [root_node] + list(root_node.get_descendants())
-        my_family = set(self.get_descendants())
-        my_family.add(self)
+        all_nodes = root_node.depth_first_order()
+        my_family = set(self.depth_first_order())
         return [i for i in all_nodes if validator(i.content) and i not in my_family]
-
 
 
 class Content(models.Model):
@@ -271,10 +272,8 @@ class Content(models.Model):
     form = ModelForm
     formfield_overrides = {}
 
-
     class Meta:
         abstract = True
-
 
     def __init__(self, *args, **kwargs):
         super(Content, self).__init__(*args, **kwargs)
@@ -289,6 +288,7 @@ class Content(models.Model):
             'object_pk': self.pk})
 
     def to_json(self, site):
+        node_pk_kwargs = {'node_pk': self.node.pk}
         data = {
             'url': self.get_api_url(site),
             '__class__': self.class_name,
@@ -298,10 +298,10 @@ class Content(models.Model):
             'draggable': self.draggable,
             'deletable': self.deletable,
             'accepting_children': self.accepting_children,
-            'template_url': site.reverse(site.node_templates_view, kwargs={'node_pk': self.node.pk}),
+            'template_url': site.reverse(site.node_templates_view, kwargs=node_pk_kwargs),
             'preview_template': self.get_preview_template(),
             'pop_out': self.pop_out,
-            'edit_url': site.reverse(site.node_edit_view, kwargs={'node_pk': self.node.pk}),
+            'edit_url': site.reverse(site.node_edit_view, kwargs=node_pk_kwargs),
             'shelf': self.shelf,
         }
         model_data = model_to_dict(self)
@@ -315,9 +315,9 @@ class Content(models.Model):
         :Returns: a json-able python object that represents the class type.
         """
         return {
-                '__class__': "%s.%s" % (cls._meta.app_label, cls._meta.module_name),
-                'title': cls._meta.verbose_name.title(),
-                }
+            '__class__': "%s.%s" % (cls._meta.app_label, cls._meta.module_name),
+            'title': cls._meta.verbose_name.title(),
+        }
 
     @property
     def class_name(self):
@@ -529,7 +529,8 @@ class Content(models.Model):
         if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
             from django.contrib.admin import site as admin_site
             related_modeladmin = admin_site._registry.get(db_field.rel.to)
-            can_add_related = bool(related_modeladmin and related_modeladmin.has_add_permission(request))
+            can_add_related = bool(related_modeladmin and
+                                   related_modeladmin.has_add_permission(request))
             formfield.widget = widgets.RelatedFieldWidgetWrapper(
                 formfield.widget, db_field.rel, admin_site,
                 can_add_related=can_add_related)

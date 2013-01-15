@@ -27,7 +27,7 @@ class RootNodeTestCase(TestCase):
 def tree_to_dot(node):
     output = []
     output.append('digraph {')
-    for i in [node] + list(node.get_descendants().order_by('path')):
+    for i in node.depth_first_order():
         output.append('  %s [label="%s: %s"];' % (i.id, i.id, repr(i.content)))
         if i != node:
             output.append('  %s -> %s;' % (i.get_parent().id, i.id))
