@@ -148,27 +148,34 @@ class NodeView(WidgyView):
 
 class ShelfView(WidgyView):
     """
-    Resource that retrieves not only the valid content classes, but also the
-    valid content classes of the node's children.
+    For a given node, returns a mapping of node urls to lists of content
+    classes that can be their children.::
 
-    **Supported Methods**:
-        :get: Get all the child classes of the node instance, and all its
-            children.
+        {
+            node_url: [content classes]
+            node_url: [content classes]
+        }
+
+    Used on the frontend to populate the shelf.
     """
+
+    def serialize_content_classes(self, obj):
+        """
+        The built-in json encoder doesn't support class_to_json, so
+        we'll do it manually.
+        """
+        res = {}
+        for node, classes in obj.iteritems():
+            res[node.get_api_url(self.site)] = [i.class_to_json(self.site) for i in classes]
+        return res
+
     def get(self, request, node_pk):
         content_classes = self.site.get_all_content_classes()
         node = get_object_or_404(Node, pk=node_pk)
         node.prefetch_tree()
         content_classes = node.filter_child_classes_recursive(self.site, content_classes)
-        res_dict = {}
-        for node, class_list in content_classes.iteritems():
-            if node.content.pop_out != 2 or str(node.pk) == node_pk:
-                for cls in class_list:
-                    res_dict.setdefault(cls, cls.class_to_json(self.site))
-                    res_dict[cls].setdefault('possible_parent_nodes', [])
-                    res_dict[cls]['possible_parent_nodes'].append(node.get_api_url(self.site))
-
-        return self.render_to_response(res_dict.values())
+        return self.render_to_response(
+            self.serialize_content_classes(content_classes))
 
 
 class NodeSingleObjectMixin(SingleObjectMixin):
@@ -178,7 +185,7 @@ class NodeSingleObjectMixin(SingleObjectMixin):
 
 class NodeEditView(WidgyViewMixin, NodeSingleObjectMixin, DetailView):
     """
-    Popped out node editing
+    The only TemplateView in widgy: The interface for popped out node editing.
     """
 
     template_name = 'widgy/edit_node.html'

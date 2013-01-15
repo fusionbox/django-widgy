@@ -9,7 +9,6 @@ from django.db import models
 from django.forms.models import modelform_factory, ModelForm
 from django.forms import model_to_dict
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
 from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.contrib.admin.options import FORMFIELD_FOR_DBFIELD_DEFAULTS
@@ -222,16 +221,29 @@ class Node(MP_Node):
             assert right or parent
 
     def filter_child_classes(self, site, classes):
+        """
+        What Content classes from `classes` would I let be my children?
+        """
+
         validator = partial(site.validate_relationship, self.content)
         return filter(
             exception_to_bool(validator, ParentChildRejection),
             classes)
 
     def filter_child_classes_recursive(self, site, classes):
-        allowed_classes = {self: self.filter_child_classes(site, classes)}
-        for child in self.get_children():
-            allowed_classes.update(child.filter_child_classes_recursive(site, classes))
-        return allowed_classes
+        """
+        A dictionary of node objects to lists of content classes they would allow::
+
+            {
+                node_obj: [content_class, content_class, ...],
+                 ...
+            }
+        """
+
+        res = {}
+        for node in self.depth_first_order():
+            res[node] = node.filter_child_classes(site, classes)
+        return res
 
     def possible_parents(self, site, root_node):
         """

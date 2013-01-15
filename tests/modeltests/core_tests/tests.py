@@ -353,11 +353,6 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         super(TestApi, self).setUp()
         self.node_url = widgy_site.reverse(widgy_site.node_view)
 
-    def test_textcontent_available(self):
-        available_children = json.loads(
-            self.get(self.root_node.to_json(widgy_site)['available_children_url']).content)
-        self.assertIn('core_tests.rawtextwidget', [i['__class__'] for i in available_children])
-
     def test_add_child(self):
         bucket = self.root_node.to_json(widgy_site)['children'][0]
         db_bucket = Node.objects.get(id=extract_id(bucket['url']))
@@ -408,34 +403,32 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         subbucket = list(left.get_children())[-1]
         resp = self.get(self.root_node.to_json(widgy_site)['available_children_url'])
         self.assertEqual(resp.status_code, 200)
-        available_children = json.loads(resp.content)
+        data = json.loads(resp.content)
 
         def select(cls_name):
-            for i in available_children:
-                if i['__class__'] == cls_name:
-                    return i
-            assert False, "Couldn't find %r" % cls_name
+            possible_parent_urls = []
+            for node_url, child_classes in data.iteritems():
+                for i in child_classes:
+                    if i['__class__'] == cls_name:
+                        possible_parent_urls.append(node_url)
+            return possible_parent_urls
 
-        bucket_data = select('core_tests.bucket')
-        immovablebucket_data = select('core_tests.immovablebucket')
-        pickybucket_data = select('core_tests.pickybucket')
-        rawtext_data = select('core_tests.rawtextwidget')
-
-        self.assertRaises(AssertionError, select, 'core_tests.cantgoanywherewidget')
+        bucket_parents = select('core_tests.bucket')
+        immovablebucket_parents = select('core_tests.immovablebucket')
+        pickybucket_parents = select('core_tests.pickybucket')
+        rawtext_parents = select('core_tests.rawtextwidget')
+        cantgoanywhere_parents = select('core_tests.cantgoanywherewidget')
 
         def lists_equal(instances, urls):
             urls = sorted(map(str, urls))
             instance_urls = sorted(str(i.get_api_url(widgy_site)) for i in instances)
             self.assertEqual(instance_urls, urls)
 
-        lists_equal([right, left, subbucket, self.root_node],
-                    bucket_data['possible_parent_nodes'])
-        lists_equal([right, left, subbucket, self.root_node],
-                    immovablebucket_data['possible_parent_nodes'])
-        lists_equal([right, left, subbucket, self.root_node],
-                    pickybucket_data['possible_parent_nodes'])
-        lists_equal([right, left, subbucket],
-                    rawtext_data['possible_parent_nodes'])
+        lists_equal([], cantgoanywhere_parents)
+        lists_equal([right, left, subbucket, self.root_node], bucket_parents)
+        lists_equal([right, left, subbucket, self.root_node], immovablebucket_parents)
+        lists_equal([right, left, subbucket, self.root_node], pickybucket_parents)
+        lists_equal([right, left, subbucket], rawtext_parents)
 
     def test_unauthorized_access(self):
         """
