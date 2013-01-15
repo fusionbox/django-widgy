@@ -63,6 +63,7 @@ class Node(MP_Node):
             'content': self.content.to_json(site),
             'children': children,
             'available_children_url': self.get_available_children_url(site),
+            'possible_parents_url': self.get_possible_parents_url(site),
         }
         parent = self.get_parent()
         if parent:
@@ -190,6 +191,9 @@ class Node(MP_Node):
     def get_available_children_url(self, site):
         return site.reverse(site.shelf_view, kwargs={'node_pk': self.pk})
 
+    def get_possible_parents_url(self, site):
+        return site.reverse(site.node_parents_view, kwargs={'node_pk': self.pk})
+
     def reposition(self, site, right=None, parent=None):
         """
         Validates the requested node restructering and executes by calling :meth:`~Node.move` on
@@ -225,6 +229,20 @@ class Node(MP_Node):
         for child in self.get_children():
             allowed_classes.update(child.filter_child_classes_recursive(site, classes))
         return allowed_classes
+
+    def possible_parents(self, site, root_node):
+        """
+        Where in root_node's tree can I be moved?
+        """
+
+        validator = exception_to_bool(
+            partial(site.validate_relationship, child=self.content),
+            ParentChildRejection)
+        all_nodes = [root_node] + list(root_node.get_descendants())
+        my_family = set(self.get_descendants())
+        my_family.add(self)
+        return [i for i in all_nodes if validator(i.content) and i not in my_family]
+
 
 
 class Content(models.Model):

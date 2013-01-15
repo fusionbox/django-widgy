@@ -9,6 +9,7 @@ from widgy.views import (
     ShelfView,
     NodeEditView,
     NodeTemplatesView,
+    NodeParentsView,
 )
 from widgy.exceptions import (
     MutualRejection,
@@ -24,6 +25,7 @@ class WidgySite(object):
         self.shelf_view = self.get_shelf_view()
         self.node_edit_view = self.get_node_edit_view()
         self.node_templates_view = self.get_node_templates_view()
+        self.node_parents_view = self.get_node_parents_view()
 
     def get_registry(self):
         return registry
@@ -38,6 +40,7 @@ class WidgySite(object):
             url('^node/(?P<node_pk>[^/]+)/available-children-recursive/$', self.shelf_view),
             url('^node/(?P<node_pk>[^/]+)/edit/$', self.node_edit_view),
             url('^node/(?P<node_pk>[^/]+)/templates/$', self.node_templates_view),
+            url('^node/(?P<node_pk>[^/]+)/possible-parents/$', self.node_parents_view),
             url('^contents/(?P<app_label>[A-z_][\w_]*)/(?P<object_name>[A-z_][\w_]*)/(?P<object_pk>[^/]+)/$', self.content_view),
         )
         return urlpatterns
@@ -77,6 +80,9 @@ class WidgySite(object):
 
     def get_node_templates_view(self):
         return NodeTemplatesView.as_view(site=self)
+
+    def get_node_parents_view(self):
+        return NodeParentsView.as_view(site=self)
 
     def valid_parent_of(self, parent, child_class, child=None):
         return parent.valid_parent_of(child_class, child)

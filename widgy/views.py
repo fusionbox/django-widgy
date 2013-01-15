@@ -171,10 +171,17 @@ class ShelfView(WidgyView):
         return self.render_to_response(res_dict.values())
 
 
-class NodeEditView(WidgyViewMixin, DetailView):
-    template_name = 'widgy/edit_node.html'
+class NodeSingleObjectMixin(SingleObjectMixin):
     model = Node
     pk_url_kwarg = 'node_pk'
+
+
+class NodeEditView(WidgyViewMixin, NodeSingleObjectMixin, DetailView):
+    """
+    Popped out node editing
+    """
+
+    template_name = 'widgy/edit_node.html'
 
     def dispatch(self, *args, **kwargs):
         self.auth(*args, **kwargs)
@@ -187,10 +194,23 @@ class NodeEditView(WidgyViewMixin, DetailView):
         return kwargs
 
 
-class NodeTemplatesView(SingleObjectMixin, WidgyView):
-    model = Node
-    pk_url_kwarg = 'node_pk'
+class NodeTemplatesView(NodeSingleObjectMixin, WidgyView):
+    """
+    Gets the dynamic [needing request] templates for a node.
+    """
 
     def get(self, request, *args, **kwargs):
         node = self.object = self.get_object()
         return self.render_to_response(node.content.get_templates(request))
+
+
+class NodeParentsView(NodeSingleObjectMixin, WidgyView):
+    """
+    Given a node, where in its tree can it be moved?
+    """
+
+    def get(self, request, *args, **kwargs):
+        node = self.object = self.get_object()
+        node.prefetch_tree()
+        possible_parents = node.possible_parents(self.site, node.get_root())
+        return self.render_to_response([i.get_api_url(self.site) for i in possible_parents])

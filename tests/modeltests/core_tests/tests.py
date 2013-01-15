@@ -157,11 +157,9 @@ class TestCore(RootNodeTestCase):
         with self.assertRaises(ChildWasRejected):
             bucket.add_child(widgy_site, Bucket)
 
-
         bucket.add_child(widgy_site, ImmovableBucket)
         with self.assertRaises(ChildWasRejected):
             bucket.add_child(widgy_site, Bucket)
-
 
 
 class TestWidgyField(TestCase):
@@ -468,3 +466,33 @@ class TestApi(RootNodeTestCase, HttpTestCase):
                 resp = getattr(self.client, method)(url, HTTP_COOKIE='unauthorized_access=1')
 
                 self.assertEqual(resp.status_code, 403)
+
+    def test_possible_parents(self):
+        def order_ignorant_equals(a, b):
+            self.assertEqual(sorted(a), sorted(b))
+
+        left, right = make_a_nice_tree(self.root_node)
+
+        resp = self.get(self.root_node.to_json(widgy_site)['possible_parents_url'])
+        possible_parents = json.loads(resp.content)
+        order_ignorant_equals([], possible_parents)
+
+        resp = self.get(left.to_json(widgy_site)['possible_parents_url'])
+        possible_parents = json.loads(resp.content)
+        order_ignorant_equals([right.get_api_url(widgy_site),
+                               self.root_node.get_api_url(widgy_site)],
+                              possible_parents)
+
+        resp = self.get(right.to_json(widgy_site)['possible_parents_url'])
+        possible_parents = json.loads(resp.content)
+        order_ignorant_equals([left.get_api_url(widgy_site),
+                               self.root_node.get_api_url(widgy_site),
+                               left.content.children[2].node.get_api_url(widgy_site)],
+                              possible_parents)
+
+        resp = self.get(left.content.children[0].node.to_json(widgy_site)['possible_parents_url'])
+        possible_parents = json.loads(resp.content)
+        order_ignorant_equals([left.get_api_url(widgy_site),
+                               right.get_api_url(widgy_site),
+                               left.content.children[2].node.get_api_url(widgy_site)],
+                              possible_parents)
