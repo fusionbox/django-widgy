@@ -643,6 +643,12 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
   var NodePreviewView = NodeViewBase.extend({
     template: node_preview_view_template,
 
+    // Override the NodeViewBase events, I want the whole thing draggable, not
+    // just the drag handle.
+    events: {
+      'mousedown': 'startBeingDragged'
+    },
+
     canAcceptParent: function(parent) {
       return this.app.validateRelationship(parent, this.model);
     }
