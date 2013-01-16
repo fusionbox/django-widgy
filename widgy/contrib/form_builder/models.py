@@ -10,7 +10,7 @@ from widgy import registry
 
 class Form(Content):
     accepting_children = True
-    #shelf = True
+    shelf = True
     component_name = 'bucket'
 
     @classmethod

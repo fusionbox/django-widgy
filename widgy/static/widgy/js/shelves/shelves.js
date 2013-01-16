@@ -23,7 +23,8 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
         'addOne',
         'addAll',
         'refresh',
-        'addOptions'
+        'addOptions',
+        'filterDuplicates'
       );
 
       this.collection
@@ -46,6 +47,7 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
         app: this.app
       });
 
+      model.once('node:sync', this.app.refreshCompatibility);
       view.on('all', this.bubble);
 
       this.list.push(view);
@@ -68,6 +70,22 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
         if ( this.collection.where({'__class__': content_class['__class__']}).length == 0 )
           this.collection.add(content_class);
       }, this);
+    },
+
+    filterDuplicates: function(parent_view) {
+      var seen_classes = [];
+      parent_view = parent_view.parent
+      while ( parent_view )
+      {
+        if (parent_view.hasShelf())
+        {
+          _.each(parent_view.getShelf().collection.toJSON(), function(data) {
+            this.collection.remove(this.collection.where({'__class__': data['__class__']}));
+          }, this);
+        }
+        parent_view = parent_view.parent;
+      }
+
     }
   });
 

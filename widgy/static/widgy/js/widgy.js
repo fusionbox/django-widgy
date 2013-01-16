@@ -64,7 +64,14 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
     setCompatibility: function(data) {
       this.compatibility_data = data;
       this.node_view_list.each(function(view) {
+        view.getShelf().collection.reset();
+      });
+      this.node_view_list.each(function(view) {
         view.getShelf().addOptions(data[view.model.id]);
+      });
+      this.node_view_list.each(function(view) {
+        if ( view.hasShelf() )
+          view.shelf.filterDuplicates(view);
       });
     },
 

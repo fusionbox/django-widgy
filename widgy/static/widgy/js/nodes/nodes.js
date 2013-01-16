@@ -314,7 +314,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       this
         .listenTo(this.model, 'load:content', this.renderContent)
-        .listenTo(this.model, 'node:sync', this.nodeSync)
+        .listenTo(this.model, 'node:sync', this.app.refreshCompatibility)
         .listenTo(this.collection, 'add', this.addChild)
         .listenTo(this.collection, 'reset', this.renderChildren);
 
@@ -343,8 +343,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       this
         .listenTo(node_view, 'startDrag', this.startDrag)
-        .listenTo(node_view, 'stopDrag', this.stopDrag)
-        .listenTo(node_view, 'node:sync', this.nodeSync);
+        .listenTo(node_view, 'stopDrag', this.stopDrag);
 
       this.app.node_view_list.push(node_view);
       this.list.push(node_view);
@@ -396,12 +395,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
      */
     nodeSync: function(node) {
       debug.call(this, 'nodeSync', node);
-
-      if ( this.hasShelf() && node !== this.model ) {
-        this.app.refreshCompatibility();
-      } else {
-        this.trigger('node:sync', node);
-      }
+      this.app.refreshCompatibility();
     },
 
     stopDrag: function(callback) {
@@ -593,9 +587,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         app: this.app
       });
 
-      this
-        .listenTo(shelf, 'startDrag', this.startDrag)
-        .listenTo(shelf.collection, 'remove', this.app.refreshCompatibility);
+      this.listenTo(shelf, 'startDrag', this.startDrag);
 
       this.$children.before(shelf.render().el);
     },
