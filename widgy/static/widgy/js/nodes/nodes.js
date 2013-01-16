@@ -410,7 +410,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     canAcceptChild: function(view) {
-      return view.canAcceptParent(this);
+      return ! this.dontShowChildren() && view.canAcceptParent(this);
     },
 
     canAcceptParent: function(parent) {
