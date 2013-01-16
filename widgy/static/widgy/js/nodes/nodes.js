@@ -77,7 +77,13 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
     loadContent: function(content) {
       debug.call(this, 'loadContent', content);
+
       if ( content ) {
+        // we store these variables because we need them now.
+        this.pop_out = content.pop_out;
+        this.shelf = content.shelf;
+        this.__class__ = content.__class__;
+
         // This is asynchronous because of requirejs.
         contents.getModel(content.component, _.bind(this.instantiateContent, this, content));
       }
@@ -303,14 +309,23 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.list.closeAll();
     },
 
+    dontShowChildren: function() {
+      return this.model.pop_out === 2 && ! this.options.rootNode;
+    },
+
     renderChildren: function() {
       debug.call(this, 'renderChildren');
+      if ( this.dontShowChildren() )
+        return;
 
       this.list.closeAll();
       this.collection.each(this.addChild);
     },
 
     addChild: function(node) {
+      if ( this.dontShowChildren() )
+        return;
+
       var node_view = new NodeView({
         model: node,
         parent: this,
@@ -386,7 +401,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     getShelf: function() {
-      if ( this.model.content.get('pop_out') == 2 && ! this.options.rootNode )
+      if ( this.model.pop_out == 2 && ! this.options.rootNode )
         return null;
       else if ( this.hasShelf() )
         return this.shelf;
