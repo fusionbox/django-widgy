@@ -21,24 +21,16 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
       Backbone.View.prototype.initialize.apply(this, arguments);
       _.bindAll(this,
         'addOne',
-        'addAll',
         'refresh',
         'addOptions',
         'filterDuplicates'
       );
 
-      this.collection
-        .on('reset', this.addAll)
-        .on('add', this.addOne);
+      this.collection.on('add', this.addOne);
 
       this.app = options.app;
 
       this.list = new Backbone.ViewList();
-    },
-
-    addAll: function() {
-      this.list.closeAll();
-      this.collection.each(this.addOne);
     },
 
     addOne: function(model) {
@@ -66,26 +58,44 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
     },
 
     addOptions: function(content_classes) {
+      this.content_classes = this.content_classes || {};
       _.each(content_classes, function(content_class) {
-        if ( this.collection.where({'__class__': content_class['__class__']}).length == 0 )
-          this.collection.add(content_class);
+        this.content_classes[content_class.__class__] = content_class;
       }, this);
     },
 
+    /**
+     * Using the list that addOptions built up, determine whether or not a
+     * NodePreview should live on this shelf. Then, update the collection
+     * non-destructively.
+     */
     filterDuplicates: function(parent_view) {
       var seen_classes = [];
       parent_view = parent_view.parent
+
+      // filter out items that are on one of our parent shelves
       while ( parent_view )
       {
         if (parent_view.hasShelf())
         {
           _.each(parent_view.getShelf().collection.toJSON(), function(data) {
-            this.collection.remove(this.collection.where({'__class__': data['__class__']}));
+            delete this.content_classes[data.__class__];
           }, this);
         }
         parent_view = parent_view.parent;
       }
 
+      // we need the same instance of the Node, so that update won't destroy our
+      // view, which might be being dragged. This allows people to add things
+      // while the shelf is being refreshed.
+      this.collection.update(_.map(this.content_classes, function(value, key) {
+        var existing = this.collection.where({__class__: key});
+        if ( existing.length )
+          return existing[0];
+        else
+          return new nodes.Node(value);
+      }, this));
+      this.content_classes = null;
     }
   });
 

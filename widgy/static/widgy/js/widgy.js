@@ -66,11 +66,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
       this.node_view_list.each(function(view) {
         var shelf = view.getShelf()
         if ( shelf )
-          shelf.collection.reset();
-      });
-      this.node_view_list.each(function(view) {
-        var shelf = view.getShelf()
-        if ( shelf )
           shelf.addOptions(data[view.model.id]);
       });
       this.node_view_list.each(function(view) {
