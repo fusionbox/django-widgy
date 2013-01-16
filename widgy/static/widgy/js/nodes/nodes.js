@@ -386,7 +386,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     getShelf: function() {
-      if ( this.hasShelf() )
+      if ( this.model.content.get('pop_out') == 2 && ! this.options.rootNode )
+        return null;
+      else if ( this.hasShelf() )
         return this.shelf;
       else
         return this.parent.getShelf();
