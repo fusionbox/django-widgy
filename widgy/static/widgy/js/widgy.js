@@ -17,6 +17,15 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
     template: app_template,
 
     initialize: function(options) {
+      Backbone.View.prototype.initialize.apply(this, arguments);
+
+      _.bindAll(this,
+        'refreshCompatibility',
+        'setCompatibility',
+        'validateRelationship',
+        'ready'
+      );
+
       // instantiate node_view_list before creating the root node
       // please!
       this.node_view_list = new Backbone.ViewList();
@@ -32,6 +41,8 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
 
       root_node_view
         .on('created', this.node_view_list.push);
+
+      this.refreshCompatibility();
     },
 
     render: function() {
@@ -41,6 +52,28 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
       this.$editor.append(this.root_node_view.render().el);
 
       return this;
+    },
+
+    refreshCompatibility: function() {
+      $.ajax({
+        url: this.root_node_view.model.get('available_children_url'),
+        success: this.setCompatibility,
+      });
+    },
+
+    setCompatibility: function(data) {
+      this.compatibility_data = data;
+      this.node_view_list.each(function(view) {
+        view.getShelf().addOptions(data[view.model.id]);
+      });
+    },
+
+    validateRelationship: function(parent, child) {
+      return _.where(this.compatibility_data[parent.model.id], {'__class__': child.get('__class__')}).length != 0;
+    },
+
+    ready: function() {
+      return !!this.compatibility_data;
     }
   });
 

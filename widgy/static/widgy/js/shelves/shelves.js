@@ -6,24 +6,11 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
 
   var ShelfCollection = Backbone.Collection.extend({
     initialize: function(options) {
-      _.bindAll(this,
-        'refresh'
-      );
-
       this.model = nodes.Node;
 
       this.node = options.node;
-      this.on('remove', this.refresh);
-    },
-
-    url: function() {
-      return this.node.get('available_children_url');
-    },
-
-    refresh: function() {
-      // IE tries to cache this
-      this.fetch({cache: false});
     }
+
   });
 
   var ShelfView = Backbone.View.extend({
@@ -35,7 +22,8 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
       _.bindAll(this,
         'addOne',
         'addAll',
-        'refresh'
+        'refresh',
+        'addOptions'
       );
 
       this.collection
@@ -72,13 +60,19 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
     },
 
     refresh: function() {
-      this.collection.refresh();
+      this.app.refreshCompatibility();
     },
 
     validParentOf: function(parent_id, child_class) {
       var data = this.collection.where({'__class__': child_class});
-      console.log(data);
       return data.length && _.contains(data[0].get('possible_parent_nodes'), parent_id);
+    },
+
+    addOptions: function(content_classes) {
+      _.each(content_classes, function(content_class) {
+        if ( this.collection.where({'__class__': content_class['__class__']}).length == 0 )
+          this.collection.add(content_class);
+      }, this);
     }
   });
 

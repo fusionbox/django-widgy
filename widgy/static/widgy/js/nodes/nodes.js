@@ -137,7 +137,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         'checkDidReposition',
         'reposition',
         'addDropTargets',
-        'clearDropTargets'
+        'clearDropTargets',
+        'canAcceptParent'
       );
 
       this
@@ -187,6 +188,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       // only on a left click.
       if ( event.which !== 1 )
+        return;
+
+      if ( ! this.app.ready() )
         return;
 
       // Store the mouse offset in this container for followMouse to use.  We
@@ -272,7 +276,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
    *
    * -  `this.model` is the node.
    * -  `this.collection` is the node's children (Also available in
-   *    `this.model.children`.
+   *    `this.model.children`.)
    * -  `this.app` is the instance of AppView
    */
   var NodeView = NodeViewBase.extend({
@@ -394,7 +398,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       debug.call(this, 'nodeSync', node);
 
       if ( this.hasShelf() && node !== this.model ) {
-        this.shelf.refresh();
+        this.app.refreshCompatibility();
       } else {
         this.trigger('node:sync', node);
       }
@@ -419,22 +423,19 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     canAcceptChild: function(view) {
-      if ( view instanceof NodePreviewView ) {
-        return _.contains(view.model.get('possible_parent_nodes'), this.model.id)
-      } else {
-        // it is me.
-        if ( this === view )
-          return false;
+      return view.canAcceptParent(this);
+    },
 
-        // it is already my child.
-        if ( this.list.contains(view) )
-          return true;
+    canAcceptParent: function(parent) {
+      // it is me.
+      if ( this === parent )
+        return false;
 
-        return this.getShelf().validParentOf(
-            this.model.id,
-            view.model.content.get('__class__')
-            );
-      }
+      // it is already my child.
+      if ( parent.list.contains(this) )
+        return true;
+
+      return this.app.validateRelationship(parent, this.model.content);
     },
 
     /**
@@ -592,8 +593,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         app: this.app
       });
 
-      this.listenTo(shelf, 'startDrag', this.startDrag);
-      shelf.collection.refresh();
+      this
+        .listenTo(shelf, 'startDrag', this.startDrag)
+        .listenTo(shelf.collection, 'remove', this.app.refreshCompatibility);
 
       this.$children.before(shelf.render().el);
     },
@@ -639,7 +641,11 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
 
   var NodePreviewView = NodeViewBase.extend({
-    template: node_preview_view_template
+    template: node_preview_view_template,
+
+    canAcceptParent: function(parent) {
+      return this.app.validateRelationship(parent, this.model);
+    }
   });
 
 
