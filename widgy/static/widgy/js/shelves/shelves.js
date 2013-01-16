@@ -63,11 +63,6 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
       this.app.refreshCompatibility();
     },
 
-    validParentOf: function(parent_id, child_class) {
-      var data = this.collection.where({'__class__': child_class});
-      return data.length && _.contains(data[0].get('possible_parent_nodes'), parent_id);
-    },
-
     addOptions: function(content_classes) {
       _.each(content_classes, function(content_class) {
         if ( this.collection.where({'__class__': content_class['__class__']}).length == 0 )
