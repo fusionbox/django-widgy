@@ -15,8 +15,8 @@ class Form(Content):
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
-        for parent in list(parent.get_ancestors()) + [parent]:
-            if isinstance(parent, Form):
+        for p in list(parent.get_ancestors()) + [parent]:
+            if isinstance(p, Form):
                 return False
         return super(Form, cls).valid_child_of(parent, obj)
 
@@ -38,8 +38,8 @@ class FormElement(Widget):
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
-        for parent in list(parent.get_ancestors()) + [parent]:
-            if isinstance(parent, Form):
+        for p in list(parent.get_ancestors()) + [parent]:
+            if isinstance(p, Form):
                 return super(FormElement, cls).valid_child_of(parent, obj)
         return False
 
