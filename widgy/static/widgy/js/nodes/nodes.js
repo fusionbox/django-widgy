@@ -150,30 +150,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.parent = options.parent;
     },
 
-    checkDidReposition: function(model, resp, options) {
-      debug('checkDidReposition');
-
-      var new_parent_id = model.get('parent_id'),
-          old_parent_id = null,
-          new_right_id = model.get('right_id'),
-          old_right_id = null,
-          right_view = this.app.node_view_list.findByEl(this.$el.next()[0]),
-          parent_view = this.app.node_view_list.findByEl(this.$el.parents('.node')[0]);
-
-
-      if ( parent_view ) {
-        old_parent_id = parent_view.model.id;
-      }
-
-      if ( right_view ) {
-        old_right_id = right_view.model.id;
-      }
-
-      if ( old_right_id !== new_right_id || old_parent_id !== new_parent_id ) {
-        this.triggerReposition(model);
-      }
-    },
-
     triggerReposition: function(model) {
       model.trigger('reposition', model, model.get('parent_id'), model.get('right_id'));
     },
@@ -432,6 +408,28 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       return this.app.validateRelationship(parent, this.model.content);
     },
 
+    checkDidReposition: function(model, resp, options) {
+      var new_parent_id = model.get('parent_id'),
+          old_parent_id = null,
+          new_right_id = model.get('right_id'),
+          old_right_id = null,
+          right_view = this.app.node_view_list.findByEl(this.$el.next()[0]),
+          parent_view = this.app.node_view_list.findByEl(this.$el.parents('.node')[0]);
+
+
+      if ( parent_view ) {
+        old_parent_id = parent_view.model.id;
+      }
+
+      if ( right_view ) {
+        old_right_id = right_view.model.id;
+      }
+
+      if ( old_right_id !== new_right_id || old_parent_id !== new_parent_id ) {
+        this.triggerReposition(model);
+      }
+    },
+
     /**
      * `addDropTargets`, `createDropTarget`, `clearDropTargets`, `position`,
      * and `dropChildView` all deal with a possible child NodeView being
@@ -639,6 +637,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     // just the drag handle.
     events: {
       'mousedown': 'startBeingDragged'
+    },
+
+    checkDidReposition: function(model, resp, options) {
+      this.triggerReposition(model);
     },
 
     canAcceptParent: function(parent) {
