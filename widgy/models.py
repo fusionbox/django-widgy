@@ -239,11 +239,10 @@ class Node(MP_Node):
                  ...
             }
         """
-
-        res = {}
-        for node in self.depth_first_order():
-            res[node] = node.filter_child_classes(site, classes)
-        return res
+        allowed_classes = {self: self.filter_child_classes(site, classes)}
+        for child in self.get_children():
+            allowed_classes.update(child.filter_child_classes_recursive(site, classes))
+        return allowed_classes
 
     def possible_parents(self, site, root_node):
         """
