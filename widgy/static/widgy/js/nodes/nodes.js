@@ -553,7 +553,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     hasShelf: function() {
-      return this.model.content.get('shelf') || this.options.rootNode;
+      return this.model.shelf || this.options.rootNode;
     },
 
     render: function() {
@@ -584,7 +584,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       content_view.render();
 
-      if ( content.get('pop_out') == 2 && ! this.options.rootNode )
+      if ( this.model.pop_out == 2 && ! this.options.rootNode )
         return;
 
       if ( this.hasShelf() ) {
