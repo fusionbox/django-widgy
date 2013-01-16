@@ -1,9 +1,10 @@
 from django.db import models
 from django import forms
-from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import SortedDict
+from django.core.urlresolvers import reverse
 
 from widgy.models import Content
+from widgy.utils import update_context
 from widgy.contrib.page_builder.models import Widget
 from widgy import registry
 
@@ -12,6 +13,13 @@ class Form(Content):
     accepting_children = True
     shelf = True
     component_name = 'bucket'
+
+    @property
+    def action_url(self):
+        return reverse('widgy.contrib.widgy_mezzanine.views.handle_form',
+                       kwargs={
+                           'node_pk': self.node.pk,
+                       })
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
@@ -26,26 +34,26 @@ class Form(Content):
 
         return type('WidgyForm', (forms.BaseForm,), {'base_fields': fields})
 
+    @property
+    def context_var(self):
+        return 'form_instance_{node_pk}'.format(node_pk=self.node.pk)
+
+    def render(self, context):
+        if self.context_var in context:
+            form = context[self.context_var]
+        else:
+            form = self.get_form()()
+
+        with update_context(context, {'form': form}):
+            return super(Form, self).render(context)
+
 
 registry.register(Form)
 
 
-class FormElement(Widget):
-    editable = True
-
-    class Meta:
-        abstract = True
-
-    @classmethod
-    def valid_child_of(cls, parent, obj=None):
-        for p in list(parent.get_ancestors()) + [parent]:
-            if isinstance(p, Form):
-                return super(FormElement, cls).valid_child_of(parent, obj)
-        return False
-
-
 class FormField(FormElement):
     formfield_class = None
+    widget = None
 
     label = models.CharField(max_length=255)
 
@@ -58,7 +66,19 @@ class FormField(FormElement):
         return str(self.id)
 
     def get_formfield(self):
-        return self.formfield_class(label=self.label, help_text=self.help_text)
+        kwargs = {
+            'label': self.label,
+            'help_text': self.help_text,
+            'widget': self.widget,
+        }
+
+        return self.formfield_class(**kwargs)
+
+    def render(self, context):
+        form = context['form']
+        field = form[self.get_formfield_name()]
+        with update_context(context, {'field': field}):
+            return super(FormField, self).render(context)
 
 
 FORM_INPUT_TYPES = (
@@ -89,7 +109,8 @@ registry.register(FormInput)
 
 
 class Textarea(FormField):
-    pass
+    formfield_class = forms.CharField
+    widget = forms.Textarea
 
 registry.register(Textarea)
 

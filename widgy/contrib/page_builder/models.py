@@ -4,7 +4,6 @@ from django.conf import settings
 from widgy.models import Content
 from widgy.db.fields import WidgyField
 from widgy.contrib.page_builder.db.fields import MarkdownField
-from widgy.utils import path_generator
 from widgy import registry
 
 
@@ -12,18 +11,6 @@ class PageBuilderContent(Content):
     """
     Base class for all page builder content models.
     """
-    def get_render_templates(self, context):
-        templates = list(super(PageBuilderContent, self).get_render_templates(context))
-        template_path = path_generator(u'widgy/')
-        for cls in filter(lambda c: issubclass(c, Content), self.__class__.__mro__):
-            templates.extend([
-                template_path(
-                    cls._meta.module_name
-                ),
-            ])
-
-        return templates
-
     class Meta:
         abstract = True
 
@@ -75,13 +62,6 @@ class Widget(PageBuilderContent):
 
     class Meta:
         abstract = True
-
-    @property
-    def preview_templates(self):
-        return (
-            'widgy/%s/widget.html' % self.class_name,
-            'widgy/widget.html',
-        )
 
 
 class MainContent(Bucket):

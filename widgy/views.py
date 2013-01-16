@@ -188,7 +188,7 @@ class NodeEditView(WidgyViewMixin, NodeSingleObjectMixin, DetailView):
     The only TemplateView in widgy: The interface for popped out node editing.
     """
 
-    template_name = 'widgy/edit_node.html'
+    template_name = 'widgy/views/edit_node.html'
 
     def dispatch(self, *args, **kwargs):
         self.auth(*args, **kwargs)

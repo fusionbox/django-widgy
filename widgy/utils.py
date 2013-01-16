@@ -1,6 +1,7 @@
 """
 Some utility functions used throughout the project.
 """
+from contextlib import contextmanager
 
 
 def path_generator(prefix, ext='.html'):
@@ -57,3 +58,10 @@ def fancy_import(name):
     import_path, import_me = name.rsplit('.', 1)
     imported = __import__(import_path, globals(), locals(), [import_me], -1)
     return getattr(imported, import_me)
+
+
+@contextmanager
+def update_context(context, dict):
+    context.update(dict)
+    yield context
+    context.pop()
