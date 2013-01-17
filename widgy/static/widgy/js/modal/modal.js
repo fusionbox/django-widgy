@@ -34,7 +34,11 @@ define([ 'widgy.backbone',
     var error_view = new ErrorView({
       message: JSON.parse(resp.responseText).message
     });
-    $(document.body).append(error_view.render().$el);
+    $(document.body).append(error_view.render().$el.css({
+      left: document.body.offsetWidth/2,
+      top: document.body.offsetHeight/2,
+      position: 'fixed'
+    }));
   };
 
   return {
