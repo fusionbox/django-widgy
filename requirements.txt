@@ -6,7 +6,7 @@ django-cachebuster
 django-compressor
 django-debug-toolbar
 django-extensions
-Mezzanine==1.2.0
+Mezzanine
 http://github.com/fusionbox/pyScss/tarball/master#egg=pyscss-1.1.5
 django-treebeard==1.61
 psycopg2==2.4.5
