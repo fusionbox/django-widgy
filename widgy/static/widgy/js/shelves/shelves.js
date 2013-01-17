@@ -5,12 +5,13 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
       ) {
 
   var ShelfCollection = Backbone.Collection.extend({
+    comparator: 'title',
+
     initialize: function(options) {
       this.model = nodes.Node;
 
       this.node = options.node;
     }
-
   });
 
   var ShelfView = Backbone.View.extend({
@@ -21,12 +22,14 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
       Backbone.View.prototype.initialize.apply(this, arguments);
       _.bindAll(this,
         'addOne',
+        'resort',
         'refresh',
         'addOptions',
         'filterDuplicates'
       );
 
-      this.collection.on('add', this.addOne);
+      this.collection.on('add', this.addOne)
+                     .on('sort', this.resort);
 
       this.app = options.app;
 
@@ -44,6 +47,13 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
 
       this.list.push(view);
       this.$list.append(view.render().el);
+    },
+
+    resort: function(collection) {
+      _.each(collection.models, function(model) {
+        var view = this.list.findByModel(model);
+        this.$list.append(view.el);
+      }, this);
     },
 
     render: function() {
@@ -88,13 +98,15 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
       // we need the same instance of the Node, so that update won't destroy our
       // view, which might be being dragged. This allows people to add things
       // while the shelf is being refreshed.
-      this.collection.update(_.map(this.content_classes, function(value, key) {
+      var instances = _.map(this.content_classes, function(value, key) {
         var existing = this.collection.where({__class__: key});
         if ( existing.length )
           return existing[0];
         else
           return new nodes.Node(value);
-      }, this));
+      }, this);
+      this.collection.update(instances);
+      this.collection.sort();
       this.content_classes = null;
     }
   });

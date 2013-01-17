@@ -189,6 +189,12 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
       return this.find(function(view) {
         return el === view.el;
       });
+    },
+
+    findByModel: function(model) {
+      return this.find(function(view) {
+        return model === view.model;
+      });
     }
   });
 
