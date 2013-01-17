@@ -372,6 +372,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       $(document).off('.' + dragged_view.cid);
 
+      if ( dragged_view.drop_target )
+        dragged_view.drop_target.close();
+
       this.clearDropTargets();
 
       dragged_view.stopBeingDragged();
@@ -605,7 +608,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         app: this.app
       });
 
-      this.listenTo(shelf, 'startDrag', this.startDrag);
+      this.listenTo(shelf, 'startDrag', this.startDrag)
+          .listenTo(shelf, 'stopDrag', this.stopDrag);
 
       this.$children.before(shelf.render().el);
     },
@@ -665,6 +669,15 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
     canAcceptParent: function(parent) {
       return this.app.validateRelationship(parent, this.model);
+    },
+
+    startBeingDragged: function() {
+      NodeViewBase.prototype.startBeingDragged.apply(this, arguments);
+
+      var drop_target = this.drop_target = new DropTargetView();
+      drop_target.once('dropped', _.bind(this.trigger, this, 'stopDrag'));
+
+      this.$el.after(drop_target.render().el);
     }
   });
 
