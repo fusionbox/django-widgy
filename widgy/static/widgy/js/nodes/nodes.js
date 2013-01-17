@@ -674,6 +674,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     startBeingDragged: function() {
       NodeViewBase.prototype.startBeingDragged.apply(this, arguments);
 
+      // only on a left click.
+      if ( event.which !== 1 )
+        return;
+
       var drop_target = this.drop_target = new DropTargetView();
       drop_target.once('dropped', _.bind(this.trigger, this, 'stopDrag'));
 
