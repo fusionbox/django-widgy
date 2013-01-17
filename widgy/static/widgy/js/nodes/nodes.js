@@ -671,7 +671,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       return this.app.validateRelationship(parent, this.model);
     },
 
-    startBeingDragged: function() {
+    startBeingDragged: function(event) {
       NodeViewBase.prototype.startBeingDragged.apply(this, arguments);
 
       // only on a left click.
