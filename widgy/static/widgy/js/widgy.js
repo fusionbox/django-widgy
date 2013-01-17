@@ -1,7 +1,7 @@
 define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
-    'text!app.html'
+    'text!app.html', 'shelves/shelves'
     ], function($, _, Backbone, nodes,
-      app_template
+      app_template, shelves
       ) {
 
   /**
