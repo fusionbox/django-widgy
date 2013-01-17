@@ -285,6 +285,7 @@ class Content(models.Model):
     deletable = True            #: Set this content instance to be deleteable
     accepting_children = False  #: Sets this content instance to be able to have children.
     shelf = False
+    component_name = 'widget'
     # 0: can not pop out
     # 1: can pop out
     # 2: must pop out
@@ -346,14 +347,6 @@ class Content(models.Model):
         :Returns: a fully qualified classname including app_label and module_name
         """
         return "%s.%s" % (self._meta.app_label, self._meta.module_name)
-
-    @property
-    def component_name(self):
-        """
-        :Returns: a string that will be used clientside to retrieve this
-        content's component.js resource.
-        """
-        return self.class_name
 
     @property
     def node(self):

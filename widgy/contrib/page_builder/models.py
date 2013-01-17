@@ -25,9 +25,6 @@ class Layout(StrictDefaultChildrenMixin, PageBuilderContent):
 
     draggable = False
     deletable = False
-    editable = True
-
-    component_name = 'layout'
 
     @classmethod
     def valid_child_of(cls, content, obj=None):
@@ -38,15 +35,6 @@ class Bucket(PageBuilderContent):
     draggable = False
     deletable = False
     accepting_children = True
-
-    component_name = 'bucket'
-
-    class Meta:
-        abstract = True
-
-
-class Widget(PageBuilderContent):
-    component_name = 'widget'
 
     class Meta:
         abstract = True
@@ -97,10 +85,11 @@ class DefaultLayout(Layout):
 registry.register(DefaultLayout)
 
 
-class Markdown(Widget):
+class Markdown(Content):
     content = MarkdownField(blank=True)
     rendered = models.TextField(editable=False)
 
+    editable = True
     component_name = 'markdown'
 
 registry.register(Markdown)
@@ -130,8 +119,10 @@ class Callout(models.Model):
         return self.name
 
 
-class CalloutWidget(Widget):
+class CalloutWidget(Content):
     callout = models.ForeignKey(Callout, null=True, blank=True)
+
+    editable = True
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
@@ -150,10 +141,11 @@ class Accordion(Bucket):
 registry.register(Accordion)
 
 
-class Section(Widget):
-    accepting_children = True
-
+class Section(Content):
     title = models.CharField(max_length=1023)
+
+    editable = True
+    accepting_children = True
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):

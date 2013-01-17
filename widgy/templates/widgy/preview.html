@@ -17,4 +17,7 @@
   {% endblock %}
 </div>
 {% block after-preview %}
+{% if self.editable %}
+<button class="edit"><span class="icon-edit"></span> Edit</button>
+{% endif %}
 {% endblock %}

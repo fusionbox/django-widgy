@@ -1,8 +1,7 @@
 {% load widgy_tags %}
 
-<form action="{{ content.action_url }}" method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+<form action="{{ content.action_url }}?page_pk={{ page.pk }}" method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
   {% csrf_token %}
-  <input type="hidden" name="page_pk" value="{{ page.pk }}">
   {% for child in content.children %}
     {% render child %}
   {% endfor %}

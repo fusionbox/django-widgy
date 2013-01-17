@@ -1,17 +1,20 @@
+import markdown
+
 from django.db import models
 from django import forms
 from django.utils.datastructures import SortedDict
 from django.core.urlresolvers import reverse
+from django.core.mail import send_mail
+from django.conf import settings
 
 from widgy.models import Content
 from widgy.models.mixins import DefaultChildrenMixin
 from widgy.utils import update_context
-from widgy.contrib.page_builder.models import Widget
 from widgy.contrib.page_builder.db.fields import MarkdownField
 from widgy import registry
 
 
-class FormElement(Widget):
+class FormElement(Content):
     editable = True
 
     class Meta:
@@ -34,6 +37,8 @@ class FormElement(Widget):
 
 
 class FormSuccessHandler(Content):
+    editable = True
+
     class Meta:
         abstract = True
 
@@ -52,6 +57,9 @@ class EmailSuccessHandler(FormSuccessHandler):
     content = MarkdownField(blank=True)
 
     component_name = 'markdown'
+
+    def execute(self, request, form):
+        send_mail('Subject', self.content, settings.SERVER_EMAIL, [self.to])
 
 
 registry.register(EmailSuccessHandler)
@@ -122,6 +130,16 @@ class Form(DefaultChildrenMixin, Content):
 
         with update_context(context, {'form': form}):
             return super(Form, self).render(context)
+
+    def execute(self, request, form):
+        # TODO: only call the handlers for the submit button that was pressed.
+        resp = None
+        for child in self.depth_first_order():
+            if isinstance(child, FormReponseHandler):
+                resp = child.execute(request, form)
+            elif isinstance(child, FormSuccessHandler):
+                child.execute(request, form)
+        return resp
 
 
 registry.register(Form)
