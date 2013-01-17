@@ -3,6 +3,7 @@ sqlite_database
 src/
 static/*
 media/*
+demo/media/*
 !.gitkeep
 .sass-cache/
 tmp/
