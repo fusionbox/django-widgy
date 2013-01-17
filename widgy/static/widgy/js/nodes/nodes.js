@@ -372,8 +372,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       $(document).off('.' + dragged_view.cid);
 
-      if ( dragged_view.drop_target )
-        dragged_view.drop_target.close();
+      if ( dragged_view.placeholder )
+        dragged_view.placeholder.remove();
 
       this.clearDropTargets();
 
@@ -678,10 +678,15 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       if ( event.which !== 1 )
         return;
 
-      var drop_target = this.drop_target = new DropTargetView();
-      drop_target.once('dropped', _.bind(this.trigger, this, 'stopDrag'));
+      var placeholder = this.placeholder = $('<li class="placeholder">')
+        .css({
+          width: this.$el.width(),
+          height: this.$el.height(),
+          margin: this.$el.css('margin'),
+          padding: this.$el.css('padding')
+        });
 
-      this.$el.after(drop_target.render().el);
+      this.$el.after(placeholder);
     }
   });
 

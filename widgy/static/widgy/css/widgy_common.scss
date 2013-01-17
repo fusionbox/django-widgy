@@ -129,6 +129,13 @@ $green:       #559911;
       position: absolute;
       top: 0;
       right: -210px;
+
+      li {
+
+        &.placholder {
+          background-color: wheat;
+        }
+      }
     }
   }
 
