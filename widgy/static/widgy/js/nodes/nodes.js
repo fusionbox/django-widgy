@@ -575,6 +575,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       this.renderChildren();
 
+      if ( this.hasShelf() ) {
+        this.renderShelf();
+      }
+
       return this;
     },
 
@@ -592,10 +596,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       if ( this.model.pop_out == 2 && ! this.options.rootNode )
         return;
-
-      if ( this.hasShelf() ) {
-        this.renderShelf();
-      }
     },
 
     renderShelf: function() {
