@@ -342,7 +342,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     'delete': function(event) {
-      this.model.destroy();
+      this.model.destroy({
+        wait: true,
+        error: modal.raiseError
+      });
       return false;
     },
 

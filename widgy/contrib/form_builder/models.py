@@ -4,15 +4,88 @@ from django.utils.datastructures import SortedDict
 from django.core.urlresolvers import reverse
 
 from widgy.models import Content
+from widgy.models.mixins import DefaultChildrenMixin
 from widgy.utils import update_context
 from widgy.contrib.page_builder.models import Widget
+from widgy.contrib.page_builder.db.fields import MarkdownField
 from widgy import registry
 
 
-class Form(Content):
+class FormElement(Widget):
+    editable = True
+
+    class Meta:
+        abstract = True
+
+    @property
+    def parent_form(self):
+        for i in self.get_ancestors():
+            if isinstance(i, Form):
+                return i
+
+        assert False, "This FormElement, doesn't belong to a Form?!?!?"
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        for p in list(parent.get_ancestors()) + [parent]:
+            if isinstance(p, Form):
+                return super(FormElement, cls).valid_child_of(parent, obj)
+        return False
+
+
+class FormSuccessHandler(Content):
+    class Meta:
+        abstract = True
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        return isinstance(parent, SubmitButton)
+
+
+class FormReponseHandler(FormSuccessHandler):
+    class Meta:
+        abstract = True
+
+
+class EmailSuccessHandler(FormSuccessHandler):
+    to = models.EmailField()
+    content = MarkdownField(blank=True)
+
+    component_name = 'markdown'
+
+
+registry.register(EmailSuccessHandler)
+
+
+class SubmitButton(FormElement):
+    text = models.CharField(max_length=255, default='submit')
+
+    @property
+    def deletable(self):
+        return len([i for i in self.parent_form.depth_first_order() if isinstance(i, SubmitButton)]) > 1
+
+    def valid_parent_of(self, cls, obj=None):
+        if obj in self.children:
+            return True
+
+        # only accept one FormReponseHandler
+        if issubclass(cls, FormReponseHandler) and any([isinstance(child, FormReponseHandler)
+                                                        for child in self.children]):
+            return False
+
+        return issubclass(cls, FormSuccessHandler)
+
+registry.register(SubmitButton)
+
+
+class Form(DefaultChildrenMixin, Content):
     accepting_children = True
     shelf = True
     component_name = 'bucket'
+
+    default_children = [
+        (SubmitButton, (), {}),
+    ]
 
     @property
     def action_url(self):
@@ -20,6 +93,9 @@ class Form(Content):
                        kwargs={
                            'node_pk': self.node.pk,
                        })
+
+    def valid_parent_of(self, cls, obj=None):
+        return True
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
@@ -112,10 +188,5 @@ class Textarea(FormField):
     formfield_class = forms.CharField
     widget = forms.Textarea
 
+
 registry.register(Textarea)
-
-
-class SubmitButton(FormElement):
-    text = models.CharField(max_length=255, default='submit')
-
-registry.register(SubmitButton)

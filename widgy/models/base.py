@@ -22,7 +22,7 @@ from widgy.exceptions import (
     RootDisplacementError
 )
 from widgy.generic import ProxyGenericForeignKey, ProxyGenericRelation
-from widgy.utils import exception_to_bool
+from widgy.utils import exception_to_bool, update_context
 
 
 class Node(MP_Node):
@@ -44,6 +44,9 @@ class Node(MP_Node):
     content_type = models.ForeignKey(ContentType)
     content_id = models.PositiveIntegerField()
     content = ProxyGenericForeignKey('content_type', 'content_id')
+
+    class Meta:
+        app_label = 'widgy'
 
     def __unicode__(self):
         return str(self.content)
@@ -122,7 +125,14 @@ class Node(MP_Node):
         """
         All of the nodes in my tree (including myself) in depth-first order.
         """
-        return [self] + list(self.get_descendants().order_by('path'))
+        if hasattr(self, '_children'):
+            ret = [self]
+            for child in self.get_children():
+                for i in child.depth_first_order():
+                    ret.append(i)
+            return ret
+        else:
+            return [self] + list(self.get_descendants().order_by('path'))
 
     def prefetch_tree(self):
         """
@@ -369,6 +379,9 @@ class Content(models.Model):
     def get_ancestors(self):
         return [ancestor.content for ancestor in self.node.get_ancestors()]
 
+    def depth_first_order(self):
+        return [node.content for node in self.node.depth_first_order()]
+
     def meta(self):
         return self._meta
 
@@ -457,44 +470,53 @@ class Content(models.Model):
         """
         pass
 
+    def get_templates_hierarchy(self, **kwargs):
+        templates = (
+            'widgy/{app_label}/{module_name}/{template_name}.html',
+            'widgy/{app_label}/{template_name}.html',
+            'widgy/{template_name}.html',
+        )
+
+        ret = []
+        for template in templates:
+            for cls in self.__class__.__mro__:
+                try:
+                    ret.append(template.format(**cls.get_template_kwargs(**kwargs)))
+                except AttributeError:
+                    pass
+
+        return ret
+
+    @classmethod
+    def get_template_kwargs(cls, **kwargs):
+        defaults = {
+            'app_label': cls._meta.app_label,
+            'module_name': cls._meta.module_name,
+        }
+        defaults.update(**kwargs)
+
+        return defaults
+
     @property
     def preview_templates(self):
         """
         List of templates to search for the content template that is displayed
         in the editor to show a preview.
-
-        -   ``widgy/{class_name}/preview.html``
-        -   ``widgy/preview.html``
         """
-        return (
-            'widgy/%s/preview.html' % self.class_name,
-            'widgy/preview.html',
-        )
+        return self.get_templates_hierarchy(template_name='preview')
 
     @property
     def edit_templates(self):
         """
         List of templates to search for the edit form.
-
-        -    ``widgy/{class_name}/edit_form.html``
-        -    ``widgy/edit_form.html``
         """
-        return (
-            'widgy/%s/edit_form.html' % self.class_name,
-            'widgy/edit_form.html',
-        )
+        return self.get_templates_hierarchy(template_name='edit')
 
     def get_render_templates(self, context):
         """
         List of templates to search for the rendered template on the frontend.
-
-        -    widgy/{module_name}.html
-        -    widgy/{class_name}/{module_name}.html'
         """
-        return (
-            'widgy/%s.html' % self._meta.module_name,
-            'widgy/%s/%s.html' % (self.class_name, self._meta.module_name),
-        )
+        return self.get_templates_hierarchy(template_name='render')
 
     def get_form_template(self, request, template=None, context=None):
         """
@@ -502,30 +524,30 @@ class Content(models.Model):
         """
         if not context:
             context = RequestContext(request)
-        context.update({'form': self.get_form_class(request)(instance=self)})
-        return render_to_string(template or self.edit_templates, context)
+        with update_context(context, {'form': self.get_form_class(request)(instance=self)}):
+            return render_to_string(template or self.edit_templates, context)
 
-    def get_preview_template(self, template=None, context={}):
+    def get_preview_template(self, template=None, context=None):
         """
         :Returns: Rendered preview template with the given context, if any.
         """
+        if context is None:
+            context = {}
         context.update({'self': self})
         return render_to_string(template or self.preview_templates, context)
 
-    def render(self, context={}, template=None):
+    def render(self, context, template=None):
         """
         Renders the node in the given context.
 
         A ``template`` kwarg can be passed to use an explictly defined template
         instead of the default template list.
         """
-        context.update({'content': self})
-        rendered = render_to_string(
-            template or self.get_render_templates(context),
-            context
-        )
-        context.pop()
-        return rendered
+        with update_context(context, {'content': self}):
+            return render_to_string(
+                template or self.get_render_templates(context),
+                context
+            )
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         """

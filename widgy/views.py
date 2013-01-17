@@ -12,7 +12,8 @@ from django.db.models import get_model
 
 from fusionbox.views.rest import RestView
 
-from widgy.models import Node, InvalidTreeMovement
+from widgy.models import Node
+from widgy.exceptions import InvalidTreeMovement
 from widgy.utils import extract_id
 
 

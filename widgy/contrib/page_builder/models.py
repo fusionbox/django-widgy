@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 
 from widgy.models import Content
+from widgy.models.mixins import StrictDefaultChildrenMixin
 from widgy.db.fields import WidgyField
 from widgy.contrib.page_builder.db.fields import MarkdownField
 from widgy import registry
@@ -15,7 +16,7 @@ class PageBuilderContent(Content):
         abstract = True
 
 
-class Layout(PageBuilderContent):
+class Layout(StrictDefaultChildrenMixin, PageBuilderContent):
     """
     Base class for all layouts.
     """
@@ -27,19 +28,6 @@ class Layout(PageBuilderContent):
     editable = True
 
     component_name = 'layout'
-
-    default_children = tuple()
-
-    def post_create(self, site):
-        for cls, args, kwargs in self.default_children:
-            self.add_child(site, cls, *args, **kwargs)
-
-    def valid_parent_of(self, cls, obj=None):
-        if obj:
-            return obj in self.children or self.valid_parent_of(cls)
-
-        return (any(issubclass(cls, bucket_meta[0]) for bucket_meta in self.default_children) and
-                len(self.children) < len(self.default_children))
 
     @classmethod
     def valid_child_of(cls, content, obj=None):
