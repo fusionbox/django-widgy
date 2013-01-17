@@ -89,7 +89,6 @@ registry.register(SubmitButton)
 class Form(DefaultChildrenMixin, Content):
     accepting_children = True
     shelf = True
-    component_name = 'bucket'
 
     default_children = [
         (SubmitButton, (), {}),
