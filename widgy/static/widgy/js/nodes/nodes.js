@@ -41,6 +41,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         );
     },
 
+    parse: function(response) {
+      return response.node;
+    },
+
     set: function(key, val, options) {
       var attr, attrs;
 

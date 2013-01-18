@@ -370,7 +370,7 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         })
 
         self.assertEqual(new_child.status_code, 201)
-        new_child = json.loads(new_child.content)
+        new_child = json.loads(new_child.content)['node']
         self.assertEqual(new_child['parent_id'], bucket['url'])
         self.assertEqual(new_child['content']['__class__'], 'core_tests.rawtextwidget')
 

@@ -81,6 +81,10 @@ class NodeView(WidgyView):
             supplying a ``right_id`` in the request.
 
     """
+    def render_to_response(self, obj, *args, **kwargs):
+        obj = {'node': obj}
+        return super(NodeView, self).render_to_response(obj, *args, **kwargs)
+
     def get(self, request, node_pk):
         node = get_object_or_404(Node, pk=node_pk)
         return self.render_to_response(node.to_json(self.site))
