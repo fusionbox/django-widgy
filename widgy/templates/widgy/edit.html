@@ -1,16 +1,29 @@
 <form>
   {{ form.media }}
+  {{ form.non_field_errors }}
 
-  {% block form-inner %}
-    {{ form.as_p }}
-  {% endblock %}
+  {% for field in form %}
+    {% if field.is_hidden %}
+      {{ field }}
+    {% else %}
+    <div class="{{ field.css_classes }} {{ field.html_name }}{% if required %} required{% endif %} formField">
+      {{ field.label_tag }}
+      {{ field }}
+      {{ field.errors }}
+
+      {% if field.help_text %}
+        <p class="help_text">{{ field.help_text }}</p>
+      {% endif %}
+    </div>
+    {% endif %}
+  {% endfor %}
 
   {% block submit-row-outer %}
-    <p class="submit-row">
+    <div class="submit-row">
       {% block submit-row-inner %}
         <button class="cancel" type="button">Cancel</button>
         <input type="submit" value="Save">
       {% endblock %}
-    </p>
+    </div>
   {% endblock %}
 </form>
