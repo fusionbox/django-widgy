@@ -508,7 +508,7 @@ class TestTreeChangedSignal(RootNodeTestCase, HttpTestCase):
 
     def get_timestamps(self, content):
         node = Node.objects.get(pk=content.node.pk)
-        return [i._edit_timestamp for i in node.content.get_ancestors()]
+        return [node.content._edit_timestamp] + [i._edit_timestamp for i in node.content.get_ancestors()]
 
     def assertListsCompletelyDifferent(self, a, b):
         for before, after in zip(a, b):
@@ -562,3 +562,25 @@ class TestTreeChangedSignal(RootNodeTestCase, HttpTestCase):
 
         timestamps_after = self.get_timestamps(right.content)
         self.assertListsCompletelyDifferent(timestamps_before, timestamps_after)
+
+    def test_move_both_sides_updated(self):
+        """
+        When moving, both the source and the destination need to have their
+        timestamps updated.
+        """
+
+        left, right = make_a_nice_tree(self.root_node)
+
+        left_before = self.get_timestamps(left.content)
+        right_before = self.get_timestamps(right.content)
+
+        self.put(left.content.children[2].children[0].node.get_api_url(widgy_site), {
+            'parent_id': right.get_api_url(widgy_site),
+            'right_id': None,
+        })
+
+        left_after = self.get_timestamps(left.content)
+        right_after = self.get_timestamps(right.content)
+
+        self.assertListsCompletelyDifferent(left_before, left_after)
+        self.assertListsCompletelyDifferent(right_before, right_after)
