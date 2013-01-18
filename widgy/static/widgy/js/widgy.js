@@ -55,13 +55,18 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
     },
 
     refreshCompatibility: function() {
-      $.ajax({
+      if ( this.inflight )
+        this.inflight.abort();
+
+      this.inflight = $.ajax({
         url: this.root_node_view.model.get('available_children_url'),
         success: this.setCompatibility,
       });
     },
 
     setCompatibility: function(data) {
+      delete this.inflight;
+
       this.compatibility_data = data;
       this.node_view_list.each(function(view) {
         var shelf = view.getShelf()
