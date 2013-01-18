@@ -381,9 +381,23 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       if ( ( this.hasShelf() && ! dragged_view.model.id || ! this.model.get('parent_id') )) {
         this.dragged_view = dragged_view;
 
-        $(document).on('mouseup.' + dragged_view.cid, this.stopDragging);
-        $(document).on('mousemove.' + dragged_view.cid, dragged_view.followMouse);
-        $(document).on('selectstart.' + dragged_view.cid, function(){ return false; });
+        var bindToDocument = function() {
+          $(document).on('mouseup.' + dragged_view.cid, this.stopDragging)
+                     .on('mousemove.' + dragged_view.cid, dragged_view.followMouse)
+                     .on('selectstart.' + dragged_view.cid, function(){ return false; })
+                     // debugging helper
+                     .one('keypress.' + dragged_view.cid, function(event) {
+                       if ( event.which === 96 ) {
+                         $(document).off('.' + dragged_view.cid)
+                                    // resume
+                                    .one('keypress.' + dragged_view.cid, function(event) {
+                                      if ( event.which === 96 ) bindToDocument();
+                                    });
+                       }
+                     });
+        };
+
+        bindToDocument();
 
         this.addDropTargets(dragged_view);
       } else {
