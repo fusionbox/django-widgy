@@ -637,8 +637,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       content_view.render();
 
-      if ( this.model.pop_out == 2 && ! this.options.rootNode )
-        return;
+      if ( this.options.rootNode ) {
+        this.$content.find('.pop_out').remove();
+      }
     },
 
     renderShelf: function() {
@@ -673,6 +674,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       this.subwindow = window.open(event.target.href, '', 'height=500,width=800,resizable=yes,scrollbars=yes');
       this.subwindow.widgyCloseCallback = this.popIn;
+
+      // If they leave this page, pop back in.
+      $(window).on('unload', this.popIn);
 
       this.collection.reset();
       this.$content.html(this.renderTemplate(popped_out_template, this.toJSON()));
