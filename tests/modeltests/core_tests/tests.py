@@ -508,7 +508,8 @@ class TestTreeChangedSignal(RootNodeTestCase, HttpTestCase):
 
     def get_timestamps(self, content):
         node = Node.objects.get(pk=content.node.pk)
-        return [node.content._edit_timestamp] + [i._edit_timestamp for i in node.content.get_ancestors()]
+        return ([node.content._edit_timestamp] +
+                [i._edit_timestamp for i in node.content.get_ancestors()])
 
     def assertListsCompletelyDifferent(self, a, b):
         for before, after in zip(a, b):
@@ -574,7 +575,9 @@ class TestTreeChangedSignal(RootNodeTestCase, HttpTestCase):
         left_before = self.get_timestamps(left.content)
         right_before = self.get_timestamps(right.content)
 
-        self.put(left.content.children[2].children[0].node.get_api_url(widgy_site), {
+        thing = left.content.children[2].children[0]
+        thing_timestamp = thing._edit_timestamp
+        self.put(thing.node.get_api_url(widgy_site), {
             'parent_id': right.get_api_url(widgy_site),
             'right_id': None,
         })
@@ -582,5 +585,9 @@ class TestTreeChangedSignal(RootNodeTestCase, HttpTestCase):
         left_after = self.get_timestamps(left.content)
         right_after = self.get_timestamps(right.content)
 
-        self.assertListsCompletelyDifferent(left_before, left_after)
         self.assertListsCompletelyDifferent(right_before, right_after)
+        self.assertListsCompletelyDifferent(left_before, left_after)
+
+        # the thing we moved shouldn't have its timestamp changed
+        self.assertEqual(thing_timestamp,
+                         Node.objects.get(pk=thing.node.pk).content._edit_timestamp)

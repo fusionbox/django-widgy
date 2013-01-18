@@ -122,17 +122,21 @@ class NodeView(WidgyView):
         node = get_object_or_404(Node, pk=node_pk)
         data = self.data()
 
+        old_parent = node.get_parent()
         try:
             right = Node.objects.get(pk=extract_id(data['right_id']))
+            new_parent = right.get_parent()
             node.reposition(self.site, right=right)
         except Node.DoesNotExist:
             try:
-                parent = Node.objects.get(pk=extract_id(data['parent_id']))
-                node.reposition(self.site, parent=parent)
+                new_parent = Node.objects.get(pk=extract_id(data['parent_id']))
+                node.reposition(self.site, parent=new_parent)
             except Node.DoesNotExist:
                 raise Http404
 
-        tree_changed.send(sender=self, node=node, content=node.content)
+        tree_changed.send(sender=self, node=new_parent, content=new_parent.content)
+        if old_parent != new_parent:
+            tree_changed.send(sender=self, node=old_parent, content=old_parent.content)
 
         return self.render_to_response(None, status=200)
 

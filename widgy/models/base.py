@@ -583,6 +583,7 @@ class Content(models.Model):
 
 
 def update_timestamps(node, content, **kwargs):
+    content.save()
     for p in content.get_ancestors():
         p.save()
 
