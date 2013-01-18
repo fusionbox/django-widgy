@@ -15,6 +15,7 @@ from fusionbox.views.rest import RestView
 from widgy.models import Node
 from widgy.exceptions import InvalidTreeMovement
 from widgy.utils import extract_id
+from widgy.signals import tree_changed
 
 
 class WidgyViewMixin(object):
@@ -61,6 +62,9 @@ class ContentView(WidgyView):
         if not form.is_valid():
             raise ValidationError(form.errors)
         form.save()
+
+        tree_changed.send(sender=self, node=obj.node, content=obj)
+
         return self.render_to_response(form.instance.to_json(self.site),
                                        status=200)
 
@@ -99,6 +103,8 @@ class NodeView(WidgyView):
             parent = get_object_or_404(Node, pk=extract_id(data['parent_id']))
             content = parent.content.add_child(self.site, content_class)
 
+        tree_changed.send(sender=self, node=content.node, content=content)
+
         return self.render_to_response(content.node.to_json(self.site),
                                        status=201)
 
@@ -126,6 +132,8 @@ class NodeView(WidgyView):
             except Node.DoesNotExist:
                 raise Http404
 
+        tree_changed.send(sender=self, node=node, content=node.content)
+
         return self.render_to_response(None, status=200)
 
     def delete(self, request, node_pk):
@@ -134,6 +142,7 @@ class NodeView(WidgyView):
         if not node.content.deletable:
             raise InvalidTreeMovement({'message': "You can't delete me"})
 
+        tree_changed.send(sender=self, node=node, content=node.content)
         node.delete()
 
         return self.render_to_response(None)

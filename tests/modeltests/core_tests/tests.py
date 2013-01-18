@@ -494,3 +494,71 @@ class TestApi(RootNodeTestCase, HttpTestCase):
                                right.get_api_url(widgy_site),
                                left.content.children[2].node.get_api_url(widgy_site)],
                               possible_parents)
+
+class TestTreeChangedSignal(RootNodeTestCase, HttpTestCase):
+    """
+    This tests that the tree_changed signal gets sent by all the views. It also
+    tests recursive updating of timestamps
+    (widgy.models.base.update_timestamps)
+    """
+
+    def setUp(self):
+        super(TestTreeChangedSignal, self).setUp()
+        self.node_url = widgy_site.reverse(widgy_site.node_view)
+
+    def get_timestamps(self, content):
+        node = Node.objects.get(pk=content.node.pk)
+        return [i._edit_timestamp for i in node.content.get_ancestors()]
+
+    def assertListsCompletelyDifferent(self, a, b):
+        for before, after in zip(a, b):
+            self.assertNotEqual(before, after)
+
+    def test_timestamps_get_updated_on_change(self):
+        left, right = make_a_nice_tree(self.root_node)
+
+        bottom = left.content.children[2].children[0]
+        timestamps_before = self.get_timestamps(bottom)
+
+        data = bottom.to_json(widgy_site)
+        self.put(data['url'], data)
+
+        timestamps_after = self.get_timestamps(bottom)
+        self.assertListsCompletelyDifferent(timestamps_before, timestamps_after)
+
+    def test_timestamps_get_updated_on_create(self):
+        bucket = list(self.root_node.get_children())[0].content
+        timestamps_before = self.get_timestamps(bucket)
+
+        self.post(self.node_url, {
+            '__class__': 'core_tests.rawtextwidget',
+            'parent_id': bucket.node.get_api_url(widgy_site),
+            'right_id': None,
+        })
+
+        timestamps_after = self.get_timestamps(bucket)
+
+        self.assertListsCompletelyDifferent(timestamps_before, timestamps_after)
+
+    def test_timestamps_get_updated_on_move(self):
+        left, right = make_a_nice_tree(self.root_node)
+
+        timestamps_before = self.get_timestamps(right.content)
+
+        self.put(left.get_api_url(widgy_site), {
+            'parent_id': right.get_api_url(widgy_site),
+            'right_id': None,
+        })
+
+        timestamps_after = self.get_timestamps(right.content)
+        self.assertListsCompletelyDifferent(timestamps_before, timestamps_after)
+
+    def test_timestamps_get_updated_on_delete(self):
+        left, right = make_a_nice_tree(self.root_node)
+
+        timestamps_before = self.get_timestamps(right.content)
+
+        self.delete(list(right.get_children())[0].get_api_url(widgy_site))
+
+        timestamps_after = self.get_timestamps(right.content)
+        self.assertListsCompletelyDifferent(timestamps_before, timestamps_after)

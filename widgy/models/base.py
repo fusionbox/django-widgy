@@ -23,6 +23,7 @@ from widgy.exceptions import (
 )
 from widgy.generic import ProxyGenericForeignKey, ProxyGenericRelation
 from widgy.utils import exception_to_bool, update_context
+from widgy.signals import tree_changed
 
 
 class Node(MP_Node):
@@ -281,6 +282,8 @@ class Content(models.Model):
                                   content_type_field='content_type',
                                   object_id_field='content_id')
 
+    _edit_timestamp = models.DateTimeField(auto_now=True)
+
     draggable = True            #: Set this content to be draggable
     deletable = True            #: Set this content instance to be deleteable
     accepting_children = False  #: Sets this content instance to be able to have children.
@@ -359,7 +362,10 @@ class Content(models.Model):
         """
         if hasattr(self, '_node'):
             return self._node
-        return self._nodes.all()[0]
+        try:
+            return self._nodes.all()[0]
+        except IndexError:
+            raise Node.DoesNotExist
 
     @node.setter
     def node(self, value):
@@ -455,8 +461,10 @@ class Content(models.Model):
         return sib and sib.content
 
     def get_parent(self):
-        parent = self.node.get_parent()
-        return parent and parent.content
+        try:
+            return self.node.get_parent().content
+        except AttributeError:
+            return None
 
     def post_create(self, site):
         """
@@ -569,3 +577,13 @@ class Content(models.Model):
         return {
             'edit_template': self.get_form_template(request),
         }
+
+    def get_cache_key(self):
+        return '%s:%s' % (self.node.id, self._edit_timestamp)
+
+
+def update_timestamps(node, content, **kwargs):
+    for p in content.get_ancestors():
+        p.save()
+
+tree_changed.connect(update_timestamps)
