@@ -81,13 +81,19 @@ class NodeView(WidgyView):
             supplying a ``right_id`` in the request.
 
     """
-    def render_to_response(self, obj, *args, **kwargs):
+    def render_as_node(self, obj, *args, **kwargs):
         obj = {'node': obj}
-        return super(NodeView, self).render_to_response(obj, *args, **kwargs)
+
+        compatibility_node_url = self.request.GET.get('include_compatibility_for', None)
+        if compatibility_node_url:
+            node = get_object_or_404(Node, pk=extract_id(compatibility_node_url))
+            obj['compatibility'] = ShelfView.get_compatibility_data(self.site, node)
+
+        return self.render_to_response(obj, *args, **kwargs)
 
     def get(self, request, node_pk):
         node = get_object_or_404(Node, pk=node_pk)
-        return self.render_to_response(node.to_json(self.site))
+        return self.render_as_node(node.to_json(self.site))
 
     def post(self, request, node_pk=None):
         data = self.data()
@@ -103,8 +109,8 @@ class NodeView(WidgyView):
             parent = get_object_or_404(Node, pk=extract_id(data['parent_id']))
             content = parent.content.add_child(self.site, content_class)
 
-        return self.render_to_response(content.node.to_json(self.site),
-                                       status=201)
+        return self.render_as_node(content.node.to_json(self.site),
+                                   status=201)
 
     def put(self, request, node_pk):
         """
@@ -130,7 +136,7 @@ class NodeView(WidgyView):
             except Node.DoesNotExist:
                 raise Http404
 
-        return self.render_to_response(None, status=200)
+        return self.render_as_node(None, status=200)
 
     def delete(self, request, node_pk):
         node = get_object_or_404(Node, pk=node_pk)
@@ -140,7 +146,7 @@ class NodeView(WidgyView):
 
         node.delete()
 
-        return self.render_to_response(None)
+        return self.render_as_node(None)
 
     def options(self, request, node_pk=None):
         response = super(NodeView, self).options(request, node_pk)
@@ -164,23 +170,27 @@ class ShelfView(WidgyView):
     Used on the frontend to populate the shelf.
     """
 
-    def serialize_content_classes(self, obj):
+    @staticmethod
+    def serialize_content_classes(site, obj):
         """
         The built-in json encoder doesn't support class_to_json, so
         we'll do it manually.
         """
         res = {}
         for node, classes in obj.iteritems():
-            res[node.get_api_url(self.site)] = [i.class_to_json(self.site) for i in classes]
+            res[node.get_api_url(site)] = [i.class_to_json(site) for i in classes]
         return res
 
+    @staticmethod
+    def get_compatibility_data(site, root_node):
+        root_node.maybe_prefetch_tree()
+        content_classes = site.get_all_content_classes()
+        content_classes = root_node.filter_child_classes_recursive(site, content_classes)
+        return ShelfView.serialize_content_classes(site, content_classes)
+
     def get(self, request, node_pk):
-        content_classes = self.site.get_all_content_classes()
         node = get_object_or_404(Node, pk=node_pk)
-        node.prefetch_tree()
-        content_classes = node.filter_child_classes_recursive(self.site, content_classes)
-        return self.render_to_response(
-            self.serialize_content_classes(content_classes))
+        return self.render_to_response(self.get_compatibility_data(self.site, node))
 
 
 class NodeSingleObjectMixin(SingleObjectMixin):

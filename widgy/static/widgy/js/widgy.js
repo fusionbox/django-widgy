@@ -65,6 +65,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
     },
 
     setCompatibility: function(data) {
+      console.log('setCompatibility', data);
       delete this.inflight;
 
       this.compatibility_data = data;

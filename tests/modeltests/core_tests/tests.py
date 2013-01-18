@@ -494,3 +494,29 @@ class TestApi(RootNodeTestCase, HttpTestCase):
                                right.get_api_url(widgy_site),
                                left.content.children[2].node.get_api_url(widgy_site)],
                               possible_parents)
+
+    def test_optimized_compatibility_fetching(self):
+        left, right = make_a_nice_tree(self.root_node)
+
+        left_json = left.to_json(widgy_site)
+        left_url = left_json['url']
+        root_json = self.root_node.to_json(widgy_site)
+        root_url = root_json['url']
+
+        def doit(method, *args):
+            ret = json.loads(getattr(self, method)('{0}?include_compatibility_for={1}'.format(left_url, root_url), *args).content)
+            compatibility = json.loads(self.get(root_json['available_children_url']).content)
+
+            if method == 'get':
+                self.assertEqual(left_json, ret['node'])
+
+            self.assertEqual(compatibility, ret['compatibility'])
+
+        doit('get')
+        doit('post', {
+            '__class__': 'core_tests.rawtextwidget',
+            'parent_id': left_url,
+            'right_id': None,
+        })
+        doit('put', left_json)
+        doit('delete')

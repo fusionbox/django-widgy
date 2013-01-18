@@ -42,7 +42,6 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
         app: this.app
       });
 
-      model.once('node:sync', this.app.refreshCompatibility);
       view.on('all', this.bubble);
 
       this.list.push(view);

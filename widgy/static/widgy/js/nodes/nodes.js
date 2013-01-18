@@ -37,7 +37,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       Backbone.Model.prototype.initialize.apply(this, arguments);
 
       _.bindAll(this,
-        'instantiateContent'
+        'instantiateContent',
+        'trigger'
         );
     },
 
@@ -105,10 +106,31 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
     sync: function(method, model, options) {
       debug.call(this, 'Node#sync', arguments);
-      Backbone.sync.apply(this, arguments);
 
-      if (!options.silent)
-        this.trigger('node:sync', this);
+      // Provides an optimization for refreshing the shelf compatibility.
+      // Previously, when editing a node, you had to do two requests (one for
+      // the node, one for the shelf compatibility) to update the UI.  In
+      // addition, the shelf request had to happen after the node one, to
+      // prevent getting the compatibility wrong.  This refreshes compatibility
+      // in one request instead of waiting for two round trips.
+      if ( options.app )
+      {
+        var model_url = _.result(model, 'url'),
+            root_url = _.result(options.app.root_node_view.model, 'url'),
+            old_success = options.success;
+
+        options.success = function(resp, status, xhr) {
+          if ( old_success ) old_success(resp, status, xhr);
+
+          if ( resp.compatibility ) {
+            options.app.setCompatibility(resp.compatibility);
+          }
+        };
+
+        options.url =  model_url + '?include_compatibility_for=' + root_url;
+      }
+
+      Backbone.sync.call(this, method, model, options);
     }
   });
 
@@ -300,7 +322,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       this
         .listenTo(this.model, 'load:content', this.renderContent)
-        .listenTo(this.model, 'node:sync', this.app.refreshCompatibility)
         .listenTo(this.collection, 'add', this.addChild)
         .listenTo(this.collection, 'reset', this.renderChildren);
 
@@ -348,7 +369,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     'delete': function(event) {
       this.model.destroy({
         wait: true,
-        error: modal.raiseError
+        error: modal.raiseError,
+        app: this.app
       });
       return false;
     },
@@ -558,7 +580,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       dragged_view.model.save(attributes, {
         success: dragged_view.checkDidReposition,
-        error: modal.raiseError
+        error: modal.raiseError,
+        app: this.app
       });
     },
 
