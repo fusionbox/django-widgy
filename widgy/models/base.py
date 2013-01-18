@@ -321,7 +321,7 @@ class Content(models.Model):
             'deletable': self.deletable,
             'accepting_children': self.accepting_children,
             'template_url': site.reverse(site.node_templates_view, kwargs=node_pk_kwargs),
-            'preview_template': self.get_preview_template(),
+            'preview_template': self.get_preview_template(site),
             'pop_out': self.pop_out,
             'edit_url': site.reverse(site.node_edit_view, kwargs=node_pk_kwargs),
             'shelf': self.shelf,
@@ -523,14 +523,17 @@ class Content(models.Model):
         with update_context(context, {'form': self.get_form_class(request)(instance=self)}):
             return render_to_string(template or self.edit_templates, context)
 
-    def get_preview_template(self, template=None, context=None):
+    def get_preview_template(self, site):
         """
         :Returns: Rendered preview template with the given context, if any.
         """
-        if context is None:
-            context = {}
-        context.update({'self': self})
-        return render_to_string(template or self.preview_templates, context)
+        return render_to_string(self.preview_templates, {
+            'self': self,
+            'edit_url': site.reverse(site.node_edit_view, kwargs={
+                'node_pk': self.node.pk,
+            }),
+            'site': site,
+        })
 
     def render(self, context, template=None):
         """
