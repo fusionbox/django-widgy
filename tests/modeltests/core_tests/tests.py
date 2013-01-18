@@ -116,6 +116,11 @@ class TestCore(RootNodeTestCase):
             picky_bucket.add_child(widgy_site,
                                    Layout)
 
+    def test_to_json_works_for_multi_table_inheritance(self):
+        picky_bucket = self.root_node.content.add_child(widgy_site,
+                                                        PickyBucket)
+        picky_bucket.to_json(widgy_site)
+
     def test_reposition(self):
         left, right = make_a_nice_tree(self.root_node)
 

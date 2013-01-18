@@ -327,7 +327,10 @@ class Content(models.Model):
             'shelf': self.shelf,
         }
         model_data = model_to_dict(self)
-        del model_data[self._meta.pk.attname]
+        try:
+            del model_data[self._meta.pk.attname]
+        except KeyError:
+            pass
         data.update(model_data)
         return data
 
