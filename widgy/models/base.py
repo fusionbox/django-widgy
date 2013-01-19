@@ -162,7 +162,11 @@ class Node(MP_Node):
         content_types = ContentType.objects.in_bulk(contents.iterkeys())
         for content_type_id, content_ids in contents.iteritems():
             ct = content_types[content_type_id]
-            instances = ct.model_class().objects.filter(pk__in=content_ids)
+            model_class = ct.model_class()
+            if model_class:
+                instances = ct.model_class().objects.filter(pk__in=content_ids)
+            else:
+                instances = [UnknownWidget(ct, id) for id in content_ids]
             contents[content_type_id] = dict([(i.id, i) for i in instances])
 
         # Loop through the nodes both assigning the content instance and the
@@ -572,3 +576,20 @@ class Content(models.Model):
         return {
             'edit_template': self.get_form_template(request),
         }
+
+
+class UnknownWidget(Content):
+    deletable = False
+    draggable = False
+    editable = False
+
+    class Meta:
+        app_label = 'widgy'
+
+    def __init__(self, content_type, id, *args, **kwargs):
+        super(UnknownWidget, self).__init__(*args, **kwargs)
+        self.content_type = content_type
+        self.id = id
+
+    def render(self, *args, **kwargs):
+        return ''
