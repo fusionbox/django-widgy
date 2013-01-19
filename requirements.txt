@@ -1,4 +1,5 @@
 -e git://github.com/fusionbox/django-fusionbox.git#egg=django_fusionbox
+-e git+git@github.com:fusionbox/django-filer.git@0a1aeac70f61da803cbf38b6556adb0da2f4cfcf#egg=django_filer-dev
 Django==1.4.2
 South
 Werkzeug

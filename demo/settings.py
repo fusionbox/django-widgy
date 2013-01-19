@@ -283,6 +283,8 @@ INSTALLED_APPS = (
     'django_extensions',
 
     # widgy apps
+    'filer',
+    'easy_thumbnails',
     'urlconf_include',
 
     # local project
@@ -291,6 +293,20 @@ INSTALLED_APPS = (
 
 FORMS_LABEL_MAX_LENGTH = 255
 FORMS_FIELD_MAX_LENGTH = 255
+
+# Filer Settings
+THUMBNAIL_PROCESSORS = (
+    'easy_thumbnails.processors.colorspace',
+    'easy_thumbnails.processors.autocrop',
+    #'easy_thumbnails.processors.scale_and_crop',
+    'filer.thumbnail_processors.scale_and_crop_with_subject_location',
+    'easy_thumbnails.processors.filters',
+)
+FILER_FILE_MODELS = (
+    'widgy.contrib.page_builder.models.WidgyImageFile',
+    'filer.models.imagemodels.Image',
+    'filer.models.filemodels.File',
+)
 
 # List of processors used by RequestContext to populate the context.
 # Each one should be a callable that takes the request object as its

@@ -1,5 +1,10 @@
+import os
+
 from django.db import models
 from django.conf import settings
+
+from filer.fields.file import FilerFileField
+from filer.models.filemodels import File
 
 from widgy.models import Content
 from widgy.models.mixins import StrictDefaultChildrenMixin
@@ -144,3 +149,26 @@ class Section(Content):
         return isinstance(parent, Accordion)
 
 registry.register(Section)
+
+
+class WidgyImageFile(File):
+    @classmethod
+    def matches_file_type(cls, iname, ifile, request):
+        iext = os.path.splitext(iname)[1].lower()
+        return iext in ['.jpg', '.jpeg', '.png', '.gif']
+
+
+class WidgyImageField(FilerFileField):
+    default_model_class = WidgyImageFile
+
+
+class Image(Content):
+    editable = True
+
+    # What should happen on_delete.  Set to models.PROTECT so this is harder to
+    # ignore and forget about.
+    image = WidgyImageField(null=True, blank=True,
+                            related_name='image_widgets',
+                            on_delete=models.PROTECT)
+
+registry.register(Image)
