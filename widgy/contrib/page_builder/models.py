@@ -8,15 +8,7 @@ from widgy.contrib.page_builder.db.fields import MarkdownField
 from widgy import registry
 
 
-class PageBuilderContent(Content):
-    """
-    Base class for all page builder content models.
-    """
-    class Meta:
-        abstract = True
-
-
-class Layout(StrictDefaultChildrenMixin, PageBuilderContent):
+class Layout(StrictDefaultChildrenMixin, Content):
     """
     Base class for all layouts.
     """
@@ -31,7 +23,7 @@ class Layout(StrictDefaultChildrenMixin, PageBuilderContent):
         return False
 
 
-class Bucket(PageBuilderContent):
+class Bucket(Content):
     draggable = False
     deletable = False
     accepting_children = True
