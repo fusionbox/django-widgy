@@ -41,12 +41,7 @@
   }
 
   .node {
-    @include rounded(4px);
-    background: $black10;
-    list-style: none;
-    margin: 1em;
-    padding: 10px;
-    position: relative;
+
     
 
     .content {
@@ -77,15 +72,11 @@
       }
     }
     
-    button.edit {
-      position: absolute;
-      right: 79px;
-      top: 10px;
-      z-index: 10;
-    }
-    
+    button.edit,
     button.delete {
+      display: inline;
       float: right;
+      margin-left: 1em;
     }
     
     .dragHandle {
@@ -310,14 +301,83 @@
 
 /* Esther New Styling */
 
+body {
+  font-size: 62.5%;
+}
+  
+body, html {
+  line-height: normal;
+}
 
 .widgy {
-  li.node {
+  .node {
+    @include rounded(4px);
+    background: $black10;
+    border: 2px solid #fff;
+    list-style: none;
+    margin: 0 0 1em 0;
+    padding: 10px;
+    position: relative;
   
+    span.title {
+      font-size: 2.4em;
+      padding: 5px 0;
+    }
+    
     &:hover {
       cursor: pointer;
       
     }
+    
+    p.drag-row {
+      padding: 1em 0;
+    }
+    
+    > .content {
+      > span.title{
+        font-weight: bold;
+      }
+      
+      > div.preview  {
+        margin-bottom: 2em;
+      }
+    }
+    
+    .node {
+      background: #fff;
+      border: 1px solid #fff;
+      
+      span.title {
+        font-size: 1.4em;
+        padding: 5px 0;
+      }
+    
+    
+      .node {
+        background: $black10;
+        
+        
+        .shelf .node {
+          margin-left: 1em;
+        }
+        
+        .node {
+          background: #fff;
+          
+          
+          .node {
+            background: $black10;
+          }
+        }
+      }
+      
+    }
+  }
+  
+  
+  div.preview {
+    border: 1px solid #E8E8E8;
+    padding: 1em;
   }
 }
 
