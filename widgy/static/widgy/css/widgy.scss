@@ -3,6 +3,11 @@
 /* CMS
 -------------------*/
 
+%loading {
+  background: url('../image/loading.gif') center no-repeat;
+  color: transparent;
+}
+
 .widgy {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -77,6 +82,10 @@
       display: inline;
       float: right;
       margin-left: 1em;
+
+      &.loading {
+        @extend %loading;
+      }
     }
     
     .dragHandle {
@@ -238,6 +247,10 @@
     
     &:hover {
       background-color: lighten($green,5%);
+    }
+
+    &.loading {
+      @extend %loading;
     }
   }
 }

@@ -367,9 +367,16 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     'delete': function(event) {
+      var spinner = new Backbone.Spinner({el: this.$content.find('.delete')});
+
+      var error = function() {
+        spinner.restore();
+        model.raiseError.call(this, arguments);
+      };
+
       this.model.destroy({
         wait: true,
-        error: modal.raiseError,
+        error: error,
         app: this.app
       });
       return false;
