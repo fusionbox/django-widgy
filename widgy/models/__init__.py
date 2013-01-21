@@ -1,1 +1,1 @@
-from widgy.models.base import Node, Content
+from widgy.models.base import Node, Content, UnknownWidget

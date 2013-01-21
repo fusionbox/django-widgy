@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 
-from widgy.models import Node
+from widgy.models import Node, UnknownWidget
 from widgy.views import extract_id
 from widgy.exceptions import (ParentWasRejected, ChildWasRejected,
                               MutualRejection, InvalidTreeMovement)
@@ -165,6 +165,39 @@ class TestCore(RootNodeTestCase):
         bucket.add_child(widgy_site, ImmovableBucket)
         with self.assertRaises(ChildWasRejected):
             bucket.add_child(widgy_site, Bucket)
+
+    def test_unkown_content_type(self):
+        """
+        A node with a ContentType whose model class can not be found should use
+        an UnknownWidget in its place
+        """
+        fake_ct = ContentType.objects.create(
+            name='fake',
+            app_label='faaaaake',
+        )
+        self.root_node.content_type = fake_ct
+        self.root_node.save()
+
+        root_node = Node.objects.get(pk=self.root_node.pk)
+        self.assertIsInstance(root_node.content, UnknownWidget)
+
+    def test_unkown_content_type_prefetch(self):
+        """
+        prefetch_tree follows a different code path, so test it too
+        """
+
+        fake_ct = ContentType.objects.create(
+            name='fake',
+            app_label='faaaaake',
+        )
+
+        left, right = make_a_nice_tree(self.root_node)
+        left.content_type = fake_ct
+        left.save()
+
+        root_node = Node.objects.get(pk=self.root_node.pk)
+        root_node.prefetch_tree()
+        self.assertIsInstance(list(root_node.content.get_children())[0].node.content, UnknownWidget)
 
 
 class TestWidgyField(TestCase):

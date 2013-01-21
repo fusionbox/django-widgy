@@ -1,0 +1,6 @@
+{% extends "widgy/preview.html" %}
+{% block content %}
+<p>
+Unknown Widget Type: {{ self.content_type.app_label }}.{{ self.content_type.model }}
+</p>
+{% endblock %}
