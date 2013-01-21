@@ -4,6 +4,7 @@ objects.
 """
 from collections import defaultdict
 from functools import partial
+import logging
 
 from django.db import models
 from django.forms.models import modelform_factory, ModelForm
@@ -21,8 +22,10 @@ from widgy.exceptions import (
     ParentChildRejection,
     RootDisplacementError
 )
-from widgy.generic import ProxyGenericForeignKey, ProxyGenericRelation
+from widgy.generic import WidgyGenericForeignKey, ProxyGenericRelation
 from widgy.utils import exception_to_bool, update_context
+
+logger = logging.getLogger(__name__)
 
 
 class Node(MP_Node):
@@ -43,7 +46,7 @@ class Node(MP_Node):
     """
     content_type = models.ForeignKey(ContentType)
     content_id = models.PositiveIntegerField()
-    content = ProxyGenericForeignKey('content_type', 'content_id')
+    content = WidgyGenericForeignKey('content_type', 'content_id')
 
     class Meta:
         app_label = 'widgy'
@@ -162,7 +165,12 @@ class Node(MP_Node):
         content_types = ContentType.objects.in_bulk(contents.iterkeys())
         for content_type_id, content_ids in contents.iteritems():
             ct = content_types[content_type_id]
-            instances = ct.model_class().objects.filter(pk__in=content_ids)
+            model_class = ct.model_class()
+            if model_class:
+                instances = ct.model_class().objects.filter(pk__in=content_ids)
+            else:
+                instances = [UnknownWidget(ct, id) for id in content_ids]
+                instances and instances[0].warn()
             contents[content_type_id] = dict([(i.id, i) for i in instances])
 
         # Loop through the nodes both assigning the content instance and the
@@ -572,3 +580,36 @@ class Content(models.Model):
         return {
             'edit_template': self.get_form_template(request),
         }
+
+
+class UnknownWidget(Content):
+    """
+    A placeholder Content class used when the correct one can't be found. For
+    example, when the database refers to widgets from an app that is no longer
+    installed.
+    """
+
+    deletable = True
+    draggable = False
+    editable = False
+
+    class Meta:
+        app_label = 'widgy'
+        # we don't actually need a db table
+        managed = False
+
+    def __init__(self, content_type, id, *args, **kwargs):
+        super(UnknownWidget, self).__init__(*args, **kwargs)
+        self.content_type = content_type
+        self.id = id
+
+    def render(self, *args, **kwargs):
+        return ''
+
+    def delete(*args, **kwargs):
+        pass
+
+    def warn(self):
+        logger.warning('UnknownWidget being rendered. Content type: %s.%s',
+                       self.content_type.app_label,
+                       self.content_type.model)
