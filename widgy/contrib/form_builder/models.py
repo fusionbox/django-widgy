@@ -22,7 +22,7 @@ class FormElement(Content):
 
     @property
     def parent_form(self):
-        for i in self.get_ancestors():
+        for i in self.ancestors:
             if isinstance(i, Form):
                 return i
 
@@ -30,7 +30,7 @@ class FormElement(Content):
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
-        for p in list(parent.get_ancestors()) + [parent]:
+        for p in list(parent.ancestors) + [parent]:
             if isinstance(p, Form):
                 return super(FormElement, cls).valid_child_of(parent, obj)
         return False
@@ -106,7 +106,7 @@ class Form(DefaultChildrenMixin, Content):
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
-        for p in list(parent.get_ancestors()) + [parent]:
+        for p in list(parent.ancestors) + [parent]:
             if isinstance(p, Form):
                 return False
         return super(Form, cls).valid_child_of(parent, obj)

@@ -377,11 +377,24 @@ class Content(models.Model):
     def children(self):
         return [child.content for child in self.node.get_children()]
 
-    def get_root(self):
+    @property
+    def root(self):
         return self.node.get_root().content
 
-    def get_ancestors(self):
+    @property
+    def ancestors(self):
         return [ancestor.content for ancestor in self.node.get_ancestors()]
+
+    @property
+    def next_sibling(self):
+        sib = self.node.get_next_sibling()
+        return sib and sib.content
+
+    @property
+    def parent(self):
+        parent = self.node.get_parent()
+        return parent and parent.content
+
 
     def depth_first_order(self):
         return [node.content for node in self.node.depth_first_order()]
@@ -454,17 +467,6 @@ class Content(models.Model):
         self.node.add_sibling(content=obj, pos='left')
         obj.post_create(site)
         return obj
-
-    def get_children(self):
-        return (i.content for i in self.node.get_children())
-
-    def get_next_sibling(self):
-        sib = self.node.get_next_sibling()
-        return sib and sib.content
-
-    def get_parent(self):
-        parent = self.node.get_parent()
-        return parent and parent.content
 
     def post_create(self, site):
         """

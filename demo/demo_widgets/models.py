@@ -30,7 +30,7 @@ class DemoAccordion(Accordion):
             return True
         else:
             sup = super(DemoAccordion, self).valid_parent_of(cls)
-            if isinstance(self.get_root(), TwoContentLayout):
+            if isinstance(self.root, TwoContentLayout):
                 return sup and len(self.children) < 2
             else:
                 return sup

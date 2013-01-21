@@ -42,7 +42,7 @@ def display_node(node):
 
 
 def make_a_nice_tree(root_node):
-    left, right = root_node.content.get_children()
+    left, right = root_node.content.children
     left.add_child(widgy_site,
                    RawTextWidget,
                    text='left_1')
@@ -92,7 +92,7 @@ class TestCore(RootNodeTestCase):
         with self.assertRaises(ChildWasRejected):
             widgy_site.validate_relationship(self.root_node.content, RawTextWidget)
 
-        bucket = list(self.root_node.content.get_children())[0]
+        bucket = list(self.root_node.content.children)[0]
         with self.assertRaises(ParentWasRejected):
             widgy_site.validate_relationship(bucket, CantGoAnywhereWidget)
 
@@ -197,7 +197,7 @@ class TestCore(RootNodeTestCase):
 
         root_node = Node.objects.get(pk=self.root_node.pk)
         root_node.prefetch_tree()
-        self.assertIsInstance(list(root_node.content.get_children())[0].node.content, UnknownWidget)
+        self.assertIsInstance(list(root_node.content.children)[0].node.content, UnknownWidget)
 
 
 class TestWidgyField(TestCase):
@@ -263,36 +263,36 @@ class TestPrefetchTree(RootNodeTestCase):
         # we have the tree, verify its structure without executing any
         # queries
         with self.assertNumQueries(0):
-            left, right = root_node.content.get_children()
-            left_children = list(left.get_children())
+            left, right = root_node.content.children
+            left_children = left.children
             self.assertEqual(left_children[0].text, 'left_1')
             self.assertEqual(left_children[1].text, 'left_2')
             subbucket = left_children[2]
-            subbucket_children = list(subbucket.get_children())
+            subbucket_children = subbucket.children
             self.assertEqual(subbucket_children[0].text, 'subbucket_1')
             self.assertEqual(subbucket_children[1].text, 'subbucket_2')
 
-            right_children = list(right.get_children())
+            right_children = right.children
             self.assertEqual(right_children[0].text, 'right_1')
             self.assertEqual(right_children[1].text, 'right_2')
 
         # verify some convience methods are prefetched as well
         with self.assertNumQueries(0):
             # on the Content
-            left, right = root_node.content.get_children()
-            self.assertEqual(left.get_next_sibling(), right)
-            self.assertEqual(right.get_next_sibling(), None)
-            self.assertEqual(right.get_parent(), root_node.content)
-            self.assertEqual(root_node.content.get_parent(), None)
-            self.assertEqual(root_node.content.get_next_sibling(), None)
-            self.assertEqual(left.get_ancestors(), [root_node.content])
-            self.assertEqual(left.children[0].get_ancestors(), [root_node.content, left])
+            left, right = root_node.content.children
+            self.assertEqual(left.next_sibling, right)
+            self.assertEqual(right.next_sibling, None)
+            self.assertEqual(right.parent, root_node.content)
+            self.assertEqual(root_node.content.parent, None)
+            self.assertEqual(root_node.content.next_sibling, None)
+            self.assertEqual(left.ancestors, [root_node.content])
+            self.assertEqual(left.children[0].ancestors, [root_node.content, left])
             self.assertEqual(
-                left.children[2].children[0].get_ancestors(),
+                left.children[2].children[0].ancestors,
                 [root_node.content, left, left.children[2]])
 
-            self.assertEqual(left.get_root(), left.get_parent())
-            self.assertEqual(left.children[0].get_root(), left.get_parent())
+            self.assertEqual(left.root, left.parent)
+            self.assertEqual(left.children[0].root, left.parent)
             self.assertEqual(root_node.get_root(), root_node)
 
             # on the Node
@@ -327,11 +327,11 @@ class TestPrefetchTree(RootNodeTestCase):
 
         with self.assertNumQueries(0):
             left = left_node.content
-            left_children = list(left.get_children())
+            left_children = left.children
             self.assertEqual(left_children[0].text, 'left_1')
             self.assertEqual(left_children[1].text, 'left_2')
             subbucket = left_children[2]
-            subbucket_children = list(subbucket.get_children())
+            subbucket_children = subbucket.children
             self.assertEqual(subbucket_children[0].text, 'subbucket_1')
             self.assertEqual(subbucket_children[1].text, 'subbucket_2')
 
@@ -345,11 +345,11 @@ class TestPrefetchTree(RootNodeTestCase):
 
         # get_ancestors must work correctly for non-root nodes, but it can't be
         # prefetched
-        self.assertEqual(left.get_ancestors(), [left.get_parent()])
-        self.assertEqual(left.children[0].get_ancestors(), [left.get_parent(), left])
+        self.assertEqual(left.ancestors, [left.parent])
+        self.assertEqual(left.children[0].ancestors, [left.parent, left])
 
-        self.assertEqual(left.get_root(), left.get_parent())
-        self.assertEqual(left.children[0].get_root(), left.get_parent())
+        self.assertEqual(left.root, left.parent)
+        self.assertEqual(left.children[0].root, left.parent)
 
 
 class HttpTestCase(TestCase):
