@@ -156,7 +156,7 @@ class FormField(FormElement):
         abstract = True
 
     def get_formfield_name(self):
-        return str(self.id)
+        return str(self.node.pk)
 
     def get_formfield(self):
         kwargs = {
