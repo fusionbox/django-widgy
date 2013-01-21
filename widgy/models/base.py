@@ -350,10 +350,6 @@ class Content(models.Model):
     def node(self, value):
         self._node = value
 
-    @property
-    def children(self):
-        return [child.content for child in self.node.get_children()]
-
     def get_root(self):
         return self.node.get_root().content
 
@@ -433,7 +429,7 @@ class Content(models.Model):
         return obj
 
     def get_children(self):
-        return (i.content for i in self.node.get_children())
+        return [i.content for i in self.node.get_children()]
 
     def get_next_sibling(self):
         sib = self.node.get_next_sibling()

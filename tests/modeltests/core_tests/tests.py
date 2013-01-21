@@ -278,13 +278,13 @@ class TestPrefetchTree(RootNodeTestCase):
             self.assertEqual(root_node.content.get_parent(), None)
             self.assertEqual(root_node.content.get_next_sibling(), None)
             self.assertEqual(left.get_ancestors(), [root_node.content])
-            self.assertEqual(left.children[0].get_ancestors(), [root_node.content, left])
+            self.assertEqual(left.get_children()[0].get_ancestors(), [root_node.content, left])
             self.assertEqual(
-                left.children[2].children[0].get_ancestors(),
-                [root_node.content, left, left.children[2]])
+                left.get_children()[2].get_children()[0].get_ancestors(),
+                [root_node.content, left, left.get_children()[2]])
 
             self.assertEqual(left.get_root(), left.get_parent())
-            self.assertEqual(left.children[0].get_root(), left.get_parent())
+            self.assertEqual(left.get_children()[0].get_root(), left.get_parent())
             self.assertEqual(root_node.get_root(), root_node)
 
             # on the Node
@@ -338,10 +338,10 @@ class TestPrefetchTree(RootNodeTestCase):
         # get_ancestors must work correctly for non-root nodes, but it can't be
         # prefetched
         self.assertEqual(left.get_ancestors(), [left.get_parent()])
-        self.assertEqual(left.children[0].get_ancestors(), [left.get_parent(), left])
+        self.assertEqual(left.get_children()[0].get_ancestors(), [left.get_parent(), left])
 
         self.assertEqual(left.get_root(), left.get_parent())
-        self.assertEqual(left.children[0].get_root(), left.get_parent())
+        self.assertEqual(left.get_children()[0].get_root(), left.get_parent())
 
 
 class HttpTestCase(TestCase):
@@ -524,14 +524,14 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         possible_parents = json.loads(resp.content)
         order_ignorant_equals([left.get_api_url(widgy_site),
                                self.root_node.get_api_url(widgy_site),
-                               left.content.children[2].node.get_api_url(widgy_site)],
+                               left.content.get_children()[2].node.get_api_url(widgy_site)],
                               possible_parents)
 
-        resp = self.get(left.content.children[0].node.to_json(widgy_site)['possible_parents_url'])
+        resp = self.get(left.content.get_children()[0].node.to_json(widgy_site)['possible_parents_url'])
         possible_parents = json.loads(resp.content)
         order_ignorant_equals([left.get_api_url(widgy_site),
                                right.get_api_url(widgy_site),
-                               left.content.children[2].node.get_api_url(widgy_site)],
+                               left.content.get_children()[2].node.get_api_url(widgy_site)],
                               possible_parents)
 
     def test_optimized_compatibility_fetching(self):

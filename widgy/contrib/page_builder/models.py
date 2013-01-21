@@ -184,7 +184,7 @@ class TableRow(TableElement):
         return issubclass(cls, TableData)
 
     def post_create(self, site):
-        for column in self.table.header.children:
+        for column in self.table.header.get_children():
             self.add_child(site, TableData)
 
 
@@ -202,7 +202,7 @@ class TableHeaderData(TableElement):
     def valid_child_of(cls, parent, obj=None):
         if obj and obj.get_parent():
             # we can't be moved to another table
-            return obj in parent.children
+            return obj in parent.get_children()
         else:
             return isinstance(parent, TableHeader)
 
@@ -212,7 +212,7 @@ class TableHeaderData(TableElement):
             for d in self.table.cells_at_index(right.sibling_index - 1):
                 d.add_sibling(site, TableData)
         else:
-            for row in self.table.body.children:
+            for row in self.table.body.get_children():
                 row.add_child(site, TableData)
 
     def pre_delete(self):
@@ -264,10 +264,10 @@ class TableHeader(TableElement):
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
-        if obj in parent.children:
+        if obj in parent.get_children():
             return True
         return (isinstance(parent, Table) and
-                len([i for i in parent.children if isinstance(i, cls)]) < 1)
+                len([i for i in parent.get_children() if isinstance(i, cls)]) < 1)
 
     def valid_parent_of(self, cls, obj=None):
         return issubclass(cls, TableHeaderData)
@@ -285,9 +285,9 @@ class TableBody(InvisibleMixin, TableElement):
 
     def valid_parent_of(self, cls, obj=None):
         if obj:
-            if obj in self.children:
+            if obj in self.get_children():
                 return True
-            if isinstance(obj, TableRow) and len(obj.children) == len(self.table.header.children):
+            if isinstance(obj, TableRow) and len(obj.get_children()) == len(self.table.header.get_children()):
                 return True
         else:
             return issubclass(cls, TableRow)
@@ -306,14 +306,14 @@ class Table(StrictDefaultChildrenMixin, TableElement):
 
     @property
     def header(self):
-        return self.children[0]
+        return self.get_children()[0]
 
     @property
     def body(self):
-        return self.children[1]
+        return self.get_children()[1]
 
     def cells_at_index(self, index):
-        return [list(i.get_children())[index] for i in self.body.children]
+        return [list(i.get_children())[index] for i in self.body.get_children()]
 
 registry.register(Table)
 registry.register(TableRow)

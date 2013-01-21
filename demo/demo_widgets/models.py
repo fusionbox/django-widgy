@@ -26,12 +26,12 @@ class DemoAccordion(Accordion):
         verbose_name = 'Accordion'
 
     def valid_parent_of(self, cls, obj=None):
-        if obj and obj in self.children:
+        if obj and obj in self.get_children():
             return True
         else:
             sup = super(DemoAccordion, self).valid_parent_of(cls)
             if isinstance(self.get_root(), TwoContentLayout):
-                return sup and len(self.children) < 2
+                return sup and len(self.get_children()) < 2
             else:
                 return sup
 
