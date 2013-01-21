@@ -6,6 +6,7 @@ from south.modelsinspector import add_introspection_rules
 
 add_introspection_rules([], ["^widgy\.generic\.ProxyGenericRelation"])
 add_introspection_rules([], ["^widgy\.generic\.ProxyGenericForeignKey"])
+add_introspection_rules([], ["^widgy\.generic\.WidgyGenericForeignKey"])
 
 
 class ProxyGenericForeignKey(generic.GenericForeignKey):
@@ -20,6 +21,20 @@ class ProxyGenericForeignKey(generic.GenericForeignKey):
                 for_concrete_model=False)
         else:
             return super(ProxyGenericForeignKey, self).get_content_type(obj, id, using)
+
+
+class WidgyGenericForeignKey(ProxyGenericForeignKey):
+    def __get__(self, instance, instance_type=None):
+        try:
+            return super(WidgyGenericForeignKey, self).__get__(instance, instance_type)
+        except AttributeError:
+            # The model for this content type couldn't be loaded. Use an
+            # UnknownWidget instead.
+            from widgy.models import UnknownWidget
+            ret = UnknownWidget(getattr(instance, self.ct_field), getattr(instance, self.fk_field), instance)
+            ret.node = instance
+            ret.warn()
+            return ret
 
 
 class ProxyGenericRelation(generic.GenericRelation):
