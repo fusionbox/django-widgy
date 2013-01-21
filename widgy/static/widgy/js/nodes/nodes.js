@@ -693,7 +693,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         this.subwindow.close();
       }
 
-      this.model.fetch();
+      this.model.fetch({
+        app: this.app
+      });
 
       return false;
     }
