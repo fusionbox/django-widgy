@@ -3,7 +3,7 @@
   <span class="drag_handle dragHandle icon-move"></span>
   {% endif %}
   
-  <span class="{{ self.class_name }} title">{{ self.meta.verbose_name }}</span>
+  <span class="{{ self.class_name }} title">{{ self.meta.verbose_name|capfirst }}</span>
   
   {% if self.editable %}
   <button class="edit"><span class="icon-edit"></span> Edit</button>
