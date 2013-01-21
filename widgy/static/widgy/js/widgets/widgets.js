@@ -61,7 +61,7 @@ define([
 
       var values = this.serialize();
 
-      this.model.save(values, {
+      this.model.save({'attributes': values}, {
         success: this.handleSuccess,
         error: this.handleError
       });

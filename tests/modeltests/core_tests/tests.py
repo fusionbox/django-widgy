@@ -410,14 +410,14 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         db_bucket = Node.objects.get(id=extract_id(bucket['url']))
         self.assertEqual(db_bucket.get_children_count(), 1)
 
-        new_child['content']['text'] = 'foobar'
+        new_child['content']['attributes']['text'] = 'foobar'
         r = self.put(new_child['content']['url'], new_child['content'])
         self.assertEqual(r.status_code, 200)
 
         r = self.get(new_child['content']['url'])
         self.assertEqual(r.status_code, 200)
         textcontent = json.loads(r.content)
-        self.assertEqual(textcontent['text'], 'foobar')
+        self.assertEqual(textcontent['attributes']['text'], 'foobar')
 
         # move the node to the other bucket
         new_child['parent_id'] = self.root_node.to_json(widgy_site)['children'][1]['url']

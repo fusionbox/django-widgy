@@ -339,7 +339,7 @@ class Content(models.Model):
             del model_data[self._meta.pk.attname]
         except KeyError:
             pass
-        data.update(model_data)
+        data['attributes'] = model_data
         return data
 
     @classmethod
