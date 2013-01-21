@@ -73,12 +73,12 @@ class SubmitButton(FormElement):
         return len([i for i in self.parent_form.depth_first_order() if isinstance(i, SubmitButton)]) > 1
 
     def valid_parent_of(self, cls, obj=None):
-        if obj in self.children:
+        if obj in self.get_children():
             return True
 
         # only accept one FormReponseHandler
         if issubclass(cls, FormReponseHandler) and any([isinstance(child, FormReponseHandler)
-                                                        for child in self.children]):
+                                                        for child in self.get_children()]):
             return False
 
         return issubclass(cls, FormSuccessHandler)
@@ -113,7 +113,7 @@ class Form(DefaultChildrenMixin, Content):
 
     def get_form(self):
         fields = SortedDict((child.get_formfield_name(), child.get_formfield())
-                            for child in self.children if isinstance(child, FormField))
+                            for child in self.get_children() if isinstance(child, FormField))
 
         return type('WidgyForm', (forms.BaseForm,), {'base_fields': fields})
 
