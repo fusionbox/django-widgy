@@ -20,8 +20,9 @@
       position: absolute;
       top: 0;
       right: -210px;
- 
+
       li {
+        cursor: pointer;
 
         &.placeholder {
           border: 1px dashed #000;
@@ -38,7 +39,7 @@
   ul.nodeChildren {
     margin: 0 !important;
     padding: 0 !important;
-    
+
     li ul.nodeChildren {
       margin: 0 !important;
       padding: 0 !important;
@@ -47,7 +48,7 @@
 
   .node {
 
-    
+
 
     .content {
       -webkit-user-select: auto;
@@ -63,20 +64,20 @@
       margin: 0;
       position: fixed;
     }
-    
+
     p.title {
       font-size: 14px;
       font-weight: bold;
       line-height: 18px;
       margin-bottom: 10px;
-      
+
       &.bucket {
         font-size: 18px;
         line-height: 24px;
         padding-top: 0px;
       }
     }
-    
+
     button.edit,
     button.delete {
       display: inline;
@@ -87,12 +88,13 @@
         @extend %loading;
       }
     }
-    
+
     .dragHandle {
       left: -5px;
       float: left;
       font-size: 20px;
       position: relative;
+      cursor: pointer;
     }
   }
 
@@ -101,7 +103,7 @@
     height: 25px;
     padding: 10px;
     width: 100%;
-    
+
 
     &.active {
       border: 1px dashed #000;
@@ -111,14 +113,14 @@
 
   /* Inputs
   -------------------*/
-  
+
   input[type='text'], textarea {
     @include inset-shadow($black10,0px,1px,2px);
     border: 0px;
     font-weight: normal !important;
     padding: 6px 4px 5px;
   }
-  
+
   textarea {
     height: 120px;
   }
@@ -148,7 +150,7 @@
   -------------------*/
 
   .vFileBrowseField {display:none;}
-  
+
   p.image-thumbnail {
     @include rounded(3px);
     background: white;
@@ -156,7 +158,7 @@
     margin: 0px 0px 10px 0px;
     padding: 15px;
     text-align: center;
-    
+
     img {
       border: 0px;
       margin: 0 auto;
@@ -167,29 +169,29 @@
 
   /* Text Widget
   -------------------*/
-  
+
   p.text-input {
     @include clearfix;
     margin: 20px 0px 20px 0px;
-    
+
     input[type='text'], textarea {
       width: 98%;
     }
   }
-  
+
 
   /* File Select
   -------------------*/
-  
+
   p.file-select {
     @include clearfix;
     margin: 0px 0px 20px 0px;
-    
+
     input[type='text'] {
       float: left;
       width: 70%;
     }
-    
+
     button {
       float: right;
     }
@@ -197,7 +199,7 @@
 
   /* Submit Row
   -------------------*/
-  
+
   p.submit-row {
     @include rounded(3px);
     background: $white20;
@@ -211,7 +213,7 @@
   button {
     background: $blue;
     height: auto;
-    
+
     &:hover {
       background-color: lighten($blue,10%);
     }
@@ -219,16 +221,16 @@
     &.cancel {
       background: $darkgrey;
       opacity: 0.7;
-      
+
       &:hover {
         background-color: lighten($darkgrey,10%);
         opacity: 1;
       }
     }
-    
+
     &.edit {
       padding: 2px;
-    }    
+    }
 
     &.delete {
       background-color: $red;
@@ -240,11 +242,11 @@
       }
     }
   }
-  
+
   input[type='submit'] {
     background: $green;
     height: auto;
-    
+
     &:hover {
       background-color: lighten($green,5%);
     }
@@ -317,7 +319,7 @@
 body {
   font-size: 62.5%;
 }
-  
+
 body, html {
   line-height: normal;
 }
@@ -331,63 +333,58 @@ body, html {
     margin: 0 0 1em 0;
     padding: 10px;
     position: relative;
-  
+
     span.title {
       font-size: 2.4em;
       padding: 5px 0;
     }
-    
-    &:hover {
-      cursor: pointer;
-      
-    }
-    
+
     p.drag-row {
       padding: 1em 0;
     }
-    
+
     > .content {
       > span.title{
         font-weight: bold;
       }
-      
+
       > div.preview  {
         margin-bottom: 2em;
       }
     }
-    
+
     .node {
       background: #fff;
       border: 1px solid #fff;
-      
+
       span.title {
         font-size: 1.4em;
         padding: 5px 0;
       }
-    
-    
+
+
       .node {
         background: $black10;
-        
-        
+
+
         .shelf .node {
           margin-left: 1em;
         }
-        
+
         .node {
           background: #fff;
-          
-          
+
+
           .node {
             background: $black10;
           }
         }
       }
-      
+
     }
   }
-  
-  
+
+
   div.preview {
     border: 1px solid #E8E8E8;
     padding: 1em;
@@ -396,15 +393,15 @@ body, html {
 
 
 
-/* Mezzanine Override */ 
+/* Mezzanine Override */
 
-input[type="text"], 
-input[type="password"], 
-input.vDateField, 
-input.vTimeField, 
-.change-list form table .vAutocompleteSearchField, 
-.change-list form table .vM2MAutocompleteSearchField, 
-.inline-tabular .vAutocompleteSearchField, 
+input[type="text"],
+input[type="password"],
+input.vDateField,
+input.vTimeField,
+.change-list form table .vAutocompleteSearchField,
+.change-list form table .vM2MAutocompleteSearchField,
+.inline-tabular .vAutocompleteSearchField,
 .inline-tabular .vM2MAutocompleteSearchField {
   width: 200px;
 }
