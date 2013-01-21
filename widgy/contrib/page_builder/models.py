@@ -4,7 +4,6 @@ from django.db import models
 from django.conf import settings
 
 from filer.fields.file import FilerFileField
-from filer.models.filemodels import File
 
 from widgy.models import Content
 from widgy.models.mixins import StrictDefaultChildrenMixin
@@ -151,15 +150,10 @@ class Section(Content):
 registry.register(Section)
 
 
-class WidgyImageFile(File):
-    @classmethod
-    def matches_file_type(cls, iname, ifile, request):
-        iext = os.path.splitext(iname)[1].lower()
-        return iext in ['.jpg', '.jpeg', '.png', '.gif']
-
-
-class WidgyImageField(FilerFileField):
-    default_model_class = WidgyImageFile
+def validate_image(*args, **kwargs):
+    import pdb; pdb.set_trace()
+    iext = os.path.splitext(iname)[1].lower()
+    return iext in ['.jpg', '.jpeg', '.png', '.gif']
 
 
 class Image(Content):
@@ -167,8 +161,9 @@ class Image(Content):
 
     # What should happen on_delete.  Set to models.PROTECT so this is harder to
     # ignore and forget about.
-    image = WidgyImageField(null=True, blank=True,
-                            related_name='image_widgets',
-                            on_delete=models.PROTECT)
+    image = FilerFileField(null=True, blank=True,
+                           #validators=[validate_image],
+                           related_name='image_widgets',
+                           on_delete=models.PROTECT)
 
 registry.register(Image)

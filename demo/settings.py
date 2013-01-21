@@ -303,8 +303,8 @@ THUMBNAIL_PROCESSORS = (
     'easy_thumbnails.processors.filters',
 )
 FILER_FILE_MODELS = (
-    'widgy.contrib.page_builder.models.WidgyImageFile',
-    'filer.models.imagemodels.Image',
+    #'widgy.contrib.page_builder.models.WidgyImageFile',
+    #'filer.models.imagemodels.Image',
     'filer.models.filemodels.File',
 )
 
