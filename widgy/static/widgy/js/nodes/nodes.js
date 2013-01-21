@@ -632,7 +632,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       content_view = new view_class({
         model: content,
-        el: this.$content
+        el: this.$content,
+        app: this.app
       });
 
       content_view.render();

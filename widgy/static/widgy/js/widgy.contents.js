@@ -38,6 +38,10 @@ define([ 'widgy.backbone' ], function(Backbone) {
   var ContentView = Backbone.View.extend({
     className: 'content',
 
+    initialize: function(options) {
+      this.app = options.app;
+    },
+
     getTemplate: function() {
       return this.model.get('preview_template');
     }

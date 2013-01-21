@@ -116,7 +116,6 @@ define([
 
     initialize: function() {
       contents.ContentView.prototype.initialize.apply(this, arguments);
-
     },
 
     getEditorClass: function() {
@@ -127,7 +126,10 @@ define([
       event.preventDefault();
 
       var editor_class = this.getEditorClass(),
-          edit_view = new editor_class({model: this.model});
+          edit_view = new editor_class({
+            app: this.app,
+            model: this.model
+          });
 
       edit_view.on('close', this.render);
       this.$el.html(edit_view.render().el);
