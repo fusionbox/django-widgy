@@ -304,7 +304,7 @@ THUMBNAIL_PROCESSORS = (
 )
 FILER_FILE_MODELS = (
     #'widgy.contrib.page_builder.models.WidgyImageFile',
-    #'filer.models.imagemodels.Image',
+    'filer.models.imagemodels.Image',
     'filer.models.filemodels.File',
 )
 

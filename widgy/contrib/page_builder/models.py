@@ -1,9 +1,11 @@
 import os
 
+from django import forms
 from django.db import models
 from django.conf import settings
 
 from filer.fields.file import FilerFileField
+from filer.models.filemodels import File
 
 from widgy.models import Content
 from widgy.models.mixins import StrictDefaultChildrenMixin
@@ -150,10 +152,12 @@ class Section(Content):
 registry.register(Section)
 
 
-def validate_image(*args, **kwargs):
-    import pdb; pdb.set_trace()
-    iext = os.path.splitext(iname)[1].lower()
-    return iext in ['.jpg', '.jpeg', '.png', '.gif']
+def validate_image(file_pk):
+    file = File.objects.get(pk=file_pk)
+    iext = os.path.splitext(file.file.path)[1].lower()
+    if not iext in ['.jpg', '.jpeg', '.png', '.gif']:
+        raise forms.ValidationError('File type must be jpg, png, or gif')
+    return file_pk
 
 
 class Image(Content):
@@ -162,7 +166,7 @@ class Image(Content):
     # What should happen on_delete.  Set to models.PROTECT so this is harder to
     # ignore and forget about.
     image = FilerFileField(null=True, blank=True,
-                           #validators=[validate_image],
+                           validators=[validate_image],
                            related_name='image_widgets',
                            on_delete=models.PROTECT)
 
