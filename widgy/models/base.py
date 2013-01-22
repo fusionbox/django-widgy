@@ -595,7 +595,7 @@ class UnknownWidget(Content):
     installed.
     """
 
-    deletable = True
+    deletable = False
     draggable = False
     editable = False
 
