@@ -214,30 +214,6 @@ class Node(MP_Node):
     def get_possible_parents_url(self, site):
         return site.reverse(site.node_parents_view, kwargs={'node_pk': self.pk})
 
-    def reposition(self, site, right=None, parent=None):
-        """
-        Validates the requested node restructering and executes by calling :meth:`~Node.move` on
-        the instance.
-
-        .. todo::
-
-        fix the error messages
-        """
-        if not self.content.draggable:
-            raise InvalidTreeMovement({'message': "You can't move me"})
-
-        if right:
-            if right.is_root():
-                raise InvalidTreeMovement({'message': 'You can\'t move the root'})
-
-            site.validate_relationship(right.get_parent().content, self.content)
-            self.move(right, pos='left')
-        elif parent:
-            site.validate_relationship(parent.content, self.content)
-            self.move(parent, pos='last-child')
-        else:
-            assert right or parent
-
     def filter_child_classes(self, site, classes):
         """
         What Content classes from `classes` would I let be my children?
@@ -433,14 +409,15 @@ class Content(models.Model):
 
     def add_child(self, site, cls, **kwargs):
         obj = cls.objects.create(**kwargs)
+        node = self.node.add_child(content=obj)
 
         try:
             site.validate_relationship(self, obj)
-        except ParentChildRejection:
+        except:
+            node.delete()
             obj.delete()
             raise
 
-        self.node.add_child(content=obj)
         obj.post_create(site)
         return obj
 
@@ -449,15 +426,16 @@ class Content(models.Model):
             raise RootDisplacementError({'message': 'You can\'t put things next to me'})
 
         obj = cls.objects.create(**kwargs)
+        node = self.node.add_sibling(content=obj, pos='left')
         parent = self.node.get_parent().content
 
         try:
             site.validate_relationship(parent, obj)
         except ParentChildRejection:
+            node.delete()
             obj.delete()
             raise
 
-        self.node.add_sibling(content=obj, pos='left')
         obj.post_create(site)
         return obj
 
@@ -590,6 +568,19 @@ class Content(models.Model):
         return {
             'edit_template': self.get_form_template(request),
         }
+
+    def reposition(self, site, right=None, parent=None):
+        if right:
+            if right.node.is_root():
+                raise InvalidTreeMovement({'message': 'You can\'t move the root'})
+
+            site.validate_relationship(right.get_parent(), self)
+            self.node.move(right.node, pos='left')
+        elif parent:
+            site.validate_relationship(parent, self)
+            self.node.move(parent.node, pos='last-child')
+        else:
+            assert right or parent
 
 
 class UnknownWidget(Content):
