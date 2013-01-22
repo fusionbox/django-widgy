@@ -297,6 +297,11 @@
 .node {
   .node {
     .shelf {
+      &.empty {
+        // a shelf without any widgets shouldn't be displayed at all
+        display: none
+      }
+
       position: static;
       h2 {
         display: inline-block;
@@ -391,6 +396,16 @@ body, html {
   }
 }
 
+.widgy .node.widgy.unknownwidget {
+  background-size: 50px 50px;
+  background-color: #CCCCCC;
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
+                    transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
+                    transparent 75%, transparent);
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
+                    transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
+                    transparent 75%, transparent);
+}
 
 
 /* Mezzanine Override */
