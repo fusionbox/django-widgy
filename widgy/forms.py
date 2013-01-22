@@ -5,6 +5,8 @@ from django import forms
 from django.template.loader import render_to_string
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
+from django.forms import widgets
+from django.contrib.contenttypes.models import ContentType
 
 try:
     from django.utils.html import format_html
@@ -52,6 +54,31 @@ class WidgyWidget(forms.HiddenInput):
         })
 
 
+class ContentTypeRadioInput(widgets.RadioInput):
+    def __init__(self, name, value, attrs, choice, index):
+        super(ContentTypeRadioInput, self).__init__(name, value, attrs, choice, index)
+        self.choice_label = format_html('<span class="label">{0}</span>', self.choice_label)
+
+    def tag(self):
+        tag = super(ContentTypeRadioInput, self).tag()
+        ct = ContentType.objects.get_for_id(self.choice_value)
+        return format_html('<div class="previewImage {0} {1}"></div>{2}', ct.app_label, ct.model, tag)
+
+
+class ContentTypeRadioRenderer(widgets.RadioFieldRenderer):
+    def __iter__(self):
+        for i, choice in enumerate(self.choices):
+            yield ContentTypeRadioInput(self.name, self.value, self.attrs.copy(), choice, i)
+
+    def __getitem__(self, idx):
+        choice = self.choices[idx] # Let the IndexError propogate
+        return ContentTypeRadioInput(self.name, self.value, self.attrs.copy(), choice, idx)
+
+
+class ContentTypeRadioSelect(widgets.RadioSelect):
+    renderer = ContentTypeRadioRenderer
+
+
 class WidgyFormField(forms.ModelChoiceField):
     """
     Django form field that switches its widget based on the context of the
@@ -82,8 +109,9 @@ class WidgyFormField(forms.ModelChoiceField):
             self.widget = DisplayWidget(display_name=choices[1][1])
             self.help_text = 'You must save before you can edit this.'
         else:
-            self.widget = forms.Select(
-                choices=choices,
+            self.widget = ContentTypeRadioSelect(
+                # remove the empty choice
+                choices=[c for c in choices if c[0]]
             )
 
         self.widget.site = self.site
