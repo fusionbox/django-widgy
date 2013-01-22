@@ -297,6 +297,11 @@
 .node {
   .node {
     .shelf {
+      &.empty {
+        // a shelf without any widgets shouldn't be displayed at all
+        display: none
+      }
+
       position: static;
       h2 {
         display: inline-block;
