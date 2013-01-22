@@ -152,3 +152,39 @@ class Section(Content):
         return isinstance(parent, Accordion)
 
 registry.register(Section)
+
+
+class Table(Content):
+    shelf = True
+
+    def valid_parent_of(self, cls, obj=None):
+        return issubclass(cls, TableRow)
+
+
+class TableRow(Content):
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        return isinstance(parent, Table)
+
+    def valid_parent_of(self, cls, obj=None):
+        return issubclass(cls, TableData)
+
+    def post_create(self, site):
+        other_row = self.get_next_sibling() or self.get_prev_sibling()
+        if other_row:
+            for i in range(len(other_row.children)):
+                self.add_child(site, TableData)
+
+
+class TableData(Content):
+    accepting_children = True
+    draggable = False
+    deletable = False
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        return isinstance(parent, TableRow)
+
+registry.register(Table)
+registry.register(TableRow)
+registry.register(TableData)

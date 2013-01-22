@@ -462,6 +462,10 @@ class Content(models.Model):
         sib = self.node.get_next_sibling()
         return sib and sib.content
 
+    def get_prev_sibling(self):
+        sib = self.node.get_prev_sibling()
+        return sib and sib.content
+
     def get_parent(self):
         parent = self.node.get_parent()
         return parent and parent.content
