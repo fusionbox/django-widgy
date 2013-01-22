@@ -322,6 +322,7 @@ class Content(models.Model):
         data = {
             'url': self.get_api_url(site),
             '__class__': self.class_name,
+            'css_classes': self.css_classes,
             'component': self.component_name,
             'model': self._meta.module_name,
             'object_name': self._meta.object_name,
@@ -350,6 +351,7 @@ class Content(models.Model):
         return {
             '__class__': "%s.%s" % (cls._meta.app_label, cls._meta.module_name),
             'title': cls._meta.verbose_name.title(),
+            'css_classes': (cls._meta.app_label, cls._meta.module_name),
         }
 
     @property
@@ -358,6 +360,10 @@ class Content(models.Model):
         :Returns: a fully qualified classname including app_label and module_name
         """
         return "%s.%s" % (self._meta.app_label, self._meta.module_name)
+
+    @property
+    def css_classes(self):
+        return (self._meta.app_label, self._meta.module_name)
 
     @property
     def node(self):

@@ -88,6 +88,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         this.pop_out = content.pop_out;
         this.shelf = content.shelf;
         this.__class__ = content.__class__;
+        this.css_classes = content.css_classes;
 
         // This is asynchronous because of requirejs.
         contents.getModel(content.component, _.bind(this.instantiateContent, this, content));
@@ -184,6 +185,13 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
     triggerReposition: function(model) {
       model.trigger('reposition', model, model.get('parent_id'), model.get('right_id'));
+    },
+
+    render: function() {
+      Backbone.View.prototype.render.apply(this, arguments);
+      _.each(this.model.css_classes, this.$el.addClass, this.$el);
+
+      return this;
     },
 
     /**
@@ -614,7 +622,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
     render: function() {
       debug.call(this, 'render');
-      Backbone.View.prototype.render.apply(this, arguments);
+      NodeViewBase.prototype.render.apply(this, arguments);
 
       this.$children = this.$el.children('.node_children');
       this.$content = this.$el.children('.content');
