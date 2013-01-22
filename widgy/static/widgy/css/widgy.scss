@@ -10,7 +10,7 @@
 
 .widgy {
   -webkit-user-select: none;
-  -moz-user-select: none;
+  -moz-user-select: -moz-none;
 
   .editor {
     width: 960px;
@@ -52,7 +52,7 @@
 
     .content {
       -webkit-user-select: auto;
-      -moz-user-select: auto;
+      -moz-user-select: text;
     }
 
     p.drag-row {
