@@ -4,7 +4,7 @@ from django.conf import settings
 from widgy.models import Content
 from widgy.models.mixins import StrictDefaultChildrenMixin
 from widgy.db.fields import WidgyField
-from widgy.contrib.page_builder.db.fields import MarkdownField
+from widgy.contrib.page_builder.db.fields import MarkdownField, VideoField
 from widgy import registry
 
 
@@ -152,3 +152,13 @@ class Section(Content):
         return isinstance(parent, Accordion)
 
 registry.register(Section)
+
+
+class Video(Content):
+    title = models.CharField(max_length=255)
+    video = VideoField()
+    caption = models.CharField(max_length=255, blank=True)
+
+    editable = True
+
+registry.register(Video)
