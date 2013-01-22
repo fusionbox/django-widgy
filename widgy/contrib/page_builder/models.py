@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 
 from widgy.models import Content
-from widgy.models.mixins import StrictDefaultChildrenMixin
+from widgy.models.mixins import StrictDefaultChildrenMixin, InvisibleMixin
 from widgy.db.fields import WidgyField
 from widgy.contrib.page_builder.db.fields import MarkdownField
 from widgy import registry
@@ -188,6 +188,9 @@ class TableHeaderData(TableElement):
     draggable = True
     deletable = True
 
+    class Meta:
+        verbose_name = 'column'
+
     @classmethod
     def valid_child_of(cls, parent, obj=None):
         if obj and obj.get_parent():
@@ -249,6 +252,9 @@ class TableHeader(TableElement):
     draggable = False
     deletable = False
 
+    class Meta:
+        verbose_name = 'columns'
+
     @classmethod
     def valid_child_of(cls, parent, obj=None):
         if obj in parent.children:
@@ -260,7 +266,7 @@ class TableHeader(TableElement):
         return issubclass(cls, TableHeaderData)
 
 
-class TableBody(TableElement):
+class TableBody(InvisibleMixin, TableElement):
     tag_name = 'tbody'
 
     draggable = False
@@ -276,6 +282,7 @@ class TableBody(TableElement):
 
 class Table(StrictDefaultChildrenMixin, TableElement):
     tag_name = 'table'
+    component_name = 'table'
 
     shelf = True
 

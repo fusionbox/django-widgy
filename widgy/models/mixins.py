@@ -26,3 +26,21 @@ class StrictDefaultChildrenMixin(DefaultChildrenMixin):
 
         return (issubclass(cls, tuple([child_class[0] for child_class in self.default_children])) and
                 len(self.children) < len(self.default_children))
+
+
+class InvisibleMixin(object):
+    """
+    Provides a preview template that accepts children, but is otherwise
+    invisible.
+    """
+    css_classes = ('invisible',)
+
+    @classmethod
+    def get_template_kwargs(cls, **kwargs):
+        defaults = {
+            'app_label': 'mixins',
+            'module_name': 'invisible',
+        }
+        defaults.update(**kwargs)
+
+        return defaults
