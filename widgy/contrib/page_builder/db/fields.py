@@ -47,7 +47,7 @@ class VimeoUrl(VideoUrl):
 
 
 VIDEO_URL_CLASSES = {
-    r'^https?:\/\/(?:www\.)?youtube.com\/watch\?v=(\w+)$': YoutubeUrl,
+    r'^https?:\/\/(?:www\.)?youtube.com\/watch\?(?=.*v=\w+)(?:\S+)?$': YoutubeUrl,
     r'^https?:\/\/youtu\.be\/(\w+)$': YoutubeUrl,
     r'^https?:\/\/(?:www\.)?vimeo.com\/(\d+)$': VimeoUrl,
 }
