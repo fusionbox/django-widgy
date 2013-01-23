@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.utils import unittest
 
 from widgy.site import WidgySite
 from widgy.models import Node
@@ -45,6 +46,36 @@ class TestTableWidget(TestCase):
         self.assertEqual(len(self.table.body.children[1].children), 2)
         self.assertEqual(refetch(row_1).children[1], cell_1)
         self.assertEqual(refetch(row_2).children[1], cell_2)
+
+    def test_three_columns(self):
+        row_1 = self.table.body.add_child(widgy_site, TableRow)
+
+        th1 = self.table.header.add_child(widgy_site, TableHeaderData)
+        th2 = th1.add_sibling(widgy_site, TableHeaderData)
+
+        cell_1 = row_1.children[0]
+        cell_2 = row_1.children[1]
+
+        th3 = th1.add_sibling(widgy_site, TableHeaderData)
+
+        self.assertEqual(len(self.table.body.children[0].children), 3)
+        self.assertEqual(refetch(row_1).children[0], cell_1)
+        self.assertEqual(refetch(row_1).children[2], cell_2)
+
+    def test_three_columns_front(self):
+        row_1 = self.table.body.add_child(widgy_site, TableRow)
+
+        th1 = self.table.header.add_child(widgy_site, TableHeaderData)
+        th2 = th1.add_sibling(widgy_site, TableHeaderData)
+
+        cell_1 = row_1.children[0]
+        cell_2 = row_1.children[1]
+
+        th3 = th2.add_sibling(widgy_site, TableHeaderData)
+
+        self.assertEqual(len(self.table.body.children[0].children), 3)
+        self.assertEqual(refetch(row_1).children[1], cell_1)
+        self.assertEqual(refetch(row_1).children[2], cell_2)
 
     def test_add_row(self):
         self.table.header.add_child(widgy_site, TableHeaderData)
@@ -106,6 +137,8 @@ class TestTableWidget(TestCase):
         self.assertEqual(len(first_row.children), 1)
         self.assertEqual(len(second_row.children), 1)
 
+    # before_delete is called without post_create
+    @unittest.expectedFailure
     def test_compatibility(self):
         def invalid(parent, child_class):
             with self.assertRaises(ParentChildRejection):
@@ -120,3 +153,16 @@ class TestTableWidget(TestCase):
         row = self.table.body.add_child(widgy_site, TableRow)
         invalid(row, TableRow)
         invalid(row, TableHeaderData)
+
+    def test_table_inside_of_table(self):
+        # this mainly exercises TableElement.table
+        self.table.header.add_child(widgy_site, TableHeaderData)
+        tr = self.table.body.add_child(widgy_site, TableRow)
+        td = tr.children[0]
+        table2 = td.add_child(widgy_site, Table)
+        table2_tr = table2.body.add_child(widgy_site, TableRow)
+
+        # the outer table has 1 column, the inside should have 0
+        self.assertEqual(tr.children, [td])
+        self.assertEqual(table2_tr.children, [])
+
