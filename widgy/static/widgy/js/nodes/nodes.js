@@ -66,7 +66,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       var ret = Backbone.Model.prototype.set.call(this, attrs, options);
 
       if (ret) {
-        if (children) this.children.reset(children);
+        if (children) {
+          this.children.update2(children);
+        }
         if (content) this.loadContent(content);
       }
 
@@ -81,9 +83,13 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     loadContent: function(content) {
-      debug.call(this, 'loadContent', content);
+      if ( this.content ) {
+        console.log(this.__class__, 'updating content', content);
 
-      if ( content ) {
+        this.content.set(content);
+      } else if ( content ) {
+        console.log(this.__class__, 'go load my content model');
+
         // we store these variables because we need them now.
         this.pop_out = content.pop_out;
         this.shelf = content.shelf;
@@ -96,7 +102,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     instantiateContent: function(content, model_class) {
-      debug.call(this, 'instantiateContent', content, model_class);
+      console.log(this.__class__, 'instantiating content');
 
       this.content = new model_class(content, {
         node: this
@@ -141,7 +147,25 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
    * interface to NodeViews for how to handle child NodeViews.
    */
   var NodeCollection = Backbone.Collection.extend({
-    model: Node
+    model: Node,
+
+    // less destructive update.
+    update2: function(data) {
+      var models = [];
+
+      _.each(data, function(child) {
+        var existing = this.get(child.url);
+
+        if ( existing ) {
+          existing.set(child);
+          models.push(existing);
+        } else {
+          models.push(child);
+        }
+      }, this);
+
+      this.update(models);
+    }
   });
 
 
@@ -342,6 +366,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       NodeViewBase.prototype.onClose.apply(this, arguments);
 
       this.content_view.close();
+      delete this.content_view;
+
       this.list.closeAll();
     },
 
@@ -383,7 +409,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       var error = function() {
         spinner.restore();
-        model.raiseError.call(this, arguments);
+        modal.raiseError.apply(this, arguments);
       };
 
       this.model.collection.trigger('destroy_child');
@@ -647,7 +673,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     renderContent: function(content) {
-      debug.call(this, 'renderContent', content);
+      if ( this.content_view )
+        return;
+
+      console.log(this.model.__class__, 'renderContent');
 
       var view_class = content.getViewClass();
 
@@ -665,7 +694,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     renderShelf: function() {
-      if (this.shelf) return false;
+      if (this.shelf)
+        return false;
 
       var shelf = this.shelf = new shelves.ShelfView({
         collection: new shelves.ShelfCollection({

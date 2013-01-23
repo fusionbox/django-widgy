@@ -43,6 +43,8 @@ define([ 'widgy.backbone' ], function(Backbone) {
 
     initialize: function(options) {
       this.app = options.app;
+
+      this.listenTo(this.model, 'change:preview_template', this.render);
     },
 
     getTemplate: function() {

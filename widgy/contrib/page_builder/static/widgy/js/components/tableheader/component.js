@@ -1,6 +1,6 @@
 define([ 'widgy.contents', 'widgets/widgets' ], function(contents, widgets) {
 
-  var TableView = widgets.WidgetView.extend({
+  var TableHeaderView = widgets.WidgetView.extend({
     initialize: function() {
       widgets.WidgetView.prototype.initialize.apply(this, arguments);
 
@@ -24,9 +24,9 @@ define([ 'widgy.contents', 'widgets/widgets' ], function(contents, widgets) {
     }
   });
 
-  var Table = contents.Content.extend({
-    viewClass: TableView
+  var TableHeader = contents.Content.extend({
+    viewClass: TableHeaderView
   });
 
-  return Table;
+  return TableHeader;
 });
