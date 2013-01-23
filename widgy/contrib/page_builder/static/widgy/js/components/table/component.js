@@ -20,8 +20,10 @@ define([ 'widgy.contents', 'widgets/widgets' ], function(contents, widgets) {
     },
 
     unblock: function() {
-      if ( this.overlay )
+      if ( this.overlay ) {
         this.overlay.remove();
+        delete this.overlay;
+      }
     },
 
     refresh: function() {
