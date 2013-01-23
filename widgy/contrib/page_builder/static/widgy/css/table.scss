@@ -13,9 +13,11 @@
       display: table-cell;
       width: auto;
 
-      span.title,
-      .delete span {
-        display: none;
+      & > .content .drag-row {
+        span.title,
+        .delete span {
+          display: none;
+        }
       }
     }
   }

@@ -251,6 +251,7 @@ class TableData(TableElement):
 class TableHeader(TableElement):
     draggable = False
     deletable = False
+    component_name = 'tableheader'
 
     class Meta:
         verbose_name = 'columns'
