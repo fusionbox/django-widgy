@@ -29,7 +29,8 @@ define([ 'widgy.contents', 'widgets/widgets' ], function(contents, widgets) {
     refresh: function() {
       this.model.node.fetch({
         app: this.app,
-        success: this.unblock
+        success: this.unblock,
+        resort: true
       });
     }
   });

@@ -27,10 +27,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
   var Node = Backbone.Model.extend({
     urlRoot: '/admin/widgy/node/',
 
-    constructor: function(attrs, options) {
+    constructor: function() {
       this.children = new NodeCollection();
 
-      Backbone.Model.call(this, attrs, options);
+      Backbone.Model.apply(this, arguments);
     },
 
     initialize: function() {
@@ -43,11 +43,15 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     parse: function(response) {
-      return response.node;
+      if ( response.node ) {
+        return response.node;
+      } else {
+        return response;
+      }
     },
 
     set: function(key, val, options) {
-      var attr, attrs;
+      var attrs;
 
       // Handle both `"key", value` and `{key: value}` -style arguments.
       if (_.isObject(key)) {
@@ -67,7 +71,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       if (ret) {
         if (children) {
-          this.children.update2(children);
+          this.children.update2(children, options);
+          if ( options && options.resort ) {
+            this.children.sort();
+          }
         }
         if (content) this.loadContent(content);
       }
@@ -149,22 +156,50 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
   var NodeCollection = Backbone.Collection.extend({
     model: Node,
 
-    // less destructive update.
-    update2: function(data) {
+    /**
+     * For each model in the new data, if
+     *    - the model exists, update the data of that model.
+     *    - the model is new, create a new instance and add it to the
+     *      collection.
+     *    - else, remove the old model from the collection.
+     */
+    update2: function(data, options) {
       var models = [];
 
       _.each(data, function(child) {
         var existing = this.get(child.url);
 
         if ( existing ) {
-          existing.set(child);
+          existing.set(child, options);
           models.push(existing);
         } else {
           models.push(child);
         }
       }, this);
 
-      this.update(models);
+      this.update(models, options);
+    },
+
+    /**
+     * Sort based on the right_ids.  This will most likely fail if the
+     * right_ids are not up to date, so please only call this after updating
+     * the whole collection.
+     */
+    sort: function(options) {
+      var new_order = [],
+          right_id = null;
+
+      while (new_order.length < this.models.length) {
+        var has_right = this.where({right_id: right_id})[0];
+        new_order.unshift(has_right);
+
+        right_id = has_right.id;
+      }
+
+      this.models = new_order;
+
+      if (!options || !options.silent) this.trigger('sort', this, options);
+      return this;
     }
   });
 
@@ -346,6 +381,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         'dropChildView',
         'receiveChildView',
         'renderContent',
+        'resortChildren',
         'nodeSync',
         'popOut',
         'popIn'
@@ -357,7 +393,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this
         .listenTo(this.model, 'load:content', this.renderContent)
         .listenTo(this.collection, 'add', this.addChild)
-        .listenTo(this.collection, 'reset', this.renderChildren);
+        .listenTo(this.collection, 'reset', this.renderChildren)
+        .listenTo(this.collection, 'sort', this.resortChildren);
 
       this.list = new Backbone.ViewList();
     },
@@ -401,6 +438,13 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.app.node_view_list.push(node_view);
       this.list.push(node_view);
       this.position(node_view.render());
+    },
+
+    resortChildren: function() {
+      console.log(this.model.__class__, 'resorting children');
+      this.collection.each(function(model) {
+        this.$children.append(this.list.findByModel(model).el);
+      }, this);
     },
 
     'delete': function(event) {
@@ -746,7 +790,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       }
 
       this.model.fetch({
-        app: this.app
+        app: this.app,
+        resort: true
       });
 
       return false;
