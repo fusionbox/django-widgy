@@ -255,8 +255,14 @@
       @extend %loading;
     }
   }
+
+  // node overlay
+  .overlay {
+    position: absolute;
+  }
 }
 
+// global overlay
 .overlay {
   position: fixed;
   background-color: rgba(255, 255, 255, .3);
@@ -353,7 +359,7 @@ body, html {
         font-weight: bold;
       }
 
-      > div.preview  {
+      > div.preview:not(:empty)  {
         margin-bottom: 2em;
       }
     }
@@ -390,7 +396,7 @@ body, html {
   }
 
 
-  div.preview {
+  div.preview:not(:empty) {
     border: 1px solid #E8E8E8;
     padding: 1em;
   }
@@ -405,6 +411,12 @@ body, html {
   background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
                     transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
                     transparent 75%, transparent);
+}
+
+.widgy .node.invisible {
+  background-color: inherit;
+  padding: 0;
+  border: 0 none;
 }
 
 
