@@ -125,13 +125,13 @@ class TestCore(RootNodeTestCase):
         left, right = make_a_nice_tree(self.root_node)
 
         with self.assertRaises(InvalidTreeMovement):
-            self.root_node.reposition(widgy_site, parent=left)
+            self.root_node.content.reposition(widgy_site, parent=left.content)
 
         with self.assertRaises(InvalidTreeMovement):
-            left.reposition(widgy_site, right=self.root_node)
+            left.content.reposition(widgy_site, right=self.root_node.content)
 
         # swap left and right
-        right.reposition(widgy_site, right=left)
+        right.content.reposition(widgy_site, right=left.content)
 
         new_left, new_right = self.root_node.get_children()
         self.assertEqual(right, new_left)
@@ -139,20 +139,12 @@ class TestCore(RootNodeTestCase):
 
         raw_text = new_right.get_first_child()
         with self.assertRaises(ChildWasRejected):
-            raw_text.reposition(widgy_site, parent=self.root_node, right=new_left)
+            raw_text.content.reposition(widgy_site, parent=self.root_node.content, right=new_left.content)
 
         subbucket = list(new_right.get_children())[-1]
-        subbucket.reposition(widgy_site, parent=self.root_node, right=new_left)
+        subbucket.content.reposition(widgy_site, parent=self.root_node.content, right=new_left.content)
         new_subbucket, new_left, new_right = self.root_node.get_children()
         self.assertEqual(new_subbucket, subbucket)
-
-    def test_reposition_immovable(self):
-        left, right = make_a_nice_tree(self.root_node)
-        bucket = left.content.add_child(widgy_site, ImmovableBucket)
-
-        with self.assertRaises(InvalidTreeMovement):
-            bucket.node.reposition(widgy_site, parent=self.root_node,
-                                   right=left)
 
     def test_proxy_model(self):
         bucket = VowelBucket.add_root(widgy_site)
@@ -435,6 +427,16 @@ class TestApi(RootNodeTestCase, HttpTestCase):
             Node.objects.get(pk=right.pk)
 
         self.assertEqual(Node.objects.count(), number_of_nodes - number_of_right_nodes)
+
+    def test_reposition_immovable(self):
+        left, right = make_a_nice_tree(self.root_node)
+        bucket = left.content.add_child(widgy_site, ImmovableBucket)
+
+        resp = self.put(bucket.node.get_api_url(widgy_site), {
+            'right_id': None,
+            'parent_id': right.get_api_url(widgy_site),
+        })
+        self.assertEquals(resp.status_code, 409)
 
     def test_available_children(self):
         left, right = make_a_nice_tree(self.root_node)

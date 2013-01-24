@@ -126,13 +126,16 @@ class NodeView(WidgyView):
         node = get_object_or_404(Node, pk=node_pk)
         data = self.data()
 
+        if not node.content.draggable:
+            raise InvalidTreeMovement({'message': "You can't move me"})
+
         try:
             right = Node.objects.get(pk=extract_id(data['right_id']))
-            node.reposition(self.site, right=right)
+            node.content.reposition(self.site, right=right.content)
         except Node.DoesNotExist:
             try:
                 parent = Node.objects.get(pk=extract_id(data['parent_id']))
-                node.reposition(self.site, parent=parent)
+                node.content.reposition(self.site, parent=parent.content)
             except Node.DoesNotExist:
                 raise Http404
 

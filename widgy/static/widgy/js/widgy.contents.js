@@ -14,9 +14,12 @@ define([ 'widgy.backbone' ], function(Backbone) {
   var Content = Backbone.Model.extend({
     viewClass: false,
 
-    initialize: function(options) {
+    initialize: function(attributes, options) {
+      Backbone.Model.prototype.initialize.apply(this, arguments);
+
       // debugging: this will go away later probably.
       this.type = this.get('model');
+      this.node = options.node;
     },
 
     getViewClass: function() {
@@ -40,6 +43,8 @@ define([ 'widgy.backbone' ], function(Backbone) {
 
     initialize: function(options) {
       this.app = options.app;
+
+      this.listenTo(this.model, 'change:preview_template', this.render);
     },
 
     getTemplate: function() {
