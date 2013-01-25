@@ -752,6 +752,40 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
           .listenTo(shelf, 'stopDrag', this.stopDrag);
 
       this.$children.before(shelf.render().el);
+
+      // position sticky
+      if ( this.options.rootNode ) {
+        var state = -1;
+        $(window).scroll(_.bind(function() {
+          var upper_bound = this.el.offsetTop,
+              lower_bound = upper_bound + this.el.offsetHeight - this.shelf.el.offsetHeight;
+          if ( window.scrollY < upper_bound && state !== -1) {
+            this.shelf.$el.css({
+              position: '',
+              top: '',
+              left: ''
+            });
+            state = -1;
+          }
+          if ( window.scrollY > upper_bound && state !== 0) {
+            this.shelf.$el.css({
+              position: 'fixed',
+              // this 80px is to adjust for Mezzanine's fixed header.
+              top: 80,
+              left: this.shelf.$el.offset().left
+            });
+            state = 0;
+          }
+          if ( window.scrollY > lower_bound && state !== 1) {
+            this.shelf.$el.css({
+              position: 'absolute',
+              top: lower_bound - upper_bound,
+              left: ''
+            });
+            state = 1;
+          }
+        }, this));
+      }
     },
 
     toJSON: function() {
