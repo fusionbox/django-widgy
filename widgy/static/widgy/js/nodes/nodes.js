@@ -292,7 +292,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.$el.css({
         top: '',
         left: '',
-        width: ''
+        width: '',
+        'z-index': ''
       });
 
       this.$el.removeClass('being_dragged');
@@ -751,10 +752,13 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.listenTo(shelf, 'startDrag', this.startDrag)
           .listenTo(shelf, 'stopDrag', this.stopDrag);
 
-      this.$children.before(shelf.render().el);
-
       // position sticky
       if ( this.options.rootNode ) {
+        // The shelf needs to be after the children because in state 0 (fixed),
+        // the shelf items will be displayed underneath everything else that is
+        // after it in HTML.
+        this.$children.after(shelf.render().el);
+
         var state = -1;
         $(window).scroll(_.bind(function() {
           var upper_bound = this.el.offsetTop,
@@ -785,6 +789,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
             state = 1;
           }
         }, this));
+      } else {
+        this.$children.before(shelf.render().el);
       }
     },
 
@@ -858,13 +864,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       if ( event.which !== 1 )
         return;
 
-      var placeholder = this.placeholder = $('<li class="placeholder">')
-        .css({
-          width: this.$el.width(),
-          height: this.$el.height(),
-          margin: this.$el.css('margin'),
-          padding: this.$el.css('padding')
-        });
+      var placeholder = this.placeholder = $('<li class="drag_placeholder">&nbsp;</li>').css({
+        width: this.$el.width(),
+        padding: this.$el.css('padding')
+      });
 
       this.$el.after(placeholder);
     }
