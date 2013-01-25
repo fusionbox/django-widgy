@@ -404,7 +404,7 @@ class Content(models.Model):
 
     def add_child(self, site, cls, **kwargs):
         obj = cls.objects.create(**kwargs)
-        node = self.node.add_child(content=obj)
+        self.node.add_child(content=obj)
 
         try:
             site.validate_relationship(self, obj)
@@ -420,7 +420,7 @@ class Content(models.Model):
             raise RootDisplacementError({'message': 'You can\'t put things next to me'})
 
         obj = cls.objects.create(**kwargs)
-        node = self.node.add_sibling(content=obj, pos='left')
+        self.node.add_sibling(content=obj, pos='left')
         parent = self.node.get_parent().content
 
         try:

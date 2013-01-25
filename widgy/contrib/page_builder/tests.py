@@ -137,8 +137,6 @@ class TestTableWidget(TestCase):
         self.assertEqual(len(first_row.children), 1)
         self.assertEqual(len(second_row.children), 1)
 
-    # before_delete is called without post_create
-    # @unittest.expectedFailure
     def test_compatibility(self):
         def invalid(parent, child_class):
             with self.assertRaises(ParentChildRejection):
