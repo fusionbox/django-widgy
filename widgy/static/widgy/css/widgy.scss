@@ -1,63 +1,69 @@
 @import "widgy_common.scss";
 
-/* CMS
+/* Placeholder selectors
 -------------------*/
-
 %loading {
   background: url('../image/loading.gif') center no-repeat;
   color: transparent;
 }
 
+
+/* Widgy
+-------------------*/
+
 .widgy {
   -webkit-user-select: none;
   -moz-user-select: -moz-none;
 
-  .editor {
-    width: 960px;
-    display: inline-block;
+  // All Shelves
+  .shelf {
+    li {
+      cursor: pointer;
 
-    .shelf {
-      position: absolute;
-      top: 0;
-      right: -210px;
-      width: 200px;
-
-      li {
-        cursor: pointer;
-
-        &.placeholder {
-          border: 1px dashed #000;
-          background-color: wheat;
-          display: block;
-          margin: 0px;
-          padding: 0px;
-        }
+      &.placeholder {
+        border: 1px dashed #000;
+        background-color: wheat;
       }
     }
   }
 
-  // Node Container
-  ul.nodeChildren {
-    margin: 0 !important;
-    padding: 0 !important;
-
-    li ul.nodeChildren {
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-  }
-
+  // All Nodes
   .node {
-
-
+    @include rounded(4px);
+    list-style: none;
+    margin: 0 0 1em 0;
+    padding: 10px;
+    position: relative;
 
     .content {
       -webkit-user-select: auto;
       -moz-user-select: text;
+
+      p.drag-row {
+        @include clearfix;
+        padding: 1em 0;
+      }
+
+      button.edit,
+      button.delete {
+        display: inline;
+        float: right;
+        margin-left: 1em;
+      }
+
+      .dragHandle {
+        left: -5px;
+        float: left;
+        font-size: 20px;
+        position: relative;
+        cursor: pointer;
+      }
     }
 
-    p.drag-row {
-      @include clearfix;
+    .preview:not(:empty) {
+      border: 1px solid #E8E8E8;
+      padding: 1em;
+      margin-bottom: 2em;
     }
 
     &.being_dragged {
@@ -66,36 +72,39 @@
       position: fixed;
     }
 
-    p.title {
-      font-size: 14px;
-      font-weight: bold;
-      line-height: 18px;
-      margin-bottom: 10px;
+    // Node Container
+    ul.nodeChildren {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
 
-      &.bucket {
-        font-size: 18px;
-        line-height: 24px;
-        padding-top: 0px;
+    // Local Shelf
+    .node {
+      .shelf {
+
+        &.empty {
+          // a shelf without any widgets shouldn't be displayed at all
+          display: none
+        }
+
+        h2 {
+          display: inline-block;
+          -webkit-transform: rotate(-90deg);
+        }
+
+        ul {
+          display: inline;
+          li {
+            display: inline-block;
+            margin-left: 1em;
+          }
+        }
       }
     }
 
-    button.edit,
-    button.delete {
-      display: inline;
-      float: right;
-      margin-left: 1em;
-
-      &.loading {
-        @extend %loading;
-      }
-    }
-
-    .dragHandle {
-      left: -5px;
-      float: left;
-      font-size: 20px;
-      position: relative;
-      cursor: pointer;
+    // node overlay
+    .overlay {
+      position: absolute;
     }
   }
 
@@ -103,8 +112,6 @@
     background: #fff;
     height: 25px;
     padding: 10px;
-    width: 100%;
-
 
     &.active {
       border: 1px dashed #000;
@@ -112,9 +119,88 @@
     }
   }
 
+  // App View
+  .editor {
+    width: 960px;
+    display: inline-block;
+  }
+
+  // Root Node
+  section.node {
+    background: $black10;
+    border: 2px solid #fff;
+    width: 966px;
+    float: left;
+
+    & > .content {
+      span.title {
+        font-size: 2.4em;
+        padding: 5px 0;
+      }
+    }
+
+    // Root Shelf
+    & > .shelf {
+      position: absolute;
+      top: 0;
+      right: -210px;
+      width: 200px;
+    }
+
+    // Second level
+    .node {
+      background: #fff;
+      border: 1px solid #fff;
+
+      & > .content {
+        span.title {
+          font-size: 1.4em;
+          padding: 5px 0;
+        }
+      }
+
+      // Third level
+      .node {
+        background: $black10;
+
+        // Fourth level
+        .node {
+          background: #fff;
+
+          // Fifth level
+          .node {
+            background: $black10;
+          }
+        }
+      }
+    }
+  }
+
+  // Specific Node Styles
+  .node {
+    &.invisible {
+      background-color: inherit;
+      padding: 0;
+      border: 0 none;
+
+      & > .nodeChildren:not(:empty) {
+        display: none;
+      }
+    }
+    &.unknownwidget {
+      background-size: 50px 50px;
+      background-color: #CCCCCC;
+      background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
+                        transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
+                        transparent 75%, transparent);
+      background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
+                        transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
+                        transparent 75%, transparent);
+    }
+  }
+
   /* Inputs
   -------------------*/
-
   input[type='text'], textarea {
     @include inset-shadow($black10,0px,1px,2px);
     border: 0px;
@@ -125,91 +211,6 @@
   textarea {
     height: 120px;
   }
-}
-
-
-
-/* Global
------------------------------------------------*/
-.change-form div.submit-row {
-  z-index: 1000;
-}
-
-
-
-
-.widgy {
-
-  /* Node overwrites
-  --------------------*/
-  section.node {
-    width: 966px;
-    float: left;
-  }
-
-  /* Image Widget
-  -------------------*/
-
-  .vFileBrowseField {display:none;}
-
-  p.image-thumbnail {
-    @include rounded(3px);
-    background: white;
-    display: block !important;
-    margin: 0px 0px 10px 0px;
-    padding: 15px;
-    text-align: center;
-
-    img {
-      border: 0px;
-      margin: 0 auto;
-      padding: 0px;
-      width: 60%;
-    }
-  }
-
-  /* Text Widget
-  -------------------*/
-
-  p.text-input {
-    @include clearfix;
-    margin: 20px 0px 20px 0px;
-
-    input[type='text'], textarea {
-      width: 98%;
-    }
-  }
-
-
-  /* File Select
-  -------------------*/
-
-  p.file-select {
-    @include clearfix;
-    margin: 0px 0px 20px 0px;
-
-    input[type='text'] {
-      float: left;
-      width: 70%;
-    }
-
-    button {
-      float: right;
-    }
-  }
-
-  /* Submit Row
-  -------------------*/
-
-  p.submit-row {
-    @include rounded(3px);
-    background: $white20;
-    margin: 0px;
-    padding: 4px;
-  }
-
-  /* Buttons
-  -------------------*/
 
   button {
     background: $blue;
@@ -242,6 +243,10 @@
         background-color: lighten($red,10%);
       }
     }
+
+    &.loading {
+      @extend %loading;
+    }
   }
 
   input[type='submit'] {
@@ -255,11 +260,6 @@
     &.loading {
       @extend %loading;
     }
-  }
-
-  // node overlay
-  .overlay {
-    position: absolute;
   }
 }
 
@@ -275,15 +275,12 @@
 }
 
 .modal {
+  @include rounded(5px);
+  @include shadow(0px 0px 10px #999999);
+
   display: block;
   background-color: #ffffff;
   padding: 20px;
-  border-radius: 5px;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  box-shadow: 0px 0px 10px #999999;
-  -moz-box-shadow: 0px 0px 10px #999999;
-  -webkit-box-shadow: 0px 0px 10px #999999;
   position: fixed;
   width: 300px;
   z-index: 101;
@@ -291,138 +288,8 @@
   margin-left: -150px;
 }
 
-.errorMessage {
-  .modal {
-    .serverResponse {
-      font-weight: bold;
-      font-family: monospace;
-    }
-  }
-}
 
-
-.node {
-  .node {
-    .shelf {
-      &.empty {
-        // a shelf without any widgets shouldn't be displayed at all
-        display: none
-      }
-
-      position: static;
-      h2 {
-        display: inline-block;
-        -webkit-transform: rotate(-90deg);
-      }
-
-      ul {
-        display: inline;
-        li {
-          display: inline-block;
-        }
-      }
-    }
-  }
-}
-
-
-/* Esther New Styling */
-
-body {
-  font-size: 62.5%;
-}
-
-body, html {
-  line-height: normal;
-}
-
-.widgy {
-  .node {
-    @include rounded(4px);
-    background: $black10;
-    border: 2px solid #fff;
-    list-style: none;
-    margin: 0 0 1em 0;
-    padding: 10px;
-    position: relative;
-
-    span.title {
-      font-size: 2.4em;
-      padding: 5px 0;
-    }
-
-    p.drag-row {
-      padding: 1em 0;
-    }
-
-    > .content {
-      > span.title{
-        font-weight: bold;
-      }
-
-      > div.preview:not(:empty)  {
-        margin-bottom: 2em;
-      }
-    }
-
-    .node {
-      background: #fff;
-      border: 1px solid #fff;
-
-      span.title {
-        font-size: 1.4em;
-        padding: 5px 0;
-      }
-
-
-      .node {
-        background: $black10;
-
-
-        .shelf .node {
-          margin-left: 1em;
-        }
-
-        .node {
-          background: #fff;
-
-
-          .node {
-            background: $black10;
-          }
-        }
-      }
-
-    }
-  }
-
-
-  div.preview:not(:empty) {
-    border: 1px solid #E8E8E8;
-    padding: 1em;
-  }
-}
-
-.widgy .node.widgy.unknownwidget {
-  background-size: 50px 50px;
-  background-color: #CCCCCC;
-  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
-                    transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
-                    transparent 75%, transparent);
-  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
-                    transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
-                    transparent 75%, transparent);
-}
-
-.widgy .node.invisible {
-  background-color: inherit;
-  padding: 0;
-  border: 0 none;
-}
-
-
-/* Mezzanine Override */
-
+// Mezzanine Override
 input[type="text"],
 input[type="password"],
 input.vDateField,
@@ -432,4 +299,16 @@ input.vTimeField,
 .inline-tabular .vAutocompleteSearchField,
 .inline-tabular .vM2MAutocompleteSearchField {
   width: 200px;
+}
+
+.change-form div.submit-row {
+  z-index: 1000;
+}
+
+body {
+  font-size: 62.5%;
+}
+
+body, html {
+  line-height: normal;
 }
