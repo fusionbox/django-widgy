@@ -26,7 +26,6 @@
   .node {
     @include rounded(4px);
     list-style: none;
-    margin: 0 0 1em 0;
     padding: 10px;
     position: relative;
 
@@ -73,6 +72,10 @@
     ul.nodeChildren {
       margin: 0 !important;
       padding: 0 !important;
+
+      li {
+        margin: 0 0 1em 0;
+      }
     }
 
     // Local Shelf
@@ -106,7 +109,7 @@
   }
 
   .node_drop_target {
-    background: #fff;
+    background: wheat;
     height: 25px;
     padding: 10px;
 
