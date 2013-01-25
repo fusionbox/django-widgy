@@ -160,7 +160,7 @@ class TableElement(Content):
 
     @property
     def table(self):
-        for i in self.get_ancestors():
+        for i in reversed(self.get_ancestors()):
             if isinstance(i, Table):
                 return i
         assert False, "This TableElement isn't in a table?!?"
