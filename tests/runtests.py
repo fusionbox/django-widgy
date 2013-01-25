@@ -50,7 +50,8 @@ ALWAYS_INSTALLED_APPS = [
     "mezzanine.generic",
     "mezzanine.pages",
     "mezzanine.forms",
-    "mezzanine.blog",
+    # blog is affected by https://code.djangoproject.com/ticket/12728
+    # "mezzanine.blog",
     "widgy",
     "treebeard",
 ]

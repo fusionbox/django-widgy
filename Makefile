@@ -1,4 +1,4 @@
 test:
-	cd tests && ./runtests.py --settings=test_sqlite --verbosity=2
+	cd tests && ./runtests.py --settings=test_multidb --verbosity=2
 
 .PHONY: test
