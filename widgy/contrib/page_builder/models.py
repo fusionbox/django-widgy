@@ -284,7 +284,13 @@ class TableBody(InvisibleMixin, TableElement):
         return isinstance(parent, Table)
 
     def valid_parent_of(self, cls, obj=None):
-        return issubclass(cls, TableRow)
+        if obj:
+            if obj in self.children:
+                return True
+            if isinstance(obj, TableRow) and len(obj.children) == len(self.table.header.children):
+                return True
+        else:
+            return issubclass(cls, TableRow)
 
 
 class Table(StrictDefaultChildrenMixin, TableElement):

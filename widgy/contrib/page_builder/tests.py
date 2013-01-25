@@ -163,3 +163,23 @@ class TestTableWidget(TestCase):
         # the outer table has 1 column, the inside should have 0
         self.assertEqual(tr.children, [td])
         self.assertEqual(table2_tr.children, [])
+
+    def test_move_rows(self):
+        table1 = self.table
+        table2 = Table.add_root(widgy_site)
+
+        table1.header.add_child(widgy_site, TableHeaderData)
+        table2.header.add_child(widgy_site, TableHeaderData)
+        row = table2.body.add_child(widgy_site, TableRow)
+
+        self.assertEqual(table2.body.children, [row])
+        self.assertEqual(table1.body.children, [])
+        # a row can be moved to another table with the same number of rows
+        row.reposition(widgy_site, parent=table1.body)
+        self.assertEqual(table1.body.children, [row])
+        self.assertEqual(table2.body.children, [])
+
+        # but not a table with a different number of rows
+        table2.header.add_child(widgy_site, TableHeaderData)
+        with self.assertRaises(ParentChildRejection):
+            row.reposition(widgy_site, parent=table2.body)
