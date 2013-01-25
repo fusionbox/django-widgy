@@ -19,11 +19,6 @@
   .shelf {
     li {
       cursor: pointer;
-
-      &.placeholder {
-        border: 1px dashed #000;
-        background-color: wheat;
-      }
     }
   }
 
@@ -67,6 +62,8 @@
     }
 
     &.being_dragged {
+      @include shadow(#999999, 2px, 2px, 5px);
+
       background-color: blue;
       margin: 0;
       position: fixed;
@@ -145,6 +142,10 @@
       top: 0;
       right: -210px;
       width: 200px;
+
+      li {
+        margin: 0 0 1em 0;
+      }
     }
 
     // Second level
@@ -276,7 +277,7 @@
 
 .modal {
   @include rounded(5px);
-  @include shadow(0px 0px 10px #999999);
+  @include shadow(#999999, 0px, 0px, 10px);
 
   display: block;
   background-color: #ffffff;
