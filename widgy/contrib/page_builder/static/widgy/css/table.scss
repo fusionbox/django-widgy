@@ -1,13 +1,13 @@
 %horizontalChildren {
-  & > .content .drag-row {
-    span.title {
-      display: none;
-    }
-  }
-
   & > .nodeChildren {
     display: table;
+    table-layout: fixed;
     width: 100%;
+    -webkit-transition: all 1s;
+
+    &:hover {
+      table-layout: auto;
+    }
 
     & > li {
       display: table-cell;
@@ -23,10 +23,33 @@
   }
 }
 
+.widgy:not(.node_in_motion) {
+  %horizontalChildren {
+    & > .nodeChildren > li:not(:hover) {
+      .drag-row, :empty, .shelf {
+        display: none;
+      }
+
+      * {
+        display: inline;
+      }
+
+      .node {
+        background-color: transparent;
+        border: none;
+      }
+    }
+  }
+}
+
 .tableheader {
   @extend %horizontalChildren;
 }
 
 .tablerow {
   @extend %horizontalChildren;
+
+  & > .content .drag-row span.title {
+    display: none;
+  }
 }

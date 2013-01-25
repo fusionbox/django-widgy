@@ -492,6 +492,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
         bindToDocument();
 
+        this.app.$el.addClass('node_in_motion');
         this.addDropTargets(dragged_view);
       } else {
         // propagate event
@@ -508,6 +509,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       if ( dragged_view.placeholder )
         dragged_view.placeholder.remove();
 
+      this.app.$el.removeClass('node_in_motion');
       this.clearDropTargets();
 
       dragged_view.stopBeingDragged();

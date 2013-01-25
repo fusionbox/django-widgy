@@ -305,6 +305,13 @@ class Table(StrictDefaultChildrenMixin, TableElement):
     ]
 
     @property
+    def pop_out(self):
+        for i in self.get_ancestors():
+            if isinstance(i, Table):
+                return 2
+        return 0
+
+    @property
     def header(self):
         return self.children[0]
 
