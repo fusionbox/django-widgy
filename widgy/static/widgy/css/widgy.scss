@@ -205,7 +205,12 @@
 
   /* Inputs
   -------------------*/
-  input[type='text'], textarea {
+  input, textarea, button {
+    &:focus {
+      @include inset-shadow(blueviolet, 1px, 1px, 2px);
+    }
+  }
+  input, textarea {
     @include inset-shadow($black10,0px,1px,2px);
     border: 0px;
     font-weight: normal !important;

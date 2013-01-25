@@ -142,6 +142,7 @@ define([
       this.listenTo(edit_view, 'close', this.render)
           .listenTo(edit_view, 'render', function() {
             this.$el.html(edit_view.el);
+            edit_view.$el.find(':input:first').focus();
           });
 
       edit_view.render();
