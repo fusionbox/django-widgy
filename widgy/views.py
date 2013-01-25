@@ -93,6 +93,7 @@ class NodeView(WidgyView):
 
     def get(self, request, node_pk):
         node = get_object_or_404(Node, pk=node_pk)
+        node.prefetch_tree()
         return self.render_as_node(node.to_json(self.site))
 
     def post(self, request, node_pk=None):

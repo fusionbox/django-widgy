@@ -165,6 +165,13 @@ class TableElement(Content):
                 return i
         assert False, "This TableElement isn't in a table?!?"
 
+    def get_siblings(self):
+        return list(self.get_parent().get_children())
+
+    @property
+    def sibling_index(self):
+        return self.get_siblings().index(self)
+
 
 class TableRow(TableElement):
     tag_name = 'tr'
@@ -178,7 +185,7 @@ class TableRow(TableElement):
 
     def post_create(self, site):
         for column in self.table.header.children:
-            self.add_child(site, TableData, column=column)
+            self.add_child(site, TableData)
 
 
 class TableHeaderData(TableElement):
@@ -202,37 +209,36 @@ class TableHeaderData(TableElement):
     def post_create(self, site):
         right = self.get_next_sibling()
         if right:
-            for d in right.cells.all():
-                d.add_sibling(site, TableData, column=self)
+            for d in self.table.cells_at_index(right.sibling_index - 1):
+                d.add_sibling(site, TableData)
         else:
             for row in self.table.body.children:
-                row.add_child(site, TableData, column=self)
+                row.add_child(site, TableData)
 
-    def delete(self):
-        # can't use ON DELETE CASCADE here, because deleting just a content
-        # doesn't work
-        for i in self.cells.all():
+    def pre_delete(self):
+        for i in self.table.cells_at_index(self.sibling_index):
             i.node.delete()
-        return super(TableHeaderData, self).delete()
 
     def reposition(self, site, right=None, parent=None):
         # we must always stay in the same table
         assert not parent or self.get_parent() == parent
+
+        prev_index = self.sibling_index
+        right_index = right and right.sibling_index
+
         super(TableHeaderData, self).reposition(site, right, parent)
 
         if right:
-            new_rights = right.cells.all()
+            new_rights = self.table.cells_at_index(right_index)
         else:
-            new_rights = [None] * len(self.cells.all())
+            new_rights = [None] * len(self.get_siblings())
 
-        for (i, new_right) in zip(self.cells.all(), new_rights):
+        for (i, new_right) in zip(self.table.cells_at_index(prev_index), new_rights):
             i.reposition(site, new_right, i.get_parent())
 
 
 class TableData(TableElement):
     tag_name = 'td'
-
-    column = models.ForeignKey(TableHeaderData, on_delete=models.PROTECT, related_name='cells')
 
     accepting_children = True
     draggable = False
@@ -300,6 +306,8 @@ class Table(StrictDefaultChildrenMixin, TableElement):
     def body(self):
         return self.children[1]
 
+    def cells_at_index(self, index):
+        return [list(i.get_children())[index] for i in self.body.children]
 
 registry.register(Table)
 registry.register(TableRow)

@@ -131,14 +131,14 @@ class TestTableWidget(TestCase):
         self.assertEqual(len(first_row.children), 2)
         self.assertEqual(len(second_row.children), 2)
 
-        th1.node.delete()
+        th1.delete()
 
         first_row, second_row = refetch(first_row), refetch(second_row)
         self.assertEqual(len(first_row.children), 1)
         self.assertEqual(len(second_row.children), 1)
 
     # before_delete is called without post_create
-    @unittest.expectedFailure
+    # @unittest.expectedFailure
     def test_compatibility(self):
         def invalid(parent, child_class):
             with self.assertRaises(ParentChildRejection):
@@ -165,4 +165,3 @@ class TestTableWidget(TestCase):
         # the outer table has 1 column, the inside should have 0
         self.assertEqual(tr.children, [td])
         self.assertEqual(table2_tr.children, [])
-
