@@ -54,11 +54,6 @@ class Node(MP_Node):
     def __unicode__(self):
         return str(self.content)
 
-    def delete(self, *args, **kwargs):
-        content = self.content
-        super(Node, self).delete(*args, **kwargs)
-        content.delete()
-
     def to_json(self, site):
         # reversed because we use 'right_id' and how backbone instantiates
         # nodes
@@ -414,8 +409,7 @@ class Content(models.Model):
         try:
             site.validate_relationship(self, obj)
         except:
-            node.delete()
-            obj.delete()
+            obj.delete(raw=True)
             raise
 
         obj.post_create(site)
@@ -432,8 +426,7 @@ class Content(models.Model):
         try:
             site.validate_relationship(parent, obj)
         except ParentChildRejection:
-            node.delete()
-            obj.delete()
+            obj.delete(raw=True)
             raise
 
         obj.post_create(site)
@@ -581,6 +574,18 @@ class Content(models.Model):
             self.node.move(parent.node, pos='last-child')
         else:
             assert right or parent
+
+    def pre_delete(self):
+        """
+        Called right before deletion, when our node still exists.
+        """
+        pass
+
+    def delete(self, raw=False):
+        if not raw:
+            self.pre_delete()
+        self.node.delete()
+        super(Content, self).delete()
 
 
 class UnknownWidget(Content):

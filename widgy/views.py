@@ -147,7 +147,7 @@ class NodeView(WidgyView):
         if not node.content.deletable:
             raise InvalidTreeMovement({'message': "You can't delete me"})
 
-        node.delete()
+        node.content.delete()
 
         return self.render_as_node(None)
 
