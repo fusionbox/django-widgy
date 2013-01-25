@@ -537,9 +537,10 @@ class TestApi(RootNodeTestCase, HttpTestCase):
     def test_optimized_compatibility_fetching(self):
         left, right = make_a_nice_tree(self.root_node)
 
-        left_json = left.to_json(widgy_site)
+        # loads . dumps == normalize the types to what json uses, list vs tuple
+        left_json = json.loads(json.dumps(left.to_json(widgy_site)))
         left_url = left_json['url']
-        root_json = self.root_node.to_json(widgy_site)
+        root_json = json.loads(json.dumps(self.root_node.to_json(widgy_site)))
         root_url = root_json['url']
 
         def doit(method, *args):
