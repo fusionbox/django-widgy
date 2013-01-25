@@ -187,7 +187,7 @@
       padding: 0;
       border: 0 none;
 
-      & > .nodeChildren:not(:empty) {
+      & > .nodeChildren:empty {
         display: none;
       }
     }
