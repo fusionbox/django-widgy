@@ -363,7 +363,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       return _.extend({}, NodeViewBase.prototype.events , {
         'click .delete': 'delete',
         'click .pop_out': 'popOut',
-        'click .pop_in': 'popIn'
+        'click .pop_in': 'popIn',
+        'dblclick .title': 'toggleCollapse'
       });
     },
 
@@ -465,6 +466,12 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       return false;
     },
 
+    toggleCollapse: function() {
+      this.$el.toggleClass('collapsed');
+
+      return false;
+    },
+
     startDrag: function(dragged_view) {
       debug.call(this, 'startDrag', dragged_view);
 
@@ -491,6 +498,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
         bindToDocument();
 
+        this.app.$el.addClass('node_in_motion');
         this.addDropTargets(dragged_view);
       } else {
         // propagate event
@@ -507,6 +515,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       if ( dragged_view.placeholder )
         dragged_view.placeholder.remove();
 
+      this.app.$el.removeClass('node_in_motion');
       this.clearDropTargets();
 
       dragged_view.stopBeingDragged();
