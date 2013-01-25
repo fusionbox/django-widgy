@@ -99,6 +99,17 @@
     }
   }
 
+  &:not(.node_in_motion) {
+    .node.collapsed {
+      font-weight: bold;
+      color: red;
+
+      & > .nodeChildren {
+        display: none;
+      }
+    }
+  }
+
   .node_drop_target {
     background: #fff;
     height: 25px;
