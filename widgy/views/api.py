@@ -15,7 +15,13 @@ from fusionbox.views.rest import RestView
 from widgy.models import Node
 from widgy.exceptions import InvalidTreeMovement
 from widgy.utils import extract_id
-from widgy.views.base import WidgyViewMixin
+
+
+class WidgyViewMixin(object):
+    site = None
+
+    def auth(self, request, *args, **kwargs):
+        self.site.authorize(request)
 
 
 class WidgyView(WidgyViewMixin, RestView):

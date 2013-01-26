@@ -5,6 +5,7 @@ objects.
 from collections import defaultdict
 from functools import partial
 import logging
+import copy
 
 from django.db import models
 from django.forms.models import modelform_factory, ModelForm
@@ -244,6 +245,36 @@ class Node(MP_Node):
         all_nodes = root_node.depth_first_order()
         my_family = set(self.depth_first_order())
         return [i for i in all_nodes if validator(i.content) and i not in my_family]
+
+    def clone_tree(self):
+        """
+        1. new_root <- root_node
+        2. new_root.content <- Clone(root_node.content)
+        3. Insert new_root.
+        4. children <- All descendents of root node.
+        5. Iterate over children as child:
+            i. unset PK
+            ii. replace child.path[0:steplen] with new_root.path
+            iii. cloned_content <- child.content
+            iv. content_id <- cloned_content.pk
+        6. Issue a bulk_create for children.
+        """
+        # This method only supports cloning an entire tree.
+        cls = self.__class__
+        assert self.depth == 1
+        new_root = cls.add_root(
+            content_type_id=self.content_type_id,
+            content_id=self.content.clone(),
+            numchild=self.numchild,
+        )
+        children_to_create = []
+        for child in self.get_descendants():
+            child.pk = None
+            child.path = new_root.path + child.path[cls.steplen:]
+            child.content_id = child.content.clone()
+            children_to_create.append(child)
+        cls.objects.bulk_create(children_to_create)
+        return new_root
 
 
 class Content(models.Model):
@@ -582,6 +613,14 @@ class Content(models.Model):
             self.pre_delete()
         self.node.delete()
         super(Content, self).delete()
+
+    def clone(self):
+        pk = self.pk
+        self.pk = None
+        self.save()
+        new_pk = self.pk
+        self.pk = pk
+        return new_pk
 
 
 class UnknownWidget(Content):

@@ -10,6 +10,7 @@ from widgy.views import (
     NodeEditView,
     NodeTemplatesView,
     NodeParentsView,
+    CommitView,
 )
 from widgy.exceptions import (
     MutualRejection,
@@ -26,6 +27,7 @@ class WidgySite(object):
         self.node_edit_view = self.get_node_edit_view()
         self.node_templates_view = self.get_node_templates_view()
         self.node_parents_view = self.get_node_parents_view()
+        self.commit_view = self.get_commit_view()
 
     def get_registry(self):
         return registry
@@ -42,6 +44,7 @@ class WidgySite(object):
             url('^node/(?P<node_pk>[^/]+)/templates/$', self.node_templates_view),
             url('^node/(?P<node_pk>[^/]+)/possible-parents/$', self.node_parents_view),
             url('^contents/(?P<app_label>[A-z_][\w_]*)/(?P<object_name>[A-z_][\w_]*)/(?P<object_pk>[^/]+)/$', self.content_view),
+            url('^commit/(?P<pk>[^/]+)/$', self.commit_view),
         )
         return urlpatterns
 
@@ -84,6 +87,10 @@ class WidgySite(object):
     def get_node_parents_view(self):
         return NodeParentsView.as_view(site=self)
 
+    def get_commit_view(self):
+        return CommitView.as_view(site=self)
+
+
     def valid_parent_of(self, parent, child_class, child=None):
         return parent.valid_parent_of(child_class, child)
 
@@ -106,3 +113,7 @@ class WidgySite(object):
             raise ParentWasRejected
         elif bad_child:
             raise ChildWasRejected
+
+    def get_version_tracker_model(self):
+        from widgy.models import VersionTracker
+        return VersionTracker

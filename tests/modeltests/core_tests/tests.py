@@ -4,9 +4,10 @@ from pprint import pprint
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django import forms
+from django.forms.models import model_to_dict
 from django.contrib.contenttypes.models import ContentType
 
-from widgy.models import Node, UnknownWidget
+from widgy.models import Node, UnknownWidget, VersionTracker
 from widgy.views import extract_id
 from widgy.exceptions import (ParentWasRejected, ChildWasRejected,
                               MutualRejection, InvalidTreeMovement)
@@ -190,6 +191,97 @@ class TestCore(RootNodeTestCase):
         root_node = Node.objects.get(pk=self.root_node.pk)
         root_node.prefetch_tree()
         self.assertIsInstance(list(root_node.content.get_children())[0].node.content, UnknownWidget)
+
+
+class TestVersioning(RootNodeTestCase):
+    def test_clone_tree(self):
+        left, right = make_a_nice_tree(self.root_node)
+
+        new_tree = self.root_node.clone_tree()
+        for a, b in zip(self.root_node.depth_first_order(),
+                        new_tree.depth_first_order()):
+            self.assertEqual(a.numchild, b.numchild)
+            self.assertEqual(a.content_type_id, b.content_type_id)
+            a_dict = model_to_dict(a.content)
+            b_dict = model_to_dict(b.content)
+            del a_dict['id']
+            del b_dict['id']
+            self.assertEqual(a_dict, b_dict)
+
+    def test_commit(self):
+        root_node = RawTextWidget.add_root(widgy_site, text='first').node
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        commit1 = tracker.commit()
+
+        self.assertNotEqual(tracker.working_copy, root_node)
+
+        textwidget_content = tracker.working_copy.content
+        textwidget_content.text = 'second'
+        textwidget_content.save()
+        commit2 = tracker.commit()
+
+        self.assertEqual(commit1.root_node.content.text, 'first')
+        self.assertEqual(commit2.root_node.content.text, 'second')
+
+        self.assertEqual(commit2.parent, commit1)
+        self.assertEqual(tracker.head, commit2)
+
+    def test_tree_structure_versioned(self):
+        root_node = Bucket.add_root(widgy_site).node
+        root_node.content.add_child(
+            widgy_site,
+            RawTextWidget,
+            text='a')
+        root_node.content.add_child(
+            widgy_site,
+            RawTextWidget,
+            text='b')
+
+        # if the root_node isn't refetched, get_children is somehow empty. I
+        # don't know why
+        root_node = Node.objects.get(pk=root_node.pk)
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        commit1 = tracker.commit()
+
+        new_a, new_b = tracker.working_copy.content.get_children()
+        new_b.reposition(widgy_site, right=new_a)
+        commit2 = tracker.commit()
+        self.assertEqual(['a', 'b'],
+                         [i.content.text for i in commit1.root_node.get_children()])
+        self.assertEqual(['b', 'a'],
+                         [i.content.text for i in commit2.root_node.get_children()])
+
+
+    def test_revert(self):
+        root_node = RawTextWidget.add_root(widgy_site, text='first').node
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        commit1 = tracker.commit()
+
+        self.assertNotEqual(tracker.working_copy, root_node)
+
+        textwidget_content = tracker.working_copy.content
+        textwidget_content.text = 'second'
+        textwidget_content.save()
+        commit2 = tracker.commit()
+
+        commit3 = tracker.revert_to(commit1)
+
+        textwidget_content = tracker.working_copy.content
+        textwidget_content.text = 'fourth'
+        textwidget_content.save()
+
+        commit4 = tracker.commit()
+
+        self.assertEqual(['fourth', 'first', 'second', 'first'],
+                         [i.root_node.content.text for i in tracker.get_history()])
+
+    def test_get_history(self):
+        root_node = RawTextWidget.add_root(widgy_site, text='first').node
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+
+        commits = reversed([tracker.commit() for i in range(6)])
+
+        self.assertSequenceEqual(list(tracker.get_history()), list(commits))
 
 
 class TestWidgyField(TestCase):

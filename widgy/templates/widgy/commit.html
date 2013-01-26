@@ -1,0 +1,14 @@
+<script src="{% static 'js/jquery.form.js' %}'"></script>
+
+<div class="commit">
+  <form method="post" class="commit_form" action="{{ commit_url }}">
+    {% csrf_token %}
+    {% for field in form %}
+      {% include "widgy/field_as_div.html" %}
+    {% endfor %}
+    <input type="submit" value="Commit">
+  </form>
+  <script>
+    $('.commit_form').ajaxForm({target: 'div.commit'});
+  </script>
+</div>
