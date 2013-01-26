@@ -11,6 +11,7 @@ from widgy.views import (
     NodeTemplatesView,
     NodeParentsView,
     CommitView,
+    HistoryView,
 )
 from widgy.exceptions import (
     MutualRejection,
@@ -28,6 +29,7 @@ class WidgySite(object):
         self.node_templates_view = self.get_node_templates_view()
         self.node_parents_view = self.get_node_parents_view()
         self.commit_view = self.get_commit_view()
+        self.history_view = self.get_history_view()
 
     def get_registry(self):
         return registry
@@ -45,6 +47,7 @@ class WidgySite(object):
             url('^node/(?P<node_pk>[^/]+)/possible-parents/$', self.node_parents_view),
             url('^contents/(?P<app_label>[A-z_][\w_]*)/(?P<object_name>[A-z_][\w_]*)/(?P<object_pk>[^/]+)/$', self.content_view),
             url('^commit/(?P<pk>[^/]+)/$', self.commit_view),
+            url('^history/(?P<pk>[^/]+)/$', self.history_view),
         )
         return urlpatterns
 
@@ -90,6 +93,8 @@ class WidgySite(object):
     def get_commit_view(self):
         return CommitView.as_view(site=self)
 
+    def get_history_view(self):
+        return HistoryView.as_view(site=self)
 
     def valid_parent_of(self, parent, child_class, child=None):
         return parent.valid_parent_of(child_class, child)

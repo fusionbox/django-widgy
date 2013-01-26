@@ -1,5 +1,5 @@
 from django import forms
-from django.views.generic import FormView
+from django.views.generic import FormView, DetailView
 from django.views.generic.detail import SingleObjectMixin
 from widgy.views.base import WidgyViewMixin
 
@@ -28,3 +28,14 @@ class CommitView(WidgyViewMixin, SingleObjectMixin, FormView):
             template='widgy/commit_success.html',
             context=self.get_context_data(),
         )
+
+class HistoryView(WidgyViewMixin, DetailView):
+    template_name = 'widgy/history.html'
+
+    def get_queryset(self):
+        return self.site.get_version_tracker_model().objects.all()
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(HistoryView, self).get_context_data(**kwargs)
+        kwargs['commits'] = self.object.get_history()
+        return kwargs

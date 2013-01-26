@@ -1,0 +1,11 @@
+{% extends "admin/base_site.html" %}{% load url from future %}
+
+{% block content %}
+<ol>
+    {% for commit in commits %}
+    <li>{{ commit.created_at|date:"SHORT_DATETIME_FORMAT" }}{% if commit.author %} by {{ commit.author }}{% endif %}
+    <a href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=commit.root_node.pk %}">view</a>
+    </li>
+    {% endfor %}
+</ol>
+{% endblock %}
