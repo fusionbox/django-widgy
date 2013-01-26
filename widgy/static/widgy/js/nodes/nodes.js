@@ -318,22 +318,32 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
      * to clean up our bindings.
      */
     reposition: function(model, parent_id, right_id) {
-      var parent_view = this.app.node_view_list.findById(parent_id);
+      var new_parent = this.app.node_view_list.findById(parent_id).model,
+          new_collection = new_parent.children,
+          right, index;
 
-      // This line is a little confusing.  For a model, the
-      // `collection` property is its parent collection, for a view,
-      // the `collection` is a child.  If a model has the same
-      // `collection` as a view, that means the view is the parent
-      // of the model.
-      if ( model.collection !== parent_view.collection ) {
+      var getIndex = function() {
+        if ( right_id ) {
+          right = new_collection.get(right_id);
+          index = new_collection.indexOf(right);
+        } else {
+          index = new_collection.length;
+        }
+        return index;
+      };
+
+      if ( model.collection !== new_collection ) {
         model.collection.remove(model);
         this.model.off('reposition', this.reposition);
-        parent_view.collection.add(model);
+        new_collection.add(model, {at: getIndex()});
       } else {
-        parent_view.position(this);
+        // remove the model from its old position and insert at new index.
+        new_collection.models.splice(new_collection.indexOf(model), 1);
+        new_collection.models.splice(getIndex(), 0, model);
       }
 
-      parent_view.collection.trigger('position_child');
+      new_collection.trigger('sort');
+      new_collection.trigger('position_child');
     },
 
     /**
@@ -374,7 +384,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       _.bindAll(this,
         'renderChildren',
         'addChild',
-        'position',
         'createDropTarget',
         'startDrag',
         'stopDrag',
@@ -383,7 +392,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         'receiveChildView',
         'renderContent',
         'resortChildren',
-        'nodeSync',
         'popOut',
         'popIn'
         );
@@ -420,9 +428,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       this.list.closeAll();
       this.collection.each(this.addChild);
+      this.resortChildren();
     },
 
-    addChild: function(node) {
+    addChild: function(node, collection, options) {
       if ( this.dontShowChildren() )
         return;
 
@@ -437,15 +446,23 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         .listenTo(node_view, 'stopDrag', this.stopDrag);
 
       this.app.node_view_list.push(node_view);
-      this.list.push(node_view);
-      this.position(node_view.render());
+      if ( options && options.index ) {
+        this.list.list.splice(options.index, 0, node_view);
+      } else {
+        this.list.push(node_view);
+      }
+      this.$children.append(node_view.render().el);
     },
 
     resortChildren: function() {
       console.log(this.model.__class__, 'resorting children');
+      var new_list = [];
       this.collection.each(function(model) {
-        this.$children.append(this.list.findByModel(model).el);
+        var node_view = this.list.findByModel(model);
+        this.$children.append(node_view.el);
+        new_list.push(node_view);
       }, this);
+      this.list.list = new_list;
     },
 
     'delete': function(event) {
@@ -513,19 +530,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       dragged_view.stopBeingDragged();
 
       return dragged_view;
-    },
-
-    /**
-     * `nodeSync` allows us to refresh the shelf every time a node is moved or
-     * deleted.  It doesn't refresh the shelf every time a new node is created,
-     * but that is already handled by the shelf.  That would work only if the
-     * events from preview nodes bubbled up through the shelf and hit the
-     * NodeViews that are already in the tree.  If this node doesn't have a
-     * shelf, it will just bubble the event.
-     */
-    nodeSync: function(node) {
-      debug.call(this, 'nodeSync', node);
-      this.app.refreshCompatibility();
     },
 
     stopDrag: function(callback) {
@@ -608,10 +612,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       if (this.canAcceptChild(view))
       {
         $children.prepend(this.createDropTarget().el);
-        $children.children('.node').each(function(index, elem) {
-          var drop_target = that.createDropTarget().$el.insertAfter(elem);
+        this.list.each(function(node_view) {
+          var drop_target = that.createDropTarget().$el.insertAfter(node_view.el);
 
-          if ( mine && view.el == elem )
+          if ( mine && view == node_view )
             drop_target.hide();
         });
       }
@@ -632,19 +636,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         node_view.clearDropTargets();
       });
     },
-
-    position: function(child_node_view) {
-      var child_node = child_node_view.model;
-
-      if ( child_node.get('right_id') ) {
-        var right_id = child_node.get('right_id'),
-          right_view = this.list.findById(right_id);
-          right_view.$el.before(child_node_view.el);
-      } else {
-        this.$children.append(child_node_view.el);
-      }
-    },
-
 
     dropChildView: function(drop_target) {
       var index = drop_target.$el.index() / 2,

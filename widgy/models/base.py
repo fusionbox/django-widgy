@@ -55,9 +55,7 @@ class Node(MP_Node):
         return str(self.content)
 
     def to_json(self, site):
-        # reversed because we use 'right_id' and how backbone instantiates
-        # nodes
-        children = [c.to_json(site) for c in reversed(self.get_children())]
+        children = [c.to_json(site) for c in self.get_children()]
         json = {
             'url': self.get_api_url(site),
             'content': self.content.to_json(site),
