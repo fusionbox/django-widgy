@@ -261,7 +261,12 @@ class Node(MP_Node):
             iv. content_id <- cloned_content.pk
         6. Issue a bulk_create for children.
         """
-        # This method only supports cloning an entire tree.
+        # This method only supports cloning an entire tree. We don't need it
+        # for versioning, and I'm not sure what the semantics would be.
+        #
+        # TODO: Use a prefetched tree here. The trouble is that we mutate all
+        # the child nodes, which invalidates the prefetched data.
+
         cls = self.__class__
         assert self.depth == 1
         new_root = cls.add_root(
@@ -646,6 +651,9 @@ class Content(models.Model):
         super(Content, self).delete()
 
     def clone(self):
+        # TODO: Make this work with inheritance. Maybe many-to-many
+        # relationships too, or document that you should provide your own clone()
+        # See https://code.djangoproject.com/ticket/4027
         pk = self.pk
         self.pk = None
         self.save()
@@ -658,6 +666,9 @@ class Content(models.Model):
         return super(Content, self).save(*args, **kwargs)
 
     def check_frozen(self):
+        if not self.pk:
+            # if we don't have a pk, we can't have a node
+            return
         try:
             self.node.check_frozen()
         except Node.DoesNotExist:

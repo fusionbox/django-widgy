@@ -66,6 +66,7 @@ class VersionTracker(models.Model):
             commit_id = commit.parent_id
         return res
 
+
 class VersionCommit(models.Model):
     tracker = models.ForeignKey(VersionTracker, related_name='commits')
     parent = models.ForeignKey('VersionCommit', null=True, on_delete=models.SET_NULL)
