@@ -15,13 +15,7 @@ from fusionbox.views.rest import RestView
 from widgy.models import Node
 from widgy.exceptions import InvalidTreeMovement
 from widgy.utils import extract_id
-
-
-class WidgyViewMixin(object):
-    site = None
-
-    def auth(self, request, *args, **kwargs):
-        self.site.authorize(request)
+from widgy.views.base import WidgyViewMixin, AuthorizedMixin
 
 
 class WidgyView(WidgyViewMixin, RestView):
@@ -197,7 +191,7 @@ class ShelfView(WidgyView):
         return self.render_to_response(self.get_compatibility_data(self.site, node))
 
 
-class NodeSingleObjectMixin(SingleObjectMixin):
+class NodeSingleObjectMixin(SingleObjectMixin, AuthorizedMixin):
     model = Node
     pk_url_kwarg = 'node_pk'
 
@@ -208,10 +202,6 @@ class NodeEditView(WidgyViewMixin, NodeSingleObjectMixin, DetailView):
     """
 
     template_name = 'widgy/views/edit_node.html'
-
-    def dispatch(self, *args, **kwargs):
-        self.auth(*args, **kwargs)
-        return super(NodeEditView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super(NodeEditView, self).get_context_data(**kwargs)

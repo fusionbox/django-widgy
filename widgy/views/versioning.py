@@ -1,12 +1,14 @@
 from django import forms
 from django.views.generic import FormView, DetailView
 from django.views.generic.detail import SingleObjectMixin
-from widgy.views.base import WidgyViewMixin
+from widgy.views.base import WidgyViewMixin, AuthorizedMixin
+
 
 class CommitForm(forms.Form):
     pass
 
-class CommitView(WidgyViewMixin, SingleObjectMixin, FormView):
+
+class CommitView(WidgyViewMixin, SingleObjectMixin, AuthorizedMixin, FormView):
     template_name = 'widgy/commit.html'
     form_class = CommitForm
 
@@ -29,7 +31,8 @@ class CommitView(WidgyViewMixin, SingleObjectMixin, FormView):
             context=self.get_context_data(),
         )
 
-class HistoryView(WidgyViewMixin, DetailView):
+
+class HistoryView(WidgyViewMixin, AuthorizedMixin, DetailView):
     template_name = 'widgy/history.html'
 
     def get_queryset(self):
