@@ -6,11 +6,13 @@ from django.contrib.auth.models import User
 from django import forms
 from django.forms.models import model_to_dict
 from django.contrib.contenttypes.models import ContentType
+from django.utils import unittest
 
 from widgy.models import Node, UnknownWidget, VersionTracker
 from widgy.views import extract_id
 from widgy.exceptions import (ParentWasRejected, ChildWasRejected,
-                              MutualRejection, InvalidTreeMovement)
+                              MutualRejection, InvalidTreeMovement,
+                              InvalidOperation)
 
 from .widgy_config import widgy_site
 from .models import (Layout, Bucket, RawTextWidget, CantGoAnywhereWidget,
@@ -213,7 +215,7 @@ class TestVersioning(RootNodeTestCase):
         tracker = VersionTracker.objects.create(working_copy=root_node)
         commit1 = tracker.commit()
 
-        self.assertNotEqual(tracker.working_copy, root_node)
+        self.assertNotEqual(tracker.working_copy, tracker.head.root_node)
 
         textwidget_content = tracker.working_copy.content
         textwidget_content.text = 'second'
@@ -257,7 +259,7 @@ class TestVersioning(RootNodeTestCase):
         tracker = VersionTracker.objects.create(working_copy=root_node)
         commit1 = tracker.commit()
 
-        self.assertNotEqual(tracker.working_copy, root_node)
+        self.assertNotEqual(tracker.working_copy, tracker.head.root_node)
 
         textwidget_content = tracker.working_copy.content
         textwidget_content.text = 'second'
@@ -282,6 +284,127 @@ class TestVersioning(RootNodeTestCase):
         commits = reversed([tracker.commit() for i in range(6)])
 
         self.assertSequenceEqual(list(tracker.get_history()), list(commits))
+
+
+    def test_old_contents_cant_change(self):
+        root_node = RawTextWidget.add_root(widgy_site, text='first').node
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        commit = tracker.commit()
+
+        widget = commit.root_node.content
+        widget.text = 'changed'
+        with self.assertRaises(InvalidOperation):
+            widget.save()
+
+        self.assertEquals(Node.objects.get(pk=commit.root_node.pk).content.text, 'first')
+
+        with self.assertRaises(InvalidOperation):
+            widget.delete()
+
+
+    def test_old_structure_cant_change(self):
+        root_node = Bucket.add_root(widgy_site).node
+        root_node.content.add_child(widgy_site, RawTextWidget, text='a')
+        root_node.content.add_child(widgy_site, RawTextWidget, text='b')
+        root_node = Node.objects.get(pk=root_node.pk)
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        commit = tracker.commit()
+
+        a, b = Node.objects.get(pk=commit.root_node.pk).content.get_children()
+        with self.assertRaises(InvalidOperation):
+            b.reposition(widgy_site, right=a)
+
+        with self.assertRaises(InvalidOperation):
+            commit.root_node.content.add_child(widgy_site, RawTextWidget, text='c')
+
+        self.assertEqual([i.content.text for i in commit.root_node.get_children()],
+                         ['a', 'b'])
+
+    def test_frozen_node(self):
+        c = RawTextWidget.add_root(widgy_site)
+        node = c.node
+        node.frozen = True
+        node.save()
+
+        c.text = 'asdf'
+        with self.assertRaises(InvalidOperation):
+            c.save()
+
+        with self.assertRaises(InvalidOperation):
+            c.delete()
+
+        self.assertEqual(RawTextWidget.objects.get(pk=c.pk).text, '')
+
+        with self.assertRaises(InvalidOperation):
+            node.delete()
+
+    def test_frozen_node_raw(self):
+        # even the treebeard methods called directly on the node should be frozen
+        node = RawTextWidget.add_root(widgy_site).node
+        node.frozen = True
+        node.save()
+
+        # 0 queries ensures that the exception is raised before any
+        # modification takes place
+        with self.assertNumQueries(0):
+            with self.assertRaises(InvalidOperation):
+                node.delete()
+
+            with self.assertRaises(InvalidOperation):
+                node.add_child()
+
+            with self.assertRaises(InvalidOperation):
+                node.add_child()
+
+            with self.assertRaises(InvalidOperation):
+                node.add_sibling()
+
+            with self.assertRaises(InvalidOperation):
+                node.move(node)
+
+    def test_frozen_reposition(self):
+        left, right = make_a_nice_tree(self.root_node)
+        for node in self.root_node.depth_first_order():
+            node.frozen = True
+            node.save()
+
+        before_ids = [i.id for i in self.root_node.depth_first_order()]
+
+        with self.assertRaises(InvalidOperation):
+            left.content.reposition(widgy_site, parent=right.content)
+
+        with self.assertRaises(InvalidOperation):
+            right.content.reposition(widgy_site, right=left.content)
+
+        with self.assertRaises(InvalidOperation):
+            right.content.add_child(widgy_site, RawTextWidget, text='asdf')
+
+        with self.assertRaises(InvalidOperation):
+            right.content.get_children()[0].add_sibling(widgy_site, RawTextWidget, text='asdf')
+
+        root_node = Node.objects.get(pk=self.root_node.id)
+        self.assertEqual([i.id for i in root_node.depth_first_order()],
+                         before_ids)
+
+    @unittest.expectedFailure
+    def test_frozen_db_is_canonical(self):
+        # I'm not sure if this failure should be expected or not. Should a node
+        # always recheck the database value? Or, should we use a database
+        # trigger to prevent modifications at the db level?
+        root_node = RawTextWidget.add_root(widgy_site, text='asdf')
+
+        a = Node.objects.get(pk=root_node.pk)
+        b = Node.objects.get(pk=root_node.pk)
+
+        a.frozen = True
+        a.save()
+
+        # Even though the b _instance_ isn't frozen, the entry in the database
+        # is. It would be ok if this was a database error instead of
+        # InvalidOperation, like if a BEFORE UPDATE trigger prevented an
+        # update.
+        with self.assertRaises(InvalidOperation):
+            b.delete()
 
 
 class TestWidgyField(TestCase):

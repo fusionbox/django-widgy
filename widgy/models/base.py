@@ -19,6 +19,7 @@ from django.contrib.admin import widgets
 from treebeard.mp_tree import MP_Node
 
 from widgy.exceptions import (
+    InvalidOperation,
     InvalidTreeMovement,
     ParentChildRejection,
     RootDisplacementError
@@ -48,6 +49,7 @@ class Node(MP_Node):
     content_type = models.ForeignKey(ContentType)
     content_id = models.PositiveIntegerField()
     content = WidgyGenericForeignKey('content_type', 'content_id')
+    frozen = models.BooleanField(default=False)
 
     class Meta:
         app_label = 'widgy'
@@ -246,7 +248,7 @@ class Node(MP_Node):
         my_family = set(self.depth_first_order())
         return [i for i in all_nodes if validator(i.content) and i not in my_family]
 
-    def clone_tree(self):
+    def clone_tree(self, freeze=True):
         """
         1. new_root <- root_node
         2. new_root.content <- Clone(root_node.content)
@@ -266,15 +268,37 @@ class Node(MP_Node):
             content_type_id=self.content_type_id,
             content_id=self.content.clone(),
             numchild=self.numchild,
+            frozen=freeze,
         )
         children_to_create = []
         for child in self.get_descendants():
             child.pk = None
             child.path = new_root.path + child.path[cls.steplen:]
             child.content_id = child.content.clone()
+            child.frozen = freeze
             children_to_create.append(child)
         cls.objects.bulk_create(children_to_create)
         return new_root
+
+    def check_frozen(self):
+        if self.frozen:
+            raise InvalidOperation({'message': "This widget is uneditable."})
+
+    def delete(self, *args, **kwargs):
+        self.check_frozen()
+        return super(Node, self).delete(*args, **kwargs)
+
+    def add_child(self, *args, **kwargs):
+        self.check_frozen()
+        return super(Node, self).add_child(*args, **kwargs)
+
+    def add_sibling(self, *args, **kwargs):
+        self.check_frozen()
+        return super(Node, self).add_sibling(*args, **kwargs)
+
+    def move(self, *args, **kwargs):
+        self.check_frozen()
+        return super(Node, self).move(*args, **kwargs)
 
 
 class Content(models.Model):
@@ -375,7 +399,10 @@ class Content(models.Model):
         """
         if hasattr(self, '_node'):
             return self._node
-        return self._nodes.all()[0]
+        try:
+            return self._nodes.all()[0]
+        except IndexError:
+            raise Node.DoesNotExist
 
     @node.setter
     def node(self, value):
@@ -430,6 +457,7 @@ class Content(models.Model):
         return obj
 
     def add_child(self, site, cls, **kwargs):
+        self.check_frozen()
         obj = cls.objects.create(**kwargs)
         self.node.add_child(content=obj)
 
@@ -443,6 +471,7 @@ class Content(models.Model):
         return obj
 
     def add_sibling(self, site, cls, **kwargs):
+        self.check_frozen()
         if self.node.is_root():
             raise RootDisplacementError({'message': 'You can\'t put things next to me'})
 
@@ -590,6 +619,7 @@ class Content(models.Model):
         }
 
     def reposition(self, site, right=None, parent=None):
+        self.check_frozen()
         if right:
             if right.node.is_root():
                 raise InvalidTreeMovement({'message': 'You can\'t move the root'})
@@ -609,6 +639,7 @@ class Content(models.Model):
         pass
 
     def delete(self, raw=False):
+        self.check_frozen()
         if not raw:
             self.pre_delete()
         self.node.delete()
@@ -621,6 +652,16 @@ class Content(models.Model):
         new_pk = self.pk
         self.pk = pk
         return new_pk
+
+    def save(self, *args, **kwargs):
+        self.check_frozen()
+        return super(Content, self).save(*args, **kwargs)
+
+    def check_frozen(self):
+        try:
+            self.node.check_frozen()
+        except Node.DoesNotExist:
+            pass
 
 
 class UnknownWidget(Content):

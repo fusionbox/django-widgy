@@ -17,11 +17,10 @@ class VersionTracker(models.Model):
         self.head = VersionCommit.objects.create(
             parent=self.head,
             author=user,
-            root_node=self.working_copy,
+            root_node=self.working_copy.clone_tree(),
             tracker=self,
         )
 
-        self.working_copy = self.working_copy.clone_tree()
         self.save()
 
         return self.head
@@ -34,7 +33,8 @@ class VersionTracker(models.Model):
             tracker=self,
         )
 
-        self.working_copy = commit.root_node.clone_tree()
+        self.working_copy.delete()
+        self.working_copy = commit.root_node.clone_tree(freeze=False)
         self.save()
 
         return self.head
