@@ -43,11 +43,28 @@ class VersionTracker(models.Model):
         return self.head.root_node
 
     def get_history(self):
+        """
+        An iterator over commits, newest first.
+        """
+
         commit = self.head
         while commit:
             yield commit
             commit = commit.parent
 
+    def get_history_list(self):
+        """
+        A list of commits, newest first. Fetches them all in a single query.
+        """
+
+        commit_dict = dict((i.id, i) for i in self.commits.select_related('author', 'root_node'))
+        res = []
+        commit_id = self.head_id
+        while commit_id:
+            commit = commit_dict[commit_id]
+            res.append(commit)
+            commit_id = commit.parent_id
+        return res
 
 class VersionCommit(models.Model):
     tracker = models.ForeignKey(VersionTracker, related_name='commits')

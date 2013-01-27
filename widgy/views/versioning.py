@@ -40,5 +40,5 @@ class HistoryView(WidgyViewMixin, AuthorizedMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(HistoryView, self).get_context_data(**kwargs)
-        kwargs['commits'] = self.object.get_history()
+        kwargs['commits'] = self.object.get_history_list()
         return kwargs

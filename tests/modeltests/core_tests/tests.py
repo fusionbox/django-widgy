@@ -406,6 +406,24 @@ class TestVersioning(RootNodeTestCase):
         with self.assertRaises(InvalidOperation):
             b.delete()
 
+    def test_prefetch_commits(self):
+        root_node = RawTextWidget.add_root(widgy_site, text='first').node
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        user = User.objects.create()
+        commits = reversed([tracker.commit(user=user) for i in range(6)])
+
+        with self.assertNumQueries(1):
+            history = tracker.get_history_list()
+            for commit in history:
+                # root_node and author should be prefetched too
+                commit.root_node.pk
+                commit.author.pk
+
+            self.assertEqual(list(commits), history)
+
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        self.assertEqual(tracker.get_history_list(), [])
+
 
 class TestWidgyField(TestCase):
     def test_it_acts_like_a_foreignkey(self):
