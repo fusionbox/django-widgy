@@ -326,7 +326,7 @@ class TestVersioning(RootNodeTestCase):
     def test_frozen_node(self):
         c = RawTextWidget.add_root(widgy_site)
         node = c.node
-        node.frozen = True
+        node.is_frozen = True
         node.save()
 
         c.text = 'asdf'
@@ -344,7 +344,7 @@ class TestVersioning(RootNodeTestCase):
     def test_frozen_node_raw(self):
         # even the treebeard methods called directly on the node should be frozen
         node = RawTextWidget.add_root(widgy_site).node
-        node.frozen = True
+        node.is_frozen = True
         node.save()
 
         # 0 queries ensures that the exception is raised before any
@@ -368,7 +368,7 @@ class TestVersioning(RootNodeTestCase):
     def test_frozen_reposition(self):
         left, right = make_a_nice_tree(self.root_node)
         for node in self.root_node.depth_first_order():
-            node.frozen = True
+            node.is_frozen = True
             node.save()
 
         before_ids = [i.id for i in self.root_node.depth_first_order()]
@@ -399,7 +399,7 @@ class TestVersioning(RootNodeTestCase):
         a = Node.objects.get(pk=root_node.pk)
         b = Node.objects.get(pk=root_node.pk)
 
-        a.frozen = True
+        a.is_frozen = True
         a.save()
 
         # Even though the b _instance_ isn't frozen, the entry in the database

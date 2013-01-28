@@ -49,7 +49,7 @@ class Node(MP_Node):
     content_type = models.ForeignKey(ContentType)
     content_id = models.PositiveIntegerField()
     content = WidgyGenericForeignKey('content_type', 'content_id')
-    frozen = models.BooleanField(default=False)
+    is_frozen = models.BooleanField(default=False)
 
     class Meta:
         app_label = 'widgy'
@@ -273,20 +273,20 @@ class Node(MP_Node):
             content_type_id=self.content_type_id,
             content_id=self.content.clone(),
             numchild=self.numchild,
-            frozen=freeze,
+            is_frozen=freeze,
         )
         children_to_create = []
         for child in self.get_descendants():
             child.pk = None
             child.path = new_root.path + child.path[cls.steplen:]
             child.content_id = child.content.clone()
-            child.frozen = freeze
+            child.is_frozen = freeze
             children_to_create.append(child)
         cls.objects.bulk_create(children_to_create)
         return new_root
 
     def check_frozen(self):
-        if self.frozen:
+        if self.is_frozen:
             raise InvalidOperation({'message': "This widget is uneditable."})
 
     def delete(self, *args, **kwargs):
