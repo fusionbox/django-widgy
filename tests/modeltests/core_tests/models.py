@@ -112,3 +112,13 @@ class VersionedPage4(models.Model):
 class VersionPageThrough(models.Model):
     widgy = VersionedWidgyField(site=widgy_site, related_name='+')
     page = models.ForeignKey(VersionedPage4)
+
+
+class Related(models.Model):
+    pass
+
+
+class ForeignKeyWidget(Content):
+    foo = models.ForeignKey(Related, on_delete=models.CASCADE)
+
+registry.register(ForeignKeyWidget)

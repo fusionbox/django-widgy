@@ -306,6 +306,12 @@ class Node(MP_Node):
         return super(Node, self).move(*args, **kwargs)
 
 
+def check_frozen(sender, instance, **kwargs):
+    instance.check_frozen()
+
+models.signals.pre_delete.connect(check_frozen, sender=Node)
+
+
 class Content(models.Model):
     """
     Abstract base class for all models that are intended to a part of a Widgy

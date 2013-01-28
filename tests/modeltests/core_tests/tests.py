@@ -7,6 +7,7 @@ from django import forms
 from django.forms.models import model_to_dict
 from django.contrib.contenttypes.models import ContentType
 from django.utils import unittest
+from django.db.models.deletion import ProtectedError
 
 from widgy.models import Node, UnknownWidget, VersionTracker
 from widgy.views import extract_id
@@ -17,8 +18,9 @@ from widgy.exceptions import (ParentWasRejected, ChildWasRejected,
 from .widgy_config import widgy_site
 from .models import (Layout, Bucket, RawTextWidget, CantGoAnywhereWidget,
                      PickyBucket, ImmovableBucket, HasAWidgy, AnotherLayout,
-                     HasAWidgyOnlyAnotherLayout, VowelBucket, VersionedPage, VersionedPage2,
-                     VersionedPage3, VersionedPage4, VersionPageThrough)
+                     HasAWidgyOnlyAnotherLayout, VowelBucket, VersionedPage,
+                     VersionedPage2, VersionedPage3, VersionedPage4,
+                     VersionPageThrough, Related, ForeignKeyWidget)
 
 
 class RootNodeTestCase(TestCase):
@@ -438,8 +440,9 @@ class TestVersioning(RootNodeTestCase):
         b.save()
 
         VersionPageThrough.objects.create(
-                widgy=vt,
-                page=c)
+            widgy=vt,
+            page=c,
+        )
 
         return vt, a, b, c
 
@@ -499,6 +502,48 @@ class TestVersioning(RootNodeTestCase):
 
         d = VersionedPage3.objects.create(foo=vt)
         self.assertEqual(list(VersionTracker.objects.orphan()), [])
+
+    def test_deletion_prevented(self):
+        """
+        When widgets have outgoing foreign keys, cascade deletion shouldn't be
+        able to affect a frozen widget.
+        """
+
+        related = Related.objects.create()
+        root_node = ForeignKeyWidget.add_root(widgy_site, foo=related).node
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        commit = tracker.commit()
+
+        # the related object must not be able to be deleted
+        with self.assertRaises((ProtectedError, InvalidOperation)):
+            commit.root_node.content.foo.delete()
+
+        # the related object must still exist
+        Related.objects.get(pk=related.pk)
+
+        # the node and content must still exist
+        Node.objects.get(pk=commit.root_node.pk)
+        ForeignKeyWidget.objects.get(pk=commit.root_node.content.pk)
+
+    def test_deep_deletion_prevented(self):
+        # do the deletion on something other than the root node
+        related = Related.objects.create()
+        root_node = Bucket.add_root(widgy_site).node
+        root_node.content.add_child(widgy_site, ForeignKeyWidget, foo=related)
+        root_node = Node.objects.get(pk=root_node.pk)
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        commit = tracker.commit()
+
+        # the related object must not be able to be deleted
+        with self.assertRaises((ProtectedError, InvalidOperation)):
+            related.delete()
+
+        # the related object must still exist
+        Related.objects.get(pk=related.pk)
+
+        # the node and content must still exist
+        Node.objects.get(pk=commit.root_node.pk)
+        ForeignKeyWidget.objects.get(pk=commit.root_node.content.get_children()[0].pk)
 
 
 class TestWidgyField(TestCase):
