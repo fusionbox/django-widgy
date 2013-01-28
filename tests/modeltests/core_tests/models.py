@@ -1,7 +1,7 @@
 from django.db import models
 
 from widgy.models import Content
-from widgy.db.fields import WidgyField
+from widgy.db.fields import WidgyField, VersionedWidgyField
 from widgy import registry
 
 from .widgy_config import widgy_site
@@ -53,8 +53,10 @@ class PickyBucket(Bucket):
 class ImmovableBucket(Bucket):
     draggable = False
 
+
 class AnotherLayout(Layout):
     pass
+
 
 class VowelBucket(Bucket):
     class Meta:
@@ -89,3 +91,24 @@ class HasAWidgyOnlyAnotherLayout(models.Model):
 
 class UnregisteredLayout(Layout):
     pass
+
+
+class VersionedPage(models.Model):
+    version_tracker = VersionedWidgyField(site=widgy_site)
+
+
+class VersionedPage2(models.Model):
+    bar = VersionedWidgyField(site=widgy_site, related_name='asdf')
+
+
+class VersionedPage3(models.Model):
+    foo = VersionedWidgyField(site=widgy_site, related_name='+')
+
+
+class VersionedPage4(models.Model):
+    widgies = models.ManyToManyField('widgy.VersionTracker', through='VersionPageThrough')
+
+
+class VersionPageThrough(models.Model):
+    widgy = VersionedWidgyField(site=widgy_site, related_name='+')
+    page = models.ForeignKey(VersionedPage4)

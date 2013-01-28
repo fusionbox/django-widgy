@@ -1,7 +1,10 @@
 from django.db import models
-from widgy.db.fields import WidgyField
+from django.db.models.query import QuerySet
+
+from fusionbox.db.models import QuerySetManager
 
 from widgy.utils import get_user_model
+from widgy.db.fields import WidgyField
 
 User = get_user_model()
 
@@ -12,6 +15,24 @@ class VersionTracker(models.Model):
 
     class Meta:
         app_label = 'widgy'
+
+    objects = QuerySetManager()
+
+    class QuerySet(QuerySet):
+        def orphan(self):
+            """
+            Filters the queryset to only include 'orphan' VersionTrackers. That
+            is, VersionTrackers that have no objects pointing to them. This can
+            be used to recover VersionTrackers whose parent object was deleted.
+            """
+
+            filters = {}
+            for rel_obj in (self.model._meta.get_all_related_objects() +
+                            self.model._meta.get_all_related_many_to_many_objects()):
+                if not issubclass(rel_obj.model, VersionCommit):
+                    name = rel_obj.field.rel.related_name or rel_obj.var_name
+                    filters[name + '__isnull'] = True
+            return self.filter(**filters)
 
     def commit(self, user=None):
         self.head = VersionCommit.objects.create(

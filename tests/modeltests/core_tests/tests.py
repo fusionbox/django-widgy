@@ -17,7 +17,8 @@ from widgy.exceptions import (ParentWasRejected, ChildWasRejected,
 from .widgy_config import widgy_site
 from .models import (Layout, Bucket, RawTextWidget, CantGoAnywhereWidget,
                      PickyBucket, ImmovableBucket, HasAWidgy, AnotherLayout,
-                     HasAWidgyOnlyAnotherLayout, VowelBucket)
+                     HasAWidgyOnlyAnotherLayout, VowelBucket, VersionedPage, VersionedPage2,
+                     VersionedPage3, VersionedPage4, VersionPageThrough)
 
 
 class RootNodeTestCase(TestCase):
@@ -423,6 +424,81 @@ class TestVersioning(RootNodeTestCase):
 
         tracker = VersionTracker.objects.create(working_copy=root_node)
         self.assertEqual(tracker.get_history_list(), [])
+
+
+    def orphan_helper(self):
+        a = VersionedPage.objects.create()
+        b = VersionedPage2.objects.create()
+        c = VersionedPage4.objects.create()
+
+        vt = VersionTracker.objects.create(working_copy=Layout.add_root(widgy_site).node)
+        a.version_tracker = vt
+        b.bar = vt
+        a.save()
+        b.save()
+
+        VersionPageThrough.objects.create(
+                widgy=vt,
+                page=c)
+
+        return vt, a, b, c
+
+    def test_orphan(self):
+        vt, a, b, c = self.orphan_helper()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        a.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        b.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        c.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [vt])
+        vt.delete()
+
+        vt, a, b, c = self.orphan_helper()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        b.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        a.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        c.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [vt])
+
+        vt.delete()
+
+        vt, a, b, c = self.orphan_helper()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        a.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        c.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        b.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [vt])
+
+        vt.delete()
+
+        vt, a, b, c = self.orphan_helper()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        c.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        b.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        a.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [vt])
+
+    @unittest.expectedFailure
+    def test_orphan_no_related_name(self):
+        # VersionedPage3 doesn't have a related_name on its
+        # VersionedWidgyField. I don't know if it's even possible to make this
+        # test pass. This could also be helpful -- not having a related name
+        # could be how you opt-out of the orphan checking.
+        vt, a, b, c = self.orphan_helper()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        a.delete()
+        b.delete()
+        c.delete()
+
+        d = VersionedPage3.objects.create(foo=vt)
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
 
 
 class TestWidgyField(TestCase):
