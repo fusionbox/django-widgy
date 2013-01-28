@@ -1,10 +1,33 @@
-{% extends "admin/base_site.html" %}{% load url from future %}
+{% extends "admin/base_site.html" %}{% load url from future %}{% load compress %}
+
+{% block extrahead %}
+{{ block.super }}
+{% compress css %}
+<link rel="stylesheet" href="{% static 'css/jquery.fancybox.css' %}">
+{% endcompress %}
+{% compress js %}
+<script src="{% static 'js/jquery.fancybox.js' %}"></script>
+<script>
+  $(function() {
+    $('a.widgy-fancybox').fancybox({
+      type: 'ajax'
+    });
+    window.closeFancybox = $.fancybox.close;
+  });
+</script>
+{% endcompress %}
+{% endblock  %}
 
 {% block content %}
 <ol>
     {% for commit in commits %}
     <li>{{ commit.created_at|date:"SHORT_DATETIME_FORMAT" }}{% if commit.author %} by {{ commit.author }}{% endif %}
     <a href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=commit.root_node.pk %}">view</a>
+    {% if commit.revert_url %}
+    <a class="widgy-fancybox" href="{{ commit.revert_url }}">Revert to this version</a>
+    {% else %}
+    can't revert, this is the same as the current version
+    {% endif %}
     </li>
     {% endfor %}
 </ol>

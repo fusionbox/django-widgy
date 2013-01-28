@@ -10,8 +10,8 @@ User = get_user_model()
 
 
 class VersionTracker(models.Model):
-    head = models.ForeignKey('VersionCommit', null=True)
-    working_copy = models.ForeignKey('Node')
+    head = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT)
+    working_copy = models.ForeignKey('Node', on_delete=models.PROTECT)
 
     class Meta:
         app_label = 'widgy'
@@ -54,9 +54,12 @@ class VersionTracker(models.Model):
             tracker=self,
         )
 
-        self.working_copy.delete()
+        old_working_copy = self.working_copy
         self.working_copy = commit.root_node.clone_tree(freeze=False)
+        # saving with the new working copy has to come before deleting the old
+        # working copy, because foreign keys.
         self.save()
+        old_working_copy.content.delete()
 
         return self.head
 
@@ -83,6 +86,7 @@ class VersionTracker(models.Model):
         commit_id = self.head_id
         while commit_id:
             commit = commit_dict[commit_id]
+            commit.tracker = self
             res.append(commit)
             commit_id = commit.parent_id
         return res
@@ -90,8 +94,8 @@ class VersionTracker(models.Model):
 
 class VersionCommit(models.Model):
     tracker = models.ForeignKey(VersionTracker, related_name='commits')
-    parent = models.ForeignKey('VersionCommit', null=True, on_delete=models.SET_NULL)
-    root_node = WidgyField()
+    parent = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT)
+    root_node = WidgyField(on_delete=models.PROTECT)
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now=True)
 
