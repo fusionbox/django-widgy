@@ -28,6 +28,9 @@
     {% else %}
     can't revert, this is the same as the current version
     {% endif %}
+    {% if commit.diff_url %}
+    <a href="{{ commit.diff_url }}">diff</a>
+    {% endif %}
     </li>
     {% endfor %}
 </ol>

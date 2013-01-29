@@ -13,6 +13,7 @@ from widgy.views import (
     CommitView,
     HistoryView,
     RevertView,
+    DiffView,
 )
 from widgy.exceptions import (
     MutualRejection,
@@ -32,6 +33,7 @@ class WidgySite(object):
         self.commit_view = self.get_commit_view()
         self.history_view = self.get_history_view()
         self.revert_view = self.get_revert_view()
+        self.diff_view = self.get_diff_view()
 
     def get_registry(self):
         return registry
@@ -53,6 +55,7 @@ class WidgySite(object):
             url('^revert/(?P<pk>[^/]+)/(?P<commit_pk>[^/]+)/$', self.revert_view),
             url('^commit/(?P<pk>[^/]+)/$', self.commit_view),
             url('^history/(?P<pk>[^/]+)/$', self.history_view),
+            url('^diff/(?P<before_pk>[^/]+)/(?P<after_pk>[^/]+)/$', self.diff_view),
         )
         return urlpatterns
 
@@ -103,6 +106,9 @@ class WidgySite(object):
 
     def get_revert_view(self):
         return RevertView.as_view(site=self)
+
+    def get_diff_view(self):
+        return DiffView.as_view(site=self)
 
     def valid_parent_of(self, parent, child_class, child=None):
         return parent.valid_parent_of(child_class, child)

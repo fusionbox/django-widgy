@@ -87,6 +87,7 @@ class VersionTracker(models.Model):
         while commit_id:
             commit = commit_dict[commit_id]
             commit.tracker = self
+            commit.parent = commit_dict.get(commit.parent_id)
             res.append(commit)
             commit_id = commit.parent_id
         return res

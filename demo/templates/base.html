@@ -22,6 +22,7 @@
   {% endcompress %}
 </head>
 <body>
+  {% block body %}
   {% page_menu 'pages/menus/top_nav.html' %}
   <style>
     .left_nav {
@@ -41,5 +42,6 @@
     {% block content %}
     {% endblock %}
   </div>
+  {% endblock %}
 </body>
 </html>

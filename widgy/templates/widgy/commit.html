@@ -4,6 +4,9 @@
 <div class="commit">
   {# TODO: this is dependent on widgy_mezzanine #}
   <a href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=object.working_copy.pk %}">Preview</a>
+  {% if diff_url %}
+  <a href="{{ diff_url }}">diff</a>
+  {% endif %}
   <form method="post" class="commit_form" action="{{ commit_url }}">
     {% csrf_token %}
     {% for field in form %}
