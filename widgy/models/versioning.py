@@ -34,24 +34,26 @@ class VersionTracker(models.Model):
                     filters[name + '__isnull'] = True
             return self.filter(**filters)
 
-    def commit(self, user=None):
+    def commit(self, user=None, **kwargs):
         self.head = VersionCommit.objects.create(
             parent=self.head,
             author=user,
             root_node=self.working_copy.clone_tree(),
             tracker=self,
+            **kwargs
         )
 
         self.save()
 
         return self.head
 
-    def revert_to(self, commit, user=None):
+    def revert_to(self, commit, user=None, **kwargs):
         self.head = VersionCommit.objects.create(
             parent=self.head,
             author=user,
             root_node=commit.root_node,
             tracker=self,
+            **kwargs
         )
 
         old_working_copy = self.working_copy
@@ -99,9 +101,14 @@ class VersionCommit(models.Model):
     root_node = WidgyField(on_delete=models.PROTECT)
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now=True)
+    message = models.TextField(blank=True, null=True)
 
     class Meta:
         app_label = 'widgy'
 
     def __unicode__(self):
-        return '%s %s' % (self.id, self.created_at)
+        if self.message:
+            subject = " - '%s'" % self.message.strip().split('\n')[0]
+        else:
+            subject = ''
+        return '%s %s%s' % (self.id, self.created_at, subject)

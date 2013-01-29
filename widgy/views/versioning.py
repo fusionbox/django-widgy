@@ -29,10 +29,12 @@ def diff_url(site, before, after):
 
 
 class CommitForm(forms.Form):
-    pass
+    message = forms.CharField(widget=forms.Textarea,
+                              label='Notes (optional)',
+                              required=False)
 
 
-class RevertForm(forms.Form):
+class RevertForm(CommitForm):
     pass
 
 
@@ -58,7 +60,8 @@ class CommitView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, FormView)
 
     def form_valid(self, form):
         object = self.get_object()
-        object.commit(user=self.request.user)
+        object.commit(user=self.request.user,
+                      **form.cleaned_data)
         return self.response_class(
             request=self.request,
             template='widgy/commit_success.html',
@@ -93,7 +96,7 @@ class RevertView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, FormView)
     form_class = RevertForm
 
     def get_context_data(self, **kwargs):
-        self.object = kwargs['object'] = self.get_object()
+        kwargs['object'] = self.object
         kwargs = super(RevertView, self).get_context_data(**kwargs)
         kwargs['revert_url'] = self.site.reverse(
             self.site.revert_view,
@@ -109,9 +112,17 @@ class RevertView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, FormView)
         commit.tracker = vt
         return commit
 
+    def get_form_kwargs(self):
+        self.object = self.get_object()
+        kwargs = super(RevertView, self).get_form_kwargs()
+        kwargs['initial'] = {
+            'message': 'Revert to version %s' % self.object,
+        }
+        return kwargs
+
     def form_valid(self, form):
         commit = self.get_object()
-        commit.tracker.revert_to(commit, user=self.request.user)
+        commit.tracker.revert_to(commit, user=self.request.user, **form.cleaned_data)
 
         return self.response_class(
             request=self.request,

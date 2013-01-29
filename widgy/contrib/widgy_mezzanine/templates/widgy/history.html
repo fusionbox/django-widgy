@@ -31,6 +31,9 @@
     {% if commit.diff_url %}
     <a href="{{ commit.diff_url }}">diff</a>
     {% endif %}
+    {% if commit.message %}
+    <blockquote>{{ commit.message|linebreaks }}</blockquote>
+    {% endif %}
     </li>
     {% endfor %}
 </ol>
