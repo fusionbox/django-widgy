@@ -1,9 +1,11 @@
 define([
     'widgy.backbone',
-    'underscore'
+    'underscore',
+    'modal/modal'
     ], function(
       Backbone,
-      _
+      _,
+      modal
       ) {
 
   var templates = new Backbone.Collection();
@@ -16,7 +18,7 @@ define([
         'render'
       );
     },
-    
+
     render: function(type, context) {
       return Backbone.renderTemplate(this.get(type), context);
     }
@@ -35,6 +37,7 @@ define([
           templates.add(model);
           callback(model.render(type, context));
         },
+        error: modal.raiseError,
         cache: false
       });
     }
