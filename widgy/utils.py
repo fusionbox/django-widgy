@@ -3,6 +3,12 @@ Some utility functions used throughout the project.
 """
 from contextlib import contextmanager
 
+try:
+    from django.contrib.auth import get_user_model
+except ImportError:
+    def get_user_model():
+        from django.contrib.auth.models import User
+        return User
 
 def path_generator(prefix, ext='.html'):
     """

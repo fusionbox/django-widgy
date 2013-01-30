@@ -42,16 +42,19 @@ class WidgyWidget(forms.HiddenInput):
     for a Widgy field.
     """
     stylesheets = None
+    template_name = 'widgy/widgy_field.html'
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, context={}):
         self.node.maybe_prefetch_tree()
-        return render_to_string('widgy/widgy_field.html', {
+        defaults = {
             'html_name': name,
             'value': value,
             'stylesheets': self.stylesheets,
             'html_id': attrs['id'],
             'node_dict': self.node.to_json(self.site),
-        })
+        }
+        defaults.update(context)
+        return render_to_string(self.template_name, defaults)
 
 
 class ContentTypeRadioInput(widgets.RadioInput):
@@ -128,6 +131,27 @@ class WidgyFormField(forms.ModelChoiceField):
                 raise
 
         return value
+
+
+class VersionedWidgyWidget(WidgyWidget):
+    template_name = 'widgy/versioned_widgy_field.html'
+
+    def render(self, name, value, attrs=None):
+        context = {
+            'commit_url': self.site.reverse(self.site.commit_view, kwargs={'pk': value}),
+        }
+        return super(VersionedWidgyWidget, self).render(name, value, attrs, context)
+
+
+class VersionedWidgyFormField(WidgyFormField):
+    widget = VersionedWidgyWidget
+
+    def conform_to_value(self, value):
+        self.version_tracker = value
+        return super(VersionedWidgyFormField, self).conform_to_value(value and value.working_copy)
+
+    def clean(self, value):
+        return self.version_tracker or super(VersionedWidgyFormField, self).clean(value)
 
 
 class WidgyFormMixin(object):

@@ -106,7 +106,7 @@ def setup(verbosity, test_labels):
         'django.middleware.common.CommonMiddleware',
     )
     settings.SITE_ID = 1
-    settings.WIDGY_MEZZANINE_SITE = 'modeltests.core_tests.widgy_config'
+    settings.WIDGY_MEZZANINE_SITE = 'modeltests.core_tests.widgy_config.widgy_site'
 
 
     # mezzanine junk

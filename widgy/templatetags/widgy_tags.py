@@ -36,12 +36,15 @@ def verbatim(parser, token):
 
 @register.simple_tag(takes_context=True)
 def render(context, node):
-    from widgy.models import Node
-
-    if not isinstance(node, Node):
-        node = node.node
+    from widgy.models import Content
 
     assert 'request' in context, "Widgy rendering requires that request is in context."
+
+    if isinstance(node, Content):
+        node = node.node
+    elif hasattr(node, 'get_published_node'):
+        node = node.get_published_node(context['request'])
+
     node.maybe_prefetch_tree()
 
     return node.render(context)

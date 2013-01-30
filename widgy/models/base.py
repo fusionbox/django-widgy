@@ -5,6 +5,8 @@ objects.
 from collections import defaultdict
 from functools import partial
 import logging
+import itertools
+import copy
 
 from django.db import models
 from django.forms.models import modelform_factory, ModelForm
@@ -18,6 +20,7 @@ from django.contrib.admin import widgets
 from treebeard.mp_tree import MP_Node
 
 from widgy.exceptions import (
+    InvalidOperation,
     InvalidTreeMovement,
     ParentChildRejection,
     RootDisplacementError
@@ -47,6 +50,7 @@ class Node(MP_Node):
     content_type = models.ForeignKey(ContentType)
     content_id = models.PositiveIntegerField()
     content = WidgyGenericForeignKey('content_type', 'content_id')
+    is_frozen = models.BooleanField(default=False)
 
     class Meta:
         app_label = 'widgy'
@@ -132,52 +136,72 @@ class Node(MP_Node):
         else:
             return [self] + list(self.get_descendants().order_by('path'))
 
-    def prefetch_tree(self):
+    @staticmethod
+    def fetch_content_instances(nodes):
         """
-        Builds the entire tree using python.  Each node has its Content
-        instance filled in, and the reverse node relation on the content filled
-        in as well.
+        Given a list of nodes, efficiently get all of their content instances.
 
-        .. todo::
+        The structure returned looks like this::
 
-            Maybe use in_bulk here to avoid doing a query for every content
+            {
+                content_type_id: {
+                    content_id: content_instance,
+                    content_id: content_instance,
+                },
+                content_type_id: {
+                    content_id: content_instance,
+                },
+            }
         """
-        tree = self.depth_first_order()
-
-        # This should get_depth() or is_root(), but both of those do another
-        # query
-        if self.depth == 1:
-            self._parent = None
-            self._next_sibling = None
-            self._ancestors = []
-
         # Build a mapping of content_types -> ids
         contents = defaultdict(list)
-        for node in tree:
+        for node in nodes:
             contents[node.content_type_id].append(node.content_id)
 
         # Convert that mapping to content_types -> Content instances
-        content_types = ContentType.objects.in_bulk(contents.iterkeys())
         for content_type_id, content_ids in contents.iteritems():
-            ct = content_types[content_type_id]
-            model_class = ct.model_class()
+            try:
+                ct = ContentType.objects.get_for_id(content_type_id)
+                model_class = ct.model_class()
+            except AttributeError:
+                # get_for_id raises AttributeError when there's no model_class.
+                ct = ContentType.objects.get(id=content_type_id)
+                model_class = None
             if model_class:
                 instances = ct.model_class().objects.filter(pk__in=content_ids)
             else:
                 instances = [UnknownWidget(ct, id) for id in content_ids]
                 instances and instances[0].warn()
             contents[content_type_id] = dict([(i.id, i) for i in instances])
+        return contents
 
-        # Loop through the nodes both assigning the content instance and the
-        # node instance onto the content
-        for node in tree:
-            node.content = contents[node.content_type_id][node.content_id]
-            node.content.node = node
+    @classmethod
+    def prefetch_trees(cls, *root_nodes):
+        for node in root_nodes:
+            # This should get_depth() or is_root(), but both of those do another
+            # query
+            if node.depth == 1:
+                node._parent = None
+                node._next_sibling = None
+                node._ancestors = []
 
-        # Knock the root node off before building out the tree structure
-        tree.pop(0)
-        self.consume_children(tree)
-        assert not tree, "all of the nodes should be consumed"
+        trees = [i.depth_first_order() for i in root_nodes]
+        contents = cls.fetch_content_instances(itertools.chain(*trees))
+        for tree in trees:
+            for node in tree:
+                node.content = contents[node.content_type_id][node.content_id]
+                node.content.node = node
+            root_node = tree.pop(0)
+            root_node.consume_children(tree)
+            assert not tree, "all of the nodes should be consumed"
+
+    def prefetch_tree(self):
+        """
+        Builds the entire tree using python.  Each node has its Content
+        instance filled in, and the reverse node relation on the content filled
+        in as well.
+        """
+        self.prefetch_trees(self)
 
     def consume_children(self, descendants):
         """
@@ -245,6 +269,82 @@ class Node(MP_Node):
         my_family = set(self.depth_first_order())
         return [i for i in all_nodes if validator(i.content) and i not in my_family]
 
+    def clone_tree(self, freeze=True):
+        """
+        1. new_root <- root_node
+        2. new_root.content <- Clone(root_node.content)
+        3. Insert new_root.
+        4. children <- All descendents of root node.
+        5. Iterate over children as child:
+            i. unset PK
+            ii. replace child.path[0:steplen] with new_root.path
+            iii. cloned_content <- child.content
+            iv. content_id <- cloned_content.pk
+        6. Issue a bulk_create for children.
+        """
+        # This method only supports cloning an entire tree. We don't need it
+        # for versioning, and I'm not sure what the semantics would be.
+        cls = self.__class__
+        assert self.depth == 1
+        self.maybe_prefetch_tree()
+        new_root = cls.add_root(
+            content=self.content.clone(),
+            numchild=self.numchild,
+            is_frozen=freeze,
+        )
+        children_to_create = []
+        for child in self.depth_first_order()[1:]:
+            children_to_create.append(Node(
+                content=child.content.clone(),
+                path=new_root.path + child.path[cls.steplen:],
+                is_frozen=freeze,
+                depth=child.depth,
+                numchild=child.numchild,
+            ))
+        cls.objects.bulk_create(children_to_create)
+        return new_root
+
+    def check_frozen(self):
+        if self.is_frozen:
+            raise InvalidOperation({'message': "This widget is uneditable."})
+
+    def delete(self, *args, **kwargs):
+        self.check_frozen()
+        return super(Node, self).delete(*args, **kwargs)
+
+    def add_child(self, *args, **kwargs):
+        self.check_frozen()
+        return super(Node, self).add_child(*args, **kwargs)
+
+    def add_sibling(self, *args, **kwargs):
+        self.check_frozen()
+        return super(Node, self).add_sibling(*args, **kwargs)
+
+    def move(self, *args, **kwargs):
+        self.check_frozen()
+        return super(Node, self).move(*args, **kwargs)
+
+    def trees_equal(self, other):
+        if self.content_type_id != other.content_type_id:
+            return False
+        if not self.get_depth() == other.get_depth():
+            return False
+        if not self.get_children_count() == other.get_children_count():
+            return False
+        if not self.content.equal(other.content):
+            return False
+
+        for child, other_child in zip(self.get_children(), other.get_children()):
+            if not child.trees_equal(other_child):
+                return False
+        return True
+
+
+def check_frozen(sender, instance, **kwargs):
+    instance.check_frozen()
+
+models.signals.pre_delete.connect(check_frozen, sender=Node)
+
 
 class Content(models.Model):
     """
@@ -260,10 +360,13 @@ class Content(models.Model):
                                   content_type_field='content_type',
                                   object_id_field='content_id')
 
-    draggable = True            #: Set this content to be draggable
-    deletable = True            #: Set this content instance to be deleteable
-    accepting_children = False  #: Sets this content instance to be able to have children.
+    # these preferences only affect the frontend interface and editing through
+    # the API
+    draggable = True
+    deletable = True
+    accepting_children = False
     shelf = False
+
     component_name = 'widget'
     # 0: can not pop out
     # 1: can pop out
@@ -305,14 +408,16 @@ class Content(models.Model):
             'pop_out': self.pop_out,
             'edit_url': site.reverse(site.node_edit_view, kwargs=node_pk_kwargs),
             'shelf': self.shelf,
+            'attributes': self.get_attributes()
         }
-        model_data = model_to_dict(self)
-        try:
-            del model_data[self._meta.pk.attname]
-        except KeyError:
-            pass
-        data['attributes'] = model_data
         return data
+
+    def get_attributes(self):
+        model_data = {}
+        for field in self._meta.fields:
+            if field.serialize:
+                model_data[field.attname] = field.value_from_object(self)
+        return model_data
 
     @classmethod
     def class_to_json(cls, site):
@@ -344,7 +449,10 @@ class Content(models.Model):
         """
         if hasattr(self, '_node'):
             return self._node
-        return self._nodes.all()[0]
+        try:
+            return self._nodes.all()[0]
+        except IndexError:
+            raise Node.DoesNotExist
 
     @node.setter
     def node(self, value):
@@ -399,6 +507,7 @@ class Content(models.Model):
         return obj
 
     def add_child(self, site, cls, **kwargs):
+        self.check_frozen()
         obj = cls.objects.create(**kwargs)
         self.node.add_child(content=obj)
 
@@ -412,6 +521,7 @@ class Content(models.Model):
         return obj
 
     def add_sibling(self, site, cls, **kwargs):
+        self.check_frozen()
         if self.node.is_root():
             raise RootDisplacementError({'message': 'You can\'t put things next to me'})
 
@@ -559,6 +669,7 @@ class Content(models.Model):
         }
 
     def reposition(self, site, right=None, parent=None):
+        self.check_frozen()
         if right:
             if right.node.is_root():
                 raise InvalidTreeMovement({'message': 'You can\'t move the root'})
@@ -578,10 +689,36 @@ class Content(models.Model):
         pass
 
     def delete(self, raw=False):
+        self.check_frozen()
         if not raw:
             self.pre_delete()
         self.node.delete()
         super(Content, self).delete()
+
+    def clone(self):
+        # TODO: Make this work with inheritance. Maybe many-to-many
+        # relationships too, or document that you should provide your own clone()
+        # See https://code.djangoproject.com/ticket/4027
+        new = copy.copy(self)
+        new.pk = None
+        new.save()
+        return new
+
+    def save(self, *args, **kwargs):
+        self.check_frozen()
+        return super(Content, self).save(*args, **kwargs)
+
+    def check_frozen(self):
+        if not self.pk:
+            # if we don't have a pk, we can't have a node
+            return
+        try:
+            self.node.check_frozen()
+        except Node.DoesNotExist:
+            pass
+
+    def equal(self, other):
+        return self.get_attributes() == other.get_attributes()
 
 
 class UnknownWidget(Content):
