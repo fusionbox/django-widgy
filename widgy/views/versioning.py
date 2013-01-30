@@ -57,6 +57,8 @@ class CommitView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, FormView)
         kwargs['diff_url'] = diff_url(self.site,
                                       self.object.working_copy,
                                       self.object.head.root_node)
+        kwargs['changed_anything'] = self.object.has_changes(self.request)
+
         return kwargs
 
     def form_valid(self, form):

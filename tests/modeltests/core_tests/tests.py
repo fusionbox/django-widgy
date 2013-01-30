@@ -145,10 +145,14 @@ class TestCore(RootNodeTestCase):
 
         raw_text = new_right.get_first_child()
         with self.assertRaises(ChildWasRejected):
-            raw_text.content.reposition(widgy_site, parent=self.root_node.content, right=new_left.content)
+            raw_text.content.reposition(widgy_site,
+                                        parent=self.root_node.content,
+                                        right=new_left.content)
 
         subbucket = list(new_right.get_children())[-1]
-        subbucket.content.reposition(widgy_site, parent=self.root_node.content, right=new_left.content)
+        subbucket.content.reposition(widgy_site,
+                                     parent=self.root_node.content,
+                                     right=new_left.content)
         new_subbucket, new_left, new_right = self.root_node.get_children()
         self.assertEqual(new_subbucket, subbucket)
 
@@ -200,6 +204,21 @@ class TestCore(RootNodeTestCase):
         self.assertIsInstance(content, UnknownWidget)
         self.assertEqual(content.content_type.app_label, fake_ct.app_label)
 
+    def test_get_attributes(self):
+        r = Related.objects.create()
+        tests = [
+            # (class, kwargs, attributes}
+            (Bucket, {}, {}),
+            (RawTextWidget, {'text': 'foo'}, {'text': 'foo'}),
+            (AnotherLayout, {}, {}),
+            (ForeignKeyWidget, {'foo': r}, {'foo_id': r.pk}),
+        ]
+
+        for cls, kwargs, attributes in tests:
+            widget = cls.add_root(widgy_site, **kwargs)
+            self.assertEqual(widget.get_attributes(),
+                             attributes)
+
 
 class TestVersioning(RootNodeTestCase):
     def test_clone_tree(self):
@@ -215,6 +234,26 @@ class TestVersioning(RootNodeTestCase):
             del a_dict['id']
             del b_dict['id']
             self.assertEqual(a_dict, b_dict)
+
+    def test_trees_equal(self):
+        left, right = make_a_nice_tree(self.root_node)
+        new_root = self.root_node.clone_tree(freeze=False)
+        self.assertTrue(self.root_node.trees_equal(new_root))
+        new_root.content.get_children()[0].delete()
+        self.assertFalse(self.root_node.trees_equal(new_root))
+
+    def test_content_equal(self):
+        a = RawTextWidget.add_root(widgy_site, text='a')
+        b = RawTextWidget.add_root(widgy_site, text='b')
+        self.assertFalse(a.equal(b))
+        b.text = 'a'
+        b.save()
+        self.assertTrue(a.equal(b))
+
+    def test_content_equal_mti(self):
+        a = AnotherLayout.add_root(widgy_site)
+        b = AnotherLayout.add_root(widgy_site)
+        self.assertTrue(a.equal(b))
 
     def test_commit(self):
         root_node = RawTextWidget.add_root(widgy_site, text='first').node
@@ -259,7 +298,6 @@ class TestVersioning(RootNodeTestCase):
         self.assertEqual(['b', 'a'],
                          [i.content.text for i in commit2.root_node.get_children()])
 
-
     def test_revert(self):
         root_node = RawTextWidget.add_root(widgy_site, text='first').node
         tracker = VersionTracker.objects.create(working_copy=root_node)
@@ -291,7 +329,6 @@ class TestVersioning(RootNodeTestCase):
 
         self.assertSequenceEqual(list(tracker.get_history()), list(commits))
 
-
     def test_old_contents_cant_change(self):
         root_node = RawTextWidget.add_root(widgy_site, text='first').node
         tracker = VersionTracker.objects.create(working_copy=root_node)
@@ -306,7 +343,6 @@ class TestVersioning(RootNodeTestCase):
 
         with self.assertRaises(InvalidOperation):
             widget.delete()
-
 
     def test_old_structure_cant_change(self):
         root_node = Bucket.add_root(widgy_site).node
@@ -429,7 +465,6 @@ class TestVersioning(RootNodeTestCase):
 
         tracker = VersionTracker.objects.create(working_copy=root_node)
         self.assertEqual(tracker.get_history_list(), [])
-
 
     def orphan_helper(self):
         a = VersionedPage.objects.create()
@@ -720,7 +755,6 @@ class TestPrefetchTree(RootNodeTestCase):
                              b.depth_first_order())
 
 
-
 class HttpTestCase(TestCase):
     def setUp(self):
         u = User.objects.create_user(
@@ -904,7 +938,8 @@ class TestApi(RootNodeTestCase, HttpTestCase):
                                left.content.get_children()[2].node.get_api_url(widgy_site)],
                               possible_parents)
 
-        resp = self.get(left.content.get_children()[0].node.to_json(widgy_site)['possible_parents_url'])
+        resp = self.get(
+            left.content.get_children()[0].node.to_json(widgy_site)['possible_parents_url'])
         possible_parents = json.loads(resp.content)
         order_ignorant_equals([left.get_api_url(widgy_site),
                                right.get_api_url(widgy_site),
@@ -921,7 +956,8 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         root_url = root_json['url']
 
         def doit(method, *args):
-            ret = json.loads(getattr(self, method)('{0}?include_compatibility_for={1}'.format(left_url, root_url), *args).content)
+            url = '{0}?include_compatibility_for={1}'.format(left_url, root_url)
+            ret = json.loads(getattr(self, method)(url, *args).content)
             compatibility = json.loads(self.get(root_json['available_children_url']).content)
 
             if method == 'get':

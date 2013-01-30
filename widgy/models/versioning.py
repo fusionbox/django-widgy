@@ -5,13 +5,14 @@ from fusionbox.db.models import QuerySetManager
 
 from widgy.utils import get_user_model
 from widgy.db.fields import WidgyField
+from widgy.models.base import Node
 
 User = get_user_model()
 
 
 class VersionTracker(models.Model):
     head = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT)
-    working_copy = models.ForeignKey('Node', on_delete=models.PROTECT)
+    working_copy = models.ForeignKey(Node, on_delete=models.PROTECT)
 
     class Meta:
         app_label = 'widgy'
@@ -93,6 +94,14 @@ class VersionTracker(models.Model):
             res.append(commit)
             commit_id = commit.parent_id
         return res
+
+    def has_changes(self, request):
+        if not self.head:
+            return True
+        else:
+            newest_tree = self.head.root_node
+            Node.prefetch_trees(self.working_copy, newest_tree)
+            return not self.working_copy.trees_equal(newest_tree)
 
 
 class VersionCommit(models.Model):

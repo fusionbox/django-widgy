@@ -325,6 +325,21 @@ class Node(MP_Node):
         self.check_frozen()
         return super(Node, self).move(*args, **kwargs)
 
+    def trees_equal(self, other):
+        if self.content_type != other.content_type:
+            return False
+        if not self.get_depth() == other.get_depth():
+            return False
+        if not self.get_children_count() == other.get_children_count():
+            return False
+        if not self.content.equal(other.content):
+            return False
+
+        for child, other_child in zip(self.get_children(), other.get_children()):
+            if not child.trees_equal(other_child):
+                return False
+        return True
+
 
 def check_frozen(sender, instance, **kwargs):
     instance.check_frozen()
@@ -346,10 +361,13 @@ class Content(models.Model):
                                   content_type_field='content_type',
                                   object_id_field='content_id')
 
-    draggable = True            #: Set this content to be draggable
-    deletable = True            #: Set this content instance to be deleteable
-    accepting_children = False  #: Sets this content instance to be able to have children.
+    # these preferences only affect the frontend interface and editing through
+    # the API
+    draggable = True
+    deletable = True
+    accepting_children = False
     shelf = False
+
     component_name = 'widget'
     # 0: can not pop out
     # 1: can pop out
@@ -391,14 +409,16 @@ class Content(models.Model):
             'pop_out': self.pop_out,
             'edit_url': site.reverse(site.node_edit_view, kwargs=node_pk_kwargs),
             'shelf': self.shelf,
+            'attributes': self.get_attributes()
         }
-        model_data = model_to_dict(self)
-        try:
-            del model_data[self._meta.pk.attname]
-        except KeyError:
-            pass
-        data['attributes'] = model_data
         return data
+
+    def get_attributes(self):
+        model_data = {}
+        for field in self._meta.fields:
+            if field.serialize:
+                model_data[field.attname] = field.value_from_object(self)
+        return model_data
 
     @classmethod
     def class_to_json(cls, site):
@@ -699,6 +719,9 @@ class Content(models.Model):
             self.node.check_frozen()
         except Node.DoesNotExist:
             pass
+
+    def equal(self, other):
+        return self.get_attributes() == other.get_attributes()
 
 
 class UnknownWidget(Content):
