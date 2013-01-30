@@ -460,10 +460,14 @@ class TestVersioning(RootNodeTestCase):
         # trigger to prevent modifications at the db level?
         root_node = RawTextWidget.add_root(widgy_site, text='asdf')
 
-        a = Node.objects.get(pk=root_node.pk)
-        b = Node.objects.get(pk=root_node.pk)
+        a = Node.objects.get(pk=root_node.pk).content
+        b = Node.objects.get(pk=root_node.pk).content
+        # Node has to be set before we set is_frozen, otherwise the call to
+        # delete will refetch the node.
+        a.node
+        b.node
 
-        a.is_frozen = True
+        a.node.is_frozen = True
         a.save()
 
         # Even though the b _instance_ isn't frozen, the entry in the database
