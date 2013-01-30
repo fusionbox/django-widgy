@@ -134,7 +134,7 @@ class VersionedWidgyField(WidgyField):
         unsaved throwaway Node so that we know how to properly instantiate a
         real node later on.
         """
-        from widgy.models import VersionTracker
+        VersionTracker = self.site.get_version_tracker_model()
         value = getattr(model_instance, self.name)
 
         if hasattr(value, '_ct'):
@@ -161,7 +161,7 @@ class VersionedWidgyField(WidgyField):
         Version trackers that have no references and whose content type is
         allowed by our field can be restored.
         """
-        from widgy.models import VersionTracker
+        VersionTracker = self.site.get_version_tracker_model()
         layouts = self.get_layout_contenttypes(self.root_choices)
         # Is it necessary to query on the HEAD content type _and_ the working
         # copy content type? Can a version tracker's root node content type

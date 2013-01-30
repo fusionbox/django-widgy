@@ -4,9 +4,6 @@ from widgy.models import Content
 from widgy.db.fields import WidgyField, VersionedWidgyField
 from widgy import registry
 
-from .widgy_config import widgy_site
-
-
 class Layout(Content):
     accepting_children = True
 
@@ -78,14 +75,14 @@ registry.register(VowelBucket)
 class HasAWidgy(models.Model):
     widgy = WidgyField(
         root_choices=[Layout],
-        site=widgy_site
+        site='modeltests.core_tests.widgy_config.widgy_site',
     )
 
 
 class HasAWidgyOnlyAnotherLayout(models.Model):
     widgy = WidgyField(
         root_choices=[AnotherLayout],
-        site=widgy_site
+        site='modeltests.core_tests.widgy_config.widgy_site'
     )
 
 
@@ -94,15 +91,15 @@ class UnregisteredLayout(Layout):
 
 
 class VersionedPage(models.Model):
-    version_tracker = VersionedWidgyField(site=widgy_site)
+    version_tracker = VersionedWidgyField(site='modeltests.core_tests.widgy_config.widgy_site')
 
 
 class VersionedPage2(models.Model):
-    bar = VersionedWidgyField(site=widgy_site, related_name='asdf')
+    bar = VersionedWidgyField(site='modeltests.core_tests.widgy_config.widgy_site', related_name='asdf')
 
 
 class VersionedPage3(models.Model):
-    foo = VersionedWidgyField(site=widgy_site, related_name='+')
+    foo = VersionedWidgyField(site='modeltests.core_tests.widgy_config.widgy_site', related_name='+')
 
 
 class VersionedPage4(models.Model):
@@ -110,7 +107,7 @@ class VersionedPage4(models.Model):
 
 
 class VersionPageThrough(models.Model):
-    widgy = VersionedWidgyField(site=widgy_site, related_name='+')
+    widgy = VersionedWidgyField(site='modeltests.core_tests.widgy_config.widgy_site', related_name='+')
     page = models.ForeignKey(VersionedPage4)
 
 
