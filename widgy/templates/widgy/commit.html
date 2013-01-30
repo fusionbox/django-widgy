@@ -1,0 +1,25 @@
+{% load url from future %}
+<script src="{% static 'js/jquery.form.js' %}'"></script>
+
+<div class="commit">
+  {% if changed_anything %}
+    {# TODO: this is dependent on widgy_mezzanine #}
+    <a href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=object.working_copy.pk %}">Preview</a>
+    {% if diff_url %}
+    <a href="{{ diff_url }}">diff</a>
+    {% endif %}
+    <form method="post" class="commit_form" action="{{ commit_url }}">
+      {% csrf_token %}
+      {% for field in form %}
+        {% include "widgy/field_as_div.html" %}
+      {% endfor %}
+      <input type="submit" value="Commit">
+    </form>
+    <script>
+      $('.commit_form').ajaxForm({target: 'div.commit'});
+    </script>
+  {% else %}
+    <p>Nothing has changed -- no need to commit.</p>
+  {% endif %}
+</div>
+</body>

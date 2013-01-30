@@ -4,17 +4,23 @@ from pprint import pprint
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django import forms
+from django.forms.models import model_to_dict
 from django.contrib.contenttypes.models import ContentType
+from django.utils import unittest
+from django.db.models.deletion import ProtectedError
 
-from widgy.models import Node, UnknownWidget
+from widgy.models import Node, UnknownWidget, VersionTracker
 from widgy.views import extract_id
 from widgy.exceptions import (ParentWasRejected, ChildWasRejected,
-                              MutualRejection, InvalidTreeMovement)
+                              MutualRejection, InvalidTreeMovement,
+                              InvalidOperation)
 
 from .widgy_config import widgy_site
 from .models import (Layout, Bucket, RawTextWidget, CantGoAnywhereWidget,
                      PickyBucket, ImmovableBucket, HasAWidgy, AnotherLayout,
-                     HasAWidgyOnlyAnotherLayout, VowelBucket)
+                     HasAWidgyOnlyAnotherLayout, VowelBucket, VersionedPage,
+                     VersionedPage2, VersionedPage3, VersionedPage4,
+                     VersionPageThrough, Related, ForeignKeyWidget)
 
 
 class RootNodeTestCase(TestCase):
@@ -139,10 +145,14 @@ class TestCore(RootNodeTestCase):
 
         raw_text = new_right.get_first_child()
         with self.assertRaises(ChildWasRejected):
-            raw_text.content.reposition(widgy_site, parent=self.root_node.content, right=new_left.content)
+            raw_text.content.reposition(widgy_site,
+                                        parent=self.root_node.content,
+                                        right=new_left.content)
 
         subbucket = list(new_right.get_children())[-1]
-        subbucket.content.reposition(widgy_site, parent=self.root_node.content, right=new_left.content)
+        subbucket.content.reposition(widgy_site,
+                                     parent=self.root_node.content,
+                                     right=new_left.content)
         new_subbucket, new_left, new_right = self.root_node.get_children()
         self.assertEqual(new_subbucket, subbucket)
 
@@ -172,6 +182,7 @@ class TestCore(RootNodeTestCase):
 
         root_node = Node.objects.get(pk=self.root_node.pk)
         self.assertIsInstance(root_node.content, UnknownWidget)
+        self.assertEqual(root_node.content.content_type.app_label, fake_ct.app_label)
 
     def test_unkown_content_type_prefetch(self):
         """
@@ -189,7 +200,413 @@ class TestCore(RootNodeTestCase):
 
         root_node = Node.objects.get(pk=self.root_node.pk)
         root_node.prefetch_tree()
-        self.assertIsInstance(list(root_node.content.get_children())[0].node.content, UnknownWidget)
+        content = list(root_node.content.get_children())[0].node.content
+        self.assertIsInstance(content, UnknownWidget)
+        self.assertEqual(content.content_type.app_label, fake_ct.app_label)
+
+    def test_get_attributes(self):
+        r = Related.objects.create()
+        tests = [
+            # (class, kwargs, attributes}
+            (Bucket, {}, {}),
+            (RawTextWidget, {'text': 'foo'}, {'text': 'foo'}),
+            (AnotherLayout, {}, {}),
+            (ForeignKeyWidget, {'foo': r}, {'foo_id': r.pk}),
+        ]
+
+        for cls, kwargs, attributes in tests:
+            widget = cls.add_root(widgy_site, **kwargs)
+            self.assertEqual(widget.get_attributes(),
+                             attributes)
+
+
+class TestVersioning(RootNodeTestCase):
+    def test_clone_tree(self):
+        left, right = make_a_nice_tree(self.root_node)
+
+        new_tree = self.root_node.clone_tree()
+        for a, b in zip(self.root_node.depth_first_order(),
+                        new_tree.depth_first_order()):
+            self.assertEqual(a.numchild, b.numchild)
+            self.assertEqual(a.content_type_id, b.content_type_id)
+            self.assertEqual(a.get_children_count(), b.get_children_count())
+            a_dict = model_to_dict(a.content)
+            b_dict = model_to_dict(b.content)
+            del a_dict['id']
+            del b_dict['id']
+            self.assertEqual(a_dict, b_dict)
+
+    def test_clone_tree_doesnt_mutate_tree(self):
+        make_a_nice_tree(self.root_node)
+        self.root_node.prefetch_tree()
+        before = self.root_node.depth_first_order()
+        self.root_node.clone_tree()
+        after = self.root_node.depth_first_order()
+        self.assertEqual(before, after)
+
+    def test_clone_tree_uses_prefetch(self):
+        root = Bucket.add_root(widgy_site)
+        root.add_child(widgy_site, RawTextWidget, text='a')
+        root.add_child(widgy_site, RawTextWidget, text='b')
+
+        root_node = root.node
+        root_node.prefetch_tree()
+
+        # - root content (1 query)
+        # - root node (2 queries)
+        # - 2 text contents (2 queries)
+        # - subnodes (1 query)
+        with self.assertNumQueries(6):
+            root_node.clone_tree()
+
+    def test_trees_equal(self):
+        left, right = make_a_nice_tree(self.root_node)
+        new_root = self.root_node.clone_tree(freeze=False)
+        self.assertTrue(self.root_node.trees_equal(new_root))
+        new_root.content.get_children()[0].delete()
+        self.assertFalse(self.root_node.trees_equal(new_root))
+
+    def test_content_equal(self):
+        a = RawTextWidget.add_root(widgy_site, text='a')
+        b = RawTextWidget.add_root(widgy_site, text='b')
+        self.assertFalse(a.equal(b))
+        b.text = 'a'
+        b.save()
+        self.assertTrue(a.equal(b))
+
+    def test_content_equal_mti(self):
+        a = AnotherLayout.add_root(widgy_site)
+        b = AnotherLayout.add_root(widgy_site)
+        self.assertTrue(a.equal(b))
+
+    def test_commit(self):
+        root_node = RawTextWidget.add_root(widgy_site, text='first').node
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        commit1 = tracker.commit()
+
+        self.assertNotEqual(tracker.working_copy, tracker.head.root_node)
+
+        textwidget_content = tracker.working_copy.content
+        textwidget_content.text = 'second'
+        textwidget_content.save()
+        commit2 = tracker.commit()
+
+        self.assertEqual(commit1.root_node.content.text, 'first')
+        self.assertEqual(commit2.root_node.content.text, 'second')
+
+        self.assertEqual(commit2.parent, commit1)
+        self.assertEqual(tracker.head, commit2)
+
+    def test_tree_structure_versioned(self):
+        root_node = Bucket.add_root(widgy_site).node
+        root_node.content.add_child(
+            widgy_site,
+            RawTextWidget,
+            text='a')
+        root_node.content.add_child(
+            widgy_site,
+            RawTextWidget,
+            text='b')
+
+        # if the root_node isn't refetched, get_children is somehow empty. I
+        # don't know why
+        root_node = Node.objects.get(pk=root_node.pk)
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        commit1 = tracker.commit()
+
+        new_a, new_b = tracker.working_copy.content.get_children()
+        new_b.reposition(widgy_site, right=new_a)
+        tracker.working_copy = Node.objects.get(pk=root_node.pk)
+        commit2 = tracker.commit()
+        self.assertEqual(['a', 'b'],
+                         [i.content.text for i in commit1.root_node.get_children()])
+        self.assertEqual(['b', 'a'],
+                         [i.content.text for i in commit2.root_node.get_children()])
+
+    def test_revert(self):
+        root_node = RawTextWidget.add_root(widgy_site, text='first').node
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        commit1 = tracker.commit()
+
+        self.assertNotEqual(tracker.working_copy, tracker.head.root_node)
+
+        textwidget_content = tracker.working_copy.content
+        textwidget_content.text = 'second'
+        textwidget_content.save()
+        commit2 = tracker.commit()
+
+        commit3 = tracker.revert_to(commit1)
+
+        textwidget_content = tracker.working_copy.content
+        textwidget_content.text = 'fourth'
+        textwidget_content.save()
+
+        commit4 = tracker.commit()
+
+        self.assertEqual(['fourth', 'first', 'second', 'first'],
+                         [i.root_node.content.text for i in tracker.get_history()])
+
+    def test_get_history(self):
+        root_node = RawTextWidget.add_root(widgy_site, text='first').node
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+
+        commits = reversed([tracker.commit() for i in range(6)])
+
+        self.assertSequenceEqual(list(tracker.get_history()), list(commits))
+
+    def test_old_contents_cant_change(self):
+        root_node = RawTextWidget.add_root(widgy_site, text='first').node
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        commit = tracker.commit()
+
+        widget = commit.root_node.content
+        widget.text = 'changed'
+        with self.assertRaises(InvalidOperation):
+            widget.save()
+
+        self.assertEquals(Node.objects.get(pk=commit.root_node.pk).content.text, 'first')
+
+        with self.assertRaises(InvalidOperation):
+            widget.delete()
+
+    def test_old_structure_cant_change(self):
+        root_node = Bucket.add_root(widgy_site).node
+        root_node.content.add_child(widgy_site, RawTextWidget, text='a')
+        root_node.content.add_child(widgy_site, RawTextWidget, text='b')
+        root_node = Node.objects.get(pk=root_node.pk)
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        commit = tracker.commit()
+
+        a, b = Node.objects.get(pk=commit.root_node.pk).content.get_children()
+        with self.assertRaises(InvalidOperation):
+            b.reposition(widgy_site, right=a)
+
+        with self.assertRaises(InvalidOperation):
+            commit.root_node.content.add_child(widgy_site, RawTextWidget, text='c')
+
+        self.assertEqual([i.content.text for i in commit.root_node.get_children()],
+                         ['a', 'b'])
+
+    def test_frozen_node(self):
+        c = RawTextWidget.add_root(widgy_site)
+        node = c.node
+        node.is_frozen = True
+        node.save()
+
+        c.text = 'asdf'
+        with self.assertRaises(InvalidOperation):
+            c.save()
+
+        with self.assertRaises(InvalidOperation):
+            c.delete()
+
+        self.assertEqual(RawTextWidget.objects.get(pk=c.pk).text, '')
+
+        with self.assertRaises(InvalidOperation):
+            node.delete()
+
+    def test_frozen_node_raw(self):
+        # even the treebeard methods called directly on the node should be frozen
+        node = RawTextWidget.add_root(widgy_site).node
+        node.is_frozen = True
+        node.save()
+
+        # 0 queries ensures that the exception is raised before any
+        # modification takes place
+        with self.assertNumQueries(0):
+            with self.assertRaises(InvalidOperation):
+                node.delete()
+
+            with self.assertRaises(InvalidOperation):
+                node.add_child()
+
+            with self.assertRaises(InvalidOperation):
+                node.add_child()
+
+            with self.assertRaises(InvalidOperation):
+                node.add_sibling()
+
+            with self.assertRaises(InvalidOperation):
+                node.move(node)
+
+    def test_frozen_reposition(self):
+        left, right = make_a_nice_tree(self.root_node)
+        for node in self.root_node.depth_first_order():
+            node.is_frozen = True
+            node.save()
+
+        before_ids = [i.id for i in self.root_node.depth_first_order()]
+
+        with self.assertRaises(InvalidOperation):
+            left.content.reposition(widgy_site, parent=right.content)
+
+        with self.assertRaises(InvalidOperation):
+            right.content.reposition(widgy_site, right=left.content)
+
+        with self.assertRaises(InvalidOperation):
+            right.content.add_child(widgy_site, RawTextWidget, text='asdf')
+
+        with self.assertRaises(InvalidOperation):
+            right.content.get_children()[0].add_sibling(widgy_site, RawTextWidget, text='asdf')
+
+        root_node = Node.objects.get(pk=self.root_node.id)
+        self.assertEqual([i.id for i in root_node.depth_first_order()],
+                         before_ids)
+
+    @unittest.expectedFailure
+    def test_frozen_db_is_canonical(self):
+        # I'm not sure if this failure should be expected or not. Should a node
+        # always recheck the database value? Or, should we use a database
+        # trigger to prevent modifications at the db level?
+        root_node = RawTextWidget.add_root(widgy_site, text='asdf')
+
+        a = Node.objects.get(pk=root_node.pk)
+        b = Node.objects.get(pk=root_node.pk)
+
+        a.is_frozen = True
+        a.save()
+
+        # Even though the b _instance_ isn't frozen, the entry in the database
+        # is. It would be ok if this was a database error instead of
+        # InvalidOperation, like if a BEFORE UPDATE trigger prevented an
+        # update.
+        with self.assertRaises(InvalidOperation):
+            b.delete()
+
+    def test_prefetch_commits(self):
+        root_node = RawTextWidget.add_root(widgy_site, text='first').node
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        user = User.objects.create()
+        commits = reversed([tracker.commit(user=user) for i in range(6)])
+
+        with self.assertNumQueries(1):
+            history = tracker.get_history_list()
+            for commit in history:
+                # root_node and author should be prefetched too
+                commit.root_node.pk
+                commit.author.pk
+
+            self.assertEqual(list(commits), history)
+
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        self.assertEqual(tracker.get_history_list(), [])
+
+    def orphan_helper(self):
+        a = VersionedPage.objects.create()
+        b = VersionedPage2.objects.create()
+        c = VersionedPage4.objects.create()
+
+        vt = VersionTracker.objects.create(working_copy=Layout.add_root(widgy_site).node)
+        a.version_tracker = vt
+        b.bar = vt
+        a.save()
+        b.save()
+
+        VersionPageThrough.objects.create(
+            widgy=vt,
+            page=c,
+        )
+
+        return vt, a, b, c
+
+    def test_orphan(self):
+        vt, a, b, c = self.orphan_helper()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        a.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        b.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        c.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [vt])
+        vt.delete()
+
+        vt, a, b, c = self.orphan_helper()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        b.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        a.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        c.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [vt])
+
+        vt.delete()
+
+        vt, a, b, c = self.orphan_helper()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        a.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        c.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        b.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [vt])
+
+        vt.delete()
+
+        vt, a, b, c = self.orphan_helper()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        c.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        b.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        a.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [vt])
+
+    @unittest.expectedFailure
+    def test_orphan_no_related_name(self):
+        # VersionedPage3 doesn't have a related_name on its
+        # VersionedWidgyField. I don't know if it's even possible to make this
+        # test pass. This could also be helpful -- not having a related name
+        # could be how you opt-out of the orphan checking.
+        vt, a, b, c = self.orphan_helper()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        a.delete()
+        b.delete()
+        c.delete()
+
+        d = VersionedPage3.objects.create(foo=vt)
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+
+    def test_deletion_prevented(self):
+        """
+        When widgets have outgoing foreign keys, cascade deletion shouldn't be
+        able to affect a frozen widget.
+        """
+
+        related = Related.objects.create()
+        root_node = ForeignKeyWidget.add_root(widgy_site, foo=related).node
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        commit = tracker.commit()
+
+        # the related object must not be able to be deleted
+        with self.assertRaises((ProtectedError, InvalidOperation)):
+            commit.root_node.content.foo.delete()
+
+        # the related object must still exist
+        Related.objects.get(pk=related.pk)
+
+        # the node and content must still exist
+        Node.objects.get(pk=commit.root_node.pk)
+        ForeignKeyWidget.objects.get(pk=commit.root_node.content.pk)
+
+    def test_deep_deletion_prevented(self):
+        # do the deletion on something other than the root node
+        related = Related.objects.create()
+        root_node = Bucket.add_root(widgy_site).node
+        root_node.content.add_child(widgy_site, ForeignKeyWidget, foo=related)
+        root_node = Node.objects.get(pk=root_node.pk)
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        commit = tracker.commit()
+
+        # the related object must not be able to be deleted
+        with self.assertRaises((ProtectedError, InvalidOperation)):
+            related.delete()
+
+        # the related object must still exist
+        Related.objects.get(pk=related.pk)
+
+        # the node and content must still exist
+        Node.objects.get(pk=commit.root_node.pk)
+        ForeignKeyWidget.objects.get(pk=commit.root_node.content.get_children()[0].pk)
 
 
 class TestWidgyField(TestCase):
@@ -234,18 +651,20 @@ class TestPrefetchTree(RootNodeTestCase):
     def setUp(self):
         super(TestPrefetchTree, self).setUp()
         make_a_nice_tree(self.root_node)
+        # ensure the ContentType cache is filled
+        for i in ContentType.objects.all():
+            ContentType.objects.get_for_id(i.pk)
 
     def test_prefetch_tree(self):
         with self.assertNumQueries(1):
             root_node = Node.objects.get(pk=self.root_node.pk)
 
-        # 5 queries:
+        # 4 queries:
         #  - get descendants of root_node
-        #  - get content types
         #  - get bucket contents
         #  - get layout contents
         #  - get text contents
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(4):
             root_node.prefetch_tree()
 
         # maybe_prefetch_tree shouldn't prefetch the tree again
@@ -309,12 +728,11 @@ class TestPrefetchTree(RootNodeTestCase):
     def test_works_on_not_root_node(self):
         left_node = self.root_node.get_first_child()
 
-        # 4 queries:
+        # 3 queries:
         #  - get descendants
-        #  - get content types
         #  - get bucket contents
         #  - get text contents
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             left_node.prefetch_tree()
 
         with self.assertNumQueries(0):
@@ -342,6 +760,24 @@ class TestPrefetchTree(RootNodeTestCase):
 
         self.assertEqual(left.get_root(), left.get_parent())
         self.assertEqual(left.get_children()[0].get_root(), left.get_parent())
+
+    def test_prefetch_trees(self):
+        a = Node.objects.get(pk=self.root_node.pk)
+        b = Node.objects.get(pk=self.root_node.pk)
+
+        # a.get_descendants, b.get_descendants
+        # 3 contents
+        with self.assertNumQueries(5):
+            Node.prefetch_trees(a, b)
+
+        root_node_dfo = self.root_node.depth_first_order()
+        with self.assertNumQueries(0):
+            a.content
+            b.content
+            self.assertEqual(root_node_dfo,
+                             a.depth_first_order())
+            self.assertEqual(a.depth_first_order(),
+                             b.depth_first_order())
 
 
 class HttpTestCase(TestCase):
@@ -527,7 +963,8 @@ class TestApi(RootNodeTestCase, HttpTestCase):
                                left.content.get_children()[2].node.get_api_url(widgy_site)],
                               possible_parents)
 
-        resp = self.get(left.content.get_children()[0].node.to_json(widgy_site)['possible_parents_url'])
+        resp = self.get(
+            left.content.get_children()[0].node.to_json(widgy_site)['possible_parents_url'])
         possible_parents = json.loads(resp.content)
         order_ignorant_equals([left.get_api_url(widgy_site),
                                right.get_api_url(widgy_site),
@@ -544,7 +981,8 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         root_url = root_json['url']
 
         def doit(method, *args):
-            ret = json.loads(getattr(self, method)('{0}?include_compatibility_for={1}'.format(left_url, root_url), *args).content)
+            url = '{0}?include_compatibility_for={1}'.format(left_url, root_url)
+            ret = json.loads(getattr(self, method)(url, *args).content)
             compatibility = json.loads(self.get(root_json['available_children_url']).content)
 
             if method == 'get':
