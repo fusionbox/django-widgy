@@ -14,7 +14,7 @@ class WidgyPageAdmin(PageAdmin, WidgyAdmin):
         return fancy_import(settings.WIDGY_MEZZANINE_SITE)
 
     def render_change_form(self, request, context, *args, **kwargs):
-        if 'original' in context:
+        if 'original' in context and context['original'].root_node:
             # we are rendering a change form
             obj = context['original']
             site = self.get_site()

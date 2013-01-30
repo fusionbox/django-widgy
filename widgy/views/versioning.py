@@ -54,9 +54,10 @@ class CommitView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, FormView)
         kwargs['object'] = self.object
         kwargs['commit_url'] = self.site.reverse(self.site.commit_view,
                                                  kwargs={'pk': self.object.pk})
-        kwargs['diff_url'] = diff_url(self.site,
-                                      self.object.working_copy,
-                                      self.object.head.root_node)
+        if self.object.head:
+            kwargs['diff_url'] = diff_url(self.site,
+                                          self.object.working_copy,
+                                          self.object.head.root_node)
         kwargs['changed_anything'] = self.object.has_changes(self.request)
 
         return kwargs
