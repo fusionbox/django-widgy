@@ -6,6 +6,7 @@ from collections import defaultdict
 from functools import partial
 import logging
 import itertools
+import copy
 
 from django.db import models
 from django.forms.models import modelform_factory, ModelForm
@@ -283,25 +284,23 @@ class Node(MP_Node):
         """
         # This method only supports cloning an entire tree. We don't need it
         # for versioning, and I'm not sure what the semantics would be.
-        #
-        # TODO: Use a prefetched tree here. The trouble is that we mutate all
-        # the child nodes, which invalidates the prefetched data.
-
         cls = self.__class__
         assert self.depth == 1
+        self.maybe_prefetch_tree()
         new_root = cls.add_root(
-            content_type_id=self.content_type_id,
-            content_id=self.content.clone(),
+            content=self.content.clone(),
             numchild=self.numchild,
             is_frozen=freeze,
         )
         children_to_create = []
-        for child in self.get_descendants():
-            child.pk = None
-            child.path = new_root.path + child.path[cls.steplen:]
-            child.content_id = child.content.clone()
-            child.is_frozen = freeze
-            children_to_create.append(child)
+        for child in self.depth_first_order()[1:]:
+            children_to_create.append(Node(
+                content=child.content.clone(),
+                path=new_root.path + child.path[cls.steplen:],
+                is_frozen=freeze,
+                depth=child.depth,
+                numchild=child.numchild,
+            ))
         cls.objects.bulk_create(children_to_create)
         return new_root
 
@@ -326,7 +325,7 @@ class Node(MP_Node):
         return super(Node, self).move(*args, **kwargs)
 
     def trees_equal(self, other):
-        if self.content_type != other.content_type:
+        if self.content_type_id != other.content_type_id:
             return False
         if not self.get_depth() == other.get_depth():
             return False
@@ -700,12 +699,10 @@ class Content(models.Model):
         # TODO: Make this work with inheritance. Maybe many-to-many
         # relationships too, or document that you should provide your own clone()
         # See https://code.djangoproject.com/ticket/4027
-        pk = self.pk
-        self.pk = None
-        self.save()
-        new_pk = self.pk
-        self.pk = pk
-        return new_pk
+        new = copy.copy(self)
+        new.pk = None
+        new.save()
+        return new
 
     def save(self, *args, **kwargs):
         self.check_frozen()

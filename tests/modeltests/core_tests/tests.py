@@ -229,11 +229,35 @@ class TestVersioning(RootNodeTestCase):
                         new_tree.depth_first_order()):
             self.assertEqual(a.numchild, b.numchild)
             self.assertEqual(a.content_type_id, b.content_type_id)
+            self.assertEqual(a.get_children_count(), b.get_children_count())
             a_dict = model_to_dict(a.content)
             b_dict = model_to_dict(b.content)
             del a_dict['id']
             del b_dict['id']
             self.assertEqual(a_dict, b_dict)
+
+    def test_clone_tree_doesnt_mutate_tree(self):
+        make_a_nice_tree(self.root_node)
+        self.root_node.prefetch_tree()
+        before = self.root_node.depth_first_order()
+        self.root_node.clone_tree()
+        after = self.root_node.depth_first_order()
+        self.assertEqual(before, after)
+
+    def test_clone_tree_uses_prefetch(self):
+        root = Bucket.add_root(widgy_site)
+        root.add_child(widgy_site, RawTextWidget, text='a')
+        root.add_child(widgy_site, RawTextWidget, text='b')
+
+        root_node = root.node
+        root_node.prefetch_tree()
+
+        # - root content (1 query)
+        # - root node (2 queries)
+        # - 2 text contents (2 queries)
+        # - subnodes (1 query)
+        with self.assertNumQueries(6):
+            root_node.clone_tree()
 
     def test_trees_equal(self):
         left, right = make_a_nice_tree(self.root_node)
@@ -292,6 +316,7 @@ class TestVersioning(RootNodeTestCase):
 
         new_a, new_b = tracker.working_copy.content.get_children()
         new_b.reposition(widgy_site, right=new_a)
+        tracker.working_copy = Node.objects.get(pk=root_node.pk)
         commit2 = tracker.commit()
         self.assertEqual(['a', 'b'],
                          [i.content.text for i in commit1.root_node.get_children()])
