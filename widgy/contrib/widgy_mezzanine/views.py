@@ -28,8 +28,8 @@ def handle_form(request, node_pk):
     else:
         return redirect(page.get_absolute_url())
 
-def preview(request, node_pk):
-    node = get_object_or_404(Node, pk=node_pk)
+def preview(request, node_pk, node=None):
+    node = node or get_object_or_404(Node, pk=node_pk)
 
     widgy_page = get_object_or_404(
         WidgyPage.objects.distinct(),

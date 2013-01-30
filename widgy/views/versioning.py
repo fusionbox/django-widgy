@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 
 from widgy.views.base import WidgyViewMixin, AuthorizedMixin
+from widgy.models import Node
 
 try:
     # lxml and daisydiff must be installed to calculate diffs
@@ -40,7 +41,7 @@ class RevertForm(CommitForm):
 
 class VersionTrackerMixin(SingleObjectMixin):
     def get_queryset(self):
-        return self.site.get_version_tracker_model().objects.all().select_related('head')
+        return self.site.get_version_tracker_model().objects.all().select_related('head', 'head__root_node', 'working_copy')
 
 
 class CommitView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, FormView):
@@ -71,9 +72,6 @@ class CommitView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, FormView)
 
 class HistoryView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, DetailView):
     template_name = 'widgy/history.html'
-
-    def get_queryset(self):
-        return super(HistoryView, self).get_queryset().select_related('head__root_node')
 
     def get_context_data(self, **kwargs):
         kwargs = super(HistoryView, self).get_context_data(**kwargs)
@@ -139,8 +137,11 @@ class DiffView(WidgyViewMixin, AuthorizedMixin, TemplateView):
 
         kwargs = super(DiffView, self).get_context_data(**kwargs)
 
-        a = preview(self.request, self.kwargs['before_pk'])
-        b = preview(self.request, self.kwargs['after_pk'])
+        before_node = get_object_or_404(Node, pk=self.kwargs['before_pk'])
+        after_node = get_object_or_404(Node, pk=self.kwargs['after_pk'])
+        Node.prefetch_trees(before_node, after_node)
+        a = preview(self.request, before_node.pk, node=before_node)
+        b = preview(self.request, after_node.pk, node=after_node)
 
         kwargs['diff'] = daisydiff(a.rendered_content, b.rendered_content)
 

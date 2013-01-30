@@ -178,6 +178,7 @@ class TestCore(RootNodeTestCase):
 
         root_node = Node.objects.get(pk=self.root_node.pk)
         self.assertIsInstance(root_node.content, UnknownWidget)
+        self.assertEqual(root_node.content.content_type.app_label, fake_ct.app_label)
 
     def test_unkown_content_type_prefetch(self):
         """
@@ -195,7 +196,9 @@ class TestCore(RootNodeTestCase):
 
         root_node = Node.objects.get(pk=self.root_node.pk)
         root_node.prefetch_tree()
-        self.assertIsInstance(list(root_node.content.get_children())[0].node.content, UnknownWidget)
+        content = list(root_node.content.get_children())[0].node.content
+        self.assertIsInstance(content, UnknownWidget)
+        self.assertEqual(content.content_type.app_label, fake_ct.app_label)
 
 
 class TestVersioning(RootNodeTestCase):
@@ -588,18 +591,20 @@ class TestPrefetchTree(RootNodeTestCase):
     def setUp(self):
         super(TestPrefetchTree, self).setUp()
         make_a_nice_tree(self.root_node)
+        # ensure the ContentType cache is filled
+        for i in ContentType.objects.all():
+            ContentType.objects.get_for_id(i.pk)
 
     def test_prefetch_tree(self):
         with self.assertNumQueries(1):
             root_node = Node.objects.get(pk=self.root_node.pk)
 
-        # 5 queries:
+        # 4 queries:
         #  - get descendants of root_node
-        #  - get content types
         #  - get bucket contents
         #  - get layout contents
         #  - get text contents
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(4):
             root_node.prefetch_tree()
 
         # maybe_prefetch_tree shouldn't prefetch the tree again
@@ -663,12 +668,11 @@ class TestPrefetchTree(RootNodeTestCase):
     def test_works_on_not_root_node(self):
         left_node = self.root_node.get_first_child()
 
-        # 4 queries:
+        # 3 queries:
         #  - get descendants
-        #  - get content types
         #  - get bucket contents
         #  - get text contents
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             left_node.prefetch_tree()
 
         with self.assertNumQueries(0):
@@ -696,6 +700,25 @@ class TestPrefetchTree(RootNodeTestCase):
 
         self.assertEqual(left.get_root(), left.get_parent())
         self.assertEqual(left.get_children()[0].get_root(), left.get_parent())
+
+    def test_prefetch_trees(self):
+        a = Node.objects.get(pk=self.root_node.pk)
+        b = Node.objects.get(pk=self.root_node.pk)
+
+        # a.get_descendants, b.get_descendants
+        # 3 contents
+        with self.assertNumQueries(5):
+            Node.prefetch_trees(a, b)
+
+        root_node_dfo = self.root_node.depth_first_order()
+        with self.assertNumQueries(0):
+            a.content
+            b.content
+            self.assertEqual(root_node_dfo,
+                             a.depth_first_order())
+            self.assertEqual(a.depth_first_order(),
+                             b.depth_first_order())
+
 
 
 class HttpTestCase(TestCase):

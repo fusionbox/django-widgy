@@ -5,7 +5,7 @@ objects.
 from collections import defaultdict
 from functools import partial
 import logging
-import copy
+import itertools
 
 from django.db import models
 from django.forms.models import modelform_factory, ModelForm
@@ -135,52 +135,72 @@ class Node(MP_Node):
         else:
             return [self] + list(self.get_descendants().order_by('path'))
 
-    def prefetch_tree(self):
+    @staticmethod
+    def fetch_content_instances(nodes):
         """
-        Builds the entire tree using python.  Each node has its Content
-        instance filled in, and the reverse node relation on the content filled
-        in as well.
+        Given a list of nodes, efficiently get all of their content instances.
 
-        .. todo::
+        The structure returned looks like this::
 
-            Maybe use in_bulk here to avoid doing a query for every content
+            {
+                content_type_id: {
+                    content_id: content_instance,
+                    content_id: content_instance,
+                },
+                content_type_id: {
+                    content_id: content_instance,
+                },
+            }
         """
-        tree = self.depth_first_order()
-
-        # This should get_depth() or is_root(), but both of those do another
-        # query
-        if self.depth == 1:
-            self._parent = None
-            self._next_sibling = None
-            self._ancestors = []
-
         # Build a mapping of content_types -> ids
         contents = defaultdict(list)
-        for node in tree:
+        for node in nodes:
             contents[node.content_type_id].append(node.content_id)
 
         # Convert that mapping to content_types -> Content instances
-        content_types = ContentType.objects.in_bulk(contents.iterkeys())
         for content_type_id, content_ids in contents.iteritems():
-            ct = content_types[content_type_id]
-            model_class = ct.model_class()
+            try:
+                ct = ContentType.objects.get_for_id(content_type_id)
+                model_class = ct.model_class()
+            except AttributeError:
+                # get_for_id raises AttributeError when there's no model_class.
+                ct = ContentType.objects.get(id=content_type_id)
+                model_class = None
             if model_class:
                 instances = ct.model_class().objects.filter(pk__in=content_ids)
             else:
                 instances = [UnknownWidget(ct, id) for id in content_ids]
                 instances and instances[0].warn()
             contents[content_type_id] = dict([(i.id, i) for i in instances])
+        return contents
 
-        # Loop through the nodes both assigning the content instance and the
-        # node instance onto the content
-        for node in tree:
-            node.content = contents[node.content_type_id][node.content_id]
-            node.content.node = node
+    @classmethod
+    def prefetch_trees(cls, *root_nodes):
+        for node in root_nodes:
+            # This should get_depth() or is_root(), but both of those do another
+            # query
+            if node.depth == 1:
+                node._parent = None
+                node._next_sibling = None
+                node._ancestors = []
 
-        # Knock the root node off before building out the tree structure
-        tree.pop(0)
-        self.consume_children(tree)
-        assert not tree, "all of the nodes should be consumed"
+        trees = [i.depth_first_order() for i in root_nodes]
+        contents = cls.fetch_content_instances(itertools.chain(*trees))
+        for tree in trees:
+            for node in tree:
+                node.content = contents[node.content_type_id][node.content_id]
+                node.content.node = node
+            root_node = tree.pop(0)
+            root_node.consume_children(tree)
+            assert not tree, "all of the nodes should be consumed"
+
+    def prefetch_tree(self):
+        """
+        Builds the entire tree using python.  Each node has its Content
+        instance filled in, and the reverse node relation on the content filled
+        in as well.
+        """
+        self.prefetch_trees(self)
 
     def consume_children(self, descendants):
         """
