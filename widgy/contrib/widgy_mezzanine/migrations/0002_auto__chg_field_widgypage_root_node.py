@@ -10,6 +10,8 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
         # Changing field 'WidgyPage.root_node'
+        if not db.dry_run:
+            orm.Page.objects.all().delete()
         db.alter_column('widgy_mezzanine_widgypage', 'root_node_id', self.gf('widgy.db.fields.VersionedWidgyField')(to=orm['widgy.VersionTracker'], null=True, on_delete=models.SET_NULL))
 
     def backwards(self, orm):
