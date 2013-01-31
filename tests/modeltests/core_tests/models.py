@@ -29,6 +29,9 @@ class RawTextWidget(Content):
     def __unicode__(self):
         return self.text
 
+    def render(self, context):
+        return self.text
+
 
 class CantGoAnywhereWidget(Content):
     @classmethod
