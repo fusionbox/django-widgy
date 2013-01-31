@@ -14,3 +14,5 @@ dist/
 *.egg-info/
 CACHE/
 .tox/
+tests/.coverage
+tests/coverage_html/
