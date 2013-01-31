@@ -72,8 +72,12 @@ def get_test_modules():
                 f.startswith('sql') or
                 os.path.basename(f) in REGRESSION_SUBDIRS_TO_SKIP):
                 continue
-            if os.listdir(os.path.join(dirpath, f)):
-                modules.append((loc, f))
+            files = os.listdir(os.path.join(dirpath, f))
+            # skip directories with no python files
+            for file in files:
+                if file.endswith('.py'):
+                    modules.append((loc, f))
+                    break
     return modules
 
 def setup(verbosity, test_labels):
