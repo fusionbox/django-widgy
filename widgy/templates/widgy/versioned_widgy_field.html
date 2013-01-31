@@ -1,0 +1,19 @@
+{% extends "widgy/widgy_field.html" %}{% load compress %}
+{% block widgy_container %}
+{% compress css %}
+<link rel="stylesheet" href="{% static 'css/jquery.fancybox.css' %}">
+{% endcompress %}
+<a class="widgy-fancybox" href="{{ commit_url }}">Commit</a>
+{% compress js %}
+<script src="{% static 'js/jquery.fancybox.js' %}"></script>
+<script>
+  $(function() {
+    $('a.widgy-fancybox').fancybox({
+      type: 'ajax'
+    });
+    window.closeFancybox = $.fancybox.close;
+  });
+</script>
+{% endcompress %}
+{{ block.super }}
+{% endblock %}

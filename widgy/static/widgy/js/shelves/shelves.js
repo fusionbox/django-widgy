@@ -53,6 +53,12 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
         var view = this.list.findByModel(model);
         this.$list.append(view.el);
       }, this);
+
+      if ( collection.length == 0 )
+        this.$el.addClass('empty');
+      else
+        this.$el.removeClass('empty');
+
     },
 
     render: function() {

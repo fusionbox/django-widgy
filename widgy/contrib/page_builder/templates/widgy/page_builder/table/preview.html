@@ -1,0 +1,9 @@
+{% extends "widgy/preview.html" %}
+
+{% load compress %}
+
+{% block before-preview %}
+{% compress css %}
+  <link type="text/x-scss" href="{% static 'widgy/css/table.scss' %}" rel="stylesheet">
+{% endcompress %}
+{% endblock %}

@@ -1,0 +1,6 @@
+{% load widgy_tags %}
+<{{ content.tag_name }}>
+  {% for child in content.get_children %}
+  {% render child %}
+  {% endfor %}
+</{{ content.tag_name }}>

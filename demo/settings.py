@@ -382,6 +382,8 @@ REPLACEMENTS_APP_BLACKLIST = ('admin',)
 
 WIDGY_MEZZANINE_SITE = 'demo.widgy.widgy_site'
 
+DAISYDIFF_JAR_PATH = os.path.join(PROJECT_ROOT, '..', 'bin', 'daisydiff', 'daisydiff.jar')
+
 ###################
 # DEPLOY SETTINGS #
 ###################

@@ -3,12 +3,13 @@ from django.conf import settings
 
 from mezzanine.pages.models import Page
 
-from widgy.db.fields import WidgyField
+from widgy.db.fields import VersionedWidgyField
 
 
 class WidgyPage(Page):
-    root_node = WidgyField(
+    root_node = VersionedWidgyField(
         site=settings.WIDGY_MEZZANINE_SITE,
+        to=getattr(settings, 'WIDGY_MEZZANINE_VERSIONTRACKER', None),
         verbose_name=_('widgy content'),
         root_choices=(
             'page_builder.Layout',

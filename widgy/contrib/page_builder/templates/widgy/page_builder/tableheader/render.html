@@ -1,0 +1,8 @@
+{% load widgy_tags %}
+<thead>
+  <tr>
+    {% for child in content.get_children %}
+    {% render child %}
+    {% endfor %}
+  </tr>
+</thead>

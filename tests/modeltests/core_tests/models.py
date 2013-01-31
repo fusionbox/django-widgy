@@ -1,11 +1,8 @@
 from django.db import models
 
 from widgy.models import Content
-from widgy.db.fields import WidgyField
+from widgy.db.fields import WidgyField, VersionedWidgyField
 from widgy import registry
-
-from .widgy_config import widgy_site
-
 
 class Layout(Content):
     accepting_children = True
@@ -32,6 +29,9 @@ class RawTextWidget(Content):
     def __unicode__(self):
         return self.text
 
+    def render(self, context):
+        return self.text
+
 
 class CantGoAnywhereWidget(Content):
     @classmethod
@@ -53,8 +53,10 @@ class PickyBucket(Bucket):
 class ImmovableBucket(Bucket):
     draggable = False
 
+
 class AnotherLayout(Layout):
     pass
+
 
 class VowelBucket(Bucket):
     class Meta:
@@ -62,6 +64,12 @@ class VowelBucket(Bucket):
 
     def valid_parent_of(self, cls, obj=None):
         return cls.__name__[0].lower() in 'aeiou'
+
+
+class UndeletableRawTextWidget(RawTextWidget):
+    deletable = False
+    class Meta:
+        proxy = True
 
 registry.register(Layout)
 registry.register(Bucket)
@@ -76,16 +84,47 @@ registry.register(VowelBucket)
 class HasAWidgy(models.Model):
     widgy = WidgyField(
         root_choices=[Layout],
-        site=widgy_site
+        site='modeltests.core_tests.widgy_config.widgy_site',
     )
 
 
 class HasAWidgyOnlyAnotherLayout(models.Model):
     widgy = WidgyField(
         root_choices=[AnotherLayout],
-        site=widgy_site
+        site='modeltests.core_tests.widgy_config.widgy_site'
     )
 
 
 class UnregisteredLayout(Layout):
     pass
+
+
+class VersionedPage(models.Model):
+    version_tracker = VersionedWidgyField(site='modeltests.core_tests.widgy_config.widgy_site')
+
+
+class VersionedPage2(models.Model):
+    bar = VersionedWidgyField(site='modeltests.core_tests.widgy_config.widgy_site', related_name='asdf')
+
+
+class VersionedPage3(models.Model):
+    foo = VersionedWidgyField(site='modeltests.core_tests.widgy_config.widgy_site', related_name='+')
+
+
+class VersionedPage4(models.Model):
+    widgies = models.ManyToManyField('widgy.VersionTracker', through='VersionPageThrough')
+
+
+class VersionPageThrough(models.Model):
+    widgy = VersionedWidgyField(site='modeltests.core_tests.widgy_config.widgy_site', related_name='+')
+    page = models.ForeignKey(VersionedPage4)
+
+
+class Related(models.Model):
+    pass
+
+
+class ForeignKeyWidget(Content):
+    foo = models.ForeignKey(Related, on_delete=models.CASCADE)
+
+registry.register(ForeignKeyWidget)

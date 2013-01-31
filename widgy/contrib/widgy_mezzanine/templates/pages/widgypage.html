@@ -21,5 +21,9 @@
     {% endhighlight %}
   </nav>
 
-  {% render page.get_content_model.root_node %}
+  {% if root_node_override %}
+      {% render root_node_override %}
+  {% else %}
+      {% render page.get_content_model.root_node %}
+  {% endif %}
 {% endblock %}
