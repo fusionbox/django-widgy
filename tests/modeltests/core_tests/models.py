@@ -100,7 +100,10 @@ class UnregisteredLayout(Layout):
 
 
 class VersionedPage(models.Model):
-    version_tracker = VersionedWidgyField(site='modeltests.core_tests.widgy_config.widgy_site')
+    version_tracker = VersionedWidgyField(
+        site='modeltests.core_tests.widgy_config.widgy_site',
+        root_choices=[Layout, AnotherLayout],
+    )
 
 
 class VersionedPage2(models.Model):

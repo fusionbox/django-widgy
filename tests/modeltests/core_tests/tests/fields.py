@@ -3,10 +3,12 @@ from django import forms
 from django.contrib.contenttypes.models import ContentType
 
 from widgy.forms import WidgyFormMixin, WidgyFormField
-from widgy.models import Node
+from widgy.models import Node, VersionTracker
 
 from modeltests.core_tests.widgy_config import widgy_site
-from modeltests.core_tests.models import (HasAWidgy, Layout, HasAWidgyOnlyAnotherLayout, AnotherLayout)
+from modeltests.core_tests.models import (HasAWidgy, Layout,
+                                          HasAWidgyOnlyAnotherLayout,
+                                          AnotherLayout, VersionedPage)
 
 
 class TestWidgyField(TestCase):
@@ -172,3 +174,48 @@ class TestModelForm(TestCase):
         self.assertTrue(x.is_valid())
         instance = x.save()
         self.assertIsInstance(instance.widgy.content, AnotherLayout)
+
+class VersionedWidgiedForm(WidgyFormMixin, forms.ModelForm):
+    class Meta:
+        model = VersionedPage
+
+class TestVersionedModelForm(TestCase):
+    def test_render(self):
+        x = VersionedWidgiedForm()
+        rendered = x.as_p()
+        self.assertIn('value="%s"' % ContentType.objects.get_for_model(Layout).id,
+                      rendered)
+        self.assertIn('value="%s"' % ContentType.objects.get_for_model(AnotherLayout).id,
+                      rendered)
+        self.assertIn('name="version_tracker"',
+                      rendered)
+        self.assertIn('core_tests',
+                      rendered)
+        self.assertIn('anotherlayout',
+                      rendered)
+
+    def test_first_save_noroot(self):
+        x = VersionedWidgiedForm({})
+
+        self.assertTrue(x.is_valid())
+        instance = x.save()
+        self.assertEqual(instance.version_tracker, None)
+
+    def test_first_save(self):
+        x = VersionedWidgiedForm({
+            'version_tracker': ContentType.objects.get_for_model(Layout).id,
+        })
+
+        self.assertTrue(x.is_valid())
+        instance = x.save()
+        self.assertIsInstance(instance.version_tracker, VersionTracker)
+        self.assertIsInstance(instance.version_tracker.working_copy.content, Layout)
+
+    def test_second_render(self):
+        x = VersionedWidgiedForm({
+            'version_tracker': ContentType.objects.get_for_model(Layout).id,
+        })
+        instance = x.save()
+        x = VersionedWidgiedForm(instance=instance)
+        url = widgy_site.reverse(widgy_site.commit_view, kwargs={'pk': instance.pk})
+        self.assertIn(url, x.as_p())

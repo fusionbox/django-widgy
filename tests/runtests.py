@@ -56,6 +56,7 @@ ALWAYS_INSTALLED_APPS = [
     "treebeard",
     "compressor",
     "fusionbox.core",
+    "filer",
 ]
 
 def get_test_modules():
