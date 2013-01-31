@@ -3,9 +3,9 @@
 <section class="main">
   <h1>{{ page.title }}</h1>
 
-  {% render content.children.0 %}
+  {% render content.get_children.0 %}
 </section>
 
 <section class="sidebar">
-  {% render content.children.1 %}
+  {% render content.get_children.1 %}
 </section>

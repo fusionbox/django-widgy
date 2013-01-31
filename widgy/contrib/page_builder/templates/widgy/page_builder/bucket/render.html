@@ -1,5 +1,5 @@
 {% load widgy_tags %}
 
-{% for child in content.children %}
+{% for child in content.get_children %}
   {% render child %}
 {% endfor %}

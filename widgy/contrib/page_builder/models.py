@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 
 from widgy.models import Content
-from widgy.models.mixins import StrictDefaultChildrenMixin
+from widgy.models.mixins import StrictDefaultChildrenMixin, InvisibleMixin
 from widgy.db.fields import WidgyField
 from widgy.contrib.page_builder.db.fields import MarkdownField
 from widgy import registry
@@ -144,3 +144,171 @@ class Section(Content):
         return isinstance(parent, Accordion)
 
 registry.register(Section)
+
+
+class TableElement(Content):
+    class Meta:
+        abstract = True
+
+    @property
+    def table(self):
+        for i in reversed(self.get_ancestors()):
+            if isinstance(i, Table):
+                return i
+        assert False, "This TableElement isn't in a table?!?"
+
+    def get_siblings(self):
+        return list(self.get_parent().get_children())
+
+    @property
+    def sibling_index(self):
+        return self.get_siblings().index(self)
+
+
+class TableRow(TableElement):
+    tag_name = 'tr'
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        return isinstance(parent, TableBody)
+
+    def valid_parent_of(self, cls, obj=None):
+        return issubclass(cls, TableData)
+
+    def post_create(self, site):
+        for column in self.table.header.get_children():
+            self.add_child(site, TableData)
+
+
+class TableHeaderData(TableElement):
+    tag_name = 'th'
+
+    accepting_children = True
+    draggable = True
+    deletable = True
+
+    class Meta:
+        verbose_name = 'column'
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        if obj and obj.get_parent():
+            # we can't be moved to another table
+            return obj in parent.get_children()
+        else:
+            return isinstance(parent, TableHeader)
+
+    def post_create(self, site):
+        right = self.get_next_sibling()
+        if right:
+            for d in self.table.cells_at_index(right.sibling_index - 1):
+                d.add_sibling(site, TableData)
+        else:
+            for row in self.table.body.get_children():
+                row.add_child(site, TableData)
+
+    def pre_delete(self):
+        for i in self.table.cells_at_index(self.sibling_index):
+            i.node.delete()
+
+    def reposition(self, site, right=None, parent=None):
+        # we must always stay in the same table
+        assert not parent or self.get_parent() == parent
+
+        prev_index = self.sibling_index
+        right_index = right and right.sibling_index
+
+        super(TableHeaderData, self).reposition(site, right, parent)
+
+        if right:
+            new_rights = self.table.cells_at_index(right_index)
+        else:
+            new_rights = [None] * len(self.get_siblings())
+
+        for (i, new_right) in zip(self.table.cells_at_index(prev_index), new_rights):
+            i.reposition(site, new_right, i.get_parent())
+
+
+class TableData(TableElement):
+    tag_name = 'td'
+
+    accepting_children = True
+    draggable = False
+    deletable = False
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        # this is kind of a hack -- we are valid children of TableRow, but we
+        # can't be added from the shelf
+        if obj:
+            return isinstance(parent, TableRow)
+        else:
+            return False
+
+
+class TableHeader(TableElement):
+    draggable = False
+    deletable = False
+    component_name = 'tableheader'
+
+    class Meta:
+        verbose_name = 'columns'
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        if obj in parent.get_children():
+            return True
+        return (isinstance(parent, Table) and
+                len([i for i in parent.get_children() if isinstance(i, cls)]) < 1)
+
+    def valid_parent_of(self, cls, obj=None):
+        return issubclass(cls, TableHeaderData)
+
+
+class TableBody(InvisibleMixin, TableElement):
+    tag_name = 'tbody'
+
+    draggable = False
+    deletable = False
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        return isinstance(parent, Table)
+
+    def valid_parent_of(self, cls, obj=None):
+        if obj:
+            if obj in self.get_children():
+                return True
+            if isinstance(obj, TableRow) and len(obj.get_children()) == len(self.table.header.get_children()):
+                return True
+        else:
+            return issubclass(cls, TableRow)
+
+
+class Table(StrictDefaultChildrenMixin, TableElement):
+    tag_name = 'table'
+    component_name = 'table'
+
+    shelf = True
+
+    default_children = [
+        (TableHeader, (), {}),
+        (TableBody, (), {}),
+    ]
+
+    @property
+    def header(self):
+        return self.get_children()[0]
+
+    @property
+    def body(self):
+        return self.get_children()[1]
+
+    def cells_at_index(self, index):
+        return [list(i.get_children())[index] for i in self.body.get_children()]
+
+registry.register(Table)
+registry.register(TableRow)
+registry.register(TableData)
+registry.register(TableHeaderData)
+registry.register(TableHeader)

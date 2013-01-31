@@ -50,9 +50,12 @@ ALWAYS_INSTALLED_APPS = [
     "mezzanine.generic",
     "mezzanine.pages",
     "mezzanine.forms",
-    "mezzanine.blog",
+    # blog is affected by https://code.djangoproject.com/ticket/12728
+    # "mezzanine.blog",
     "widgy",
     "treebeard",
+    "compressor",
+    "fusionbox.core",
 ]
 
 def get_test_modules():
@@ -69,8 +72,12 @@ def get_test_modules():
                 f.startswith('sql') or
                 os.path.basename(f) in REGRESSION_SUBDIRS_TO_SKIP):
                 continue
-            if os.listdir(os.path.join(dirpath, f)):
-                modules.append((loc, f))
+            files = os.listdir(os.path.join(dirpath, f))
+            # skip directories with no python files
+            for file in files:
+                if file.endswith('.py'):
+                    modules.append((loc, f))
+                    break
     return modules
 
 def setup(verbosity, test_labels):
@@ -105,7 +112,7 @@ def setup(verbosity, test_labels):
         'django.middleware.common.CommonMiddleware',
     )
     settings.SITE_ID = 1
-    settings.WIDGY_MEZZANINE_SITE = 'modeltests.core_tests.widgy_config'
+    settings.WIDGY_MEZZANINE_SITE = 'modeltests.core_tests.widgy_config.widgy_site'
 
 
     # mezzanine junk

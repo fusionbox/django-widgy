@@ -3,23 +3,11 @@
   {{ form.non_field_errors }}
 
   {% for field in form %}
-    {% if field.is_hidden %}
-      {{ field }}
-    {% else %}
-    <div class="{{ field.css_classes }} {{ field.html_name }}{% if required %} required{% endif %} formField">
-      {{ field.label_tag }}
-      {{ field }}
-      {{ field.errors }}
-
-      {% if field.help_text %}
-        <p class="help_text">{{ field.help_text }}</p>
-      {% endif %}
-    </div>
-    {% endif %}
+  {% include "widgy/field_as_div.html" %}
   {% endfor %}
 
   {% block submit-row-outer %}
-    <div class="submit-row">
+    <div>
       {% block submit-row-inner %}
         <button class="cancel" type="button">Cancel</button>
         <input type="submit" value="Save">

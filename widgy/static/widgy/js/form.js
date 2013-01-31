@@ -36,6 +36,9 @@ define([
     },
 
     handleClick: function(event) {
+      if ( event.target.disabled )
+        return false;
+
       switch(event.which) {
         case 0:
           // this is 0 in ie sometimes. http://bugs.jquery.com/ticket/13209
@@ -55,8 +58,11 @@ define([
 
     handleKeypress: function(event) {
       if (event.which == 13) {
-        // enter key, submit the form
-        this.submit();
+        // enter key, submit the form by clicking the submit button
+        this.$el.find(':submit:not(:disabled):first').trigger({
+          type: 'click',
+          which: 1
+        });
         return false;
       }
     },

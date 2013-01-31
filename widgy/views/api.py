@@ -15,13 +15,7 @@ from fusionbox.views.rest import RestView
 from widgy.models import Node
 from widgy.exceptions import InvalidTreeMovement
 from widgy.utils import extract_id
-
-
-class WidgyViewMixin(object):
-    site = None
-
-    def auth(self, request, *args, **kwargs):
-        self.site.authorize(request)
+from widgy.views.base import WidgyViewMixin, AuthorizedMixin
 
 
 class WidgyView(WidgyViewMixin, RestView):
@@ -56,7 +50,7 @@ class ContentView(WidgyView):
 
     def put(self, request, app_label, object_name, object_pk):
         obj = self.get_object(app_label, object_name, object_pk)
-        data = self.data()
+        data = self.data()['attributes']
         form = obj.get_form_class(request)(data=data or None, instance=obj)
         if not form.is_valid():
             raise ValidationError(form.errors)
@@ -93,6 +87,7 @@ class NodeView(WidgyView):
 
     def get(self, request, node_pk):
         node = get_object_or_404(Node, pk=node_pk)
+        node.prefetch_tree()
         return self.render_as_node(node.to_json(self.site))
 
     def post(self, request, node_pk=None):
@@ -126,13 +121,16 @@ class NodeView(WidgyView):
         node = get_object_or_404(Node, pk=node_pk)
         data = self.data()
 
+        if not node.content.draggable:
+            raise InvalidTreeMovement({'message': "You can't move me"})
+
         try:
             right = Node.objects.get(pk=extract_id(data['right_id']))
-            node.reposition(self.site, right=right)
+            node.content.reposition(self.site, right=right.content)
         except Node.DoesNotExist:
             try:
                 parent = Node.objects.get(pk=extract_id(data['parent_id']))
-                node.reposition(self.site, parent=parent)
+                node.content.reposition(self.site, parent=parent.content)
             except Node.DoesNotExist:
                 raise Http404
 
@@ -144,7 +142,7 @@ class NodeView(WidgyView):
         if not node.content.deletable:
             raise InvalidTreeMovement({'message': "You can't delete me"})
 
-        node.delete()
+        node.content.delete()
 
         return self.render_as_node(None)
 
@@ -193,7 +191,7 @@ class ShelfView(WidgyView):
         return self.render_to_response(self.get_compatibility_data(self.site, node))
 
 
-class NodeSingleObjectMixin(SingleObjectMixin):
+class NodeSingleObjectMixin(SingleObjectMixin, AuthorizedMixin):
     model = Node
     pk_url_kwarg = 'node_pk'
 
@@ -204,10 +202,6 @@ class NodeEditView(WidgyViewMixin, NodeSingleObjectMixin, DetailView):
     """
 
     template_name = 'widgy/views/edit_node.html'
-
-    def dispatch(self, *args, **kwargs):
-        self.auth(*args, **kwargs)
-        return super(NodeEditView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super(NodeEditView, self).get_context_data(**kwargs)
