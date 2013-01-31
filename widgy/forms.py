@@ -125,7 +125,7 @@ class WidgyFormField(forms.ModelChoiceField):
         try:
             value = super(WidgyFormField, self).clean(value)
         except:
-            if self.node:
+            if getattr(self, 'node', None):
                 value = self.node
             else:
                 raise
@@ -164,5 +164,8 @@ class WidgyFormMixin(object):
 
         for name, field in self.fields.iteritems():
             if isinstance(field, WidgyFormField):
-                value = getattr(self.instance, name)
+                if hasattr(self, 'instance'):
+                    value = getattr(self.instance, name)
+                else:
+                    value = None
                 field.conform_to_value(value)

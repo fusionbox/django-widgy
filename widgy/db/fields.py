@@ -1,6 +1,6 @@
 from operator import or_
 
-from django.db import models, DEFAULT_DB_ALIAS, connection
+from django.db import models
 from django.db.models import Q
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from django.db.models.loading import get_app
@@ -167,5 +167,5 @@ class VersionedWidgyField(WidgyField):
         # copy content type? Can a version tracker's root node content type
         # change?  If it can change, which one should be used here?
         return VersionTracker.objects.orphan().filter(
-                head__root_node__content_type_id__in=layouts,
-                working_copy__content_type_id__in=layouts)
+            head__root_node__content_type_id__in=layouts,
+            working_copy__content_type_id__in=layouts)

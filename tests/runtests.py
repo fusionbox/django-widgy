@@ -54,6 +54,8 @@ ALWAYS_INSTALLED_APPS = [
     # "mezzanine.blog",
     "widgy",
     "treebeard",
+    "compressor",
+    "fusionbox.core",
 ]
 
 def get_test_modules():

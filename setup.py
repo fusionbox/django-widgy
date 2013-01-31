@@ -20,6 +20,7 @@ install_requires = [
     'PyScss == 1.1.5',
     'six',
     'markdown',
+    'django-compressor',
 ]
 
 version = (0, 0, 1, 'alpha')
