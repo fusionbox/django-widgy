@@ -4,7 +4,7 @@ from widgy.views import extract_id
 from widgy.models import Node
 
 from modeltests.core_tests.widgy_config import widgy_site
-from modeltests.core_tests.models import ImmovableBucket
+from modeltests.core_tests.models import ImmovableBucket, UndeletableRawTextWidget, RawTextWidget
 from modeltests.core_tests.tests.base import RootNodeTestCase, HttpTestCase, make_a_nice_tree
 
 
@@ -45,6 +45,18 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         new_child['parent_id'] = self.root_node.to_json(widgy_site)['children'][1]['url']
         r = self.put(new_child['url'], new_child)
         self.assertEqual(r.status_code, 200)
+
+    def test_validation_error(self):
+        left, right = make_a_nice_tree(self.root_node)
+        obj = RawTextWidget.objects.all()[0]
+        url = obj.get_api_url(widgy_site)
+        data = obj.to_json(widgy_site)
+        data['attributes']['text'] = ''
+
+        resp = self.put(url, data)
+        self.assertEqual(resp.status_code, 409)
+        # validation error for field name
+        self.assertIn('text', json.loads(resp.content))
 
     def test_delete(self):
         left, right = make_a_nice_tree(self.root_node)
@@ -192,3 +204,11 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         })
         doit('put', left_json)
         doit('delete')
+
+    def test_delete_undeletable(self):
+        node = UndeletableRawTextWidget.add_root(widgy_site,
+                                                 text='asdf').node
+
+        resp = self.delete(node.get_api_url(widgy_site))
+        self.assertEqual(resp.status_code, 409)
+        self.assertTrue(Node.objects.get(pk=node.pk))

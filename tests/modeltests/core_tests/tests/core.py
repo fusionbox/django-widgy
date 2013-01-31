@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils import unittest
 from django.db.models.deletion import ProtectedError
 
-from widgy.models import Node, UnknownWidget, VersionTracker
+from widgy.models import Node, UnknownWidget, VersionTracker, Content
 from widgy.exceptions import (ParentWasRejected, ChildWasRejected,
                               MutualRejection, InvalidTreeMovement,
                               InvalidOperation)
@@ -164,6 +164,33 @@ class TestCore(RootNodeTestCase):
             widget = cls.add_root(widgy_site, **kwargs)
             self.assertEqual(widget.get_attributes(),
                              attributes)
+
+
+class TestRegistry(RootNodeTestCase):
+    def setUp(self):
+        from widgy import Registry
+        self.registry = Registry()
+        class Test(Content):
+            pass
+        self.cls = Test
+
+    def test_register(self):
+        self.registry.register(self.cls)
+        self.assertIn(self.cls, self.registry.keys())
+
+    def test_unregister(self):
+        self.registry.register(self.cls)
+        self.registry.unregister(self.cls)
+        self.assertNotIn(self.cls, self.registry.keys())
+
+    def test_register_twice(self):
+        self.registry.register(self.cls)
+        with self.assertRaises(Exception):
+            self.registry.register(self.cls)
+
+    def test_unregister_not_registered(self):
+        with self.assertRaises(Exception):
+            self.registry.unregister(self.cls)
 
 
 class TestVersioning(RootNodeTestCase):
@@ -554,6 +581,23 @@ class TestVersioning(RootNodeTestCase):
         Node.objects.get(pk=commit.root_node.pk)
         ForeignKeyWidget.objects.get(pk=commit.root_node.content.get_children()[0].pk)
 
+    def test_field_create(self):
+        x = VersionedPage()
+        x.version_tracker = ContentType.objects.get_for_model(Layout)
+        x.save()
+        self.assertIsInstance(x.version_tracker, VersionTracker)
+        self.assertIsInstance(x.version_tracker.working_copy.content, Layout)
+
+    def test_has_changes(self):
+        left, right = make_a_nice_tree(self.root_node)
+        vt = VersionTracker.objects.create(working_copy=self.root_node)
+        self.assertTrue(vt.has_changes())
+        vt.commit()
+        self.assertFalse(vt.has_changes())
+        left.content.add_child(widgy_site, RawTextWidget, text='foo')
+        vt = VersionTracker.objects.get(pk=vt.pk)
+        self.assertTrue(vt.has_changes())
+
 
 class TestPrefetchTree(RootNodeTestCase):
     def setUp(self):
@@ -594,6 +638,7 @@ class TestPrefetchTree(RootNodeTestCase):
             right_children = list(right.get_children())
             self.assertEqual(right_children[0].text, 'right_1')
             self.assertEqual(right_children[1].text, 'right_2')
+            self.assertTrue(all(isinstance(i, Content) for i in root_node.content.depth_first_order()))
 
         # verify some convience methods are prefetched as well
         with self.assertNumQueries(0):

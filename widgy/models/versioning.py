@@ -95,7 +95,7 @@ class VersionTracker(models.Model):
             commit_id = commit.parent_id
         return res
 
-    def has_changes(self, request):
+    def has_changes(self):
         if not self.head:
             return True
         else:

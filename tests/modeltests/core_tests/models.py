@@ -65,6 +65,12 @@ class VowelBucket(Bucket):
     def valid_parent_of(self, cls, obj=None):
         return cls.__name__[0].lower() in 'aeiou'
 
+
+class UndeletableRawTextWidget(RawTextWidget):
+    deletable = False
+    class Meta:
+        proxy = True
+
 registry.register(Layout)
 registry.register(Bucket)
 registry.register(RawTextWidget)
