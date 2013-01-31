@@ -99,12 +99,3 @@ class ProxyReverseGenericRelatedObjectsDescriptor(generic.ReverseGenericRelatedO
         )
 
         return manager
-
-    def __set__(self, instance, value):
-        if instance is None:
-            raise AttributeError("Manager must be accessed via instance")
-
-        manager = self.__get__(instance)
-        manager.clear()
-        for obj in value:
-            manager.add(obj)
