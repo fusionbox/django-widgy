@@ -1,5 +1,11 @@
+import os
+
+from django import forms
 from django.db import models
 from django.conf import settings
+
+from filer.fields.file import FilerFileField
+from filer.models.filemodels import File
 
 from widgy.models import Content
 from widgy.models.mixins import StrictDefaultChildrenMixin, InvisibleMixin
@@ -8,15 +14,7 @@ from widgy.contrib.page_builder.db.fields import MarkdownField
 from widgy import registry
 
 
-class PageBuilderContent(Content):
-    """
-    Base class for all page builder content models.
-    """
-    class Meta:
-        abstract = True
-
-
-class Layout(StrictDefaultChildrenMixin, PageBuilderContent):
+class Layout(StrictDefaultChildrenMixin, Content):
     """
     Base class for all layouts.
     """
@@ -31,7 +29,7 @@ class Layout(StrictDefaultChildrenMixin, PageBuilderContent):
         return False
 
 
-class Bucket(PageBuilderContent):
+class Bucket(Content):
     draggable = False
     deletable = False
     accepting_children = True
@@ -152,6 +150,27 @@ class Section(Content):
         return isinstance(parent, Accordion)
 
 registry.register(Section)
+
+
+def validate_image(file_pk):
+    file = File.objects.get(pk=file_pk)
+    iext = os.path.splitext(file.file.path)[1].lower()
+    if not iext in ['.jpg', '.jpeg', '.png', '.gif']:
+        raise forms.ValidationError('File type must be jpg, png, or gif')
+    return file_pk
+
+
+class Image(Content):
+    editable = True
+
+    # What should happen on_delete.  Set to models.PROTECT so this is harder to
+    # ignore and forget about.
+    image = FilerFileField(null=True, blank=True,
+                           validators=[validate_image],
+                           related_name='image_widgets',
+                           on_delete=models.PROTECT)
+
+registry.register(Image)
 
 
 class TableElement(Content):
