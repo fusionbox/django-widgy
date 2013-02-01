@@ -155,17 +155,3 @@ class VersionedWidgyField(WidgyField):
         return super(VersionedWidgyField, self).formfield(
             form_class=VersionedWidgyFormField,
             **kwargs)
-
-    def get_undelete_queryset(self):
-        """
-        Version trackers that have no references and whose content type is
-        allowed by our field can be restored.
-        """
-        VersionTracker = self.site.get_version_tracker_model()
-        layouts = self.get_layout_contenttypes(self.root_choices)
-        # Is it necessary to query on the HEAD content type _and_ the working
-        # copy content type? Can a version tracker's root node content type
-        # change?  If it can change, which one should be used here?
-        return VersionTracker.objects.orphan().filter(
-            head__root_node__content_type_id__in=layouts,
-            working_copy__content_type_id__in=layouts)
