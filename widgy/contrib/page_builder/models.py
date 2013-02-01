@@ -349,8 +349,6 @@ class Figure(Content):
 
 @widgy.register
 class Video(Content):
-    title = models.CharField(max_length=255)
     video = VideoField()
-    caption = models.CharField(max_length=255, blank=True)
 
     editable = True
