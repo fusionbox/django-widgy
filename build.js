@@ -7,12 +7,12 @@
       exports: '_'
     },
     'backbone': {
-      deps: ['underscore', 'jquery', 'fusionbox'],
+      deps: ['underscore', 'jquery', 'csrf'],
       exports: 'Backbone'
     },
-    'fusionbox': {
+    'csrf': {
       deps: ['jquery'],
-      exports: 'fusionbox'
+      exports: 'csrf'
     }
   },
   paths: {
@@ -20,7 +20,7 @@
     'underscore': './lib/underscore',
     'backbone': './lib/backbone',
     'mustache': './lib/mustache',
-    'fusionbox': './lib/fusionbox',
+    'csrf': './lib/csrf',
     'RelatedObjectLookups' : './lib/RelatedObjectLookups',
     'text': 'require/text'
   },

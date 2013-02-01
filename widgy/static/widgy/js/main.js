@@ -16,12 +16,12 @@ require.config({
       exports: '_'
     },
     'backbone': {
-      deps: ['underscore', 'jquery', 'fusionbox'],
+      deps: ['underscore', 'jquery', 'csrf'],
       exports: 'Backbone'
     },
-    'fusionbox': {
+    'csrf': {
       deps: ['jquery'],
-      exports: 'fusionbox'
+      exports: 'csrf'
     }
   },
   paths: {
@@ -29,7 +29,7 @@ require.config({
   'underscore': './lib/underscore',
   'backbone': './lib/backbone',
   'mustache': './lib/mustache',
-  'fusionbox': './lib/fusionbox',
+  'csrf': './lib/csrf',
   'django_admin' : './lib/django_admin',
   'text': 'require/text'
   }
