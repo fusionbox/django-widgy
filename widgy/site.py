@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
+from django.contrib.staticfiles import finders
+from django.utils.functional import cached_property
 
 from widgy import registry
 from widgy.views import (
@@ -136,3 +138,20 @@ class WidgySite(object):
     def get_version_tracker_model(self):
         from widgy.models import VersionTracker
         return VersionTracker
+
+    def filter_existing_staticfiles(self, filename):
+        path = finders.find(filename)
+        return bool(path)
+
+    def find_media_files(self, extension):
+        files = set()
+        for widget in self.get_all_content_classes():
+            files.update(widget.get_templates_hierarchy(
+                heirarchy=['widgy/{app_label}/{module_name}{extension}'],
+                extension=extension,
+            ))
+        return filter(self.filter_existing_staticfiles, files)
+
+    @cached_property
+    def scss_files(self):
+        return self.find_media_files('.scss')

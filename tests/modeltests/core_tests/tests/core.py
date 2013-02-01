@@ -1,5 +1,6 @@
 from pprint import pprint
 
+from django.test import TestCase
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils import unittest
@@ -749,3 +750,11 @@ class TestPrefetchTree(RootNodeTestCase):
 
         self.assertIn('foo', diff)
         self.assertIn('bar', diff)
+
+
+class TestSite(TestCase):
+    def test_scss_location(self):
+        scss_files = widgy_site.scss_files
+        self.assertIn('widgy/core_tests/rawtextwidget.scss', scss_files)
+        # widgy.Content will never have an scss file
+        self.assertNotIn('widgy/models/content.scss', scss_files)

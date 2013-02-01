@@ -4,6 +4,12 @@
 {% load fusionbox_tags %}
 
 {% block title %}{{ block.super }} - {{ page.title }}{% endblock %}
+{% block css %}
+{{ block.super }}
+{% for scss_file in 'WIDGY_MEZZANINE_SITE'|scss_files %}
+<link rel="stylesheet" href="{% static scss_file %}" type="text/x-scss">
+{% endfor %}
+{% endblock %}
 
 {% block seo_description %}{{ page.keywords_string }}{% endblock %}
 {% block seo_keywords %}{{ page.description }}{% endblock %}

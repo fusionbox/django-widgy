@@ -561,18 +561,20 @@ class Content(models.Model):
         """
         pass
 
-    def get_templates_hierarchy(self, **kwargs):
-        templates = (
-            'widgy/{app_label}/{module_name}/{template_name}.html',
-            'widgy/{app_label}/{template_name}.html',
-            'widgy/{template_name}.html',
-        )
+    @classmethod
+    def get_templates_hierarchy(cls, **kwargs):
+        templates = kwargs.get('heirarchy', (
+            'widgy/{app_label}/{module_name}/{template_name}{extension}',
+            'widgy/{app_label}/{template_name}{extension}',
+            'widgy/{template_name}{extension}',
+        ))
+        kwargs.setdefault('extension', '.html')
 
         ret = []
         for template in templates:
-            for cls in self.__class__.__mro__:
+            for parent_cls in cls.__mro__:
                 try:
-                    ret.append(template.format(**cls.get_template_kwargs(**kwargs)))
+                    ret.append(template.format(**parent_cls.get_template_kwargs(**kwargs)))
                 except AttributeError:
                     pass
 

@@ -1,4 +1,7 @@
 from django import template
+from django.conf import settings
+
+from widgy.utils import fancy_import
 
 register = template.Library()
 
@@ -17,3 +20,15 @@ def render(context, node):
     node.maybe_prefetch_tree()
 
     return node.render(context)
+
+
+@register.filter
+def scss_files(site):
+    try:
+        site = getattr(settings, site)
+    except AttributeError:
+        pass
+
+    site = fancy_import(site)
+
+    return site.scss_files
