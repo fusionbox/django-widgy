@@ -11,7 +11,7 @@ from widgy.models import Content
 from widgy.models.mixins import StrictDefaultChildrenMixin, InvisibleMixin
 from widgy.db.fields import WidgyField
 from widgy.contrib.page_builder.db.fields import MarkdownField
-from widgy import registry
+import widgy
 
 
 class Layout(StrictDefaultChildrenMixin, Content):
@@ -38,6 +38,7 @@ class Bucket(Content):
         abstract = True
 
 
+@widgy.register
 class MainContent(Bucket):
     def valid_parent_of(self, cls, obj=None):
         return not issubclass(cls, (MainContent, Sidebar))
@@ -46,9 +47,8 @@ class MainContent(Bucket):
     def valid_child_of(cls, parent, obj=None):
         return isinstance(parent, Layout)
 
-registry.register(MainContent)
 
-
+@widgy.register
 class Sidebar(Bucket):
     pop_out = 1
 
@@ -65,9 +65,8 @@ class Sidebar(Bucket):
     def valid_child_of(cls, parent, obj=None):
         return isinstance(parent, Layout)
 
-registry.register(Sidebar)
 
-
+@widgy.register
 class DefaultLayout(Layout):
     """
     On creation, creates a left and right bucket.
@@ -80,9 +79,8 @@ class DefaultLayout(Layout):
         (Sidebar, (), {}),
     ]
 
-registry.register(DefaultLayout)
 
-
+@widgy.register
 class Markdown(Content):
     content = MarkdownField(blank=True)
     rendered = models.TextField(editable=False)
@@ -90,9 +88,8 @@ class Markdown(Content):
     editable = True
     component_name = 'markdown'
 
-registry.register(Markdown)
 
-
+@widgy.register
 class CalloutBucket(Bucket):
     @classmethod
     def valid_child_of(cls, parent, obj=None):
@@ -101,7 +98,6 @@ class CalloutBucket(Bucket):
     def valid_parent_of(self, cls, obj=None):
         return issubclass(cls, (Markdown,))
 
-registry.register(CalloutBucket)
 
 
 class Callout(models.Model):
@@ -117,6 +113,7 @@ class Callout(models.Model):
         return self.name
 
 
+@widgy.register
 class CalloutWidget(Content):
     callout = models.ForeignKey(Callout, null=True, blank=True)
 
@@ -126,9 +123,8 @@ class CalloutWidget(Content):
     def valid_child_of(cls, parent, obj=None):
         return isinstance(parent, Sidebar)
 
-registry.register(CalloutWidget)
 
-
+@widgy.register
 class Accordion(Bucket):
     draggable = True
     deletable = True
@@ -136,9 +132,8 @@ class Accordion(Bucket):
     def valid_parent_of(self, cls, obj=None):
         return issubclass(cls, Section)
 
-registry.register(Accordion)
 
-
+@widgy.register
 class Section(Content):
     title = models.CharField(max_length=1023)
 
@@ -149,8 +144,6 @@ class Section(Content):
     def valid_child_of(cls, parent, obj=None):
         return isinstance(parent, Accordion)
 
-registry.register(Section)
-
 
 def validate_image(file_pk):
     file = File.objects.get(pk=file_pk)
@@ -160,6 +153,7 @@ def validate_image(file_pk):
     return file_pk
 
 
+@widgy.register
 class Image(Content):
     editable = True
 
@@ -169,8 +163,6 @@ class Image(Content):
                            validators=[validate_image],
                            related_name='image_widgets',
                            on_delete=models.PROTECT)
-
-registry.register(Image)
 
 
 class TableElement(Content):
@@ -192,6 +184,7 @@ class TableElement(Content):
         return self.get_siblings().index(self)
 
 
+@widgy.register
 class TableRow(TableElement):
     tag_name = 'tr'
 
@@ -207,6 +200,7 @@ class TableRow(TableElement):
             self.add_child(site, TableData)
 
 
+@widgy.register
 class TableHeaderData(TableElement):
     tag_name = 'th'
 
@@ -256,6 +250,7 @@ class TableHeaderData(TableElement):
             i.reposition(site, new_right, i.get_parent())
 
 
+@widgy.register
 class TableData(TableElement):
     tag_name = 'td'
 
@@ -273,6 +268,7 @@ class TableData(TableElement):
             return False
 
 
+@widgy.register
 class TableHeader(TableElement):
     draggable = False
     deletable = False
@@ -292,6 +288,7 @@ class TableHeader(TableElement):
         return issubclass(cls, TableHeaderData)
 
 
+@widgy.register
 class TableBody(InvisibleMixin, TableElement):
     tag_name = 'tbody'
 
@@ -312,6 +309,7 @@ class TableBody(InvisibleMixin, TableElement):
             return issubclass(cls, TableRow)
 
 
+@widgy.register
 class Table(StrictDefaultChildrenMixin, TableElement):
     tag_name = 'table'
     component_name = 'table'
@@ -334,8 +332,3 @@ class Table(StrictDefaultChildrenMixin, TableElement):
     def cells_at_index(self, index):
         return [list(i.get_children())[index] for i in self.body.get_children()]
 
-registry.register(Table)
-registry.register(TableRow)
-registry.register(TableData)
-registry.register(TableHeaderData)
-registry.register(TableHeader)

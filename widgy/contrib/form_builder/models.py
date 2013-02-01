@@ -1,5 +1,3 @@
-import markdown
-
 from django.db import models
 from django import forms
 from django.utils.datastructures import SortedDict
@@ -11,7 +9,7 @@ from widgy.models import Content
 from widgy.models.mixins import DefaultChildrenMixin
 from widgy.utils import update_context
 from widgy.contrib.page_builder.db.fields import MarkdownField
-from widgy import registry
+import widgy
 
 
 class FormElement(Content):
@@ -52,6 +50,7 @@ class FormReponseHandler(FormSuccessHandler):
         abstract = True
 
 
+@widgy.register
 class EmailSuccessHandler(FormSuccessHandler):
     to = models.EmailField()
     content = MarkdownField(blank=True)
@@ -62,9 +61,7 @@ class EmailSuccessHandler(FormSuccessHandler):
         send_mail('Subject', self.content, settings.SERVER_EMAIL, [self.to])
 
 
-registry.register(EmailSuccessHandler)
-
-
+@widgy.register
 class SubmitButton(FormElement):
     text = models.CharField(max_length=255, default='submit')
 
@@ -83,9 +80,8 @@ class SubmitButton(FormElement):
 
         return issubclass(cls, FormSuccessHandler)
 
-registry.register(SubmitButton)
 
-
+@widgy.register
 class Form(DefaultChildrenMixin, Content):
     accepting_children = True
     shelf = True
@@ -141,9 +137,6 @@ class Form(DefaultChildrenMixin, Content):
         return resp
 
 
-registry.register(Form)
-
-
 class FormField(FormElement):
     formfield_class = None
     widget = None
@@ -192,18 +185,15 @@ class FormInputForm(forms.ModelForm):
 #        raise forms.ValidationError('asdfasd')
 
 
+@widgy.register
 class FormInput(FormField):
     formfield_class = forms.CharField
     form = FormInputForm
 
     type = models.CharField(choices=FORM_INPUT_TYPES, max_length=255)
 
-registry.register(FormInput)
 
-
+@widgy.register
 class Textarea(FormField):
     formfield_class = forms.CharField
     widget = forms.Textarea
-
-
-registry.register(Textarea)
