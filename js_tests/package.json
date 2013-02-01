@@ -1,0 +1,24 @@
+{
+  "name": "test_js",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "jsdom": "~0.3.4",
+    "requirejs": "~2.1.4",
+    "chai": "~1.4.2"
+  },
+  "devDependencies": {
+    "mocha": "~1.8.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": "",
+  "author": "",
+  "license": "BSD",
+  "readmeFilename": "README.md"
+}
