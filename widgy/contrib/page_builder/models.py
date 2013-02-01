@@ -10,7 +10,7 @@ from filer.models.filemodels import File
 from widgy.models import Content
 from widgy.models.mixins import StrictDefaultChildrenMixin, InvisibleMixin
 from widgy.db.fields import WidgyField
-from widgy.contrib.page_builder.db.fields import MarkdownField
+from widgy.contrib.page_builder.db.fields import MarkdownField, VideoField
 import widgy
 
 
@@ -143,7 +143,6 @@ class Section(Content):
     @classmethod
     def valid_child_of(cls, parent, obj=None):
         return isinstance(parent, Accordion)
-
 
 def validate_image(file_pk):
     file = File.objects.get(pk=file_pk)
@@ -346,3 +345,12 @@ class Figure(Content):
 
     title = models.CharField(blank=True, null=True, max_length=1023)
     caption = models.TextField(blank=True, null=True)
+
+
+@widgy.register
+class Video(Content):
+    title = models.CharField(max_length=255)
+    video = VideoField()
+    caption = models.CharField(max_length=255, blank=True)
+
+    editable = True

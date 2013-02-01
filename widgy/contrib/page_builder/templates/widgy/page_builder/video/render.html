@@ -1,0 +1,7 @@
+<figure class="video">
+  <iframe width="560" height="315" src="{{ content.video.embed_url }}" frameborder="0" allowfullscreen></iframe>
+  <figcaption>
+    <strong>{{ content.title }}</strong>
+    {% if content.caption %}<p>{{ content.caption }}</p>{% endif %}
+  </figcaption>
+</figure>
