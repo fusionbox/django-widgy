@@ -164,7 +164,7 @@ def daisydiff(before, after):
         f_a.flush()
         f_b.flush()
 
-        subprocess.check_output([
+        proc = subprocess.Popen(stdout=subprocess.PIPE, args=[
             'java',
             '-jar',
             settings.DAISYDIFF_JAR_PATH,
@@ -172,6 +172,10 @@ def daisydiff(before, after):
             f_a.name,
             '--file=' + f_out.name,
         ])
+        proc.communicate()
+        retcode = proc.poll()
+        if retcode:
+            assert False, "Daisydiff returned %s" % retcode
 
         diff_html = f_out.read()
 

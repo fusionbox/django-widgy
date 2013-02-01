@@ -114,6 +114,8 @@ def setup(verbosity, test_labels):
     )
     settings.SITE_ID = 1
     settings.WIDGY_MEZZANINE_SITE = 'modeltests.core_tests.widgy_config.widgy_site'
+    settings.DAISYDIFF_JAR_PATH = os.path.join(os.path.dirname(__file__),
+                                               '..', 'bin', 'daisydiff', 'daisydiff.jar')
 
 
     # mezzanine junk

@@ -9,6 +9,7 @@ from widgy.models import Node, UnknownWidget, VersionTracker, Content
 from widgy.exceptions import (ParentWasRejected, ChildWasRejected,
                               MutualRejection, InvalidTreeMovement,
                               InvalidOperation)
+from widgy.views.versioning import daisydiff
 
 from modeltests.core_tests.widgy_config import widgy_site
 from modeltests.core_tests.models import (Layout, Bucket, RawTextWidget, CantGoAnywhereWidget,
@@ -731,3 +732,20 @@ class TestPrefetchTree(RootNodeTestCase):
                              a.depth_first_order())
             self.assertEqual(a.depth_first_order(),
                              b.depth_first_order())
+    def test_daisydiff(self):
+        a = """<html>
+            <body>
+                <p>foo
+            </body>
+        </html>"""
+
+        b = """<html>
+            <body>
+                <p>bar
+            </body>
+        </html>"""
+
+        diff = daisydiff(a, b)
+
+        self.assertIn('foo', diff)
+        self.assertIn('bar', diff)
