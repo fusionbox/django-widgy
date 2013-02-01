@@ -8,15 +8,12 @@ from django.views.generic.detail import SingleObjectMixin
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 
+from BeautifulSoup import BeautifulSoup
+
 from widgy.views.base import WidgyViewMixin, AuthorizedMixin
 from widgy.models import Node
 
-try:
-    # lxml and daisydiff must be installed to calculate diffs
-    from lxml import html
-    DIFF_ENABLED = bool(getattr(settings, 'DAISYDIFF_JAR_PATH', False))
-except ImportError:
-    DIFF_ENABLED = False
+DIFF_ENABLED = bool(getattr(settings, 'DAISYDIFF_JAR_PATH', False))
 
 
 def diff_url(site, before, after):
@@ -41,7 +38,10 @@ class RevertForm(CommitForm):
 
 class VersionTrackerMixin(SingleObjectMixin):
     def get_queryset(self):
-        return self.site.get_version_tracker_model().objects.all().select_related('head', 'head__root_node', 'working_copy')
+        return self.site.get_version_tracker_model().objects.all().select_related(
+            'head',
+            'head__root_node',
+            'working_copy')
 
 
 class CommitView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, FormView):
@@ -176,8 +176,8 @@ def daisydiff(before, after):
         diff_html = f_out.read()
 
         # remove the daisydiff chrome so we can add our own
-        parsed = html.document_fromstring(diff_html)
+        parsed = BeautifulSoup(diff_html)
         body = parsed.find('body')
-        for i in range(6):
-            body.remove(body[0])
-        return ''.join(html.tostring(i) for i in body)
+        for i in body.findAll(recursive=False)[:6]:
+            i.extract()
+        return str(body)
