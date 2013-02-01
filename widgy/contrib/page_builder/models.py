@@ -332,3 +332,17 @@ class Table(StrictDefaultChildrenMixin, TableElement):
     def cells_at_index(self, index):
         return [list(i.get_children())[index] for i in self.body.get_children()]
 
+
+@widgy.register
+class Figure(Content):
+    editable = True
+    accepting_children = True
+
+    position = models.CharField(default='center', max_length=50, choices=[
+        ('left', 'Float left'),
+        ('right', 'Float right'),
+        ('center', 'Center'),
+    ])
+
+    title = models.CharField(blank=True, null=True, max_length=1023)
+    caption = models.TextField(blank=True, null=True)
