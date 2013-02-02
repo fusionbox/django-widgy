@@ -8,7 +8,7 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
     comparator: 'title',
 
     initialize: function(options) {
-      this.model = nodes.Node;
+      // this.model = nodes.Node;
 
       this.node = options.node;
     }
@@ -37,15 +37,15 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
     },
 
     addOne: function(model) {
-      var view = new nodes.NodePreviewView({
-        model: model,
-        app: this.app
-      });
+      // var view = new nodes.NodePreviewView({
+      //   model: model,
+      //   app: this.app
+      // });
 
-      view.on('all', this.bubble);
+      // view.on('all', this.bubble);
 
-      this.list.push(view);
-      this.$list.append(view.render().el);
+      // this.list.push(view);
+      // this.$list.append(view.render().el);
     },
 
     resort: function(collection) {

@@ -23,6 +23,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
         'refreshCompatibility',
         'setCompatibility',
         'validateRelationship',
+        'instantiateView',
         'ready'
       );
 
@@ -30,26 +31,34 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
       // please!
       this.node_view_list = new Backbone.ViewList();
 
-      var root_node_view = this.root_node_view = new nodes.NodeView({
-        model: new nodes.Node(options.root_node),
-        app: this,
+      this.root_node = new nodes.Node(options.root_node);
+
+      this.root_node.ready.then(this.instantiateView);
+    },
+
+    instantiateView: function(node) {
+      this.root_node_view = new node.component.View({
         tagName: 'section',
-        rootNode: true
+        node: node,
+        content: node.content,
+        app: this
       });
 
-      this.node_view_list.push(root_node_view);
+      this.node_view_list.push(this.root_node_view);
 
-      root_node_view
+      this.root_node_view
         .on('created', this.node_view_list.push);
 
-      this.refreshCompatibility();
+//       this.refreshCompatibility();
     },
 
     render: function() {
       Backbone.View.prototype.render.apply(this, arguments);
 
       this.$editor = this.$el.children('.editor');
-      this.$editor.append(this.root_node_view.render().el);
+      this.root_node.ready.then(_.bind(function() {
+        this.$editor.append(this.root_node_view.render().el);
+      }, this)).done();
 
       return this;
     },
@@ -59,8 +68,8 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
         this.inflight.abort();
 
       this.inflight = $.ajax({
-        url: this.root_node_view.model.get('available_children_url'),
-        success: this.setCompatibility,
+        url: this.root_node_view.node.get('available_children_url'),
+        success: this.setCompatibility
       });
     },
 
@@ -70,7 +79,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
 
       this.compatibility_data = data;
       this.node_view_list.each(function(view) {
-        var shelf = view.getShelf()
+        var shelf = view.getShelf();
         if ( shelf )
           shelf.addOptions(data[view.model.id]);
       });
@@ -81,7 +90,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
     },
 
     validateRelationship: function(parent, child) {
-      return _.where(this.compatibility_data[parent.model.id], {'__class__': child.get('__class__')}).length != 0;
+      return _.where(this.compatibility_data[parent.model.id], {'__class__': child.get('__class__')}).length !== 0;
     },
 
     ready: function() {
