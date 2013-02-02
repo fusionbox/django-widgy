@@ -214,11 +214,11 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
     initialize: function() {
       Backbone.View.prototype.initialize.apply(this, arguments);
 
-      this.$el.addClass('loading').attr('disabled', true);
+      this.$el.addClass('loading').prop('disabled', true);
     },
 
     restore: function() {
-      this.$el.removeClass('loading').attr('disabled', false);
+      this.$el.removeClass('loading').prop('disabled', false);
     }
   });
 
