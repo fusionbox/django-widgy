@@ -1,51 +1,36 @@
-var requirejs, jsdom, setup;
-requirejs = require('requirejs');
-jsdom = require('jsdom').jsdom;
+var path = require('path'),
+    requirejs = require('requirejs'),
+    jsdom = require('jsdom').jsdom;
 
 global.document = global.document || jsdom();
 global.window = global.window = global.document.createWindow();
 
-// Does this matter? Backbone needs this set
-global.location = {
-  href: '//127.0.0.1'
-}
-
 requirejs.config({
-  baseUrl: "widgy/static/widgy/js/",
-  shim: {
-    'underscore': {
-      exports: '_'
-    },
-    'backbone': {
-      deps: ['underscore', 'jquery', 'csrf'],
-      exports: 'Backbone'
-    },
-    'csrf': {
-      deps: ['jquery'],
-      exports: 'csrf'
-    }
-  },
+  baseUrl: path.join(__dirname, "../../widgy/static/widgy/js/"),
   paths: {
-  'jquery': 'lib/jquery',
-  'underscore': 'lib/underscore',
-  'backbone': 'lib/backbone',
-  'mustache': 'lib/mustache',
-  'csrf': 'lib/csrf',
-  'django_admin' : 'lib/django_admin',
-  'text': 'require/text'
+    'text': 'require/text'
   }
 });
 
-test = {
+// Backbone expects window.jQuery to be set.
+var Backbone = requirejs('backbone'),
+    jQuery = requirejs('jquery');
 
+Backbone.$ = jQuery;
+
+// Does this matter? Backbone needs this set
+global.location = {
+  href: '//127.0.0.1'
+};
+
+test = {
   create: function(){
     document.innerHTML = '<html><head></head><body></body></html>';
   },
   
   destroy: function(){
     document.innerHTML = '';
-  },
-
+  }
 };
 
 module.exports = {
