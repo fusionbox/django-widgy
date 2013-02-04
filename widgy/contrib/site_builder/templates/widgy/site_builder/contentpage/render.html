@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load widgy_tags %}
+
+{% block title %}{{ block.super }} - {{ page.title }}{% endblock %}
+
+{% block seo_description %}{{ page.keywords_string }}{% endblock %}
+{% block seo_keywords %}{{ page.description }}{% endblock %}
+
+{% block breadcrumbs %}
+  {% for ancestor in page.get_ancestors %}
+    {% if ancestor.get_absolute_url %}
+      {% if ancestor.root_node.head %}
+        <li><a href="{{ ancestor.get_absolute_url }}">{{ ancestor.title|truncatewords:4 }}</a> <span class="divider">/</span></li>
+      {% else %}
+        <li>{{ ancestor.title|truncatewords:4 }} <span class="divider">/</span></li>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  <li>{{ page.title }} <span class="divider">/</span></li>
+{% endblock %}
+
+{% block content %}
+  <nav>
+    <p>Nav goes here</p>
+  </nav>
+
+  {% render page.root_node %}
+{% endblock %}

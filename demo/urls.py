@@ -28,6 +28,7 @@ urlpatterns = patterns("",
     # one out.
 
     url("^$", direct_to_template, {"template": "index.html"}, name="home"),
+    url("^favicon.ico$", direct_to_template, {"template": "favicon.ico"}),
 
     # HOMEPAGE AS AN EDITABLE PAGE IN THE PAGE TREE
     # ---------------------------------------------
@@ -67,6 +68,7 @@ urlpatterns = patterns("",
     # from it, and use them directly below instead of using
     # ``mezzanine.urls``.
     ("^", include("widgy.mezzanine_urls")),
+    ("^", include('widgy.contrib.site_builder.urls')),
 
 )
 

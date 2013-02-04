@@ -34,6 +34,13 @@
       width: 80%;
     }
   </style>
+  <div>
+    <ul class="breadcrumb">
+      <li><a href="/">Home</a> <span class="divider">/</span></li>
+      {% block breadcrumbs %}
+      {% endblock %}
+    </ul>
+  </div>
   <div class="left_nav">
       <div class="panel tree">{% page_menu "pages/menus/tree.html" %}</div>
   </div>

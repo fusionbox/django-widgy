@@ -1,0 +1,32 @@
+{% load url from future %}
+
+{% block before-preview %}{% endblock %}
+<p class="drag-row">
+  {% if self.draggable %}
+  <span class="drag_handle dragHandle icon-move"></span>
+  {% endif %}
+  
+  {% block title %}
+  <span class="title{% if not self.root_node or not self.slug %} error{% endif %}">
+    {% if self.slug %}
+    {{ self.slug }} - {{ self.get_absolute_url }}{% if self.root_node.head %} - <a href="{{ self.get_absolute_url }}" target="_blank">View on Site</a>{% endif %}
+    {% else %}
+      Untitled Page
+    {% endif %}
+  </span>
+  {% endblock %}
+  
+  {% if self.editable %}
+  <button class="edit"><i class="icon-edit"></i> <span>Edit Slug</span></button>
+  {% endif %}
+  <a href="{% url 'admin:site_builder_contentpage_change' self.pk %}" class="button"><i class="icon-edit"></i>Edit</a>
+  {% if self.get_full_path %}
+    <a href="{{ self.get_full_path" class="button" target="_blank"><i class="icon-edit"></i>Edit</a>
+  {% endif %}
+  {% if self.deletable %}
+  <button class="delete"><i class="icon-remove"></i> <span>Delete</span></button>
+  {% endif %}
+  {% if self.pop_out %}
+  <a href="{{ edit_url }}" class="pop_out">pop out</a>
+  {% endif %}
+</p>

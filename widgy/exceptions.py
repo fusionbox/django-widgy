@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 class InvalidOperation(ValidationError):
     pass
 
+
 class InvalidTreeMovement(InvalidOperation):
     """
     Inherits from ``django.core.exceptions.ValidationError``.

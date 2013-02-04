@@ -266,6 +266,7 @@ INSTALLED_APPS = (
     #"mezzanine.forms",
     "mezzanine.pages",
     'widgy',
+    'widgy.contrib.site_builder',
     'widgy.contrib.page_builder',
     'widgy.contrib.form_builder',
     'widgy.contrib.widgy_mezzanine',

@@ -1,0 +1,22 @@
+{% load url from future %}
+
+{% block before-preview %}{% endblock %}
+<p class="drag-row">
+  {% if self.draggable %}
+  <span class="drag_handle dragHandle icon-move"></span>
+  {% endif %}
+  
+  {% block title %}
+  <span class="title{% if not self.root_node or not self.slug %} error{% endif %}">
+    Redirect: {% if self.slug %}{{ self.get_absolute_url }}{% else %}undefined{% endif %} &gt; {{ self.target|default:"undefined" }}
+  </span>
+  {% endblock %}
+  
+  <a href="{{ self.get_edit_url }}" class="button"><i class="icon-edit"></i>Edit</a>
+  {% if self.deletable %}
+  <button class="delete"><i class="icon-remove"></i> <span>Delete</span></button>
+  {% endif %}
+  {% if self.pop_out %}
+  <a href="{{ edit_url }}" class="pop_out">pop out</a>
+  {% endif %}
+</p>
