@@ -10,7 +10,6 @@ import copy
 
 from django.db import models
 from django.forms.models import modelform_factory, ModelForm
-from django.forms import model_to_dict
 from django.contrib.contenttypes.models import ContentType
 from django.template.loader import render_to_string
 from django.template import RequestContext
@@ -336,6 +335,29 @@ class Node(MP_Node):
             if not child.trees_equal(other_child):
                 return False
         return True
+
+    @classmethod
+    def find_widgy_problems(cls, site=None):
+        """
+        Searches all the nodes for inconsistencies.
+
+            - Nodes whose content doesn't exist
+            - Nodes whose content types don't exist (UnknownWidgets)
+
+        TODO: Maybe check for Content instances that don't have any nodes
+        pointing to them.
+        """
+
+        dangling, unknown = [], []
+
+        for node in cls.objects.all():
+            content = node.content
+            if not content:
+                dangling.append(node.id)
+            elif isinstance(content, UnknownWidget):
+                unknown.append(node.id)
+
+        return dangling, unknown
 
 
 def check_frozen(sender, instance, **kwargs):

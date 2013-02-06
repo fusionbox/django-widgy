@@ -758,3 +758,30 @@ class TestSite(TestCase):
         self.assertIn('widgy/core_tests/rawtextwidget.scss', scss_files)
         # widgy.Content will never have an scss file
         self.assertNotIn('widgy/models/content.scss', scss_files)
+
+
+class TestFindProblems(RootNodeTestCase):
+    def setUp(self):
+        super(TestFindProblems, self).setUp()
+        from django.db import connection
+        self.cursor = connection.cursor()
+
+    def test_dangling_content(self):
+        left_bucket = self.root_node.content.get_children()[0]
+        left_node = left_bucket.node
+        self.cursor.execute('DELETE FROM core_tests_bucket WHERE id = ?', str(left_bucket.id))
+        ids, _ = Node.find_widgy_problems()
+        self.assertEqual(ids, [left_node.id])
+
+    def test_unknown_widget(self):
+        left_bucket = self.root_node.content.get_children()[0]
+        fake_ct = ContentType.objects.create(
+            name='fake',
+            app_label='faaaaake',
+        )
+        left_node = left_bucket.node
+        left_node.content_type_id = fake_ct.id
+        left_node.save()
+
+        _, ids = Node.find_widgy_problems()
+        self.assertEqual(ids, [left_node.id])
