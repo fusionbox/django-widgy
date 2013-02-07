@@ -3,6 +3,7 @@ from django import forms
 from django.utils.datastructures import SortedDict
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
+from django.core import validators
 from django.conf import settings
 from django.db.models.query import QuerySet
 
@@ -291,10 +292,6 @@ class FormField(BaseFormField):
         return kwargs
 
 
-FORM_INPUT_TYPES = (
-    ('text', 'Text'),
-    ('number', 'Number'),
-)
 
 class FormInputForm(forms.ModelForm):
     class Meta:
@@ -308,10 +305,26 @@ class FormInputForm(forms.ModelForm):
 
 @widgy.register
 class FormInput(FormField):
+    FORMFIELD_CLASSES = {
+        'text': forms.CharField,
+        'number': forms.IntegerField,
+        'email': forms.EmailField,
+    }
+
+    FORM_INPUT_TYPES = (
+        ('text', 'Text'),
+        ('number', 'Number'),
+        ('email', 'Email'),
+    )
+
     formfield_class = forms.CharField
     form = FormInputForm
 
     type = models.CharField(choices=FORM_INPUT_TYPES, max_length=255)
+
+    @property
+    def formfield_class(self):
+        return self.FORMFIELD_CLASSES[self.type]
 
 
 @widgy.register
