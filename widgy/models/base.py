@@ -659,7 +659,7 @@ class Content(models.Model):
         A ``template`` kwarg can be passed to use an explictly defined template
         instead of the default template list.
         """
-        with update_context(context, {'content': self}):
+        with update_context(context, {'self': self}):
             return render_to_string(
                 template or self.get_render_templates(context),
                 context
