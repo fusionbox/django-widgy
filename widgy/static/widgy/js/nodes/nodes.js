@@ -237,7 +237,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         'reposition',
         'addDropTargets',
         'clearDropTargets',
-        'canAcceptParent'
+        'canAcceptParent',
+        'cssClasses'
       );
 
       this
@@ -253,9 +254,13 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       model.trigger('reposition', model, model.get('parent_id'), model.get('right_id'));
     },
 
+    cssClasses: function() {
+      return [];
+    },
+
     render: function() {
       Backbone.View.prototype.render.apply(this, arguments);
-      _.each(this.model.css_classes, this.$el.addClass, this.$el);
+      _.each(this.cssClasses(), this.$el.addClass, this.$el);
 
       return this;
     },
@@ -812,8 +817,11 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       });
 
       return false;
-    }
+    },
 
+    cssClasses: function() {
+      return this.model.css_classes;
+    }
   });
 
 
@@ -847,6 +855,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       });
 
       this.$el.after(placeholder);
+    },
+
+    cssClasses: function() {
+      return this.model.get('css_classes');
     }
   });
 
