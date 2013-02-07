@@ -159,9 +159,14 @@ class Form(DefaultChildrenMixin, Content):
 
     def get_form(self):
         fields = SortedDict((child.get_formfield_name(), child.get_formfield())
-                            for child in self.get_children() if isinstance(child, FormField))
+                            for child in self.depth_first_order() if isinstance(child, BaseFormField))
 
-        return type('WidgyForm', (forms.BaseForm,), {'base_fields': fields})
+        mixins = []
+        for child in self.depth_first_order():
+            if hasattr(child, 'get_form_mixins'):
+                mixins.extend(child.get_form_mixins())
+
+        return type('WidgyForm', tuple(mixins + [forms.BaseForm]), {'base_fields': fields})
 
     @property
     def context_var(self):
@@ -199,6 +204,9 @@ class Form(DefaultChildrenMixin, Content):
         self.make_root()
 
     def get_fields(self):
+        """
+        A dictionary of formfield name -> FormField widget
+        """
         ret = {}
         for child in self.depth_first_order():
             if isinstance(child, FormField):
@@ -229,8 +237,36 @@ class Form(DefaultChildrenMixin, Content):
                 {})
 
 
-class FormField(FormElement):
+class BaseFormField(FormElement):
     formfield_class = None
+
+    class Meta:
+        abstract = True
+
+    def get_formfield_name(self):
+        return str(self.node.pk)
+
+    def render(self, context):
+        form = context['form']
+        field = form[self.get_formfield_name()]
+        with update_context(context, {'field': field}):
+            return super(BaseFormField, self).render(context)
+
+    def get_formfield_kwargs(self):
+        return {}
+
+    def get_formfield(self):
+        return self.formfield_class(**self.get_formfield_kwargs())
+
+    def get_form_mixins(self):
+        """
+        A list of mixins to apply to the Django form
+        """
+
+        return []
+
+
+class FormField(BaseFormField):
     widget = None
 
     label = models.CharField(max_length=255)
@@ -242,25 +278,15 @@ class FormField(FormElement):
     class Meta:
         abstract = True
 
-    def get_formfield_name(self):
-        return str(self.node.pk)
-
     def get_formfield_kwargs(self):
-        return {
+        kwargs = super(FormField, self).get_formfield_kwargs()
+        kwargs.update({
             'label': self.label,
             'help_text': self.help_text,
             'widget': self.widget,
             'required': self.required,
-        }
-
-    def get_formfield(self):
-        return self.formfield_class(**self.get_formfield_kwargs())
-
-    def render(self, context):
-        form = context['form']
-        field = form[self.get_formfield_name()]
-        with update_context(context, {'field': field}):
-            return super(FormField, self).render(context)
+        })
+        return kwargs
 
 
 FORM_INPUT_TYPES = (
@@ -290,6 +316,37 @@ class FormInput(FormField):
 class Textarea(FormField):
     formfield_class = forms.CharField
     widget = forms.Textarea
+
+
+@widgy.register
+class Uncaptcha(BaseFormField):
+    editable = False
+    formfield_class = forms.CharField
+
+    def get_form_mixins(self):
+        # since validating an uncaptcha widget requires access to the
+        # csrfmiddlewaretoken and not just our field value, create a
+        # form mixin with a clean_uncaptcha method to do the validation.
+        def clean(form):
+            value = form.cleaned_data[self.get_formfield_name()]
+            if value != form.data.get('csrfmiddlewaretoken'):
+                raise forms.ValidationError('Incorrect Uncaptcha value')
+        UncaptchaMixin = type('UncaptchaMixin', (object,), {
+            'clean_%s' % self.get_formfield_name(): clean
+        })
+        return [UncaptchaMixin]
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        # only allow 1 uncaptcha per form
+        if not isinstance(parent, Form):
+            return False
+        if obj in parent.get_children():
+            return True
+        if [i for i in parent.get_children() if isinstance(i, cls)]:
+            return False
+        else:
+            return super(Uncaptcha, cls).valid_child_of(parent, obj)
 
 
 class FormSubmission(behaviors.Timestampable, models.Model):
