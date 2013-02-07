@@ -7,17 +7,17 @@ from django.utils import unittest
 from django.db.models.deletion import ProtectedError
 
 from widgy.models import Node, UnknownWidget, VersionTracker, Content
-from widgy.exceptions import (ParentWasRejected, ChildWasRejected,
-                              MutualRejection, InvalidTreeMovement,
-                              InvalidOperation)
+from widgy.exceptions import (
+    ParentWasRejected, ChildWasRejected, MutualRejection, InvalidTreeMovement,
+    InvalidOperation)
 from widgy.views.versioning import daisydiff
 
 from modeltests.core_tests.widgy_config import widgy_site
-from modeltests.core_tests.models import (Layout, Bucket, RawTextWidget, CantGoAnywhereWidget,
-                     PickyBucket, ImmovableBucket, AnotherLayout,
-                     VowelBucket, VersionedPage,
-                     VersionedPage2, VersionedPage3, VersionedPage4,
-                     VersionPageThrough, Related, ForeignKeyWidget)
+from modeltests.core_tests.models import (
+    Layout, Bucket, RawTextWidget, CantGoAnywhereWidget, PickyBucket,
+    ImmovableBucket, AnotherLayout, VowelBucket, VersionedPage, VersionedPage2,
+    VersionedPage3, VersionedPage4, VersionPageThrough, Related,
+    ForeignKeyWidget)
 
 
 from modeltests.core_tests.tests.base import RootNodeTestCase, make_a_nice_tree
@@ -172,6 +172,7 @@ class TestRegistry(RootNodeTestCase):
     def setUp(self):
         from widgy import Registry
         self.registry = Registry()
+
         class Test(Content):
             pass
         self.cls = Test
@@ -193,6 +194,50 @@ class TestRegistry(RootNodeTestCase):
     def test_unregister_not_registered(self):
         with self.assertRaises(Exception):
             self.registry.unregister(self.cls)
+
+
+class TestTreesEqual(RootNodeTestCase):
+    def test_trees_equal_after_clone(self):
+        left, right = make_a_nice_tree(self.root_node)
+        new_root = self.root_node.clone_tree(freeze=False)
+        self.assertTrue(self.root_node.trees_equal(new_root))
+        new_root.content.get_children()[0].delete()
+        self.assertFalse(self.root_node.trees_equal(new_root))
+
+    def test_trees_unequal_content_type(self):
+        a = CantGoAnywhereWidget.add_root(widgy_site)
+        b = RawTextWidget.add_root(widgy_site, text='a')
+
+        self.assertEqual(a.pk, b.pk)
+        self.assertFalse(a.node.trees_equal(b.node))
+
+    def test_trees_unequal_children(self):
+        a = Bucket.add_root(widgy_site)
+        a.add_child(widgy_site, RawTextWidget, text='a')
+        a.add_child(widgy_site, RawTextWidget, text='b')
+
+        b = Bucket.add_root(widgy_site)
+        b.add_child(widgy_site, RawTextWidget, text='a')
+
+        self.assertFalse(a.node.trees_equal(b.node))
+
+    def test_trees_unequal_depth(self):
+        a = Bucket.add_root(widgy_site).add_child(widgy_site, RawTextWidget, text='a')
+        b = RawTextWidget.add_root(widgy_site, text='a')
+
+        self.assertFalse(a.node.trees_equal(b.node))
+
+    def test_trees_unequal_content(self):
+        a = RawTextWidget.add_root(widgy_site, text='b')
+        b = RawTextWidget.add_root(widgy_site, text='a')
+
+        self.assertFalse(a.node.trees_equal(b.node))
+
+    def test_trees_equal_equal(self):
+        a = RawTextWidget.add_root(widgy_site, text='a')
+        b = RawTextWidget.add_root(widgy_site, text='a')
+
+        self.assertTrue(a.node.trees_equal(b.node))
 
 
 class TestVersioning(RootNodeTestCase):
@@ -229,13 +274,6 @@ class TestVersioning(RootNodeTestCase):
         # - subnodes (1 query)
         with self.assertNumQueries(6):
             root_node.clone_tree()
-
-    def test_trees_equal(self):
-        left, right = make_a_nice_tree(self.root_node)
-        new_root = self.root_node.clone_tree(freeze=False)
-        self.assertTrue(self.root_node.trees_equal(new_root))
-        new_root.content.get_children()[0].delete()
-        self.assertFalse(self.root_node.trees_equal(new_root))
 
     def test_content_equal(self):
         a = RawTextWidget.add_root(widgy_site, text='a')
