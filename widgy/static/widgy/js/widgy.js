@@ -1,6 +1,6 @@
-define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/nodes',
+define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'nodes/nodes',
     'text!app.html', 'shelves/shelves'
-    ], function($, _, Backbone, nodes,
+    ], function($, _, Backbone, csrf, nodes,
       app_template, shelves
       ) {
 

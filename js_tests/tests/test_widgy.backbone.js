@@ -1,12 +1,14 @@
-var requirejs, expect, test;
-var test = require('./setup').test;
-var requirejs = require('requirejs')
-var assert = require('chai').assert;
+var test = require('./setup').test,
+    requirejs = require('requirejs'),
+    assert = require('chai').assert;
+
+var WidgyBackbone = requirejs('widgy.backbone');
 
 describe('Widgy ViewLists', function(){
 
-  beforeEach(function(done){
-    var _this = this;
+  beforeEach(function(){
+    test.create();
+
     this.MockView = function(cid){
       this.i_was_closed = false;
       this.off_was_called = false;
@@ -19,18 +21,8 @@ describe('Widgy ViewLists', function(){
         id: cid
       };
     };
-    test.create();
-    requirejs([ 'jquery', 'widgy.backbone', 'backbone' ], function(
-    $,
-    WidgyBackbone,
-    Backbone){
-      var WidgyViewList;
-      Backbone.$ = $;
-      WidgyViewList = WidgyBackbone.ViewList;
-      _this.WidgyView = WidgyBackbone.View;
-      _this.ViewList = new WidgyViewList();
-      done();
-    });
+
+    this.view_list = new WidgyBackbone.ViewList();
   });
 
   afterEach(function(){
@@ -40,8 +32,8 @@ describe('Widgy ViewLists', function(){
 
   it('should push views onto the list property', function(){
     var mockview = new this.MockView(1);
-    this.ViewList.push(mockview);
-    assert.deepEqual(this.ViewList.list, [ mockview ]);
+    this.view_list.push(mockview);
+    assert.deepEqual(this.view_list.list, [ mockview ]);
   });
 
 
@@ -49,9 +41,9 @@ describe('Widgy ViewLists', function(){
     var mockview = new this.MockView(1),
         mockview1 = new this.MockView(2),
         mockview2 = new this.MockView(3);
-    this.ViewList.list = [ mockview, mockview1, mockview2 ];
-    this.ViewList.remove(mockview2);
-    assert.deepEqual(this.ViewList.list, [ mockview, mockview1 ]);
+    this.view_list.list = [ mockview, mockview1, mockview2 ];
+    this.view_list.remove(mockview2);
+    assert.deepEqual(this.view_list.list, [ mockview, mockview1 ]);
   });
 
 
@@ -59,8 +51,8 @@ describe('Widgy ViewLists', function(){
     var mockview = new this.MockView(1),
         mockview1 = new this.MockView(2),
         mockview2 = new this.MockView(3);
-    this.ViewList.list = [ mockview, mockview1 ];
-    assert.isFalse(this.ViewList.remove(mockview2));
+    this.view_list.list = [ mockview, mockview1 ];
+    assert.isFalse(this.view_list.remove(mockview2));
   });
 
 
@@ -68,11 +60,11 @@ describe('Widgy ViewLists', function(){
     var mockview = new this.MockView(1),
         mockview1 = new this.MockView(2),
         mockview2 = new this.MockView(3);
-    this.ViewList.list = [ mockview, mockview1, mockview2 ];
-    this.ViewList.closeAll();
-    assert.isTrue(this.ViewList.list[0].i_was_closed);
-    assert.isTrue(this.ViewList.list[1].i_was_closed);
-    assert.isTrue(this.ViewList.list[2].i_was_closed);
+    this.view_list.list = [ mockview, mockview1, mockview2 ];
+    this.view_list.closeAll();
+    assert.isTrue(this.view_list.list[0].i_was_closed);
+    assert.isTrue(this.view_list.list[1].i_was_closed);
+    assert.isTrue(this.view_list.list[2].i_was_closed);
   });
 
 
@@ -80,8 +72,8 @@ describe('Widgy ViewLists', function(){
     var mockview = new this.MockView(1),
         mockview1 = new this.MockView(2),
         mockview2 = new this.MockView(3);
-    this.ViewList.list = [ mockview, mockview1, mockview2 ];
-    assert.strictEqual(this.ViewList.findById(2), mockview1);
+    this.view_list.list = [ mockview, mockview1, mockview2 ];
+    assert.strictEqual(this.view_list.findById(2), mockview1);
   });
 
 
@@ -95,33 +87,23 @@ describe('Widgy ViewLists', function(){
     mockview1.el = search_el;
     mockview2.el = document.createElement('div');
 
-    this.ViewList.list = [ mockview, mockview1, mockview2 ];
-    assert.strictEqual(this.ViewList.findByEl(search_el), mockview1);
+    this.view_list.list = [ mockview, mockview1, mockview2 ];
+    assert.strictEqual(this.view_list.findByEl(search_el), mockview1);
   });
 
   it('should find a view object from its view model', function(){
     var mockview = new this.MockView(1),
         mockview1 = new this.MockView(2),
         mockview2 = new this.MockView(3);
-    this.ViewList.list = [ mockview, mockview1, mockview2 ];
-    assert.strictEqual(this.ViewList.findByModel(mockview1.model), mockview1);
+    this.view_list.list = [ mockview, mockview1, mockview2 ];
+    assert.strictEqual(this.view_list.findByModel(mockview1.model), mockview1);
   });
 });
 
 describe('Spinner View', function(){
 
-  beforeEach(function(done){
-    var _this = this;
+  beforeEach(function(){
     test.create();
-    requirejs([ 'jquery', 'widgy.backbone', 'backbone' ], function(
-    $,
-    WidgyBackbone,
-    Backbone){
-      var WidgyViewList;
-      Backbone.$ = $;
-      _this.Spinner = WidgyBackbone.Spinner;
-      done();
-    });
   });
 
   afterEach(function(){
@@ -129,23 +111,23 @@ describe('Spinner View', function(){
   });
 
   it('should set the "disabled" property on its element on initialization', function(){
-    var spinner = new this.Spinner();
+    var spinner = new WidgyBackbone.Spinner();
     assert.isTrue(spinner.el.disabled);
   });
 
   it('should unset the "disabled" property on its element after calling restore', function(){
-    var spinner = new this.Spinner();
+    var spinner = new WidgyBackbone.Spinner();
     spinner.restore();
     assert.isFalse(spinner.el.disabled);
   });
 
   it('should add a "loading" class to its element on initialization', function(){
-    var spinner = new this.Spinner();
+    var spinner = new WidgyBackbone.Spinner();
     assert.isTrue(spinner.$el.hasClass('loading'));
   });
 
   it('should remove "loading" class to its element on initialization', function(){
-    var spinner = new this.Spinner();
+    var spinner = new WidgyBackbone.Spinner();
     spinner.restore();
     assert.isFalse(spinner.$el.hasClass('loading'));
   });

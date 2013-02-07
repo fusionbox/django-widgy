@@ -16,12 +16,8 @@ require.config({
       exports: '_'
     },
     'backbone': {
-      deps: ['underscore', 'jquery', 'csrf'],
+      deps: ['underscore', 'jquery'],
       exports: 'Backbone'
-    },
-    'csrf': {
-      deps: ['jquery'],
-      exports: 'csrf'
     }
   },
   paths: {
@@ -29,8 +25,6 @@ require.config({
   'underscore': './lib/underscore',
   'backbone': './lib/backbone',
   'mustache': './lib/mustache',
-  'csrf': './lib/csrf',
-  'django_admin' : './lib/django_admin',
   'text': 'require/text'
   }
 });

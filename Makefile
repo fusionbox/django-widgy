@@ -16,6 +16,10 @@ js_tests/node_modules: js_tests/package.json
 	cd js_tests && npm install .
 
 test-js: js_tests/node_modules
-	./js_tests/node_modules/mocha/bin/mocha --reporter spec -s 5 --globals _,Backbone $(JS_FILES)
+	./js_tests/node_modules/mocha/bin/mocha \
+		--reporter spec \
+		-s 5 \
+		--globals _,Backbone \
+		$(JS_FILES)
 
 .PHONY: test coverage browser test-py test-js
