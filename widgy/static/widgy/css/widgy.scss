@@ -88,15 +88,18 @@
   }
 
   .node_drop_target {
+    border: 2px dashed red;
     background: #fff;
-    height: 25px;
-    padding: 10px;
-    width: 100%;
+    font-size: 1.4em;
+    font-style: italic;
+    height: auto;
+    margin-bottom: 1em;
+    padding: 1em;
     
 
     &.active {
-      border: 1px dashed #000;
-      height: 50px;
+      border: 2px dashed #000;
+      background: red;
     }
   }
 
@@ -310,10 +313,15 @@ body, html {
 }
 
 .widgy {
+  margin-top: 10px;
+  
   .node {
     @include rounded(4px);
-    background: $black10;
-    border: 2px solid #fff;
+    @include shadow($black10,1px,1px,0px);
+    @include inset-shadow(#ffffff,-1px,1px,0px);
+
+    background: $black10;    
+    /*border: 1px solid #fff;*/
     list-style: none;
     margin: 0 0 1em 0;
     padding: 10px;
@@ -330,6 +338,7 @@ body, html {
     }
     
     p.drag-row {
+      /*@include gradient(#999999,#ffffff);*/
       padding: 1em 0;
     }
     
