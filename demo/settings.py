@@ -344,7 +344,7 @@ MIDDLEWARE_CLASSES = (
     "mezzanine.core.middleware.FetchFromCacheMiddleware",
     "django.middleware.transaction.TransactionMiddleware",
     # prevent problems comes after transaction
-    "widgy.middleware.PreventProblemsMiddleware",
+    # "widgy.middleware.PreventProblemsMiddleware",
 )
 
 # Store these package names here as they may change in the future since
