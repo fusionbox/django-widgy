@@ -78,6 +78,41 @@ class SaveDataHandler(FormSuccessHandler):
         )
 
 
+class EmailUserHandlerForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(EmailUserHandlerForm, self).__init__(*args, **kwargs)
+        self.fields['to'].queryset = Node.objects.filter(
+            id__in=[i.node.id for i in self.instance.get_email_fields()]
+        )
+
+
+@widgy.register
+class EmailUserHandler(FormSuccessHandler):
+    editable = True
+    component_name = 'markdown'
+    form = EmailUserHandlerForm
+
+    # an input in our form
+    to = models.ForeignKey(Node, related_name='+', null=True)
+    subject = models.CharField(max_length=255)
+    content = MarkdownField(blank=True)
+
+    def execute(self, request, form):
+        to = self.to.content
+        to_email = form.cleaned_data[to.get_formfield_name()]
+        send_mail(self.subject, self.content, settings.SERVER_EMAIL, [to_email])
+
+    def get_email_fields(self):
+        return [i for i in self.parent_form.depth_first_order()
+                if isinstance(i, FormInput) and i.type == 'email']
+
+    def post_create(self, site):
+        email_fields = self.get_email_fields()
+        self.to = email_fields and email_fields[0].node
+        self.save()
+
+
+
 @widgy.register
 class SubmitButton(DefaultChildrenMixin, FormElement):
     text = models.CharField(max_length=255, default='submit')
@@ -291,6 +326,8 @@ class FormField(BaseFormField):
         })
         return kwargs
 
+    def __unicode__(self):
+        return self.label
 
 
 class FormInputForm(forms.ModelForm):
