@@ -13,6 +13,8 @@ from widgy.db.fields import WidgyField
 from widgy.contrib.page_builder.db.fields import MarkdownField, VideoField
 import widgy
 
+from widgy.contrib.page_builder.wymeditor import WYMEditorField
+
 
 class Layout(StrictDefaultChildrenMixin, Content):
     """
@@ -352,3 +354,10 @@ class Video(Content):
     video = VideoField()
 
     editable = True
+
+
+@widgy.register
+class Wymeditor(Content):
+    editable = True
+
+    content = WYMEditorField()
