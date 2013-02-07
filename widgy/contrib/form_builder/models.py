@@ -113,11 +113,9 @@ class Form(DefaultChildrenMixin, Content):
     name = models.CharField(max_length=255,
                             default=untitled_form,
                             help_text="A name to help identify this form. Only admins see this.")
-    ident = UUIDField()
-    # This gets annotate()d on, but has to be set to something first for django
-    # to let us put it in the list_display.
-    submission_count = None
 
+    # associates instances of the same logical form across versions
+    ident = UUIDField()
 
     accepting_children = True
     shelf = True
@@ -200,7 +198,7 @@ class Form(DefaultChildrenMixin, Content):
 
     def delete(self):
         self.check_frozen()
-        # don't delete, just take us of the the tree
+        # don't delete, just take us out of the tree
         self.make_root()
 
     def get_fields(self):
@@ -215,12 +213,16 @@ class Form(DefaultChildrenMixin, Content):
 
     @property
     def submissions(self):
+        """
+        All submissions of this logical (not just this version) form.
+        """
         return FormSubmission.objects.filter(
             form_ident=self.ident
         ).prefetch_related('values')
 
     @property
     def submission_count(self):
+        # see also objects.annotate_submission_count to prefetch this value
         if hasattr(self, '_submission_count'):
             return self._submission_count
 
@@ -262,7 +264,6 @@ class BaseFormField(FormElement):
         """
         A list of mixins to apply to the Django form
         """
-
         return []
 
 
@@ -273,6 +274,7 @@ class FormField(BaseFormField):
     required = models.BooleanField(default=True)
 
     help_text = models.TextField(blank=True)
+    # associates instances of the same logical field across versions
     ident = UUIDField()
 
     class Meta:
@@ -350,6 +352,10 @@ class Uncaptcha(BaseFormField):
 
 
 class FormSubmission(behaviors.Timestampable, models.Model):
+    """
+    Holds the data from one submission of a Form.
+    """
+
     form_node = models.ForeignKey(Node, on_delete=models.PROTECT, related_name='form_submissions')
     form_ident = models.CharField(max_length=Form._meta.get_field_by_name('ident')[0].max_length)
 
@@ -358,7 +364,7 @@ class FormSubmission(behaviors.Timestampable, models.Model):
     class QuerySet(QuerySet):
         def field_names(self):
             """
-            A dictionary of field uuid to field label. We used the label of the
+            A dictionary of field uuid to field label. We use the label of the
             field that was used by the most recent submission. Note that this
             means only fields that have been submitted will show up here.
             """
@@ -372,11 +378,7 @@ class FormSubmission(behaviors.Timestampable, models.Model):
                 latest_value = FormValue.objects.filter(
                     field_ident=field_uuid,
                 ).order_by('-submission__created_at', '-pk').select_related('field_node')[0]
-                if latest_value.field_node:
-                    name = latest_value.field_node.content.label
-                else:
-                    name = latest_value.field_name
-                ret[field_uuid] = name
+                ret[field_uuid] = latest_value.get_label()
             return ret
 
         def as_dictionaries(self):
@@ -405,9 +407,25 @@ class FormSubmission(behaviors.Timestampable, models.Model):
 
 
 class FormValue(models.Model):
+    """
+    Holds a datum from a form submission, EAV style.
+    """
+
     submission = models.ForeignKey(FormSubmission, related_name='values')
+
+    # three references to the form field! field_node is a foreign key to the
+    # field at the time of submission, field_ident is the field's uuid to
+    # associate submissions of the same logical field across versions, and
+    # field_name is our last resort, in case the field has been deleted.
     field_node = models.ForeignKey(Node, on_delete=models.SET_NULL, null=True)
     field_name = models.CharField(max_length=255)
     field_ident = models.CharField(
         max_length=FormField._meta.get_field_by_name('ident')[0].max_length)
+
     value = models.TextField()
+
+    def get_label(self):
+        if self.field_node:
+            return self.field_node.content.label
+        else:
+            return self.field_name
