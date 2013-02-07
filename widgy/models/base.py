@@ -173,22 +173,27 @@ class Node(MP_Node):
         return contents
 
     @classmethod
-    def prefetch_trees(cls, *root_nodes):
-        for node in root_nodes:
-            # This should get_depth() or is_root(), but both of those do another
-            # query
-            if node.depth == 1:
-                node._parent = None
-                node._next_sibling = None
-                node._ancestors = []
+    def attach_content_instances(cls, nodes):
+        """
+        Given a list of nodes, attach each one's Content. Efficiently.
+        """
+        contents = cls.fetch_content_instances(nodes)
+        for node in nodes:
+            node.content = contents[node.content_type_id][node.content_id]
+            node.content.node = node
 
+    @classmethod
+    def prefetch_trees(cls, *root_nodes):
         trees = [i.depth_first_order() for i in root_nodes]
-        contents = cls.fetch_content_instances(itertools.chain(*trees))
+        cls.attach_content_instances(list(itertools.chain(*trees)))
         for tree in trees:
-            for node in tree:
-                node.content = contents[node.content_type_id][node.content_id]
-                node.content.node = node
             root_node = tree.pop(0)
+            # This should get_depth() or is_root(), but both of those do
+            # another query
+            if root_node.depth == 1:
+                root_node._parent = None
+                root_node._next_sibling = None
+                root_node._ancestors = []
             root_node.consume_children(tree)
             assert not tree, "all of the nodes should be consumed"
 
