@@ -600,6 +600,24 @@ class TestVersioning(RootNodeTestCase):
         vt = VersionTracker.objects.get(pk=vt.pk)
         self.assertTrue(vt.has_changes())
 
+    def test_daisydiff(self):
+        a = """<html>
+            <body>
+                <p>foo
+            </body>
+        </html>"""
+
+        b = """<html>
+            <body>
+                <p>bar
+            </body>
+        </html>"""
+
+        diff = daisydiff(a, b)
+
+        self.assertIn('foo', diff)
+        self.assertIn('bar', diff)
+
 
 class TestPrefetchTree(RootNodeTestCase):
     def setUp(self):
@@ -733,23 +751,6 @@ class TestPrefetchTree(RootNodeTestCase):
                              a.depth_first_order())
             self.assertEqual(a.depth_first_order(),
                              b.depth_first_order())
-    def test_daisydiff(self):
-        a = """<html>
-            <body>
-                <p>foo
-            </body>
-        </html>"""
-
-        b = """<html>
-            <body>
-                <p>bar
-            </body>
-        </html>"""
-
-        diff = daisydiff(a, b)
-
-        self.assertIn('foo', diff)
-        self.assertIn('bar', diff)
 
 
 class TestSite(TestCase):
