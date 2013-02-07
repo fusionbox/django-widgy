@@ -22,6 +22,7 @@ install_requires = [
     'six',
     'markdown',
     'django-compressor',
+    'django-extensions',
 ]
 
 version = (0, 0, 1, 'alpha')
