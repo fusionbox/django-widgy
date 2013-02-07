@@ -208,7 +208,6 @@ class TestTreesEqual(RootNodeTestCase):
         a = CantGoAnywhereWidget.add_root(widgy_site)
         b = RawTextWidget.add_root(widgy_site, text='a')
 
-        self.assertEqual(a.pk, b.pk)
         self.assertFalse(a.node.trees_equal(b.node))
 
     def test_trees_unequal_children(self):
@@ -808,7 +807,7 @@ class TestFindProblems(RootNodeTestCase):
     def test_dangling_content(self):
         left_bucket = self.root_node.content.get_children()[0]
         left_node = left_bucket.node
-        self.cursor.execute('DELETE FROM core_tests_bucket WHERE id = ?', str(left_bucket.id))
+        self.cursor.execute('DELETE FROM core_tests_bucket WHERE id = %s', [str(left_bucket.id)])
         ids, _ = Node.find_widgy_problems()
         self.assertEqual(ids, [left_node.id])
 
