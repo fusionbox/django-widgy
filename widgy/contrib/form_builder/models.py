@@ -234,6 +234,7 @@ class FormField(FormElement):
     widget = None
 
     label = models.CharField(max_length=255)
+    required = models.BooleanField(default=True)
 
     help_text = models.TextField(blank=True)
     ident = UUIDField()
@@ -244,14 +245,16 @@ class FormField(FormElement):
     def get_formfield_name(self):
         return str(self.node.pk)
 
-    def get_formfield(self):
-        kwargs = {
+    def get_formfield_kwargs(self):
+        return {
             'label': self.label,
             'help_text': self.help_text,
             'widget': self.widget,
+            'required': self.required,
         }
 
-        return self.formfield_class(**kwargs)
+    def get_formfield(self):
+        return self.formfield_class(**self.get_formfield_kwargs())
 
     def render(self, context):
         form = context['form']
@@ -269,6 +272,7 @@ class FormInputForm(forms.ModelForm):
     class Meta:
         fields = (
             'type',
+            'required',
             'label',
             'help_text',
         )
