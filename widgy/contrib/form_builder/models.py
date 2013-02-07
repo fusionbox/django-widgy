@@ -1,17 +1,21 @@
-import markdown
-
 from django.db import models
 from django import forms
 from django.utils.datastructures import SortedDict
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
+from django.core import validators
 from django.conf import settings
+from django.db.models.query import QuerySet
 
-from widgy.models import Content
+from fusionbox import behaviors
+from fusionbox.db.models import QuerySetManager
+from django_extensions.db.fields import UUIDField
+
+from widgy.models import Content, Node
 from widgy.models.mixins import DefaultChildrenMixin
 from widgy.utils import update_context
 from widgy.contrib.page_builder.db.fields import MarkdownField
-from widgy import registry
+import widgy
 
 
 class FormElement(Content):
@@ -36,8 +40,8 @@ class FormElement(Content):
         return False
 
 
-class FormSuccessHandler(Content):
-    editable = True
+class FormSuccessHandler(FormElement):
+    draggable = False
 
     class Meta:
         abstract = True
@@ -52,6 +56,7 @@ class FormReponseHandler(FormSuccessHandler):
         abstract = True
 
 
+@widgy.register
 class EmailSuccessHandler(FormSuccessHandler):
     to = models.EmailField()
     content = MarkdownField(blank=True)
@@ -62,37 +67,112 @@ class EmailSuccessHandler(FormSuccessHandler):
         send_mail('Subject', self.content, settings.SERVER_EMAIL, [self.to])
 
 
-registry.register(EmailSuccessHandler)
+@widgy.register
+class SaveDataHandler(FormSuccessHandler):
+    editable = False
+
+    def execute(self, request, form):
+        FormSubmission.objects.submit(
+            form=self.parent_form,
+            data=form.cleaned_data
+        )
 
 
-class SubmitButton(FormElement):
+class EmailUserHandlerForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(EmailUserHandlerForm, self).__init__(*args, **kwargs)
+        self.fields['to'].queryset = Node.objects.filter(
+            id__in=[i.node.id for i in self.instance.get_email_fields()]
+        )
+
+
+@widgy.register
+class EmailUserHandler(FormSuccessHandler):
+    editable = True
+    component_name = 'markdown'
+    form = EmailUserHandlerForm
+
+    # an input in our form
+    to = models.ForeignKey(Node, related_name='+', null=True)
+    subject = models.CharField(max_length=255)
+    content = MarkdownField(blank=True)
+
+    def execute(self, request, form):
+        to = self.to.content
+        to_email = form.cleaned_data[to.get_formfield_name()]
+        send_mail(self.subject, self.content, settings.SERVER_EMAIL, [to_email])
+
+    def get_email_fields(self):
+        return [i for i in self.parent_form.depth_first_order()
+                if isinstance(i, FormInput) and i.type == 'email']
+
+    def post_create(self, site):
+        email_fields = self.get_email_fields()
+        self.to = email_fields and email_fields[0].node
+        self.save()
+
+
+
+@widgy.register
+class SubmitButton(DefaultChildrenMixin, FormElement):
     text = models.CharField(max_length=255, default='submit')
+
+    default_children = [
+        (SaveDataHandler, (), {}),
+    ]
 
     @property
     def deletable(self):
         return len([i for i in self.parent_form.depth_first_order() if isinstance(i, SubmitButton)]) > 1
 
     def valid_parent_of(self, cls, obj=None):
-        if obj in self.children:
+        if obj in self.get_children():
             return True
 
         # only accept one FormReponseHandler
         if issubclass(cls, FormReponseHandler) and any([isinstance(child, FormReponseHandler)
-                                                        for child in self.children]):
+                                                        for child in self.get_children()]):
             return False
 
         return issubclass(cls, FormSuccessHandler)
 
-registry.register(SubmitButton)
+
+def untitled_form():
+    n = Form.objects.filter(name__startswith='Untitled form ').exclude(
+        _nodes__is_frozen=True
+    ).count() + 1
+    return 'Untitled form %d' % n
 
 
+@widgy.register
 class Form(DefaultChildrenMixin, Content):
+    name = models.CharField(max_length=255,
+                            default=untitled_form,
+                            help_text="A name to help identify this form. Only admins see this.")
+
+    # associates instances of the same logical form across versions
+    ident = UUIDField()
+
     accepting_children = True
     shelf = True
+    editable = True
 
     default_children = [
         (SubmitButton, (), {}),
     ]
+
+    objects = QuerySetManager()
+
+    class QuerySet(QuerySet):
+        def annotate_submission_count(self):
+            return self.extra(select={
+                'submission_count':
+                'SELECT COUNT(*) FROM form_builder_formsubmission'
+                ' WHERE form_ident = form_builder_form.ident'
+            })
+
+    def __unicode__(self):
+        return self.name
 
     @property
     def action_url(self):
@@ -113,9 +193,14 @@ class Form(DefaultChildrenMixin, Content):
 
     def get_form(self):
         fields = SortedDict((child.get_formfield_name(), child.get_formfield())
-                            for child in self.children if isinstance(child, FormField))
+                            for child in self.depth_first_order() if isinstance(child, BaseFormField))
 
-        return type('WidgyForm', (forms.BaseForm,), {'base_fields': fields})
+        mixins = []
+        for child in self.depth_first_order():
+            if hasattr(child, 'get_form_mixins'):
+                mixins.extend(child.get_form_mixins())
+
+        return type('WidgyForm', tuple(mixins + [forms.BaseForm]), {'base_fields': fields})
 
     @property
     def context_var(self):
@@ -140,70 +225,257 @@ class Form(DefaultChildrenMixin, Content):
                 child.execute(request, form)
         return resp
 
+    def make_root(self):
+        """
+        Turns us into a root node by taking us out of the tree we're in.
+        """
+        self.node.move(Node.get_last_root_node(),
+                       'last-sibling')
 
-registry.register(Form)
+    def delete(self):
+        self.check_frozen()
+        # don't delete, just take us out of the tree
+        self.make_root()
+
+    def get_fields(self):
+        """
+        A dictionary of formfield name -> FormField widget
+        """
+        ret = {}
+        for child in self.depth_first_order():
+            if isinstance(child, FormField):
+                ret[child.get_formfield_name()] = child
+        return ret
+
+    @property
+    def submissions(self):
+        """
+        All submissions of this logical (not just this version) form.
+        """
+        return FormSubmission.objects.filter(
+            form_ident=self.ident
+        ).prefetch_related('values')
+
+    @property
+    def submission_count(self):
+        # see also objects.annotate_submission_count to prefetch this value
+        if hasattr(self, '_submission_count'):
+            return self._submission_count
+
+        return self.submissions.count()
+
+    @submission_count.setter
+    def submission_count(self, value):
+        self._submission_count = value
+
+    @models.permalink
+    def submission_url(self):
+        return ('admin:%s_%s_change' % (self._meta.app_label, self._meta.module_name),
+                (self.pk,),
+                {})
 
 
-class FormField(FormElement):
+class BaseFormField(FormElement):
     formfield_class = None
-    widget = None
-
-    label = models.CharField(max_length=255)
-
-    help_text = models.TextField(blank=True)
 
     class Meta:
         abstract = True
 
     def get_formfield_name(self):
-        return str(self.id)
-
-    def get_formfield(self):
-        kwargs = {
-            'label': self.label,
-            'help_text': self.help_text,
-            'widget': self.widget,
-        }
-
-        return self.formfield_class(**kwargs)
+        return str(self.node.pk)
 
     def render(self, context):
         form = context['form']
         field = form[self.get_formfield_name()]
         with update_context(context, {'field': field}):
-            return super(FormField, self).render(context)
+            return super(BaseFormField, self).render(context)
+
+    def get_formfield_kwargs(self):
+        return {}
+
+    def get_formfield(self):
+        return self.formfield_class(**self.get_formfield_kwargs())
+
+    def get_form_mixins(self):
+        """
+        A list of mixins to apply to the Django form
+        """
+        return []
 
 
-FORM_INPUT_TYPES = (
-    ('text', 'Text'),
-    ('number', 'Number'),
-)
+class FormField(BaseFormField):
+    widget = None
+
+    label = models.CharField(max_length=255)
+    required = models.BooleanField(default=True)
+
+    help_text = models.TextField(blank=True)
+    # associates instances of the same logical field across versions
+    ident = UUIDField()
+
+    class Meta:
+        abstract = True
+
+    def get_formfield_kwargs(self):
+        kwargs = super(FormField, self).get_formfield_kwargs()
+        kwargs.update({
+            'label': self.label,
+            'help_text': self.help_text,
+            'widget': self.widget,
+            'required': self.required,
+        })
+        return kwargs
+
+    def __unicode__(self):
+        return self.label
 
 
 class FormInputForm(forms.ModelForm):
     class Meta:
         fields = (
             'type',
+            'required',
             'label',
             'help_text',
         )
-#
-#    def clean(self):
-#        raise forms.ValidationError('asdfasd')
 
 
+@widgy.register
 class FormInput(FormField):
+    FORMFIELD_CLASSES = {
+        'text': forms.CharField,
+        'number': forms.IntegerField,
+        'email': forms.EmailField,
+    }
+
+    FORM_INPUT_TYPES = (
+        ('text', 'Text'),
+        ('number', 'Number'),
+        ('email', 'Email'),
+    )
+
     formfield_class = forms.CharField
     form = FormInputForm
 
     type = models.CharField(choices=FORM_INPUT_TYPES, max_length=255)
 
-registry.register(FormInput)
+    @property
+    def formfield_class(self):
+        return self.FORMFIELD_CLASSES[self.type]
 
 
+@widgy.register
 class Textarea(FormField):
     formfield_class = forms.CharField
     widget = forms.Textarea
 
 
-registry.register(Textarea)
+@widgy.register
+class Uncaptcha(BaseFormField):
+    editable = False
+    formfield_class = forms.CharField
+
+    def get_form_mixins(self):
+        # since validating an uncaptcha widget requires access to the
+        # csrfmiddlewaretoken and not just our field value, create a
+        # form mixin with a clean_uncaptcha method to do the validation.
+        def clean(form):
+            value = form.cleaned_data[self.get_formfield_name()]
+            if value != form.data.get('csrfmiddlewaretoken'):
+                raise forms.ValidationError('Incorrect Uncaptcha value')
+        UncaptchaMixin = type('UncaptchaMixin', (object,), {
+            'clean_%s' % self.get_formfield_name(): clean
+        })
+        return [UncaptchaMixin]
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        # only allow 1 uncaptcha per form
+        if not isinstance(parent, Form):
+            return False
+        if obj in parent.get_children():
+            return True
+        if [i for i in parent.get_children() if isinstance(i, cls)]:
+            return False
+        else:
+            return super(Uncaptcha, cls).valid_child_of(parent, obj)
+
+
+class FormSubmission(behaviors.Timestampable, models.Model):
+    """
+    Holds the data from one submission of a Form.
+    """
+
+    form_node = models.ForeignKey(Node, on_delete=models.PROTECT, related_name='form_submissions')
+    form_ident = models.CharField(max_length=Form._meta.get_field_by_name('ident')[0].max_length)
+
+    objects = QuerySetManager()
+
+    class QuerySet(QuerySet):
+        def field_names(self):
+            """
+            A dictionary of field uuid to field label. We use the label of the
+            field that was used by the most recent submission. Note that this
+            means only fields that have been submitted will show up here.
+            """
+
+            uuids = FormValue.objects.filter(
+                submission__in=self,
+            ).values('field_ident').distinct().values_list('field_ident', flat=True)
+
+            ret = {}
+            for field_uuid in uuids:
+                latest_value = FormValue.objects.filter(
+                    field_ident=field_uuid,
+                ).order_by('-submission__created_at', '-pk').select_related('field_node')[0]
+                ret[field_uuid] = latest_value.get_label()
+            return ret
+
+        def as_dictionaries(self):
+            return (i.as_dict() for i in self.all())
+
+        def submit(self, form, data):
+            submission = self.create(
+                form_node=form.node,
+                form_ident=form.ident,
+            )
+
+            for name, field in form.get_fields().iteritems():
+                submission.values.create(
+                    field_node=field.node,
+                    field_name=field.label,
+                    field_ident=field.ident,
+                    value=data[name]
+                )
+            return submission
+
+    def as_dict(self):
+        ret = {}
+        for value in self.values.all():
+            ret[value.field_ident] = value.value
+        return ret
+
+
+class FormValue(models.Model):
+    """
+    Holds a datum from a form submission, EAV style.
+    """
+
+    submission = models.ForeignKey(FormSubmission, related_name='values')
+
+    # three references to the form field! field_node is a foreign key to the
+    # field at the time of submission, field_ident is the field's uuid to
+    # associate submissions of the same logical field across versions, and
+    # field_name is our last resort, in case the field has been deleted.
+    field_node = models.ForeignKey(Node, on_delete=models.SET_NULL, null=True)
+    field_name = models.CharField(max_length=255)
+    field_ident = models.CharField(
+        max_length=FormField._meta.get_field_by_name('ident')[0].max_length)
+
+    value = models.TextField()
+
+    def get_label(self):
+        if self.field_node:
+            return self.field_node.content.label
+        else:
+            return self.field_name

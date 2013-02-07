@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% load compress %}
+{% block body %}
+{% compress css %}
+{# designers -- when you get to this, feel free to completely remove this #}
+{# css file and write your own #}
+<link href="{% static 'daisydiff/css/diff.css' %}" type="text/css" rel="stylesheet">
+{% endcompress %}
+<script>
+{# stub out daisydiff's horrible js to prevent errors. #}
+{# these are called from the generated html. #}
+function scrollToEvent(){ }
+function tipA(){ return false;}
+function tipR(){ return false;}
+function tipC(){ return false;}
+function constructToolTipC(elem){ }
+function constructToolTipA(elem){ }
+function constructToolTipR(elem){ }
+</script>
+{{ diff|safe }}
+{% endblock %}

@@ -1,0 +1,5 @@
+{% extends "widgy/preview.html" %}
+{% load markup %}
+{% block content %}
+{{ self.content|markdown|truncatewords_html:50 }}
+{% endblock %}

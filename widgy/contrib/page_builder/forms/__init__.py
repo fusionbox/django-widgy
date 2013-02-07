@@ -1,7 +1,8 @@
 from django import forms
+from django.utils.safestring import mark_safe
 
 
-PAGEDOWN_EDITOR_TEMPLATE = '''
+PAGEDOWN_EDITOR_TEMPLATE = u'''
 <div class="pagedown-buttonbar"></div>
 {textarea}
 <div class="pagedown-preview"></div>
@@ -17,7 +18,7 @@ class MarkdownWidget(forms.Textarea):
     def render(self, *args, **kwargs):
         textarea = super(MarkdownWidget, self).render(*args, **kwargs)
 
-        return PAGEDOWN_EDITOR_TEMPLATE.format(textarea=textarea)
+        return mark_safe(PAGEDOWN_EDITOR_TEMPLATE.format(textarea=textarea))
 
 
 class MarkdownField(forms.CharField):

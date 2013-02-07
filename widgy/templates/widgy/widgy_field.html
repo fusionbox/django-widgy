@@ -1,4 +1,4 @@
-{% load compress %}{% load fusionbox_tags %}
+{% load compress %}{% load fusionbox_tags %}{% load static %}
 {% compress css %}
 <link type="text/css" rel="stylesheet" href="{% static "widgy/css/font-awesome.css" %}" />
 <link type="text/x-scss" rel="stylesheet" href="{% static "widgy/css/widgy.scss" %}">
@@ -10,7 +10,9 @@
 <input type="hidden" name="{{ html_name }}" value="{{ value }}">
 {% endif %}
 <script data-main="/static/widgy/js/main" src="/static/widgy/js/require/require.js"></script>
+{% block widgy_container %}
 <div id="{{ html_id }}" class="widgy"></div>
+{% endblock %}
 <script>
   require([ 'widgy' ], function(Widgy) {
     window.widgy = new Widgy('#' + {{ html_id|json }}, {{ node_dict|json }});

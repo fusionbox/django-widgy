@@ -3,25 +3,10 @@ A collection of model and form field classes.
 """
 from django import forms
 from django.template.loader import render_to_string
-from django.utils.html import conditional_escape
-from django.utils.safestring import mark_safe
+from django.forms import widgets
+from django.contrib.contenttypes.models import ContentType
 
-try:
-    from django.utils.html import format_html
-except ImportError:
-    # Django < 1.5 doesn't have this
-
-    def format_html(format_string, *args, **kwargs):  # NOQA
-        """
-        Similar to str.format, but passes all arguments through
-        conditional_escape, and calls 'mark_safe' on the result. This function
-        should be used instead of str.format or % interpolation to build up
-        small HTML fragments.
-        """
-        args_safe = map(conditional_escape, args)
-        kwargs_safe = dict([(k, conditional_escape(v)) for (k, v) in kwargs.iteritems()])
-        return mark_safe(format_string.format(*args_safe, **kwargs_safe))
-
+from widgy.utils import format_html
 from widgy.models import Node
 
 
@@ -40,16 +25,44 @@ class WidgyWidget(forms.HiddenInput):
     for a Widgy field.
     """
     stylesheets = None
+    template_name = 'widgy/widgy_field.html'
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, context={}):
         self.node.maybe_prefetch_tree()
-        return render_to_string('widgy/widgy_field.html', {
+        defaults = {
             'html_name': name,
             'value': value,
             'stylesheets': self.stylesheets,
             'html_id': attrs['id'],
             'node_dict': self.node.to_json(self.site),
-        })
+        }
+        defaults.update(context)
+        return render_to_string(self.template_name, defaults)
+
+
+class ContentTypeRadioInput(widgets.RadioInput):
+    def __init__(self, name, value, attrs, choice, index):
+        super(ContentTypeRadioInput, self).__init__(name, value, attrs, choice, index)
+        self.choice_label = format_html('<span class="label">{0}</span>', self.choice_label)
+
+    def tag(self):
+        tag = super(ContentTypeRadioInput, self).tag()
+        ct = ContentType.objects.get_for_id(self.choice_value)
+        return format_html('<div class="previewImage {0} {1}"></div>{2}', ct.app_label, ct.model, tag)
+
+
+class ContentTypeRadioRenderer(widgets.RadioFieldRenderer):
+    def __iter__(self):
+        for i, choice in enumerate(self.choices):
+            yield ContentTypeRadioInput(self.name, self.value, self.attrs.copy(), choice, i)
+
+    def __getitem__(self, idx):
+        choice = self.choices[idx] # Let the IndexError propogate
+        return ContentTypeRadioInput(self.name, self.value, self.attrs.copy(), choice, idx)
+
+
+class ContentTypeRadioSelect(widgets.RadioSelect):
+    renderer = ContentTypeRadioRenderer
 
 
 class WidgyFormField(forms.ModelChoiceField):
@@ -82,8 +95,9 @@ class WidgyFormField(forms.ModelChoiceField):
             self.widget = DisplayWidget(display_name=choices[1][1])
             self.help_text = 'You must save before you can edit this.'
         else:
-            self.widget = forms.Select(
-                choices=choices,
+            self.widget = ContentTypeRadioSelect(
+                # remove the empty choice
+                choices=[c for c in choices if c[0]]
             )
 
         self.widget.site = self.site
@@ -94,12 +108,33 @@ class WidgyFormField(forms.ModelChoiceField):
         try:
             value = super(WidgyFormField, self).clean(value)
         except:
-            if self.node:
+            if getattr(self, 'node', None):
                 value = self.node
             else:
                 raise
 
         return value
+
+
+class VersionedWidgyWidget(WidgyWidget):
+    template_name = 'widgy/versioned_widgy_field.html'
+
+    def render(self, name, value, attrs=None):
+        context = {
+            'commit_url': self.site.reverse(self.site.commit_view, kwargs={'pk': value}),
+        }
+        return super(VersionedWidgyWidget, self).render(name, value, attrs, context)
+
+
+class VersionedWidgyFormField(WidgyFormField):
+    widget = VersionedWidgyWidget
+
+    def conform_to_value(self, value):
+        self.version_tracker = value
+        return super(VersionedWidgyFormField, self).conform_to_value(value and value.working_copy)
+
+    def clean(self, value):
+        return self.version_tracker or super(VersionedWidgyFormField, self).clean(value)
 
 
 class WidgyFormMixin(object):
@@ -112,5 +147,8 @@ class WidgyFormMixin(object):
 
         for name, field in self.fields.iteritems():
             if isinstance(field, WidgyFormField):
-                value = getattr(self.instance, name)
+                if hasattr(self, 'instance'):
+                    value = getattr(self.instance, name)
+                else:
+                    value = None
                 field.conform_to_value(value)

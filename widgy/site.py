@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
+from django.contrib.staticfiles import finders
+from django.utils.functional import cached_property
 
 from widgy import registry
 from widgy.views import (
@@ -10,6 +12,10 @@ from widgy.views import (
     NodeEditView,
     NodeTemplatesView,
     NodeParentsView,
+    CommitView,
+    HistoryView,
+    RevertView,
+    DiffView,
 )
 from widgy.exceptions import (
     MutualRejection,
@@ -26,6 +32,10 @@ class WidgySite(object):
         self.node_edit_view = self.get_node_edit_view()
         self.node_templates_view = self.get_node_templates_view()
         self.node_parents_view = self.get_node_parents_view()
+        self.commit_view = self.get_commit_view()
+        self.history_view = self.get_history_view()
+        self.revert_view = self.get_revert_view()
+        self.diff_view = self.get_diff_view()
 
     def get_registry(self):
         return registry
@@ -42,6 +52,12 @@ class WidgySite(object):
             url('^node/(?P<node_pk>[^/]+)/templates/$', self.node_templates_view),
             url('^node/(?P<node_pk>[^/]+)/possible-parents/$', self.node_parents_view),
             url('^contents/(?P<app_label>[A-z_][\w_]*)/(?P<object_name>[A-z_][\w_]*)/(?P<object_pk>[^/]+)/$', self.content_view),
+
+            # versioning
+            url('^revert/(?P<pk>[^/]+)/(?P<commit_pk>[^/]+)/$', self.revert_view),
+            url('^commit/(?P<pk>[^/]+)/$', self.commit_view),
+            url('^history/(?P<pk>[^/]+)/$', self.history_view),
+            url('^diff/(?P<before_pk>[^/]+)/(?P<after_pk>[^/]+)/$', self.diff_view),
         )
         return urlpatterns
 
@@ -84,6 +100,18 @@ class WidgySite(object):
     def get_node_parents_view(self):
         return NodeParentsView.as_view(site=self)
 
+    def get_commit_view(self):
+        return CommitView.as_view(site=self)
+
+    def get_history_view(self):
+        return HistoryView.as_view(site=self)
+
+    def get_revert_view(self):
+        return RevertView.as_view(site=self)
+
+    def get_diff_view(self):
+        return DiffView.as_view(site=self)
+
     def valid_parent_of(self, parent, child_class, child=None):
         return parent.valid_parent_of(child_class, child)
 
@@ -106,3 +134,24 @@ class WidgySite(object):
             raise ParentWasRejected
         elif bad_child:
             raise ChildWasRejected
+
+    def get_version_tracker_model(self):
+        from widgy.models import VersionTracker
+        return VersionTracker
+
+    def filter_existing_staticfiles(self, filename):
+        path = finders.find(filename)
+        return bool(path)
+
+    def find_media_files(self, extension):
+        files = set()
+        for widget in self.get_all_content_classes():
+            files.update(widget.get_templates_hierarchy(
+                heirarchy=['widgy/{app_label}/{module_name}{extension}'],
+                extension=extension,
+            ))
+        return filter(self.filter_existing_staticfiles, files)
+
+    @cached_property
+    def scss_files(self):
+        return self.find_media_files('.scss')

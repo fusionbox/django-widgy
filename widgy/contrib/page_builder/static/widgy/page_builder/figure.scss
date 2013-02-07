@@ -1,0 +1,21 @@
+figure {
+  border: 1px solid black;
+  display: inline-block;
+
+  &.left {
+    float: left;
+  }
+  &.right {
+    float: right;
+  }
+  &.center {
+    margin: 0 auto;
+    float: none;
+  }
+  figcaption {
+    text-align: center;
+    .title {
+      display: block;
+    }
+  }
+}

@@ -1,0 +1,32 @@
+%horizontalChildren {
+  & > .content .drag-row {
+    span.title {
+      display: none;
+    }
+  }
+
+  & > .nodeChildren {
+    display: table;
+    width: 100%;
+
+    & > li {
+      display: table-cell;
+      width: auto;
+
+      & > .content .drag-row {
+        span.title,
+        .delete span {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+.tableheader {
+  @extend %horizontalChildren;
+}
+
+.tablerow {
+  @extend %horizontalChildren;
+}

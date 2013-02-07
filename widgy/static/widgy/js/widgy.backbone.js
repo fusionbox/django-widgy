@@ -210,10 +210,24 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
   });
 
 
+  var Spinner = Backbone.View.extend({
+    initialize: function() {
+      Backbone.View.prototype.initialize.apply(this, arguments);
+
+      this.$el.addClass('loading').attr('disabled', true);
+    },
+
+    restore: function() {
+      this.$el.removeClass('loading').attr('disabled', false);
+    }
+  });
+
+
   return _.extend({}, Backbone, {
     Model: Model,
     View: View,
     ViewList: ViewList,
-    renderTemplate: renderTemplate
+    renderTemplate: renderTemplate,
+    Spinner: Spinner
   });
 });

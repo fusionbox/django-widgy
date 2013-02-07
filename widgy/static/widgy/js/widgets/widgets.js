@@ -12,7 +12,8 @@ define([
     templates) {
 
   // TODO: is Widget a good name?  We are trying to unify our vocabulary.
-  
+
+
   /**
    * An EditorView provides a quick form editing interface for widgets.  It
    * assumes you have one form inside the editor.  When that form is submitted,
@@ -38,12 +39,48 @@ define([
       );
     },
 
+    render: function() {
+      // asychronous (possibly) template rendering.
+      templates.render(
+          this.model.get('template_url'),
+          'edit_template',
+          this.toJSON(),
+          this.renderHTML
+          );
+
+      return this;
+    },
+
+    renderHTML: function(html) {
+      this.$el.html(html);
+      this.trigger('render');
+    },
+
+    submit: function() {
+      this.spinner = new Backbone.Spinner({el: this.$el.find('[type=submit]')});
+
+      var values = this.serialize();
+
+      this.model.save({'attributes': values}, {
+        success: this.handleSuccess,
+        error: this.handleError
+      });
+    },
+
+    handleSuccess: function(model, response, options) {
+      // kill the template cache.
+      templates.remove(model.get('template_url'));
+      this.close();
+    },
+
     handleError: function(model, xhr, options){
       var response,
           error_func = this['handleError' + parseInt(xhr.status, 3)];
       if (!! error_func ) {
         error_func(model, xhr, options);
       }
+
+      this.spinner.restore();
       response = $.parseJSON(xhr.responseText);
       $('ul.errorlist').remove();
       _.each(response, function(messages, field_name){
@@ -61,37 +98,6 @@ define([
           error_list.append(message_li);
         });
       }, this);
-    },
-
-    render: function(event) {
-      // asychronous (possibly) template rendering.
-      templates.render(
-          this.model.get('template_url'),
-          'edit_template',
-          this.toJSON(),
-          this.renderHTML
-          );
-
-      return this;
-    },
-
-    renderHTML: function(html) {
-      this.$el.html(html);
-    },
-
-    submit: function() {
-      var values = this.serialize();
-
-      this.model.save(values, {
-        success: this.handleSuccess,
-        error: this.handleError
-      });
-    },
-
-    handleSuccess: function(model, response, options) {
-      // kill the template cache.
-      templates.remove(model.get('template_url'));
-      this.close();
     }
   });
 
@@ -116,7 +122,6 @@ define([
 
     initialize: function() {
       contents.ContentView.prototype.initialize.apply(this, arguments);
-
     },
 
     getEditorClass: function() {
@@ -127,10 +132,20 @@ define([
       event.preventDefault();
 
       var editor_class = this.getEditorClass(),
-          edit_view = new editor_class({model: this.model});
+          edit_view = new editor_class({
+            app: this.app,
+            model: this.model
+          });
 
-      edit_view.on('close', this.render);
-      this.$el.html(edit_view.render().el);
+      new Backbone.Spinner({el: this.$el.find('.edit')});
+
+      this.listenTo(edit_view, 'close', this.render)
+          .listenTo(edit_view, 'render', function() {
+            this.$el.html(edit_view.el);
+            edit_view.$el.find(':input:first').focus();
+          });
+
+      edit_view.render();
     }
   });
 

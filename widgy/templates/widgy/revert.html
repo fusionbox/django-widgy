@@ -1,0 +1,18 @@
+{% load url from future %}
+<script src="{% static 'js/jquery.form.js' %}'"></script>
+
+<div class="commit">
+  {# TODO: this is dependent on widgy_mezzanine #}
+  <a href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=object.root_node.pk %}">Preview</a>
+  <form method="post" class="commit_form" action="{{ revert_url }}">
+    {% csrf_token %}
+    {% for field in form %}
+      {% include "widgy/field_as_div.html" %}
+    {% endfor %}
+    <input type="submit" value="Commit">
+  </form>
+  <script>
+    $('.commit_form').ajaxForm({target: 'div.commit'});
+  </script>
+</div>
+</body>

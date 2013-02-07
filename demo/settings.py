@@ -283,6 +283,8 @@ INSTALLED_APPS = (
     'django_extensions',
 
     # widgy apps
+    'filer',
+    'easy_thumbnails',
     'urlconf_include',
 
     # local project
@@ -291,6 +293,20 @@ INSTALLED_APPS = (
 
 FORMS_LABEL_MAX_LENGTH = 255
 FORMS_FIELD_MAX_LENGTH = 255
+
+# Filer Settings
+THUMBNAIL_PROCESSORS = (
+    'easy_thumbnails.processors.colorspace',
+    'easy_thumbnails.processors.autocrop',
+    #'easy_thumbnails.processors.scale_and_crop',
+    'filer.thumbnail_processors.scale_and_crop_with_subject_location',
+    'easy_thumbnails.processors.filters',
+)
+FILER_FILE_MODELS = (
+    #'widgy.contrib.page_builder.models.WidgyImageFile',
+    'filer.models.imagemodels.Image',
+    'filer.models.filemodels.File',
+)
 
 # List of processors used by RequestContext to populate the context.
 # Each one should be a callable that takes the request object as its
@@ -326,6 +342,9 @@ MIDDLEWARE_CLASSES = (
     "urlconf_include.middleware.PatchUrlconfMiddleware",
     "mezzanine.pages.middleware.PageMiddleware",
     "mezzanine.core.middleware.FetchFromCacheMiddleware",
+    "django.middleware.transaction.TransactionMiddleware",
+    # prevent problems comes after transaction
+    "widgy.middleware.PreventProblemsMiddleware",
 )
 
 # Store these package names here as they may change in the future since
@@ -365,6 +384,8 @@ FORCE_SCRIPT_NAME = ''
 REPLACEMENTS_APP_BLACKLIST = ('admin',)
 
 WIDGY_MEZZANINE_SITE = 'demo.widgy.widgy_site'
+
+DAISYDIFF_JAR_PATH = os.path.join(PROJECT_ROOT, '..', 'bin', 'daisydiff', 'daisydiff.jar')
 
 ###################
 # DEPLOY SETTINGS #

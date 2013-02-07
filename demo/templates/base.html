@@ -8,6 +8,7 @@
   <meta name="keywords" content="{% block seo_keywords %}{% endblock %}" />
   <title>{% block title %}Project name{% endblock %}</title>
   {% compress css %}
+    {% block css %}
     <link rel="stylesheet" href="{% static '/css/bootstrap.css' %}" />
     <link rel="stylesheet" href="{% static '/css/bootstrap-responsive.css' %}" />
      <style>
@@ -15,6 +16,7 @@
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
     </style>
+    {% endblock %}
   {% endcompress %}
   {% compress js %}
     <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
@@ -22,6 +24,7 @@
   {% endcompress %}
 </head>
 <body>
+  {% block body %}
   {% page_menu 'pages/menus/top_nav.html' %}
   <style>
     .left_nav {
@@ -41,5 +44,6 @@
     {% block content %}
     {% endblock %}
   </div>
+  {% endblock %}
 </body>
 </html>

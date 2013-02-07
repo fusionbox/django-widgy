@@ -27,10 +27,12 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
   var Node = Backbone.Model.extend({
     urlRoot: '/admin/widgy/node/',
 
-    constructor: function(attrs, options) {
-      this.children = new NodeCollection();
+    constructor: function() {
+      this.children = new NodeCollection(null, {
+        parent: this
+      });
 
-      Backbone.Model.call(this, attrs, options);
+      Backbone.Model.apply(this, arguments);
     },
 
     initialize: function() {
@@ -43,11 +45,15 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     parse: function(response) {
-      return response.node;
+      if ( response.node ) {
+        return response.node;
+      } else {
+        return response;
+      }
     },
 
     set: function(key, val, options) {
-      var attr, attrs;
+      var attrs;
 
       // Handle both `"key", value` and `{key: value}` -style arguments.
       if (_.isObject(key)) {
@@ -66,7 +72,12 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       var ret = Backbone.Model.prototype.set.call(this, attrs, options);
 
       if (ret) {
-        if (children) this.children.update(children);
+        if (children) {
+          this.children.update2(children, options);
+          if ( options && options.resort ) {
+            this.children.sortByRight();
+          }
+        }
         if (content) this.loadContent(content);
       }
 
@@ -81,13 +92,18 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     loadContent: function(content) {
-      debug.call(this, 'loadContent', content);
+      if ( this.content ) {
+        console.log(this.__class__, 'updating content', content);
 
-      if ( content ) {
+        this.content.set(content);
+      } else if ( content ) {
+        console.log(this.__class__, 'go load my content model');
+
         // we store these variables because we need them now.
         this.pop_out = content.pop_out;
         this.shelf = content.shelf;
         this.__class__ = content.__class__;
+        this.css_classes = content.css_classes;
 
         // This is asynchronous because of requirejs.
         contents.getModel(content.component, _.bind(this.instantiateContent, this, content));
@@ -95,7 +111,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     instantiateContent: function(content, model_class) {
-      debug.call(this, 'instantiateContent', content, model_class);
+      console.log(this.__class__, 'instantiating content');
 
       this.content = new model_class(content, {
         node: this
@@ -106,26 +122,26 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
     sync: function(method, model, options) {
       debug.call(this, 'Node#sync', arguments);
-
       // Provides an optimization for refreshing the shelf compatibility.
       // Previously, when editing a node, you had to do two requests (one for
       // the node, one for the shelf compatibility) to update the UI.  In
       // addition, the shelf request had to happen after the node one, to
       // prevent getting the compatibility wrong.  This refreshes compatibility
       // in one request instead of waiting for two round trips.
+      var old_success = options.success;
+
+      options.success = function(resp, status, xhr) {
+        if ( old_success ) old_success(resp, status, xhr);
+
+        if ( options.app && resp.compatibility ) {
+          options.app.setCompatibility(resp.compatibility);
+        }
+      };
+
       if ( options.app )
       {
         var model_url = _.result(model, 'url'),
-            root_url = _.result(options.app.root_node_view.model, 'url'),
-            old_success = options.success;
-
-        options.success = function(resp, status, xhr) {
-          if ( old_success ) old_success(resp, status, xhr);
-
-          if ( resp.compatibility ) {
-            options.app.setCompatibility(resp.compatibility);
-          }
-        };
+            root_url = _.result(options.app.root_node_view.model, 'url');
 
         options.url =  model_url + '?include_compatibility_for=' + root_url;
       }
@@ -140,7 +156,58 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
    * interface to NodeViews for how to handle child NodeViews.
    */
   var NodeCollection = Backbone.Collection.extend({
-    model: Node
+    model: Node,
+
+    initialize: function(models, options) {
+      Backbone.Collection.prototype.initialize.apply(this, arguments);
+      this.parent = options.parent;
+    },
+
+    /**
+     * For each model in the new data, if
+     *    - the model exists, update the data of that model.
+     *    - the model is new, create a new instance and add it to the
+     *      collection.
+     *    - else, remove the old model from the collection.
+     */
+    update2: function(data, options) {
+      var models = [];
+
+      _.each(data, function(child) {
+        var existing = this.get(child.url);
+
+        if ( existing ) {
+          existing.set(child, options);
+          models.push(existing);
+        } else {
+          models.push(child);
+        }
+      }, this);
+
+      this.update(models, options);
+    },
+
+    /**
+     * Sort based on the right_ids.  This will most likely fail if the
+     * right_ids are not up to date, so please only call this after updating
+     * the whole collection.
+     */
+    sortByRight: function(options) {
+      var new_order = [],
+          right_id = null;
+
+      while (new_order.length < this.models.length) {
+        var has_right = this.where({right_id: right_id})[0];
+        new_order.unshift(has_right);
+
+        right_id = has_right.id;
+      }
+
+      this.models = new_order;
+
+      if (!options || !options.silent) this.trigger('sort', this, options);
+      return this;
+    }
   });
 
 
@@ -186,6 +253,13 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       model.trigger('reposition', model, model.get('parent_id'), model.get('right_id'));
     },
 
+    render: function() {
+      Backbone.View.prototype.render.apply(this, arguments);
+      _.each(this.model.css_classes, this.$el.addClass, this.$el);
+
+      return this;
+    },
+
     /**
      * `startBeingDragged`, `stopBeingDragged`, `followMouse`, and `reposition` all deal with a
      * NodeView itself being dragged around.
@@ -225,7 +299,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.$el.css({
         top: '',
         left: '',
-        width: ''
+        width: '',
+        'z-index': ''
       });
 
       this.$el.removeClass('being_dragged');
@@ -250,20 +325,32 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
      * to clean up our bindings.
      */
     reposition: function(model, parent_id, right_id) {
-      var parent_view = this.app.node_view_list.findById(parent_id);
+      var new_parent = this.app.node_view_list.findById(parent_id).model,
+          new_collection = new_parent.children,
+          right, index;
 
-      // This line is a little confusing.  For a model, the
-      // `collection` property is its parent collection, for a view,
-      // the `collection` is a child.  If a model has the same
-      // `collection` as a view, that means the view is the parent
-      // of the model.
-      if ( model.collection !== parent_view.collection ) {
+      var getIndex = function() {
+        if ( right_id ) {
+          right = new_collection.get(right_id);
+          index = new_collection.indexOf(right);
+        } else {
+          index = new_collection.length;
+        }
+        return index;
+      };
+
+      if ( model.collection !== new_collection ) {
         model.collection.remove(model);
         this.model.off('reposition', this.reposition);
-        parent_view.collection.add(model);
+        new_collection.add(model, {at: getIndex()});
       } else {
-        parent_view.position(this);
+        // remove the model from its old position and insert at new index.
+        new_collection.models.splice(new_collection.indexOf(model), 1);
+        new_collection.models.splice(getIndex(), 0, model);
       }
+
+      new_collection.trigger('sort');
+      new_collection.trigger('position_child');
     },
 
     /**
@@ -304,7 +391,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       _.bindAll(this,
         'renderChildren',
         'addChild',
-        'position',
         'createDropTarget',
         'startDrag',
         'stopDrag',
@@ -312,7 +398,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         'dropChildView',
         'receiveChildView',
         'renderContent',
-        'nodeSync',
+        'resortChildren',
         'popOut',
         'popIn'
         );
@@ -323,13 +409,17 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this
         .listenTo(this.model, 'load:content', this.renderContent)
         .listenTo(this.collection, 'add', this.addChild)
-        .listenTo(this.collection, 'reset', this.renderChildren);
+        .listenTo(this.collection, 'reset', this.renderChildren)
+        .listenTo(this.collection, 'sort', this.resortChildren);
 
       this.list = new Backbone.ViewList();
     },
 
     onClose: function() {
       NodeViewBase.prototype.onClose.apply(this, arguments);
+
+      this.content_view.close();
+      delete this.content_view;
 
       this.list.closeAll();
     },
@@ -345,9 +435,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
       this.list.closeAll();
       this.collection.each(this.addChild);
+      this.resortChildren();
     },
 
-    addChild: function(node) {
+    addChild: function(node, collection, options) {
       if ( this.dontShowChildren() )
         return;
 
@@ -362,14 +453,38 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         .listenTo(node_view, 'stopDrag', this.stopDrag);
 
       this.app.node_view_list.push(node_view);
-      this.list.push(node_view);
-      this.position(node_view.render());
+      if ( options && options.index ) {
+        this.list.list.splice(options.index, 0, node_view);
+      } else {
+        this.list.push(node_view);
+      }
+      this.$children.append(node_view.render().el);
+    },
+
+    resortChildren: function() {
+      console.log(this.model.__class__, 'resorting children');
+      var new_list = [];
+      this.collection.each(function(model) {
+        var node_view = this.list.findByModel(model);
+        this.$children.append(node_view.el);
+        new_list.push(node_view);
+      }, this);
+      this.list.list = new_list;
     },
 
     'delete': function(event) {
+      var spinner = new Backbone.Spinner({el: this.$content.find('.delete')}),
+          model = this.model;
+
+      var error = function() {
+        spinner.restore();
+        modal.raiseError.apply(this, arguments);
+      };
+
+      this.model.collection.trigger('destroy_child');
       this.model.destroy({
         wait: true,
-        error: modal.raiseError,
+        error: error,
         app: this.app
       });
       return false;
@@ -424,19 +539,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       return dragged_view;
     },
 
-    /**
-     * `nodeSync` allows us to refresh the shelf every time a node is moved or
-     * deleted.  It doesn't refresh the shelf every time a new node is created,
-     * but that is already handled by the shelf.  That would work only if the
-     * events from preview nodes bubbled up through the shelf and hit the
-     * NodeViews that are already in the tree.  If this node doesn't have a
-     * shelf, it will just bubble the event.
-     */
-    nodeSync: function(node) {
-      debug.call(this, 'nodeSync', node);
-      this.app.refreshCompatibility();
-    },
-
     stopDrag: function(callback) {
       debug.call(this, 'stopDrag', callback);
 
@@ -474,23 +576,11 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     checkDidReposition: function(model, resp, options) {
-      var new_parent_id = model.get('parent_id'),
-          old_parent_id = null,
-          new_right_id = model.get('right_id'),
-          old_right_id = null,
-          right_view = this.app.node_view_list.findByEl(this.$el.next()[0]),
-          parent_view = this.app.node_view_list.findByEl(this.$el.parents('.node')[0]);
+      var current_parent_id = model.collection.parent.id,
+          current_right = model.collection.at(model.collection.indexOf(model)),
+          current_right_id = current_right && current_right.id;
 
-
-      if ( parent_view ) {
-        old_parent_id = parent_view.model.id;
-      }
-
-      if ( right_view ) {
-        old_right_id = right_view.model.id;
-      }
-
-      if ( old_right_id !== new_right_id || old_parent_id !== new_parent_id ) {
+      if ( current_right_id !== model.get('right_id') || current_parent_id !== model.get('parent_id') ) {
         this.triggerReposition(model);
       }
     },
@@ -517,10 +607,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       if (this.canAcceptChild(view))
       {
         $children.prepend(this.createDropTarget().el);
-        $children.children('.node').each(function(index, elem) {
-          var drop_target = that.createDropTarget().$el.insertAfter(elem);
+        this.list.each(function(node_view) {
+          var drop_target = that.createDropTarget().$el.insertAfter(node_view.el);
 
-          if ( mine && view.el == elem )
+          if ( mine && view == node_view )
             drop_target.hide();
         });
       }
@@ -542,19 +632,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       });
     },
 
-    position: function(child_node_view) {
-      var child_node = child_node_view.model;
-
-      if ( child_node.get('right_id') ) {
-        var right_id = child_node.get('right_id'),
-          right_view = this.list.findById(right_id);
-          right_view.$el.before(child_node_view.el);
-      } else {
-        this.$children.append(child_node_view.el);
-      }
-    },
-
-
     dropChildView: function(drop_target) {
       var index = drop_target.$el.index() / 2,
           dragCallback = _.bind(this.receiveChildView, this, index);
@@ -572,28 +649,19 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     receiveChildView: function(index, dragged_view) {
       debug('receiveChildView');
 
-      var $children = this.$children,
-          attributes = {
-            parent_id: this.model.id,
-            right_id: null
-          };
+      // It's already mine and it was dragged into its own drop target.
+      if ( index === this.collection.indexOf(dragged_view) )
+        return;
 
-      // If index is the length of $children.children there is no right element
-      // and we want it set to null.  Otherwise there is a right and we need
-      // its id.
-      //
-      // ($children.children() refers to DOM elements.)
-      if ( index !== $children.children().length ) {
-        var right_el = $children.children().eq(index)[0],
-            right_view = this.list.findByEl(right_el);
+      // This will return the model that we want at our right or undefined.
+      var right = this.collection.at(index);
 
-        // Dragged into its own drop target.
-        if ( dragged_view === right_view )
-          return;
+      var attributes = {
+        parent_id: this.model.id,
+        right_id: right ? right.id : null
+      };
 
-        attributes.right_id = right_view.model.id;
-      }
-
+      this.collection.trigger('receive_child');
       dragged_view.model.save(attributes, {
         success: dragged_view.checkDidReposition,
         error: modal.raiseError,
@@ -607,7 +675,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
 
     render: function() {
       debug.call(this, 'render');
-      Backbone.View.prototype.render.apply(this, arguments);
+      NodeViewBase.prototype.render.apply(this, arguments);
 
       this.$children = this.$el.children('.node_children');
       this.$content = this.$el.children('.content');
@@ -626,24 +694,30 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
     },
 
     renderContent: function(content) {
-      debug.call(this, 'renderContent', content);
+      if ( this.content_view )
+        return;
+
+      console.log(this.model.__class__, 'renderContent');
 
       var view_class = content.getViewClass();
 
-      content_view = new view_class({
+      this.content_view = new view_class({
         model: content,
-        el: this.$content
+        el: this.$content,
+        app: this.app
       });
 
-      content_view.render();
+      this.content_view.render();
 
+      // when we are popped out, we need to remove our own pop out button.
       if ( this.options.rootNode ) {
         this.$content.find('.pop_out').remove();
       }
     },
 
     renderShelf: function() {
-      if (this.shelf) return false;
+      if (this.shelf)
+        return false;
 
       var shelf = this.shelf = new shelves.ShelfView({
         collection: new shelves.ShelfCollection({
@@ -655,7 +729,46 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       this.listenTo(shelf, 'startDrag', this.startDrag)
           .listenTo(shelf, 'stopDrag', this.stopDrag);
 
-      this.$children.before(shelf.render().el);
+      // position sticky
+      if ( this.options.rootNode ) {
+        // The shelf needs to be after the children because in state 0 (fixed),
+        // the shelf items will be displayed underneath everything else that is
+        // after it in HTML.
+        this.$children.after(shelf.render().el);
+
+        var state = -1;
+        $(window).scroll(_.bind(function() {
+          var upper_bound = this.el.offsetTop,
+              lower_bound = upper_bound + this.el.offsetHeight - this.shelf.el.offsetHeight;
+          if ( window.scrollY < upper_bound && state !== -1) {
+            this.shelf.$el.css({
+              position: '',
+              top: '',
+              left: ''
+            });
+            state = -1;
+          }
+          if ( window.scrollY > upper_bound && state !== 0) {
+            this.shelf.$el.css({
+              position: 'fixed',
+              // this 80px is to adjust for Mezzanine's fixed header.
+              top: 80,
+              left: this.shelf.$el.offset().left
+            });
+            state = 0;
+          }
+          if ( window.scrollY > lower_bound && state !== 1) {
+            this.shelf.$el.css({
+              position: 'absolute',
+              top: lower_bound - upper_bound,
+              left: ''
+            });
+            state = 1;
+          }
+        }, this));
+      } else {
+        this.$children.before(shelf.render().el);
+      }
     },
 
     toJSON: function() {
@@ -693,7 +806,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
         this.subwindow.close();
       }
 
-      this.model.fetch();
+      this.model.fetch({
+        app: this.app,
+        resort: true
+      });
 
       return false;
     }
@@ -725,13 +841,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       if ( event.which !== 1 )
         return;
 
-      var placeholder = this.placeholder = $('<li class="placeholder">')
-        .css({
-          width: this.$el.width(),
-          height: this.$el.height(),
-          margin: this.$el.css('margin'),
-          padding: this.$el.css('padding')
-        });
+      var placeholder = this.placeholder = $('<li class="drag_placeholder">&nbsp;</li>').css({
+        width: this.$el.width(),
+        padding: this.$el.css('padding')
+      });
 
       this.$el.after(placeholder);
     }
