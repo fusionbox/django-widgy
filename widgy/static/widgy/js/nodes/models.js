@@ -111,6 +111,7 @@ define([ 'underscore', 'widgy.backbone',
     },
 
     sync: function(method, model, options) {
+      debug.call(this, 'Node#sync', arguments);
       // Provides an optimization for refreshing the shelf compatibility.
       // Previously, when editing a node, you had to do two requests (one for
       // the node, one for the shelf compatibility) to update the UI.  In

@@ -1,14 +1,14 @@
 {% load widgy_tags %}
-<figure class="page_builder figure {{ content.position }}">
-  {% for child in content.get_children %}
+<figure class="page_builder figure {{ self.position }}">
+  {% for child in self.get_children %}
     {% render child %}
   {% endfor %}
-  {% if content.title or content.caption %}
+  {% if self.title or self.caption %}
   <figcaption>
-    {% if content.title %}
-    <strong class="title">{{ content.title }}</strong>
+    {% if self.title %}
+    <strong class="title">{{ self.title }}</strong>
     {% endif %}
-    {{ content.caption }}
+    {{ self.caption }}
   </figcaption>
   {% endif %}
 </figure>

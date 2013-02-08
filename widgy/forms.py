@@ -1,6 +1,3 @@
-"""
-A collection of model and form field classes.
-"""
 from django import forms
 from django.template.loader import render_to_string
 from django.forms import widgets
@@ -35,6 +32,7 @@ class WidgyWidget(forms.HiddenInput):
             'stylesheets': self.stylesheets,
             'html_id': attrs['id'],
             'node_dict': self.node.to_json(self.site),
+            'node': self.node,
         }
         defaults.update(context)
         return render_to_string(self.template_name, defaults)
@@ -117,12 +115,14 @@ class WidgyFormField(forms.ModelChoiceField):
 
 
 class VersionedWidgyWidget(WidgyWidget):
-    template_name = 'widgy/versioned_widgy_field.html'
+    template_name = ['widgy/versioned_widgy_field.html',
+                     'widgy/versioned_widgy_field_base.html']
 
     def render(self, name, value, attrs=None):
         context = {
             'commit_url': self.site.reverse(self.site.commit_view, kwargs={'pk': value}),
         }
+
         return super(VersionedWidgyWidget, self).render(name, value, attrs, context)
 
 

@@ -8,12 +8,25 @@
 }
 
 
+/*| Basic Layout
+-----------------------------------------*/
+body {
+  font-size: 62.5%;
+}
+
+body, html {
+  line-height: normal;
+}
+
+
 /* Widgy
 -------------------*/
 
 .widgy {
   -webkit-user-select: none;
   -moz-user-select: -moz-none;
+  
+    @include clearfix;
 
   // All Shelves
   .shelf {
@@ -109,13 +122,17 @@
   }
 
   .node_drop_target {
-    background: wheat;
-    height: 25px;
-    padding: 10px;
+    border: 2px dashed red;
+    background: #fff;
+    font-size: 1.4em;
+    font-style: italic;
+    height: auto;
+    margin-bottom: 1em;
+    padding: 1em;
 
     &.active {
-      border: 1px dashed #000;
-      height: 50px;
+      border: 2px dashed #000;
+      background: red;
     }
   }
 
@@ -132,7 +149,7 @@
     width: 966px;
     float: left;
 
-    & > .content {
+    & > .widget > .content {
       span.title {
         font-size: 2.4em;
         padding: 5px 0;
@@ -140,7 +157,7 @@
     }
 
     // Root Shelf
-    & > .shelf {
+    & > .widget > .shelf {
       position: absolute;
       top: 0;
       right: -210px;
@@ -156,7 +173,7 @@
       background: #fff;
       border: 1px solid #fff;
 
-      & > .content {
+      & > .widget > .content {
         span.title {
           font-size: 1.4em;
           padding: 5px 0;
@@ -187,7 +204,7 @@
       padding: 0;
       border: 0 none;
 
-      & > .nodeChildren:empty {
+      & > .widget > .nodeChildren:empty {
         display: none;
       }
     }
@@ -203,73 +220,6 @@
     }
   }
 
-  /* Inputs
-  -------------------*/
-  input, textarea, button {
-    &:focus {
-      @include inset-shadow(blueviolet, 1px, 1px, 2px);
-    }
-  }
-  input, textarea {
-    @include inset-shadow($black10,0px,1px,2px);
-    border: 0px;
-    font-weight: normal !important;
-    padding: 6px 4px 5px;
-  }
-
-  textarea {
-    height: 120px;
-  }
-
-  button {
-    background: $blue;
-    height: auto;
-
-    &:hover {
-      background-color: lighten($blue,10%);
-    }
-
-    &.cancel {
-      background: $darkgrey;
-      opacity: 0.7;
-
-      &:hover {
-        background-color: lighten($darkgrey,10%);
-        opacity: 1;
-      }
-    }
-
-    &.edit {
-      padding: 2px;
-    }
-
-    &.delete {
-      background-color: $red;
-      color: white;
-      height: auto;
-      padding: 2px;
-      &:hover {
-        background-color: lighten($red,10%);
-      }
-    }
-
-    &.loading {
-      @extend %loading;
-    }
-  }
-
-  input[type='submit'] {
-    background: $green;
-    height: auto;
-
-    &:hover {
-      background-color: lighten($green,5%);
-    }
-
-    &.loading {
-      @extend %loading;
-    }
-  }
 }
 
 // global overlay
@@ -314,10 +264,314 @@ input.vTimeField,
   z-index: 1000;
 }
 
-body {
-  font-size: 62.5%;
+
+.widgy {
+  margin-top: 10px;
+  
+  .node {
+    @include rounded(4px);
+    @include shadow($black10,1px,1px,0px);
+    @include inset-shadow(#ffffff,-1px,1px,0px);
+
+    background: $black10;    
+    /*border: 1px solid #fff;*/
+    list-style: none;
+    margin: 0 0 1em 0;
+    padding: 10px;
+    position: relative;
+  
+    span.title {
+      font-size: 2.4em;
+      padding: 5px 0;
+    }
+    
+    &:hover {
+      cursor: pointer;
+      
+    }
+    
+    p.drag-row {
+      /*@include gradient(#999999,#ffffff);*/
+      padding: 1em 0;
+    }
+    
+    > .widget > .content {
+      > span.title{
+        font-weight: bold;
+      }
+      
+      > div.preview  {
+        margin-bottom: 2em;
+      }
+    }
+    
+    .node {
+      background: #fff;
+      border: 1px solid #fff;
+    
+      .node {
+        background: $black10;
+        
+        
+        .shelf .node {
+          margin-left: 1em;
+        }
+        
+        .node {
+          background: #fff;
+          
+          
+          .node {
+            background: $black10;
+          }
+        }
+      }
+      
+    }
+  }
+  
+  
+  div.preview {
+    border: 1px solid #E8E8E8;
+    padding: 1em;
+  }
 }
 
-body, html {
-  line-height: normal;
+
+/* shelves */
+
+ul.list.nodeChildren {
+  li.node {
+    background-color: #FFFFF;
+    display: inline-block;
+    height: auto;
+    margin-bottom: 4px;
+    padding: 5px 10px 5px 35px;
+    width: 155px;
+    
+    span.icon-move {
+      display: inline;
+      float: right;
+      font-size: 1.4em;
+      margin-top: 8px;
+    }
+    
+    span.title {
+      display: inline;
+      float: left;
+      font-size: 1.2em;
+      line-height: 1.8em;
+    }
+
+    &.accordion {
+      background: url("../image/widget_image.gif") no-repeat 10px 13px;
+    }
+    
+    &.calloutwidget {
+      background: url("../image/widget_call_to_action.gif") no-repeat 10px 13px;
+    }
+        
+    &.figure {
+      background: url("../image/widget_image.gif") no-repeat 10px 13px;
+    }
+    
+    &.form {
+      background: url("../image/widget_form.gif") no-repeat 10px 13px;
+    }
+    
+    &.image {
+      background: url("../image/widget_image.gif") no-repeat 10px 13px;
+    }
+
+    &.markdown {
+      background: url("../image/widget_code.gif") no-repeat 10px 13px;
+    }
+        
+    &.table {
+      background: url("../image/widget_table.gif") no-repeat 10px 13px;
+    }
+    
+    &.video {
+      background: url("../image/widget_video.gif") no-repeat 10px 13px;
+    }
+  }
+}
+
+
+
+/* Mezzanine Override */ 
+
+input[type="text"], 
+input[type="password"], 
+input.vDateField, 
+input.vTimeField, 
+.change-list form table .vAutocompleteSearchField, 
+.change-list form table .vM2MAutocompleteSearchField, 
+.inline-tabular .vAutocompleteSearchField, 
+.inline-tabular .vM2MAutocompleteSearchField {
+  width: 200px;
+}
+
+
+
+
+/*| Button Styles
+-----------------------------------------*/
+.button,
+button {
+  background: $blue;
+  height: auto;
+
+  &:hover {
+    background-color: lighten($blue,10%);
+  }
+
+  &.cancel {
+    background: $darkgrey;
+    opacity: 0.7;
+
+    &:hover {
+      background-color: lighten($darkgrey,10%);
+      opacity: 1;
+    }
+  }
+
+  &.commit,
+  &.edit {
+    padding: 2px;
+  }
+
+  &.delete{
+    background-color: #353535;
+  }
+  
+  &.delete {
+    background-color: $red;
+    color: white;
+    height: auto;
+    padding: 2px;
+    &:hover {
+      background-color: lighten($red,10%);
+    }
+  }
+
+  &.loading {
+    @extend %loading;
+  }
+}
+
+
+div.submit-row p {
+  width: auto;
+}
+
+
+/*| Forms
+-----------------------------------------*/
+input, 
+textarea, 
+button {
+  &:focus {
+    @include inset-shadow(blueviolet, 1px, 1px, 2px);
+  }
+}
+
+input, 
+textarea {
+  @include inset-shadow($black10,0px,1px,2px);
+  border: 0px;
+  font-weight: normal !important;
+  padding: 6px 4px 5px;
+}
+
+textarea {
+  height: 120px;
+}
+
+input[type='submit'] {
+  background: $green;
+  height: auto;
+
+  &:hover {
+    background-color: lighten($green,5%);
+  }
+
+  &.loading {
+    @extend %loading;
+  }
+}
+
+
+
+/*| Text Classes
+-----------------------------------------*/
+h1, h2, h3, h4, p, div.list, blockquote {
+  display: inline;
+  float: left;
+  height: auto;
+  width: 100%;
+}
+
+h1, h2, h3, h4, p, blockquote, table {
+  margin: 0px 0px 12px 0px;
+}
+
+p.breadcrumb {
+  border-bottom: 1px dotted #B4A485;
+  color: #a79273;
+  font-size: 12px;
+  padding-bottom: 15px;
+  
+  a:link,
+  a:visited {
+    color: #896f4b;
+    text-decoration: none;
+  }
+  
+  a:hover,
+  a:active {
+    color: #664411;
+    text-decoration: underline;
+  }
+}
+
+h1 {
+  color: #535353;
+  font-family: "Open Sans";
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 38px;
+}
+
+h2 {
+  color: #642d11;
+  font-size: 22px;
+  line-height: 28px;
+}
+
+h3 {
+  color: #C1272D;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 20px;
+}
+
+h4 {
+  color: #c1272d;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+h5{
+  color: #5b3b01;
+  margin: 0px 0px 4px 0px;
+}
+
+
+p.title {
+  color: #353535;
+  font-family: "Open Sans";
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 28px;
 }

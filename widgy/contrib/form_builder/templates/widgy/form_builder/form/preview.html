@@ -1,0 +1,7 @@
+{% extends "widgy/preview.html" %}
+{% block content %}
+<span>{{ self.name }}</span>
+{% if self.submission_count %}
+  <a href="{{ self.submission_url }}">view submissions</a>
+{% endif %}
+{% endblock %}

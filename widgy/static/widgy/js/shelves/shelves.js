@@ -152,6 +152,10 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
       });
 
       this.$el.after(placeholder);
+    },
+
+    cssClasses: function() {
+      return this.model.get('css_classes');
     }
   });
 

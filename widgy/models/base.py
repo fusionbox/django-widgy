@@ -10,7 +10,6 @@ import copy
 
 from django.db import models
 from django.forms.models import modelform_factory, ModelForm
-from django.forms import model_to_dict
 from django.contrib.contenttypes.models import ContentType
 from django.template.loader import render_to_string
 from django.template import RequestContext
@@ -83,10 +82,6 @@ class Node(MP_Node):
         return self.content.render(*args, **kwargs)
 
     def get_children(self):
-        """
-        Wraps the MP_Tree API call to return the pre_built tree of children if
-        it is present.
-        """
         if hasattr(self, '_children'):
             return self._children
         return super(Node, self).get_children()
@@ -97,19 +92,29 @@ class Node(MP_Node):
         return super(Node, self).get_parent(*args, **kwargs)
 
     def get_next_sibling(self):
-        if hasattr(self, '_next_sibling'):
-            return self._next_sibling
+        if hasattr(self, '_parent'):
+            if self._parent:
+                siblings = list(self._parent.get_children())
+            else:
+                siblings = [self]
+            try:
+                return siblings[siblings.index(self) + 1]
+            except IndexError:
+                return None
         return super(Node, self).get_next_sibling()
 
     def get_ancestors(self):
-        if hasattr(self, '_ancestors'):
-            return self._ancestors
+        if hasattr(self, '_parent'):
+            if self._parent:
+                return list(self._parent.get_ancestors()) + [self._parent]
+            else:
+                return []
         return super(Node, self).get_ancestors()
 
     def get_root(self):
-        if hasattr(self, '_ancestors'):
-            if self._ancestors:
-                return self._ancestors[0]
+        if hasattr(self, '_parent'):
+            if self._parent:
+                return self._parent.get_root()
             else:
                 return self
         return super(Node, self).get_root()
@@ -128,8 +133,7 @@ class Node(MP_Node):
         if hasattr(self, '_children'):
             ret = [self]
             for child in self.get_children():
-                for i in child.depth_first_order():
-                    ret.append(i)
+                ret.extend(child.depth_first_order())
             return ret
         else:
             return [self] + list(self.get_descendants().order_by('path'))
@@ -174,22 +178,25 @@ class Node(MP_Node):
         return contents
 
     @classmethod
-    def prefetch_trees(cls, *root_nodes):
-        for node in root_nodes:
-            # This should get_depth() or is_root(), but both of those do another
-            # query
-            if node.depth == 1:
-                node._parent = None
-                node._next_sibling = None
-                node._ancestors = []
+    def attach_content_instances(cls, nodes):
+        """
+        Given a list of nodes, attach each one's Content. Efficiently.
+        """
+        contents = cls.fetch_content_instances(nodes)
+        for node in nodes:
+            node.content = contents[node.content_type_id][node.content_id]
+            node.content.node = node
 
+    @classmethod
+    def prefetch_trees(cls, *root_nodes):
         trees = [i.depth_first_order() for i in root_nodes]
-        contents = cls.fetch_content_instances(itertools.chain(*trees))
+        cls.attach_content_instances(list(itertools.chain(*trees)))
         for tree in trees:
-            for node in tree:
-                node.content = contents[node.content_type_id][node.content_id]
-                node.content.node = node
             root_node = tree.pop(0)
+            # This should get_depth() or is_root(), but both of those do
+            # another query
+            if root_node.depth == 1:
+                root_node._parent = None
             root_node.consume_children(tree)
             assert not tree, "all of the nodes should be consumed"
 
@@ -210,14 +217,9 @@ class Node(MP_Node):
 
         while descendants:
             child = descendants[0]
-            if child.depth == self.depth + 1 and child.path.startswith(self.path):
-                if self._children:
-                    self._children[-1]._next_sibling = child
+            if child.depth == self.depth + 1:
                 self._children.append(descendants.pop(0))
-                child._next_sibling = None
                 child._parent = self
-                if hasattr(self, '_ancestors'):
-                    child._ancestors = self._ancestors + [self]
                 child.consume_children(descendants)
             else:
                 break
@@ -336,6 +338,29 @@ class Node(MP_Node):
             if not child.trees_equal(other_child):
                 return False
         return True
+
+    @classmethod
+    def find_widgy_problems(cls, site=None):
+        """
+        Searches all the nodes for inconsistencies.
+
+            - Nodes whose content doesn't exist
+            - Nodes whose content types don't exist (UnknownWidgets)
+
+        TODO: Maybe check for Content instances that don't have any nodes
+        pointing to them.
+        """
+
+        dangling, unknown = [], []
+
+        for node in cls.objects.all():
+            content = node.content
+            if not content:
+                dangling.append(node.id)
+            elif isinstance(content, UnknownWidget):
+                unknown.append(node.id)
+
+        return dangling, unknown
 
 
 def check_frozen(sender, instance, **kwargs):
@@ -637,7 +662,7 @@ class Content(models.Model):
         A ``template`` kwarg can be passed to use an explictly defined template
         instead of the default template list.
         """
-        with update_context(context, {'content': self}):
+        with update_context(context, {'self': self}):
             return render_to_string(
                 template or self.get_render_templates(context),
                 context

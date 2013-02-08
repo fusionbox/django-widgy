@@ -17,7 +17,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
   };
 
 
-
   /**
    * The NodeView provides an interface to the node.  It will also create a
    * ContentView for the node's content.  Additionally, it will create child
@@ -337,8 +336,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
       debug.call(this, 'render');
       NodeViewBase.prototype.render.apply(this, arguments);
 
-      this.$children = this.$el.children('.node_children');
-      this.$content = this.$el.children('.content');
+      this.$children = this.$el.find(' > .widget > .node_children');
+      this.$content = this.$el.find(' > .widget > .content ');
 
       if ( this.model.content ) {
         this.renderContent(this.model.content);
@@ -390,7 +389,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
           .listenTo(shelf, 'stopDrag', this.stopDrag);
 
       // position sticky
-      if ( this.options.rootNode ) {
+      if ( false && this.options.rootNode ) {
         // The shelf needs to be after the children because in state 0 (fixed),
         // the shelf items will be displayed underneath everything else that is
         // after it in HTML.
@@ -472,8 +471,11 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
       });
 
       return false;
-    }
+    },
 
+    cssClasses: function() {
+      return this.model.css_classes;
+    }
   });
 
 

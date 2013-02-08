@@ -1,7 +1,7 @@
 {% load widgy_tags %}
 <thead>
   <tr>
-    {% for child in content.get_children %}
+    {% for child in self.get_children %}
     {% render child %}
     {% endfor %}
   </tr>
