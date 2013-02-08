@@ -735,7 +735,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
           .listenTo(shelf, 'stopDrag', this.stopDrag);
 
       // position sticky
-      if ( this.options.rootNode ) {
+      if ( false && this.options.rootNode ) {
         // The shelf needs to be after the children because in state 0 (fixed),
         // the shelf items will be displayed underneath everything else that is
         // after it in HTML.
