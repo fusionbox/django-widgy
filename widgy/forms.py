@@ -1,7 +1,5 @@
-"""
-A collection of model and form field classes.
-"""
 from django import forms
+from django.core import urlresolvers
 from django.template.loader import render_to_string
 from django.forms import widgets
 from django.contrib.contenttypes.models import ContentType
@@ -122,6 +120,7 @@ class VersionedWidgyWidget(WidgyWidget):
     def render(self, name, value, attrs=None):
         context = {
             'commit_url': self.site.reverse(self.site.commit_view, kwargs={'pk': value}),
+            'preview_url': urlresolvers.reverse('widgy.contrib.widgy_mezzanine.views.preview', kwargs={'node_pk': self.node.pk}),
         }
         return super(VersionedWidgyWidget, self).render(name, value, attrs, context)
 
