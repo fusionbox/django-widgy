@@ -682,8 +682,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       debug.call(this, 'render');
       NodeViewBase.prototype.render.apply(this, arguments);
 
-      this.$children = this.$el.children('.node_children');
-      this.$content = this.$el.children('.content');
+      this.$children = this.$el.find(' > .widget > .node_children');
+      this.$content = this.$el.find(' > .widget > .content ');
 
       if ( this.model.content ) {
         this.renderContent(this.model.content);

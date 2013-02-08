@@ -149,7 +149,7 @@ body, html {
     width: 966px;
     float: left;
 
-    & > .content {
+    & > .widget > .content {
       span.title {
         font-size: 2.4em;
         padding: 5px 0;
@@ -157,7 +157,7 @@ body, html {
     }
 
     // Root Shelf
-    & > .shelf {
+    & > .widget > .shelf {
       position: absolute;
       top: 0;
       right: -210px;
@@ -173,7 +173,7 @@ body, html {
       background: #fff;
       border: 1px solid #fff;
 
-      & > .content {
+      & > .widget > .content {
         span.title {
           font-size: 1.4em;
           padding: 5px 0;
@@ -204,7 +204,7 @@ body, html {
       padding: 0;
       border: 0 none;
 
-      & > .nodeChildren:empty {
+      & > .widget > .nodeChildren:empty {
         display: none;
       }
     }
@@ -295,7 +295,7 @@ input.vTimeField,
       padding: 1em 0;
     }
     
-    > .content {
+    > .widget > .content {
       > span.title{
         font-weight: bold;
       }
