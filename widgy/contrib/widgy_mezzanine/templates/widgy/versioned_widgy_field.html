@@ -1,0 +1,5 @@
+{% extends "widgy/versioned_widgy_field_base.html" %}{% load url from future %}
+{% block widgy_tools %}
+{{ block.super }}
+  <li><a class="preview" target="_blank" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=node.pk %}">Preview</a></li>
+{% endblock %}

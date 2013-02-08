@@ -4,8 +4,9 @@
 <link rel="stylesheet" href="{% static 'css/jquery.fancybox.css' %}">
 {% endcompress %}
 <ul class="widgy-tools">
+  {% block widgy_tools %}
   <li><a class="widgy-fancybox commit" href="{{ commit_url }}">Commit</a></li>
-  <li><a class="preview" target="_blank" href="{{ preview_url }}">Preview</a></li>
+  {% endblock %}
 </ul>
 {% compress js %}
 <script src="{% static 'js/jquery.fancybox.js' %}"></script>
