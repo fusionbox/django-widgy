@@ -1,365 +1,21 @@
-define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 'shelves/shelves', 'modal/modal',
+define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves', 'modal/modal',
     'text!./node.html',
-    'text!./preview.html',
     'text!./drop_target.html',
-    'text!./popped_out.html'
-    ], function(exports, $, _, Backbone, contents, shelves, modal,
+    'text!./popped_out.html',
+    'nodes/base',
+    'nodes/models'
+    ], function(exports, $, _, Backbone, shelves, modal,
       node_view_template,
-      node_preview_view_template,
       drop_target_view_template,
-      popped_out_template
+      popped_out_template,
+      NodeViewBase,
+      models
       ) {
 
   var debug = function(where) {
     console.log(where, this, _.rest(arguments));
   };
 
-  /**
-   * Nodes provide structure in the tree.  Nodes only hold data that deals with
-   * structure.  Any other data lives in its content.
-   *
-   * A node will have two properties: `children` and `content`.  `children` is
-   * a NodeCollection which is basically just a list of child nodes. `content`
-   * is model containing all non-structure information about a node.  The
-   * actual Model Class that defines the content property depends on the
-   * content type.  See `widgy.contents.js` for more information.
-   */
-  var Node = Backbone.Model.extend({
-    urlRoot: '/admin/widgy/node/',
-
-    constructor: function() {
-      this.children = new NodeCollection(null, {
-        parent: this
-      });
-
-      Backbone.Model.apply(this, arguments);
-    },
-
-    initialize: function() {
-      Backbone.Model.prototype.initialize.apply(this, arguments);
-
-      _.bindAll(this,
-        'instantiateContent',
-        'trigger'
-        );
-    },
-
-    parse: function(response) {
-      if ( response.node ) {
-        return response.node;
-      } else {
-        return response;
-      }
-    },
-
-    set: function(key, val, options) {
-      var attrs;
-
-      // Handle both `"key", value` and `{key: value}` -style arguments.
-      if (_.isObject(key)) {
-        attrs = key;
-        options = val;
-      } else {
-        (attrs = {})[key] = val;
-      }
-
-      var children = attrs.children,
-          content = attrs.content;
-
-      delete attrs.children;
-      delete attrs.content;
-
-      var ret = Backbone.Model.prototype.set.call(this, attrs, options);
-
-      if (ret) {
-        if (children) {
-          this.children.update2(children, options);
-          if ( options && options.resort ) {
-            this.children.sortByRight();
-          }
-        }
-        if (content) this.loadContent(content);
-      }
-
-      return ret;
-    },
-
-    url: function() {
-      if ( this.id ) {
-        return this.id;
-      }
-      return this.urlRoot;
-    },
-
-    loadContent: function(content) {
-      if ( this.content ) {
-        console.log(this.__class__, 'updating content', content);
-
-        this.content.set(content);
-      } else if ( content ) {
-        console.log(this.__class__, 'go load my content model');
-
-        // we store these variables because we need them now.
-        this.pop_out = content.pop_out;
-        this.shelf = content.shelf;
-        this.__class__ = content.__class__;
-        this.css_classes = content.css_classes;
-
-        // This is asynchronous because of requirejs.
-        contents.getModel(content.component, _.bind(this.instantiateContent, this, content));
-      }
-    },
-
-    instantiateContent: function(content, model_class) {
-      console.log(this.__class__, 'instantiating content');
-
-      this.content = new model_class(content, {
-        node: this
-      });
-
-      this.trigger('load:content', this.content);
-    },
-
-    sync: function(method, model, options) {
-      debug.call(this, 'Node#sync', arguments);
-      // Provides an optimization for refreshing the shelf compatibility.
-      // Previously, when editing a node, you had to do two requests (one for
-      // the node, one for the shelf compatibility) to update the UI.  In
-      // addition, the shelf request had to happen after the node one, to
-      // prevent getting the compatibility wrong.  This refreshes compatibility
-      // in one request instead of waiting for two round trips.
-      var old_success = options.success;
-
-      options.success = function(resp, status, xhr) {
-        if ( old_success ) old_success(resp, status, xhr);
-
-        if ( options.app && resp.compatibility ) {
-          options.app.setCompatibility(resp.compatibility);
-        }
-      };
-
-      if ( options.app )
-      {
-        var model_url = _.result(model, 'url'),
-            root_url = _.result(options.app.root_node_view.model, 'url');
-
-        options.url =  model_url + '?include_compatibility_for=' + root_url;
-      }
-
-      Backbone.sync.call(this, method, model, options);
-    }
-  });
-
-
-  /**
-   * NodeCollections provide the children interface for nodes and also an
-   * interface to NodeViews for how to handle child NodeViews.
-   */
-  var NodeCollection = Backbone.Collection.extend({
-    model: Node,
-
-    initialize: function(models, options) {
-      Backbone.Collection.prototype.initialize.apply(this, arguments);
-      this.parent = options.parent;
-    },
-
-    /**
-     * For each model in the new data, if
-     *    - the model exists, update the data of that model.
-     *    - the model is new, create a new instance and add it to the
-     *      collection.
-     *    - else, remove the old model from the collection.
-     */
-    update2: function(data, options) {
-      var models = [];
-
-      _.each(data, function(child) {
-        var existing = this.get(child.url);
-
-        if ( existing ) {
-          existing.set(child, options);
-          models.push(existing);
-        } else {
-          models.push(child);
-        }
-      }, this);
-
-      this.update(models, options);
-    },
-
-    /**
-     * Sort based on the right_ids.  This will most likely fail if the
-     * right_ids are not up to date, so please only call this after updating
-     * the whole collection.
-     */
-    sortByRight: function(options) {
-      var new_order = [],
-          right_id = null;
-
-      while (new_order.length < this.models.length) {
-        var has_right = this.where({right_id: right_id})[0];
-        new_order.unshift(has_right);
-
-        right_id = has_right.id;
-      }
-
-      this.models = new_order;
-
-      if (!options || !options.silent) this.trigger('sort', this, options);
-      return this;
-    }
-  });
-
-
-  /**
-   * Provides an interface for a draggable NodeView.  See NodeView for more
-   * specific Node functionality related definition.  NodeViewBase is exposed
-   * for subclassing by a NodePreviewView and NodeView.
-   *
-   * TODO: Does NodePreviewView do anything that NodeViewBase doesn't?
-   */
-  var NodeViewBase = Backbone.View.extend({
-    tagName: 'li',
-    className: 'node',
-
-    events: {
-      'mousedown .drag_handle': 'startBeingDragged'
-    },
-
-    initialize: function(options) {
-      Backbone.View.prototype.initialize.apply(this, arguments);
-
-      _.bindAll(this,
-        'startBeingDragged',
-        'followMouse',
-        'stopBeingDragged',
-        'checkDidReposition',
-        'reposition',
-        'addDropTargets',
-        'clearDropTargets',
-        'canAcceptParent'
-      );
-
-      this
-        .listenTo(this.model, 'destroy', this.close)
-        .listenTo(this.model, 'remove', this.close)
-        .listenTo(this.model, 'reposition', this.reposition);
-
-      this.app = options.app;
-      this.parent = options.parent;
-    },
-
-    triggerReposition: function(model) {
-      model.trigger('reposition', model, model.get('parent_id'), model.get('right_id'));
-    },
-
-    render: function() {
-      Backbone.View.prototype.render.apply(this, arguments);
-      _.each(this.model.css_classes, this.$el.addClass, this.$el);
-
-      return this;
-    },
-
-    /**
-     * `startBeingDragged`, `stopBeingDragged`, `followMouse`, and `reposition` all deal with a
-     * NodeView itself being dragged around.
-     */
-    startBeingDragged: function(event) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      // only on a left click.
-      if ( event.which !== 1 )
-        return;
-
-      if ( ! this.app.ready() )
-        return;
-
-      // Store the mouse offset in this container for followMouse to use.  We
-      // need to get this before `this.app.startDrag`, otherwise the drop
-      // targets screw everything up.
-      var offset = this.$el.offset();
-      this.cursorOffsetX = event.clientX - offset.left + (event.pageX - event.clientX);
-      this.cursorOffsetY = event.clientY - offset.top + (event.pageY - event.clientY);
-
-      // follow mouse really quick, just in case they haven't moved their mouse
-      // yet.
-      this.followMouse(event);
-
-      this.$el.css({
-        width: this.$el.width(),
-        'z-index': 50
-      });
-      this.$el.addClass('being_dragged');
-
-      this.trigger('startDrag', this);
-    },
-
-    stopBeingDragged: function() {
-      this.$el.css({
-        top: '',
-        left: '',
-        width: '',
-        'z-index': ''
-      });
-
-      this.$el.removeClass('being_dragged');
-    },
-
-    followMouse: function(mouse) {
-      this.$el.css({
-        top: (mouse.clientY - this.cursorOffsetY),
-        left: (mouse.clientX - this.cursorOffsetX)
-      });
-    },
-
-    /**
-     * If the node has been put into a different parent, we need to update the
-     * collection.  That parent will be listening for adding and it will handle
-     * the positioning.  Otherwise, this node is still in the right parent and
-     * it just needs to be positioned in the parent.
-     *
-     * This is a callback to the reposition event on the Node model.
-     *
-     * When a Node is removed from the Collection, it closes this, but we need
-     * to clean up our bindings.
-     */
-    reposition: function(model, parent_id, right_id) {
-      var new_parent = this.app.node_view_list.findById(parent_id).model,
-          new_collection = new_parent.children,
-          right, index;
-
-      var getIndex = function() {
-        if ( right_id ) {
-          right = new_collection.get(right_id);
-          index = new_collection.indexOf(right);
-        } else {
-          index = new_collection.length;
-        }
-        return index;
-      };
-
-      if ( model.collection !== new_collection ) {
-        model.collection.remove(model);
-        this.model.off('reposition', this.reposition);
-        new_collection.add(model, {at: getIndex()});
-      } else {
-        // remove the model from its old position and insert at new index.
-        new_collection.models.splice(new_collection.indexOf(model), 1);
-        new_collection.models.splice(getIndex(), 0, model);
-      }
-
-      new_collection.trigger('sort');
-      new_collection.trigger('position_child');
-    },
-
-    /**
-     * `addDropTargets` and `clearDropTargets` are required as an API for the
-     * AppView. See NodeView for the actual implementation.
-     */
-    addDropTargets: function() {},
-    clearDropTargets: function() {}
-  });
 
 
   /**
@@ -669,6 +325,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
       });
     },
 
+    saveAt: function(attributes, options) {
+      this.model.save(attributes, options);
+    },
+
     hasShelf: function() {
       return this.model.shelf || this.options.rootNode;
     },
@@ -817,40 +477,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
   });
 
 
-  var NodePreviewView = NodeViewBase.extend({
-    template: node_preview_view_template,
-
-    // Override the NodeViewBase events, I want the whole thing draggable, not
-    // just the drag handle.
-    events: {
-      'mousedown': 'startBeingDragged'
-    },
-
-    checkDidReposition: function(model, resp, options) {
-      this.triggerReposition(model);
-    },
-
-    canAcceptParent: function(parent) {
-      return this.app.validateRelationship(parent, this.model);
-    },
-
-    startBeingDragged: function(event) {
-      NodeViewBase.prototype.startBeingDragged.apply(this, arguments);
-
-      // only on a left click.
-      if ( event.which !== 1 )
-        return;
-
-      var placeholder = this.placeholder = $('<li class="drag_placeholder">&nbsp;</li>').css({
-        width: this.$el.width(),
-        padding: this.$el.css('padding')
-      });
-
-      this.$el.after(placeholder);
-    }
-  });
-
-
   var DropTargetView = Backbone.View.extend({
     tagName: 'li',
     className: 'node_drop_target',
@@ -910,13 +536,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'widgy.contents', 
   });
 
 
-  _.extend(exports, {
+  return _.extend({}, models, {
     DropTargetView: DropTargetView,
-    Node: Node,
-    NodeCollection: NodeCollection,
-    NodeView: NodeView,
-    NodePreviewView: NodePreviewView,
-    NodeViewBase: NodeViewBase
+    NodeView: NodeView
   });
 
 });
