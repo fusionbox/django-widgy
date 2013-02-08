@@ -82,10 +82,6 @@ class Node(MP_Node):
         return self.content.render(*args, **kwargs)
 
     def get_children(self):
-        """
-        Wraps the MP_Tree API call to return the pre_built tree of children if
-        it is present.
-        """
         if hasattr(self, '_children'):
             return self._children
         return super(Node, self).get_children()
@@ -96,19 +92,29 @@ class Node(MP_Node):
         return super(Node, self).get_parent(*args, **kwargs)
 
     def get_next_sibling(self):
-        if hasattr(self, '_next_sibling'):
-            return self._next_sibling
+        if hasattr(self, '_parent'):
+            if self._parent:
+                siblings = list(self._parent.get_children())
+            else:
+                siblings = [self]
+            try:
+                return siblings[siblings.index(self) + 1]
+            except IndexError:
+                return None
         return super(Node, self).get_next_sibling()
 
     def get_ancestors(self):
-        if hasattr(self, '_ancestors'):
-            return self._ancestors
+        if hasattr(self, '_parent'):
+            if self._parent:
+                return list(self._parent.get_ancestors()) + [self._parent]
+            else:
+                return []
         return super(Node, self).get_ancestors()
 
     def get_root(self):
-        if hasattr(self, '_ancestors'):
-            if self._ancestors:
-                return self._ancestors[0]
+        if hasattr(self, '_parent'):
+            if self._parent:
+                return self._parent.get_root()
             else:
                 return self
         return super(Node, self).get_root()
@@ -127,8 +133,7 @@ class Node(MP_Node):
         if hasattr(self, '_children'):
             ret = [self]
             for child in self.get_children():
-                for i in child.depth_first_order():
-                    ret.append(i)
+                ret.extend(child.depth_first_order())
             return ret
         else:
             return [self] + list(self.get_descendants().order_by('path'))
@@ -192,8 +197,6 @@ class Node(MP_Node):
             # another query
             if root_node.depth == 1:
                 root_node._parent = None
-                root_node._next_sibling = None
-                root_node._ancestors = []
             root_node.consume_children(tree)
             assert not tree, "all of the nodes should be consumed"
 
@@ -214,14 +217,9 @@ class Node(MP_Node):
 
         while descendants:
             child = descendants[0]
-            if child.depth == self.depth + 1 and child.path.startswith(self.path):
-                if self._children:
-                    self._children[-1]._next_sibling = child
+            if child.depth == self.depth + 1:
                 self._children.append(descendants.pop(0))
-                child._next_sibling = None
                 child._parent = self
-                if hasattr(self, '_ancestors'):
-                    child._ancestors = self._ancestors + [self]
                 child.consume_children(descendants)
             else:
                 break
