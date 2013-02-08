@@ -1,11 +1,11 @@
 %horizontalChildren {
-  & > .content .drag-row {
+  & > .widget > .content .drag-row {
     span.title {
       display: none;
     }
   }
 
-  & > .nodeChildren {
+  & > .widget > .nodeChildren {
     display: table;
     width: 100%;
 
@@ -13,7 +13,7 @@
       display: table-cell;
       width: auto;
 
-      & > .content .drag-row {
+      & > .widget > .content .drag-row {
         span.title,
         .delete span {
           display: none;
