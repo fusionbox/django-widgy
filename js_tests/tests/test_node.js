@@ -11,12 +11,12 @@ var assertListsEqual = function(a, b) {
 
 // define a TestComponent
 var TestContent;
-requirejs.define('components/testcomponent/component', ['widgy.contents', 'widgets/widgets'], function(contents, widgets) {
-  TestContent = contents.Content.extend({
-    viewClass: widgets.WidgetView
-  });
+requirejs.define('components/testcomponent/component', ['widgy.contents'], function(contents) {
+  TestContent = contents.Model.extend();
 
-  return TestContent;
+  return _.extend({}, contents, {
+    Model: TestContent
+  });
 });
 
 

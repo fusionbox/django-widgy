@@ -358,7 +358,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
 
       console.log(this.model.__class__, 'renderContent');
 
-      var view_class = content.getViewClass();
+      var view_class = content.__view_class;
 
       this.content_view = new view_class({
         model: content,

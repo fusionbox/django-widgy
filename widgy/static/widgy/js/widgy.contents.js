@@ -12,22 +12,12 @@ define([ 'widgy.backbone' ], function(Backbone) {
    * your Content Model in for NodeView to know which ContentView to render.
    */
   var Content = Backbone.Model.extend({
-    viewClass: false,
-
     initialize: function(attributes, options) {
       Backbone.Model.prototype.initialize.apply(this, arguments);
 
       // debugging: this will go away later probably.
       this.type = this.get('model');
       this.node = options.node;
-    },
-
-    getViewClass: function() {
-      if ( ! this.viewClass ) {
-        throw new Error('You need to set a viewClass property on your Content Models');
-      }
-
-      return this.viewClass;
     }
   });
 
@@ -53,19 +43,8 @@ define([ 'widgy.backbone' ], function(Backbone) {
   });
 
 
-  /**
-   * Returns a Model class that was fetched.  This method accepts the name of
-   * the model you are retrieving.
-   */
-  function getModel(name, cb) {
-    var deps = [ 'components/' + name + '/component' ];
-    require(deps, cb);
-  }
-
-
   return {
-    Content: Content,
-    ContentView: ContentView,
-    getModel: getModel
+    Model: Content,
+    View: ContentView
   };
 });

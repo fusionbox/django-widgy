@@ -1,8 +1,8 @@
-define([ 'widgy.contents', 'widgets/widgets' ], function(contents, widgets) {
+define([ 'underscore', 'components/widget/component' ], function(_, widget) {
 
-  var TableView = widgets.WidgetView.extend({
+  var TableView = widget.View.extend({
     initialize: function() {
-      widgets.WidgetView.prototype.initialize.apply(this, arguments);
+      widget.View.prototype.initialize.apply(this, arguments);
 
       _.bindAll(this,
         'block',
@@ -35,9 +35,7 @@ define([ 'widgy.contents', 'widgets/widgets' ], function(contents, widgets) {
     }
   });
 
-  var Table = contents.Content.extend({
-    viewClass: TableView
+  return _.extend({}, widget, {
+    View: TableView
   });
-
-  return Table;
 });

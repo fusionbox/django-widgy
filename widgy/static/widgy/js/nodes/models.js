@@ -4,6 +4,16 @@ define([ 'underscore', 'widgy.backbone',
       _, Backbone,
       contents
       ) {
+
+  /**
+   * Asynchronously fetches a component.
+   */
+  function getComponent(name, cb) {
+    var deps = [ 'components/' + name + '/component' ];
+    require(deps, cb);
+  }
+
+
   /**
    * Nodes provide structure in the tree.  Nodes only hold data that deals with
    * structure.  Any other data lives in its content.
@@ -96,16 +106,18 @@ define([ 'underscore', 'widgy.backbone',
         this.css_classes = content.css_classes;
 
         // This is asynchronous because of requirejs.
-        contents.getModel(content.component, _.bind(this.instantiateContent, this, content));
+        getComponent(content.component, _.bind(this.instantiateContent, this, content));
       }
     },
 
-    instantiateContent: function(content, model_class) {
+    instantiateContent: function(content, component) {
       console.log(this.__class__, 'instantiating content');
 
-      this.content = new model_class(content, {
+      this.content = new component.Model(content, {
         node: this
       });
+
+      this.content.__view_class = component.View;
 
       this.trigger('load:content', this.content);
     },
