@@ -1,17 +1,9 @@
-define([ 'underscore', 'widgy.backbone',
+define([ 'underscore', 'widgy.backbone', 'lib/q',
     'widgy.contents'
     ], function(
-      _, Backbone,
+      _, Backbone, Q,
       contents
       ) {
-
-  /**
-   * Asynchronously fetches a component.
-   */
-  function getComponent(name, cb) {
-    var deps = [ 'components/' + name + '/component' ];
-    require(deps, cb);
-  }
 
 
   /**
@@ -35,13 +27,42 @@ define([ 'underscore', 'widgy.backbone',
       Backbone.Model.apply(this, arguments);
     },
 
-    initialize: function() {
+    initialize: function(attributes, options) {
       Backbone.Model.prototype.initialize.apply(this, arguments);
 
       _.bindAll(this,
-        'instantiateContent',
         'trigger'
         );
+    },
+
+    getComponent: function(component_name) {
+      var deferred = Q.defer();
+
+      var deps = [ 'components/' + component_name + '/component' ];
+
+      require(deps, _.bind(function(component) {
+        this.component = component;
+
+        this.content = new component.Model(this.get('content'), {
+          node: this
+        });
+
+        deferred.resolve(this);
+      }, this));
+
+      return deferred.promise;
+    },
+
+    ready: function(win, fail) {
+      if ( ! this._ready ) {
+        this._ready = this.getComponent(this.component);
+      }
+
+      if ( win || fail ) {
+        return this._ready.then(win, fail);
+      } else {
+        return this._ready;
+      }
     },
 
     parse: function(response) {
@@ -66,8 +87,22 @@ define([ 'underscore', 'widgy.backbone',
       var children = attrs.children,
           content = attrs.content;
 
+      // peek at some stuff we need for timing.
+      if ( content ) {
+        _.defaults(this, {
+          __class__: content.__class__,
+          css_classes: content.css_classes,
+          component: content.component,
+          pop_out: content.pop_out,
+          shelf: content.shelf
+        });
+
+        if ( this.content ) {
+          this.content.set(content, options);
+        }
+      }
+
       delete attrs.children;
-      delete attrs.content;
 
       var ret = Backbone.Model.prototype.set.call(this, attrs, options);
 
@@ -78,7 +113,6 @@ define([ 'underscore', 'widgy.backbone',
             this.children.sortByRight();
           }
         }
-        if (content) this.loadContent(content);
       }
 
       return ret;
@@ -89,37 +123,6 @@ define([ 'underscore', 'widgy.backbone',
         return this.id;
       }
       return this.urlRoot;
-    },
-
-    loadContent: function(content) {
-      if ( this.content ) {
-        console.log(this.__class__, 'updating content', content);
-
-        this.content.set(content);
-      } else if ( content ) {
-        console.log(this.__class__, 'go load my content model');
-
-        // we store these variables because we need them now.
-        this.pop_out = content.pop_out;
-        this.shelf = content.shelf;
-        this.__class__ = content.__class__;
-        this.css_classes = content.css_classes;
-
-        // This is asynchronous because of requirejs.
-        getComponent(content.component, _.bind(this.instantiateContent, this, content));
-      }
-    },
-
-    instantiateContent: function(content, component) {
-      console.log(this.__class__, 'instantiating content');
-
-      this.content = new component.Model(content, {
-        node: this
-      });
-
-      this.content.__view_class = component.View;
-
-      this.trigger('load:content', this.content);
     },
 
     sync: function(method, model, options) {

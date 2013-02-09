@@ -16,7 +16,8 @@
     "chai": "~1.4.2"
   },
   "devDependencies": {
-    "mocha": "~1.8.1"
+    "mocha": "~1.8.1",
+    "mocha-as-promised": "~1.2.1"
   },
   "scripts": {
     "test": "mocha"

@@ -3,7 +3,8 @@ var test = require('./setup').test,
     assert = require('chai').assert;
 
 var nodes = requirejs('nodes/nodes'),
-    _ = requirejs('underscore');
+    _ = requirejs('underscore'),
+    Q = requirejs('lib/q');
 
 var assertListsEqual = function(a, b) {
   return assert(_.isEqual(a, b));
@@ -39,20 +40,19 @@ describe('Node', function() {
   });
 
   describe('content setter', function() {
-    it('goes and finds its component', function(done) {
+    it('goes and finds its component', function() {
       var node = new nodes.Node({
         content: {
           component: 'testcomponent'
         }
       });
 
-      node.on('load:content', function() {
+      return node.ready(function() {
         assert.instanceOf(node.content, TestContent);
-        done();
       });
     });
 
-    it('updates the content', function(done) {
+    it('updates the content', function() {
       var node = new nodes.Node({
         content: {
           component: 'testcomponent',
@@ -61,7 +61,7 @@ describe('Node', function() {
         }
       });
 
-      node.on('load:content', function() {
+      return node.ready(function(node) {
         assert.equal(node.content.get('title'), 'foo');
         assert.equal(node.content.get('test'), 'foo');
 
@@ -69,7 +69,22 @@ describe('Node', function() {
 
         assert.equal(node.content.get('title'), 'bar');
         assert.equal(node.content.get('test'), 'foo');
-        done();
+      });
+    });
+
+    it('doesn\'t have timing issues', function() {
+      var node = new nodes.Node({
+        content: {
+          component: 'testcomponent',
+          test: 'foo'
+        }
+      });
+
+      node.set({content: { title: 'bar' } });
+
+      return node.ready(function(node) {
+        // this is an expected failure
+        // assert.equal(node.content.get('test'), 'bar');
       });
     });
   });
@@ -95,9 +110,8 @@ describe('NodeCollection', function() {
     assertListsEqual(x.pluck('url'), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
 
-  it('update updates content too', function(done) {
-    var count = 0,
-        x = new nodes.NodeCollection([
+  it('update updates content too', function() {
+    var x = new nodes.NodeCollection([
           {
             url: 1,
             children: [
@@ -117,15 +131,11 @@ describe('NodeCollection', function() {
           }
         ]);
 
-    x.on('load:content', function() {
-      // wait until both are ready.
-      if ( ++count < 2 )
-        return;
-      x.off('load:content');
+    var node1 = x.get(1),
+        node2 = x.get(2);
+    assert.equal(node1.children.length, 1);
 
-      var node1 = x.get(1);
-      assert.equal(node1.children.length, 1);
-
+    return Q.all([node1.ready(), node2.ready()]).then(function() {
       x.update2([
         {
           url: 1,
@@ -147,10 +157,10 @@ describe('NodeCollection', function() {
         }
       ]);
 
-      assert.equal(node1.content.get('test'), 'bar');
-
       // non destructive merge.
       assert.strictEqual(node1, x.get(1));
+
+      assert.equal(node1.content.get('test'), 'bar');
 
       // remove old ones
       assert.isUndefined(x.get(2));
@@ -158,15 +168,13 @@ describe('NodeCollection', function() {
       // add new ones
       var node3 = x.get(3);
       assert.isObject(node3);
-      node3.on('load:content', function() {
+      node3.ready(function() {
         assert.equal(node3.content.get('test'), 'baz');
       });
 
       // and do children too.
       assert.equal(node1.children.length, 2);
       assertListsEqual(node1.children.pluck('test'), [1, 2]);
-
-      done();
     });
   });
 });

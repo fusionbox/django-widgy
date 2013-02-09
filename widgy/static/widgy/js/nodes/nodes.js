@@ -62,12 +62,13 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
       this.drop_targets_list = new Backbone.ViewList();
 
       this
-        .listenTo(this.model, 'load:content', this.renderContent)
         .listenTo(this.collection, 'add', this.addChild)
         .listenTo(this.collection, 'reset', this.renderChildren)
         .listenTo(this.collection, 'sort', this.resortChildren);
 
       this.list = new Backbone.ViewList();
+
+      this.model.ready(this.renderContent);
     },
 
     onClose: function() {
@@ -339,10 +340,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
       this.$children = this.$el.find(' > .widget > .node_children');
       this.$content = this.$el.find(' > .widget > .content ');
 
-      if ( this.model.content ) {
-        this.renderContent(this.model.content);
-      }
-
       this.renderChildren();
 
       if ( this.hasShelf() ) {
@@ -352,16 +349,14 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
       return this;
     },
 
-    renderContent: function(content) {
+    renderContent: function() {
       if ( this.content_view )
         return;
 
       console.log(this.model.__class__, 'renderContent');
 
-      var view_class = content.__view_class;
-
-      this.content_view = new view_class({
-        model: content,
+      this.content_view = new this.model.component.View({
+        model: this.model.content,
         el: this.$content,
         app: this.app
       });
