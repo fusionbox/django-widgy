@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load widgy_tags %}
 {% load pages_tags %}
-{% load fusionbox_tags %}
 
 {% block title %}{{ block.super }} - {{ page.title }}{% endblock %}
 {% block css %}
@@ -22,9 +21,7 @@
 
 {% block content %}
   <nav>
-    {% highlight_here %}
-      {% page_menu "pages/menus/tree.html" %}
-    {% endhighlight %}
+    {% page_menu "pages/menus/tree.html" %}
   </nav>
 
   {% if root_node_override %}
