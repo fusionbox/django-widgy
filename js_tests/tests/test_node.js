@@ -6,8 +6,15 @@ var nodes = requirejs('nodes/nodes'),
     _ = requirejs('underscore'),
     Q = requirejs('lib/q');
 
-var assertListsEqual = function(a, b) {
-  return assert(_.isEqual(a, b));
+var assertListsEqual = function(a, b, message) {
+  if ( ! _.isEqual(a, b) )
+  {
+    var err = new Error(message);
+    err.expected = b.toString();
+    err.actual = a.toString();
+
+    throw err;
+  }
 };
 
 // define a TestComponent
