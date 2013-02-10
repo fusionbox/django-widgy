@@ -125,6 +125,14 @@ define([ 'underscore', 'widgy.backbone', 'lib/q',
       return this.urlRoot;
     },
 
+    getRight: function() {
+      return this.collection.at(this.collection.indexOf(this) + 1);
+    },
+
+    getParent: function() {
+      return this.collection.parent;
+    },
+
     sync: function(method, model, options) {
       // Provides an optimization for refreshing the shelf compatibility.
       // Previously, when editing a node, you had to do two requests (one for

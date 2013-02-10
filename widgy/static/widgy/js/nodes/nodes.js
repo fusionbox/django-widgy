@@ -8,7 +8,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
       node_view_template,
       drop_target_view_template,
       popped_out_template,
-      NodeViewBase,
+      DraggableView,
       models
       ) {
 
@@ -29,11 +29,11 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
    *    `this.model.children`.)
    * -  `this.app` is the instance of AppView
    */
-  var NodeView = NodeViewBase.extend({
+  var NodeView = DraggableView.extend({
     template: node_view_template,
 
     events: function() {
-      return _.extend({}, NodeViewBase.prototype.events , {
+      return _.extend({}, DraggableView.prototype.events , {
         'click .delete': 'delete',
         'click .pop_out': 'popOut',
         'click .pop_in': 'popIn'
@@ -41,17 +41,20 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
     },
 
     initialize: function() {
-      NodeViewBase.prototype.initialize.apply(this, arguments);
+      DraggableView.prototype.initialize.apply(this, arguments);
 
       _.bindAll(this,
         'renderChildren',
         'addChild',
+        'addDropTargets',
         'createDropTarget',
+        'clearDropTargets',
         'startDrag',
         'stopDrag',
         'stopDragging',
         'dropChildView',
         'receiveChildView',
+        'reposition',
         'renderContent',
         'resortChildren',
         'popOut',
@@ -72,7 +75,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
     },
 
     onClose: function() {
-      NodeViewBase.prototype.onClose.apply(this, arguments);
+      DraggableView.prototype.onClose.apply(this, arguments);
 
       this.content_view.close();
       delete this.content_view;
@@ -215,6 +218,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
         return this.parent.getShelf();
     },
 
+    // TODO: move these methods to model.
     canAcceptChild: function(view) {
       return ! this.dontShowChildren() && view.canAcceptParent(this);
     },
@@ -229,16 +233,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
         return true;
 
       return this.app.validateRelationship(parent, this.model.content);
-    },
-
-    checkDidReposition: function(model, resp, options) {
-      var current_parent_id = model.collection.parent.id,
-          current_right = model.collection.at(model.collection.indexOf(model)),
-          current_right_id = current_right && current_right.id;
-
-      if ( current_right_id !== model.get('right_id') || current_parent_id !== model.get('parent_id') ) {
-        this.triggerReposition(model);
-      }
     },
 
     /**
@@ -305,12 +299,18 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
     receiveChildView: function(index, dragged_view) {
       debug('receiveChildView');
 
+      var node = dragged_view.model;
+
       // It's already mine and it was dragged into its own drop target.
       if ( index === this.collection.indexOf(dragged_view) )
         return;
 
       // This will return the model that we want at our right or undefined.
       var right = this.collection.at(index);
+
+      // Bail if it didn't move.
+      if ( this.model === node.getParent() && right === node )
+        return;
 
       var attributes = {
         parent_id: this.model.id,
@@ -319,10 +319,52 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
 
       this.collection.trigger('receive_child');
       dragged_view.model.save(attributes, {
-        success: dragged_view.checkDidReposition,
+        success: this.reposition,
         error: modal.raiseError,
         app: this.app
       });
+    },
+
+    /**
+     * If the node has been put into a different parent, we need to update the
+     * collection.  That parent will be listening for adding and it will handle
+     * the positioning.  Otherwise, this node is still in the right parent and
+     * it just needs to be positioned in the parent.
+     *
+     * This is a callback to the reposition event on the Node model.
+     *
+     * When a Node is removed from the Collection, it closes this, but we need
+     * to clean up our bindings.
+     */
+    reposition: function(model) {
+      var parent_id = model.get('parent_id'),
+          right_id = model.get('right_id'),
+          new_parent = this.app.node_view_list.findById(parent_id).model,
+          new_collection = new_parent.children,
+          right, index;
+
+      var getIndex = function() {
+        if ( right_id ) {
+          right = new_collection.get(right_id);
+          index = new_collection.indexOf(right);
+        } else {
+          index = new_collection.length;
+        }
+        return index;
+      };
+
+      if ( model.collection !== new_collection ) {
+        model.collection.remove(model);
+        this.model.off('reposition', this.reposition);
+        new_collection.add(model, {at: getIndex()});
+      } else {
+        // remove the model from its old position and insert at new index.
+        new_collection.models.splice(new_collection.indexOf(model), 1);
+        new_collection.models.splice(getIndex(), 0, model);
+      }
+
+      new_collection.trigger('sort');
+      new_collection.trigger('position_child');
     },
 
     saveAt: function(attributes, options) {
@@ -335,7 +377,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
 
     render: function() {
       debug.call(this, 'render');
-      NodeViewBase.prototype.render.apply(this, arguments);
+      DraggableView.prototype.render.apply(this, arguments);
 
       this.$children = this.$el.find(' > .widget > .node_children');
       this.$content = this.$el.find(' > .widget > .content ');

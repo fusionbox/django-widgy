@@ -2,7 +2,7 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
     'nodes/models',
     'text!nodes/preview.html',
     'text!./shelf.html'
-    ], function(exports, _, Backbone, NodeViewBase,
+    ], function(exports, _, Backbone, DraggableView,
       node_models,
       shelf_item_view_template,
       shelf_view_template
@@ -120,19 +120,15 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
   });
 
 
-  var ShelfItemView = NodeViewBase.extend({
+  var ShelfItemView = DraggableView.extend({
     tagName: 'li',
     className: 'node',
     template: shelf_item_view_template,
 
-    // Override the NodeViewBase events, I want the whole thing draggable, not
+    // Override the DraggableView events, I want the whole thing draggable, not
     // just the drag handle.
     events: {
       'mousedown': 'startBeingDragged'
-    },
-
-    checkDidReposition: function(model, resp, options) {
-      this.triggerReposition(model);
     },
 
     canAcceptParent: function(parent) {
@@ -140,7 +136,7 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
     },
 
     startBeingDragged: function(event) {
-      NodeViewBase.prototype.startBeingDragged.apply(this, arguments);
+      DraggableView.prototype.startBeingDragged.apply(this, arguments);
 
       // only on a left click.
       if ( event.which !== 1 )

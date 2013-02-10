@@ -11,14 +11,15 @@ var assertListsEqual = function(a, b) {
 };
 
 // define a TestComponent
-var TestContent;
 requirejs.define('components/testcomponent/component', ['widgy.contents'], function(contents) {
-  TestContent = contents.Model.extend();
+  var TestContent = contents.Model.extend();
 
   return _.extend({}, contents, {
     Model: TestContent
   });
 });
+
+var TestComponent = requirejs('components/testcomponent/component');
 
 
 describe('Node', function() {
@@ -48,7 +49,7 @@ describe('Node', function() {
       });
 
       return node.ready(function() {
-        assert.instanceOf(node.content, TestContent);
+        assert.instanceOf(node.content, TestComponent.Model);
       });
     });
 
@@ -85,6 +86,40 @@ describe('Node', function() {
       return node.ready(function(node) {
         // this is an expected failure
         // assert.equal(node.content.get('test'), 'bar');
+      });
+    });
+  });
+
+  describe('position getters', function() {
+    it('correctly figures out right', function() {
+      var node1 = new nodes.Node(),
+          node2 = new nodes.Node(),
+          node3 = new nodes.Node(),
+          node4 = new nodes.Node(),
+          coll = new nodes.NodeCollection([node1, node2, node3, node4]);
+
+      assert.equal(node1.getRight(), node2);
+      assert.equal(node2.getRight(), node3);
+      assert.equal(node3.getRight(), node4);
+      assert.equal(node4.getRight(), null);
+    });
+
+    it('correctly figures out parent', function() {
+      var node1 = new nodes.Node(),
+          node2 = new nodes.Node();
+
+      node1.children.add(node2);
+
+      assert.equal(node2.getParent(), node1);
+    });
+  });
+
+  describe('getComponent', function() {
+    it('retrieves the component', function() {
+      var node = new nodes.Node();
+
+      return node.getComponent('testcomponent').then(function(model) {
+        assert.deepEqual(model.component, TestComponent);
       });
     });
   });

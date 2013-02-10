@@ -5,12 +5,10 @@ define(['underscore', 'widgy.backbone'], function(
 
   /**
    * Provides an interface for a draggable NodeView.  See NodeView for more
-   * specific Node functionality related definition.  NodeViewBase is exposed
+   * specific Node functionality related definition.  DraggablewView is exposed
    * for subclassing by a NodePreviewView and NodeView.
-   *
-   * TODO: Does NodePreviewView do anything that NodeViewBase doesn't?
    */
-  var NodeViewBase = Backbone.View.extend({
+  var DraggablewView = Backbone.View.extend({
     tagName: 'li',
     className: 'node',
 
@@ -25,24 +23,15 @@ define(['underscore', 'widgy.backbone'], function(
         'startBeingDragged',
         'followMouse',
         'stopBeingDragged',
-        'checkDidReposition',
-        'reposition',
-        'addDropTargets',
-        'clearDropTargets',
         'canAcceptParent'
       );
 
       this
         .listenTo(this.model, 'destroy', this.close)
-        .listenTo(this.model, 'remove', this.close)
-        .listenTo(this.model, 'reposition', this.reposition);
+        .listenTo(this.model, 'remove', this.close);
 
       this.app = options.app;
       this.parent = options.parent;
-    },
-
-    triggerReposition: function(model) {
-      model.trigger('reposition', model, model.get('parent_id'), model.get('right_id'));
     },
 
     render: function() {
@@ -52,10 +41,6 @@ define(['underscore', 'widgy.backbone'], function(
       return this;
     },
 
-    /**
-     * `startBeingDragged`, `stopBeingDragged`, `followMouse`, and `reposition` all deal with a
-     * NodeView itself being dragged around.
-     */
     startBeingDragged: function(event) {
       event.preventDefault();
       event.stopPropagation();
@@ -103,56 +88,9 @@ define(['underscore', 'widgy.backbone'], function(
         top: (mouse.clientY - this.cursorOffsetY),
         left: (mouse.clientX - this.cursorOffsetX)
       });
-    },
-
-    /**
-     * If the node has been put into a different parent, we need to update the
-     * collection.  That parent will be listening for adding and it will handle
-     * the positioning.  Otherwise, this node is still in the right parent and
-     * it just needs to be positioned in the parent.
-     *
-     * This is a callback to the reposition event on the Node model.
-     *
-     * When a Node is removed from the Collection, it closes this, but we need
-     * to clean up our bindings.
-     */
-    reposition: function(model, parent_id, right_id) {
-      var new_parent = this.app.node_view_list.findById(parent_id).model,
-          new_collection = new_parent.children,
-          right, index;
-
-      var getIndex = function() {
-        if ( right_id ) {
-          right = new_collection.get(right_id);
-          index = new_collection.indexOf(right);
-        } else {
-          index = new_collection.length;
-        }
-        return index;
-      };
-
-      if ( model.collection !== new_collection ) {
-        model.collection.remove(model);
-        this.model.off('reposition', this.reposition);
-        new_collection.add(model, {at: getIndex()});
-      } else {
-        // remove the model from its old position and insert at new index.
-        new_collection.models.splice(new_collection.indexOf(model), 1);
-        new_collection.models.splice(getIndex(), 0, model);
-      }
-
-      new_collection.trigger('sort');
-      new_collection.trigger('position_child');
-    },
-
-    /**
-     * `addDropTargets` and `clearDropTargets` are required as an API for the
-     * AppView. See NodeView for the actual implementation.
-     */
-    addDropTargets: function() {},
-    clearDropTargets: function() {}
+    }
   });
 
 
-  return NodeViewBase;
+  return DraggablewView;
 });
