@@ -172,6 +172,9 @@ define([ 'underscore', 'widgy.backbone', 'lib/q',
 
     initialize: function(models, options) {
       Backbone.Collection.prototype.initialize.apply(this, arguments);
+      _.bindAll(this,
+        'reposition'
+      );
 
       if ( options ) {
         this.parent = options.parent;
@@ -222,6 +225,30 @@ define([ 'underscore', 'widgy.backbone', 'lib/q',
 
       if (!options || !options.silent) this.trigger('sort', this, options);
       return this;
+    },
+
+    getIndexOf: function(id) {
+      var node = this.get(id);
+
+      if ( node ) {
+        return this.indexOf(node);
+      } else {
+        return this.length;
+      }
+    },
+
+    reposition: function(node) {
+      if ( node.collection !== this ) {
+        node.collection.remove(node);
+        this.add(node, {at: this.getIndexOf(node.get('right_id'))});
+      } else {
+        // remove the model from its old position and insert at new index.
+        this.models.splice(this.indexOf(node), 1);
+        this.models.splice(this.getIndexOf(node.get('right_id')), 0, node);
+      }
+
+      this.trigger('sort');
+      this.trigger('position_child');
     }
   });
 

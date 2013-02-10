@@ -212,4 +212,54 @@ describe('NodeCollection', function() {
       assertListsEqual(node1.children.pluck('test'), [1, 2]);
     });
   });
+
+  describe('reposition', function() {
+    it('reorders correctly', function() {
+      var coll = new nodes.NodeCollection([
+        {url: 1, right_id: 2},
+        {url: 2, right_id: 3},
+        {url: 3, right_id: 4},
+        {url: 4, right_id: null}
+      ]);
+
+      assertListsEqual(coll.pluck('url'), [1, 2, 3, 4]);
+
+      var node2 = coll.get(2);
+      node2.set('right_id', 1);
+      coll.reposition(node2);
+      assertListsEqual(coll.pluck('url'), [2, 1, 3, 4]);
+
+      var node3 = coll.get(3);
+      node3.set('right_id', null);
+      coll.reposition(node3);
+      assertListsEqual(coll.pluck('url'), [2, 1, 4, 3]);
+    });
+
+    it('works across collections', function() {
+      var col1 = new nodes.NodeCollection([
+            {url: 1, right_id: 2},
+            {url: 2, right_id: 3},
+            {url: 3, right_id: 4},
+            {url: 4, right_id: null}
+          ]),
+          col2 = new nodes.NodeCollection([
+            {url: 5, right_id: 6},
+            {url: 6, right_id: 7},
+            {url: 7, right_id: 8},
+            {url: 8, right_id: null}
+          ]);
+
+      var node1 = col1.get(1);
+      node1.set('right_id', 7);
+      col2.reposition(node1);
+      assertListsEqual(col1.pluck('url'), [2, 3, 4]);
+      assertListsEqual(col2.pluck('url'), [5, 6, 1, 7, 8]);
+
+      var node5 = col2.get(5);
+      node5.set('right_id', null);
+      col1.reposition(node5);
+      assertListsEqual(col1.pluck('url'), [2, 3, 4, 5]);
+      assertListsEqual(col2.pluck('url'), [6, 1, 7, 8]);
+    });
+  });
 });

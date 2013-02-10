@@ -54,7 +54,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
         'stopDragging',
         'dropChildView',
         'receiveChildView',
-        'reposition',
         'renderContent',
         'resortChildren',
         'popOut',
@@ -319,52 +318,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
 
       this.collection.trigger('receive_child');
       dragged_view.model.save(attributes, {
-        success: this.reposition,
+        success: this.collection.reposition,
         error: modal.raiseError,
         app: this.app
       });
-    },
-
-    /**
-     * If the node has been put into a different parent, we need to update the
-     * collection.  That parent will be listening for adding and it will handle
-     * the positioning.  Otherwise, this node is still in the right parent and
-     * it just needs to be positioned in the parent.
-     *
-     * This is a callback to the reposition event on the Node model.
-     *
-     * When a Node is removed from the Collection, it closes this, but we need
-     * to clean up our bindings.
-     */
-    reposition: function(model) {
-      var parent_id = model.get('parent_id'),
-          right_id = model.get('right_id'),
-          new_parent = this.app.node_view_list.findById(parent_id).model,
-          new_collection = new_parent.children,
-          right, index;
-
-      var getIndex = function() {
-        if ( right_id ) {
-          right = new_collection.get(right_id);
-          index = new_collection.indexOf(right);
-        } else {
-          index = new_collection.length;
-        }
-        return index;
-      };
-
-      if ( model.collection !== new_collection ) {
-        model.collection.remove(model);
-        this.model.off('reposition', this.reposition);
-        new_collection.add(model, {at: getIndex()});
-      } else {
-        // remove the model from its old position and insert at new index.
-        new_collection.models.splice(new_collection.indexOf(model), 1);
-        new_collection.models.splice(getIndex(), 0, model);
-      }
-
-      new_collection.trigger('sort');
-      new_collection.trigger('position_child');
     },
 
     saveAt: function(attributes, options) {
