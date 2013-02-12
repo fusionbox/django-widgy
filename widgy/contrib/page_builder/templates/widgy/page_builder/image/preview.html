@@ -1,9 +1,9 @@
 {% extends 'widgy/preview.html' %}
-{% load thumbnail %}
+{% load thumbnail_libs %}
 
 {% block content %}
   {% if self.image %}
-    {% thumbnail self.image.file "100x100" as im %}
+    {% easy_thumbnail self.image.file "100x100" as im %}
     <img src="{% media im.name %}">
   {% else %}
     <div class="noImage"></div>
