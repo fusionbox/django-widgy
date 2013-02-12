@@ -1,5 +1,8 @@
 from django import template
 from django.conf import settings
+from django.utils.safestring import mark_safe
+
+import markdown
 
 from widgy.utils import fancy_import
 
@@ -32,3 +35,14 @@ def scss_files(site):
     site = fancy_import(site)
 
     return site.scss_files
+
+
+@register.filter(name='markdown')
+def mdown(value):
+    value = markdown.markdown(
+        value,
+        extensions=['sane_lists'],
+        safe_mode='escape',
+    )
+
+    return mark_safe(value)

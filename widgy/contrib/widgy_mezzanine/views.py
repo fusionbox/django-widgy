@@ -28,6 +28,7 @@ def handle_form(request, node_pk):
     else:
         return redirect(page.get_absolute_url())
 
+
 def preview(request, node_pk, node=None):
     node = node or get_object_or_404(Node, pk=node_pk)
 
@@ -45,8 +46,10 @@ def preview(request, node_pk, node=None):
             content_model='widgypage',
         )
 
-
-    return page_view(request, page.slug, extra_context={
+    context = {
         'page': page,
         'root_node_override': node,
-    })
+        '_current_page': page,
+    }
+
+    return page_view(request, page.slug, extra_context=context)

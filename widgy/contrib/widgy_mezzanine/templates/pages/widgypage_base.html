@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load widgy_tags %}
+{% load pages_tags %}
+
+{% block title %}{{ block.super }} - {{ page.title }}{% endblock %}
+{% block css %}
+{{ block.super }}
+{% for scss_file in 'WIDGY_MEZZANINE_SITE'|scss_files %}
+<link rel="stylesheet" href="{% static scss_file %}" type="text/x-scss">
+{% endfor %}
+{% endblock %}
+
+{% block seo_description %}{{ page.keywords_string }}{% endblock %}
+{% block seo_keywords %}{{ page.description }}{% endblock %}
+
+{% block breadcrumb %}
+  <p>
+  {% page_menu "pages/menus/breadcrumb.html" %}
+  </p>
+{% endblock %}
+
+{% block leftnav %}
+  <nav>
+    {% page_menu "pages/menus/tree.html" %}
+  </nav>
+{% endblock %}
+
+{% block content %}
+  {% if root_node_override %}
+      {% render root_node_override %}
+  {% else %}
+      {% render page.get_content_model.root_node %}
+  {% endif %}
+{% endblock %}
