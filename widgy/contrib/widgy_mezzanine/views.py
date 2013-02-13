@@ -9,9 +9,25 @@ from widgy.contrib.widgy_mezzanine.models import WidgyPage
 from widgy.models import Node
 
 
+def get_page_from_node(root_node):
+    try:
+        # try to find a page that uses this root node
+        return get_object_or_404(
+            WidgyPage.objects.distinct(),
+            Q(root_node__commits__root_node=root_node) | Q(root_node__working_copy=root_node)
+        ).page_ptr
+    except Http404:
+        # otherwise, use a fake page
+        return WidgyPage(
+            titles='restoring page',
+            content_model='widgypage',
+        )
+
+
 def handle_form(request, node_pk):
     form_node = get_object_or_404(Node, pk=node_pk)
-    page = get_object_or_404(Page, pk=request.GET['page_pk'])
+    root_node = form_node.get_root()
+    page = get_page_from_node(root_node)
 
     form_class = form_node.content.get_form()
 
@@ -23,6 +39,7 @@ def handle_form(request, node_pk):
             return resp or redirect(page.get_absolute_url())
         return page_view(request, page.slug, extra_context={
             'page': page,
+            'root_node_override': root_node,
             form_node.content.context_var: form,
         })
     else:
@@ -32,19 +49,7 @@ def handle_form(request, node_pk):
 def preview(request, node_pk, node=None):
     node = node or get_object_or_404(Node, pk=node_pk)
 
-    try:
-        # try to find a page that uses this root node
-        widgy_page = get_object_or_404(
-            WidgyPage.objects.distinct(),
-            Q(root_node__commits__root_node=node) | Q(root_node__working_copy=node)
-        )
-        page = widgy_page.page_ptr
-    except Http404:
-        # otherwise, use a fake page
-        page = WidgyPage(
-            titles='restoring page',
-            content_model='widgypage',
-        )
+    page = get_page_from_node(node)
 
     context = {
         'page': page,
