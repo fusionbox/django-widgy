@@ -2,7 +2,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Q
 from django.http import Http404
 
-from mezzanine.pages.models import Page
 from mezzanine.pages.views import page as page_view
 
 from widgy.contrib.widgy_mezzanine.models import WidgyPage
@@ -29,9 +28,13 @@ def handle_form(request, node_pk):
     root_node = form_node.get_root()
     page = get_page_from_node(root_node)
 
-    form_class = form_node.content.get_form()
-
     if request.method == 'POST':
+        # not really necessary to prefetch two trees here, but if we just
+        # prefetched root_node we would have to find a prefetched instance of
+        # form_node in its tree.
+        Node.prefetch_trees(form_node, root_node)
+
+        form_class = form_node.content.get_form()
         form = form_class(request.POST, request.FILES)
 
         if form.is_valid():
