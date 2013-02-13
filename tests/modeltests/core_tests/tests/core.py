@@ -655,6 +655,15 @@ class TestVersioning(RootNodeTestCase):
         self.assertIn('foo', diff)
         self.assertIn('bar', diff)
 
+    def test_daisydiff_unicode(self):
+        a = u'\N{SNOWMAN}'
+        b = u'\N{INTERROBANG}'
+
+        diff = daisydiff(a, b)
+
+        self.assertIn(a, diff)
+        self.assertIn(b, diff)
+
 
 class TestPrefetchTree(RootNodeTestCase):
     def setUp(self):
