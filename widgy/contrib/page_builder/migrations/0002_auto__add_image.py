@@ -15,7 +15,6 @@ class Migration(SchemaMigration):
         db.create_table('page_builder_image', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('image', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='image_widgets', null=True, on_delete=models.PROTECT, to=orm['filer.Image'])),
-            ('_nodes', self.gf('widgy.generic.ProxyGenericRelation')(object_id_field='content_id', to=orm['widgy.Node'])),
         ))
         db.send_create_signal('page_builder', ['Image'])
 
