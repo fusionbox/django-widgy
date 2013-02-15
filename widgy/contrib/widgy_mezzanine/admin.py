@@ -4,15 +4,31 @@ from django import forms
 from django.core.urlresolvers import reverse
 from django.contrib.admin.util import quote
 
-from mezzanine.pages.admin import PageAdmin
+from mezzanine.pages.admin import PageAdmin, PageAdminForm
+from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
+                                   CONTENT_STATUS_DRAFT)
 
 from widgy.admin import WidgyAdmin
 from widgy.contrib.widgy_mezzanine.models import WidgyPage
 from widgy.utils import fancy_import, format_html
 
 
+class WidgyPageAdminForm(PageAdminForm):
+    def __init__(self, *args, **kwargs):
+        super(WidgyPageAdminForm, self).__init__(*args, **kwargs)
+        self.fields['status'].initial = CONTENT_STATUS_DRAFT
+
+    def clean_status(self):
+        status = self.cleaned_data.get('status')
+        if (status == CONTENT_STATUS_PUBLISHED and (not self.instance.root_node or
+                                                    not self.instance.root_node.head)):
+            raise forms.ValidationError('You must commit before you can publish')
+        return status
+
+
 class WidgyPageAdmin(PageAdmin, WidgyAdmin):
     change_form_template = 'widgy/page_builder/widgypage_change_form.html'
+    form = WidgyPageAdminForm
 
     def get_site(self):
         return fancy_import(settings.WIDGY_MEZZANINE_SITE)

@@ -20,6 +20,9 @@ def render(context, node):
     elif hasattr(node, 'get_published_node'):
         node = node.get_published_node(context['request'])
 
+    if not node:
+        return 'no content'
+
     node.maybe_prefetch_tree()
 
     return node.render(context)
