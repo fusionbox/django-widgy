@@ -4,7 +4,12 @@ from django import forms
 from django.core.urlresolvers import reverse
 from django.contrib.admin.util import quote
 
-from mezzanine.pages.admin import PageAdmin, PageAdminForm
+from mezzanine.pages.admin import PageAdmin
+try:
+    from mezzanine.pages.admin import PageAdminForm
+except ImportError:
+    PageAdminForm = forms.ModelForm
+
 from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
 
