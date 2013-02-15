@@ -73,6 +73,28 @@ class CommitView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, FormView)
         )
 
 
+class ResetView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, TemplateView):
+    template_name = 'widgy/reset.html'
+
+    def get_context_data(self, **kwargs):
+        self.object = self.get_object()
+        kwargs = super(ResetView, self).get_context_data(**kwargs)
+        kwargs['object'] = self.object
+        kwargs['changed_anything'] = self.object.has_changes()
+        kwargs['has_commits'] = bool(self.object.head)
+        kwargs['reset_url'] = self.request.get_full_path()
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        version_tracker = self.get_object()
+        version_tracker.reset()
+        return self.response_class(
+            request=self.request,
+            template='widgy/reset_success.html',
+            context=self.get_context_data(),
+        )
+
+
 class HistoryView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, DetailView):
     template_name = 'widgy/history.html'
 
