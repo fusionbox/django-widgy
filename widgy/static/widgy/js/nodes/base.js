@@ -36,7 +36,7 @@ define(['underscore', 'widgy.backbone'], function(
 
     render: function() {
       Backbone.View.prototype.render.apply(this, arguments);
-      _.each(this.model.css_classes, this.$el.addClass, this.$el);
+      _.each(this.cssClasses(), this.$el.addClass, this.$el);
 
       return this;
     },
