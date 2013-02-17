@@ -35,8 +35,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'nodes/nodes',
       var root_node_view = this.root_node_view = new nodes.NodeView({
         model: new node_models.Node(options.root_node),
         app: this,
-        tagName: 'section',
-        rootNode: true
+        tagName: 'section'
       });
 
       this.node_view_list.push(root_node_view);

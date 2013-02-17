@@ -73,6 +73,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
       this.model.ready(this.renderContent);
     },
 
+    isRootNode: function() {
+      return ! this.parent;
+    },
+
     onClose: function() {
       DraggableView.prototype.onClose.apply(this, arguments);
 
@@ -83,7 +87,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
     },
 
     dontShowChildren: function() {
-      return this.model.pop_out === 2 && ! this.options.rootNode;
+      return this.model.pop_out === 2 && ! this.isRootNode();
     },
 
     renderChildren: function() {
@@ -209,7 +213,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
     },
 
     getShelf: function() {
-      if ( this.model.pop_out == 2 && ! this.options.rootNode )
+      if ( this.model.pop_out == 2 && ! this.isRootNode() )
         return null;
       else if ( this.hasShelf() )
         return this.shelf;
@@ -329,7 +333,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
     },
 
     hasShelf: function() {
-      return this.model.shelf || this.options.rootNode;
+      return this.model.shelf || this.isRootNode();
     },
 
     render: function() {
@@ -363,7 +367,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
       this.content_view.render();
 
       // when we are popped out, we need to remove our own pop out button.
-      if ( this.options.rootNode ) {
+      if ( this.isRootNode() ) {
         this.$content.find('.pop_out').remove();
       }
     },
@@ -383,7 +387,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
           .listenTo(shelf, 'stopDrag', this.stopDrag);
 
       // position sticky
-      if ( false && this.options.rootNode ) {
+      if ( false && this.isRootNode() ) {
         // The shelf needs to be after the children because in state 0 (fixed),
         // the shelf items will be displayed underneath everything else that is
         // after it in HTML.
