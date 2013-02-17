@@ -66,8 +66,14 @@ class VersionTracker(models.Model):
 
         return self.head
 
+    def reset(self):
+        old_working_copy = self.working_copy
+        self.working_copy = self.head.root_node.clone_tree(freeze=False)
+        self.save()
+        old_working_copy.delete()
+
     def get_published_node(self, request):
-        return self.head.root_node
+        return self.head and self.head.root_node
 
     def get_history(self):
         """

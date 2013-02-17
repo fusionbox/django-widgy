@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.utils import unittest
 
 from widgy.generic.models import ContentType
 
@@ -49,6 +50,23 @@ class TestPGFK(TestCase):
 
         self.assertEqual([rel], list(Related.objects.filter(bases__id=base.id)))
 
+    @unittest.expectedFailure
+    def test_query_proxy(self):
+        """
+        I don't know how to make this pass. There's only a single instance
+        of the GenericRelation, on the parent, not the proxy.
+
+            Proxy._meta.get_field_by_name('bases').model == Related
+
+        But to do the query, GenericRelation needs to know the proxy
+        class, not the base class.
+        """
+        base = Base()
+        base.obj = rel = Proxy.objects.create()
+        base.save()
+
+        self.assertEqual(rel, Proxy.objects.get(bases=base))
+
     def test_query_negate(self):
         base = Base()
         base.obj = Related.objects.create()
@@ -56,6 +74,6 @@ class TestPGFK(TestCase):
 
         self.assertEqual([], list(Related.objects.exclude(bases__id=base.id)))
 
-    def test_fake_contenttype(self):
+    def test_proxy_contenttype(self):
         self.assertEqual(Proxy, ContentType.objects.get_for_model(Proxy, for_concrete_model=False).model_class())
         self.assertEqual(Proxy, ContentType.objects.get_for_models(Proxy, for_concrete_models=False).values()[0].model_class())

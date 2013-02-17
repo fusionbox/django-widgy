@@ -85,10 +85,6 @@ body, html {
     ul.nodeChildren {
       margin: 0 !important;
       padding: 0 !important;
-
-      li {
-        margin: 0 0 1em 0;
-      }
     }
 
     // Local Shelf
@@ -107,10 +103,6 @@ body, html {
 
         ul {
           display: inline;
-          li {
-            display: inline-block;
-            margin-left: 1em;
-          }
         }
       }
     }
@@ -144,8 +136,7 @@ body, html {
 
   // Root Node
   section.node {
-    background: $black10;
-    border: 2px solid #fff;
+    border: 2px solid #e8e8e8;
     width: 966px;
     float: left;
 
@@ -156,42 +147,12 @@ body, html {
       }
     }
 
-    // Root Shelf
-    & > .widget > .shelf {
-      position: absolute;
-      top: 0;
-      right: -210px;
-      width: 200px;
-
-      li {
-        margin: 0 0 1em 0;
-      }
-    }
-
     // Second level
     .node {
-      background: #fff;
-      border: 1px solid #fff;
-
       & > .widget > .content {
         span.title {
           font-size: 1.4em;
           padding: 5px 0;
-        }
-      }
-
-      // Third level
-      .node {
-        background: $black10;
-
-        // Fourth level
-        .node {
-          background: #fff;
-
-          // Fifth level
-          .node {
-            background: $black10;
-          }
         }
       }
     }
@@ -273,8 +234,6 @@ input.vTimeField,
     @include shadow($black10,1px,1px,0px);
     @include inset-shadow(#ffffff,-1px,1px,0px);
 
-    background: $black10;    
-    /*border: 1px solid #fff;*/
     list-style: none;
     margin: 0 0 1em 0;
     padding: 10px;
@@ -304,30 +263,6 @@ input.vTimeField,
         margin-bottom: 2em;
       }
     }
-    
-    .node {
-      background: #fff;
-      border: 1px solid #fff;
-    
-      .node {
-        background: $black10;
-        
-        
-        .shelf .node {
-          margin-left: 1em;
-        }
-        
-        .node {
-          background: #fff;
-          
-          
-          .node {
-            background: $black10;
-          }
-        }
-      }
-      
-    }
   }
   
   
@@ -337,17 +272,74 @@ input.vTimeField,
   }
 }
 
+/*| Main Content Area for Widgets
+-----------------------------------------*/
+#content-main {
+  .widgy{
+    .editor {
+      width: 100%;
+    
+    
+      section.node {
+        width: 98.5%;
+      
+      }
+    }
+    
+  }
+}
 
-/* shelves */
+
+
+/*| Shelves for Draggable Widgets
+-----------------------------------------*/
+#content-main{
+  div.widget {
+    p.drag-row {
+      span.title {
+        background-position: 5px 4px;
+        padding: 5px 0 5px 30px;
+      }
+    }
+    
+    
+    > ul.nodeChildren{
+      width: 88%;
+      
+      ul.nodeChildren{
+        width: 100%;
+      }
+    }
+    
+    
+    .shelf {
+      display: inline;
+      float: right;
+      position: relative;
+      width: 200px;
+    }
+
+    div.widget {
+      .shelf {
+        float: none;
+        width: auto;
+      }
+    }
+    
+  }
+}
+
+
 
 ul.list.nodeChildren {
   li.node {
-    background-color: #FFFFF;
+    @include gradient(#eee,#fff);
+    border: 1px solid #E0E0E0;
     display: inline-block;
     height: auto;
     margin-bottom: 4px;
-    padding: 5px 10px 5px 35px;
-    width: 155px;
+    padding: 5px 10px 5px 5px;
+    width: 185px;
     
     span.icon-move {
       display: inline;
@@ -357,43 +349,79 @@ ul.list.nodeChildren {
     }
     
     span.title {
+      background-position: 5px 9px;
       display: inline;
       float: left;
       font-size: 1.2em;
       line-height: 1.8em;
+      padding: 5px 0 5px 30px;
     }
+  }
+}
 
-    &.accordion {
-      background: url("../image/widget_image.gif") no-repeat 10px 13px;
-    }
-    
-    &.calloutwidget {
-      background: url("../image/widget_call_to_action.gif") no-repeat 10px 13px;
-    }
-        
-    &.figure {
-      background: url("../image/widget_image.gif") no-repeat 10px 13px;
-    }
-    
-    &.form {
-      background: url("../image/widget_form.gif") no-repeat 10px 13px;
-    }
-    
-    &.image {
-      background: url("../image/widget_image.gif") no-repeat 10px 13px;
-    }
+span.icon-move {
+  color: #999999;
+}
 
-    &.markdown {
-      background: url("../image/widget_code.gif") no-repeat 10px 13px;
-    }
+li.node {   
+  border: 1px solid #E0E0E0;
+     
+  &.calloutwidget span.title {
+    background: url("../image/widget-callout.png") no-repeat;
+  }
+  
+  &.demoaccordion span.title {
+    background: url("../image/widget-accordion.png") no-repeat;
+  }
+  
+  &.emailsuccesshandler span.title,
+  &.emailuserhandler span.title {
+    background: url("../image/widget-email.gif") no-repeat;
+  }
+      
+  &.figure span.title {
+    background: url("../image/widget-image.gif") no-repeat;
+  }
+  
+  &.form span.title,
+  &.forminput span.title {
+    background: url("../image/widget-form.gif") no-repeat;
+  }
+  
+  &.image span.title {
+    background: url("../image/widget-image.gif") no-repeat;
+  }
+
+  &.markdown span.title {
+    background: url("../image/widget-code.gif") no-repeat;
+  }
+
+  &.savedatahandler span.title {
+    background: url("../image/widget-save-data.png") no-repeat;
+  }
+  
+  &.section span.title {
+    background: url("../image/widget-section.png") no-repeat;
+  }
+  
+  &.submitbutton span.title {
+    background: url("../image/widget-ok-button.png") no-repeat;
+  }
         
-    &.table {
-      background: url("../image/widget_table.gif") no-repeat 10px 13px;
-    }
-    
-    &.video {
-      background: url("../image/widget_video.gif") no-repeat 10px 13px;
-    }
+  &.table span.title {
+    background: url("../image/widget-table.gif") no-repeat;
+  }
+  
+  &.textarea span.title {
+    background: url("../image/widget-textarea.gif") no-repeat;
+  }
+  
+  &.uncaptcha span.title {
+    background: url("../image/widget-hidden-field.png") no-repeat;
+  }
+  
+  &.video span.title {
+    background: url("../image/widget-video.gif") no-repeat;
   }
 }
 

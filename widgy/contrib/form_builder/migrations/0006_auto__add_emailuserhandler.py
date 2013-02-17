@@ -14,7 +14,6 @@ class Migration(SchemaMigration):
             ('to', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', null=True, to=orm['widgy.Node'])),
             ('subject', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('content', self.gf('widgy.contrib.page_builder.db.fields.MarkdownField')(blank=True)),
-            ('_nodes', self.gf('widgy.generic.ProxyGenericRelation')(object_id_field='content_id', to=orm['widgy.Node'])),
         ))
         db.send_create_signal('form_builder', ['EmailUserHandler'])
 

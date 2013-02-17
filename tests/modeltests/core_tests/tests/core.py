@@ -655,6 +655,37 @@ class TestVersioning(RootNodeTestCase):
         self.assertIn('foo', diff)
         self.assertIn('bar', diff)
 
+    def test_daisydiff_unicode(self):
+        a = u'\N{SNOWMAN}'
+        b = u'\N{INTERROBANG}'
+
+        diff = daisydiff(a, b)
+
+        self.assertIn(a, diff)
+        self.assertIn(b, diff)
+
+    def test_reset(self):
+        root_node = RawTextWidget.add_root(widgy_site, text='first').node
+        tracker = VersionTracker.objects.create(working_copy=root_node)
+        commit1 = tracker.commit()
+
+        textwidget_content = tracker.working_copy.content
+        textwidget_content.text = 'second'
+        textwidget_content.save()
+
+        tracker.reset()
+        textwidget_content = tracker.working_copy.content
+        self.assertEqual(textwidget_content.text, 'first')
+
+        # make sure working_copy is still editable
+        textwidget_content = tracker.working_copy.content
+        textwidget_content.text = 'second'
+        textwidget_content.save()
+
+        tracker.reset()
+        textwidget_content = tracker.working_copy.content
+        self.assertEqual(textwidget_content.text, 'first')
+
 
 class TestPrefetchTree(RootNodeTestCase):
     def setUp(self):

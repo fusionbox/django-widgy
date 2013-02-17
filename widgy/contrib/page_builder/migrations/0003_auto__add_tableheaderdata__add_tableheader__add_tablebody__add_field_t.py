@@ -11,27 +11,24 @@ class Migration(SchemaMigration):
         # Adding model 'TableHeaderData'
         db.create_table('page_builder_tableheaderdata', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('_nodes', self.gf('widgy.generic.ProxyGenericRelation')(object_id_field='content_id', to=orm['widgy.Node'])),
         ))
         db.send_create_signal('page_builder', ['TableHeaderData'])
 
         # Adding model 'TableHeader'
         db.create_table('page_builder_tableheader', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('_nodes', self.gf('widgy.generic.ProxyGenericRelation')(object_id_field='content_id', to=orm['widgy.Node'])),
         ))
         db.send_create_signal('page_builder', ['TableHeader'])
 
         # Adding model 'TableBody'
         db.create_table('page_builder_tablebody', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('_nodes', self.gf('widgy.generic.ProxyGenericRelation')(object_id_field='content_id', to=orm['widgy.Node'])),
         ))
         db.send_create_signal('page_builder', ['TableBody'])
 
         # Adding field 'TableData.column'
         db.add_column('page_builder_tabledata', 'column',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=0, related_name='cells', on_delete=models.PROTECT, to=orm['page_builder.TableHeaderData']),
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=None, related_name='cells', on_delete=models.PROTECT, to=orm['page_builder.TableHeaderData']),
                       keep_default=False)
 
 

@@ -285,7 +285,7 @@ INSTALLED_APPS = (
     # widgy apps
     'filer',
     'easy_thumbnails',
-    'urlconf_include',
+    'widgy.contrib.urlconf_include',
 
     # local project
     'demo.demo_widgets'
@@ -339,7 +339,7 @@ MIDDLEWARE_CLASSES = (
     "mezzanine.core.middleware.AdminLoginInterfaceSelectorMiddleware",
     # Uncomment the following if using any of the SSL settings:
     # "mezzanine.core.middleware.SSLRedirectMiddleware",
-    "urlconf_include.middleware.PatchUrlconfMiddleware",
+    "widgy.contrib.urlconf_include.middleware.PatchUrlconfMiddleware",
     "mezzanine.pages.middleware.PageMiddleware",
     "mezzanine.core.middleware.FetchFromCacheMiddleware",
     "django.middleware.transaction.TransactionMiddleware",

@@ -1,5 +1,8 @@
 from django import template
 from django.conf import settings
+from django.utils.safestring import mark_safe
+
+import markdown
 
 from widgy.utils import fancy_import
 
@@ -17,6 +20,9 @@ def render(context, node):
     elif hasattr(node, 'get_published_node'):
         node = node.get_published_node(context['request'])
 
+    if not node:
+        return 'no content'
+
     node.maybe_prefetch_tree()
 
     return node.render(context)
@@ -32,3 +38,14 @@ def scss_files(site):
     site = fancy_import(site)
 
     return site.scss_files
+
+
+@register.filter(name='markdown')
+def mdown(value):
+    value = markdown.markdown(
+        value,
+        extensions=['sane_lists'],
+        safe_mode='escape',
+    )
+
+    return mark_safe(value)
