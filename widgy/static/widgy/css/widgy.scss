@@ -433,8 +433,16 @@ input.vTimeField,
     div.widget {
       
       .shelf {
+        border-bottom: 2px solid $lightgrey;
+        display: block;
         float: none;
+        margin: 10px;
+        padding: 0px 0px 10px 0px;
         width: auto;
+        
+        p.title {
+          display: none; // hide the form widgets label
+        }
       }
       
       // Actual Widgets
@@ -485,7 +493,12 @@ input.vTimeField,
               div {
                 padding: 0px;
                 
+                &.formField {
+                  margin-bottom: 10px;
+                }
+                
                 label {
+                  clear: left;
                   padding: 0 10px 10px 0;
                 }
                 
