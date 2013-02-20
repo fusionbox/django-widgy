@@ -2,11 +2,11 @@ from django.contrib.contenttypes import generic
 from django.db import DEFAULT_DB_ALIAS, connection
 from widgy.generic.models import ContentType
 
-from south.modelsinspector import add_introspection_rules
+from south.modelsinspector import add_ignored_fields
 
-add_introspection_rules([], ["^widgy\.generic\.ProxyGenericRelation"])
-add_introspection_rules([], ["^widgy\.generic\.ProxyGenericForeignKey"])
-add_introspection_rules([], ["^widgy\.generic\.WidgyGenericForeignKey"])
+add_ignored_fields(["^widgy\.generic\.ProxyGenericRelation",
+                    "^widgy\.generic\.ProxyGenericForeignKey",
+                    "^widgy\.generic\.WidgyGenericForeignKey"])
 
 
 class ProxyGenericForeignKey(generic.GenericForeignKey):

@@ -1,12 +1,5 @@
-from django.contrib.sites.models import Site
-
-from widgy.contrib.list_content_widget.models import ListContentBase
 from widgy.contrib.page_builder.models import Layout, MainContent, Accordion
 from widgy import registry
-
-
-class SiteListCalloutContent(ListContentBase):
-    model = Site
 
 
 class TwoContentLayout(Layout):

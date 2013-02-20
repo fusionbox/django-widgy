@@ -1,8 +1,8 @@
-define([ 'widgy.contents', 'widgets/widgets' ], function(contents, widgets) {
+define([ 'underscore', 'components/widget/component' ], function(_, widget) {
 
-  var TableHeaderView = widgets.WidgetView.extend({
+  var TableHeaderView = widget.View.extend({
     initialize: function() {
-      widgets.WidgetView.prototype.initialize.apply(this, arguments);
+      widget.View.prototype.initialize.apply(this, arguments);
 
       _.bindAll(this,
         'refreshTable',
@@ -24,9 +24,12 @@ define([ 'widgy.contents', 'widgets/widgets' ], function(contents, widgets) {
     }
   });
 
-  var TableHeader = contents.Content.extend({
+  var TableHeader = widget.Model.extend({
     viewClass: TableHeaderView
   });
 
-  return TableHeader;
+  return _.extend({}, widget, {
+    Model: TableHeader,
+    View: TableHeaderView
+  });
 });

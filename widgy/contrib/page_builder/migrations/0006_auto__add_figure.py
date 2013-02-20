@@ -14,7 +14,6 @@ class Migration(SchemaMigration):
             ('position', self.gf('django.db.models.fields.CharField')(default='center', max_length=50)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=1023, null=True, blank=True)),
             ('caption', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('_nodes', self.gf('widgy.generic.ProxyGenericRelation')(object_id_field='content_id', to=orm['widgy.Node'])),
         ))
         db.send_create_signal('page_builder', ['Figure'])
 

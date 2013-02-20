@@ -1,4 +1,8 @@
-test:
+JS_FILES?=`find ./js_tests/tests -type f -name '*.js'`
+
+test: test-py test-js
+
+test-py:
 	cd tests && $(COVERAGE_COMMAND) ./runtests.py --settings=test_multidb --verbosity=2 $(TESTS)
 
 coverage:
@@ -8,4 +12,12 @@ coverage:
 browser: coverage
 	sensible-browser tests/coverage_html/index.html
 
-.PHONY: test coverage browser
+js_tests/node_modules: js_tests/package.json
+	cd js_tests && npm install .
+
+test-js: js_tests/node_modules
+	./js_tests/node_modules/mocha/bin/mocha \
+		-s 5 \
+		$(JS_FILES)
+
+.PHONY: test coverage browser test-py test-js

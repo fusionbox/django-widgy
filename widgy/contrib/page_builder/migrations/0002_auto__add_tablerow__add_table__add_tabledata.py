@@ -11,21 +11,18 @@ class Migration(SchemaMigration):
         # Adding model 'TableRow'
         db.create_table('page_builder_tablerow', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('_nodes', self.gf('widgy.generic.ProxyGenericRelation')(object_id_field='content_id', to=orm['widgy.Node'])),
         ))
         db.send_create_signal('page_builder', ['TableRow'])
 
         # Adding model 'Table'
         db.create_table('page_builder_table', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('_nodes', self.gf('widgy.generic.ProxyGenericRelation')(object_id_field='content_id', to=orm['widgy.Node'])),
         ))
         db.send_create_signal('page_builder', ['Table'])
 
         # Adding model 'TableData'
         db.create_table('page_builder_tabledata', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('_nodes', self.gf('widgy.generic.ProxyGenericRelation')(object_id_field='content_id', to=orm['widgy.Node'])),
         ))
         db.send_create_signal('page_builder', ['TableData'])
 

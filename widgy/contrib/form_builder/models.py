@@ -3,13 +3,13 @@ from django import forms
 from django.utils.datastructures import SortedDict
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
-from django.core import validators
 from django.conf import settings
 from django.db.models.query import QuerySet
 
 from fusionbox import behaviors
 from fusionbox.db.models import QuerySetManager
 from django_extensions.db.fields import UUIDField
+from fusionbox.forms.fields import PhoneNumberField
 
 from widgy.models import Content, Node
 from widgy.models.mixins import DefaultChildrenMixin
@@ -110,7 +110,6 @@ class EmailUserHandler(FormSuccessHandler):
         email_fields = self.get_email_fields()
         self.to = email_fields and email_fields[0].node
         self.save()
-
 
 
 @widgy.register
@@ -346,12 +345,14 @@ class FormInput(FormField):
         'text': forms.CharField,
         'number': forms.IntegerField,
         'email': forms.EmailField,
+        'tel': PhoneNumberField,
     }
 
     FORM_INPUT_TYPES = (
         ('text', 'Text'),
         ('number', 'Number'),
         ('email', 'Email'),
+        ('tel', 'Telephone'),
     )
 
     formfield_class = forms.CharField
@@ -363,11 +364,28 @@ class FormInput(FormField):
     def formfield_class(self):
         return self.FORMFIELD_CLASSES[self.type]
 
+    @property
+    def widget(self):
+        attrs = {
+            'type': self.type,
+        }
+        if self.required:
+            attrs['required'] = 'required'
+
+        return forms.TextInput(attrs=attrs)
+
 
 @widgy.register
 class Textarea(FormField):
     formfield_class = forms.CharField
-    widget = forms.Textarea
+
+
+    @property
+    def widget(self):
+        attrs = {}
+        if self.required:
+            attrs['required'] = 'required'
+        return forms.Textarea(attrs=attrs)
 
 
 @widgy.register

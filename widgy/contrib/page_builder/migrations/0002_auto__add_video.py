@@ -14,7 +14,6 @@ class Migration(SchemaMigration):
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('video', self.gf('widgy.contrib.page_builder.db.fields.VideoField')(max_length=200)),
             ('caption', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('_nodes', self.gf('widgy.generic.ProxyGenericRelation')(object_id_field='content_id', to=orm['widgy.Node'])),
         ))
         db.send_create_signal('page_builder', ['Video'])
 

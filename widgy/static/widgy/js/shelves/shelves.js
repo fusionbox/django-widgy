@@ -1,15 +1,18 @@
-define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
+define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
+    'nodes/models',
+    'text!nodes/preview.html',
     'text!./shelf.html'
-    ], function(exports, _, Backbone, nodes,
+    ], function(exports, _, Backbone, DraggableView,
+      node_models,
+      shelf_item_view_template,
       shelf_view_template
       ) {
 
   var ShelfCollection = Backbone.Collection.extend({
     comparator: 'title',
+    model: node_models.Node,
 
     initialize: function(options) {
-      this.model = nodes.Node;
-
       this.node = options.node;
     }
   });
@@ -37,7 +40,7 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
     },
 
     addOne: function(model) {
-      var view = new nodes.NodePreviewView({
+      var view = new ShelfItemView({
         model: model,
         app: this.app
       });
@@ -108,7 +111,7 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
         if ( existing.length )
           return existing[0];
         else
-          return new nodes.Node(value);
+          return this.collection._prepareModel(value);
       }, this);
       this.collection.update(instances);
       this.collection.sort();
@@ -117,8 +120,44 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/nodes',
   });
 
 
-  _.extend(exports, {
+  var ShelfItemView = DraggableView.extend({
+    tagName: 'li',
+    className: 'node',
+    template: shelf_item_view_template,
+
+    // Override the DraggableView events, I want the whole thing draggable, not
+    // just the drag handle.
+    events: {
+      'mousedown': 'startBeingDragged'
+    },
+
+    canAcceptParent: function(parent) {
+      return this.app.validateRelationship(parent, this.model);
+    },
+
+    startBeingDragged: function(event) {
+      DraggableView.prototype.startBeingDragged.apply(this, arguments);
+
+      // only on a left click.
+      if ( event.which !== 1 )
+        return;
+
+      var placeholder = this.placeholder = $('<li class="drag_placeholder">&nbsp;</li>').css({
+        width: this.$el.width(),
+        padding: this.$el.css('padding')
+      });
+
+      this.$el.after(placeholder);
+    },
+
+    cssClasses: function() {
+      return this.model.get('css_classes');
+    }
+  });
+
+
+  return {
     ShelfCollection: ShelfCollection,
     ShelfView: ShelfView
-  });
+  };
 });

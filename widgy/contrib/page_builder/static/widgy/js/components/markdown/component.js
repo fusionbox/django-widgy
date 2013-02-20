@@ -15,13 +15,13 @@ require.config({
   }
 });
 
-define([ 'widgy.contents', 'widgets/widgets', 'pagedown' ], function(contents, widgets, Markdown) {
+define([ 'underscore', 'components/widget/component', 'pagedown' ], function(_, widget, Markdown) {
 
   var idPostfix = 1;
 
-  var MarkdownEditorView = widgets.EditorView.extend({
+  var MarkdownEditorView = widget.EditorView.extend({
     renderHTML: function() {
-      widgets.EditorView.prototype.renderHTML.apply(this, arguments);
+      widget.EditorView.prototype.renderHTML.apply(this, arguments);
 
       var textarea = this.$('textarea[name=content]')[0],
           preview = this.$('.pagedown-preview')[0],
@@ -38,13 +38,11 @@ define([ 'widgy.contents', 'widgets/widgets', 'pagedown' ], function(contents, w
     }
   });
 
-  var MarkdownView = widgets.WidgetView.extend({
+  var MarkdownView = widget.View.extend({
     editorClass: MarkdownEditorView
   });
 
-  var Content = contents.Content.extend({
-    viewClass: MarkdownView
+  return _.extend({}, widget, {
+    View: MarkdownView
   });
-
-  return Content;
 });

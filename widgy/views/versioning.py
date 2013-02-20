@@ -73,6 +73,28 @@ class CommitView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, FormView)
         )
 
 
+class ResetView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, TemplateView):
+    template_name = 'widgy/reset.html'
+
+    def get_context_data(self, **kwargs):
+        self.object = self.get_object()
+        kwargs = super(ResetView, self).get_context_data(**kwargs)
+        kwargs['object'] = self.object
+        kwargs['changed_anything'] = self.object.has_changes()
+        kwargs['has_commits'] = bool(self.object.head)
+        kwargs['reset_url'] = self.request.get_full_path()
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        version_tracker = self.get_object()
+        version_tracker.reset()
+        return self.response_class(
+            request=self.request,
+            template='widgy/reset_success.html',
+            context=self.get_context_data(),
+        )
+
+
 class HistoryView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, DetailView):
     template_name = 'widgy/history.html'
 
@@ -158,8 +180,8 @@ def daisydiff(before, after):
     """
     files = [tempfile.NamedTemporaryFile() for i in range(3)]
     with contextlib.nested(*files) as (f_a, f_b, f_out):
-        f_a.write(before)
-        f_b.write(after)
+        f_a.write(before.encode('utf-8'))
+        f_b.write(after.encode('utf-8'))
 
         f_a.flush()
         f_b.flush()
@@ -177,11 +199,11 @@ def daisydiff(before, after):
         if retcode:
             assert False, "Daisydiff returned %s" % retcode
 
-        diff_html = f_out.read()
+        diff_html = f_out.read().decode('utf-8')
 
         # remove the daisydiff chrome so we can add our own
         parsed = BeautifulSoup(diff_html)
         body = parsed.find('body')
         for i in body.findAll(recursive=False)[:6]:
             i.extract()
-        return str(body)
+        return unicode(body)
