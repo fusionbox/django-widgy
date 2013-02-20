@@ -46,6 +46,7 @@ body, html {
     .content {
       -webkit-user-select: auto;
       -moz-user-select: text;
+      border: 0px none !important;
 
       p.drag-row {
         @include clearfix;
@@ -278,8 +279,8 @@ input.vTimeField,
 #content-main {
   .widgy{
     .editor {
+      background: #FAFAFA;
       width: 100%;
-    
     
       section.node {
         width: 98.5%;
@@ -304,7 +305,7 @@ input.vTimeField,
     }
     
     > ul.nodeChildren{
-      width: 88%;
+      width: 73%;
       
       ul.nodeChildren{
         width: 100%;
@@ -316,9 +317,38 @@ input.vTimeField,
       display: inline;
       float: right;
       position: relative;
-      width: 200px;
+      width: 25%;
+      
+      ul.list.nodeChildren {
+        li.node {
+          width: 185px;
+        
+        }
+      }
     }
 
+    li.maincontent {
+      .shelf {
+
+        ul.list.nodeChildren {
+          li.node {
+            margin-left: 5px;
+            padding: 2px 8px 2px 4px;
+            width: auto;
+          
+            span.icon-move{
+              margin-left: 5px;
+            }
+          
+            &:first-child{
+              margin-left: 0px;
+            }
+          }
+        }
+      }
+      
+    }
+    
     div.widget {
       .shelf {
         float: none;
@@ -327,6 +357,8 @@ input.vTimeField,
     }
     
   }
+  
+  
 }
 
 
@@ -339,7 +371,7 @@ ul.list.nodeChildren {
     height: auto;
     margin-bottom: 4px;
     padding: 5px 10px 5px 5px;
-    width: 185px;
+    width: 90%;
     
     span.icon-move {
       display: inline;
@@ -447,11 +479,15 @@ input.vTimeField,
 -----------------------------------------*/
 .button,
 button {
-  background: $blue;
+  background: white;
+  border: 1px solid $blue;
+  border-radius: 3px;
+  color: $blue;
   height: auto;
 
   &:hover {
-    background-color: lighten($blue,10%);
+    background-color: lighten($blue,35%);
+    color: $blue;
   }
 
   &.cancel {
@@ -459,7 +495,7 @@ button {
     opacity: 0.7;
 
     &:hover {
-      background-color: lighten($darkgrey,10%);
+      background-color: lighten($darkgrey,35%);
       opacity: 1;
     }
   }
@@ -474,12 +510,15 @@ button {
   }
   
   &.delete {
-    background-color: $red;
-    color: white;
+    background: white;
+    border: 1px solid $red;
+    border-radius: 3px;
+    color: $red;
     height: auto;
     padding: 2px;
+    
     &:hover {
-      background-color: lighten($red,10%);
+      background-color: lighten($red,35%);
     }
   }
 
