@@ -1,7 +1,67 @@
 @import "widgy_common.scss";
 
+
+/* Mixins
+-----------------------------------------*/
+
+
+@mixin button {
+  @include rounded(3px);
+  background: transparent;
+  border: 1px solid $blue;
+  color: $blue;
+  display: inline-block;
+  height: auto;
+  font-weight: bold;
+  padding: 2px;
+  width: auto;
+
+  &:hover {
+    background-color: lighten($blue,35%);
+    color: $blue;
+  }
+
+  &.cancel {
+    border-color: $grey;
+    color: $grey;
+    
+    &:hover {
+      background: lighten($lightgrey,15%);
+    }
+  }
+  
+  &.delete {
+    border-color: $red;
+    color: $red;
+    
+    &:hover {
+      background: lighten($red,35%);
+    }
+  }
+  
+  &.loading {
+    @extend %loading;
+  }
+  
+  &[type='submit'] {
+    @include rounded(3px);
+    border-color: $green;
+    color: $green;
+    height: auto;
+    font-weight: bold;
+    padding: 2px !important;
+    
+    &:hover {
+      background: lighten($green,50%);
+    }
+  }
+  
+}
+
+
+
 /* Placeholder selectors
--------------------*/
+-----------------------------------------*/
 %loading {
   background: url('../image/loading.gif') center no-repeat;
   color: transparent;
@@ -264,6 +324,18 @@ input.vTimeField,
         font-weight: bold;
       }
     }
+    
+    // Section Nodes (Main Content, Sidebar)
+    .node {
+      @include inset-shadow(transparent,0px,0px,0px);
+      background: white;
+      
+      & > .widget > .content > .drag-row > .title {
+        font-weight: bold;
+        font-size: 20px;
+        text-transform: capitalize;
+      }
+    }
   }
   
   
@@ -357,6 +429,7 @@ input.vTimeField,
       
     }
     
+    // Widget Groups (Main, Sidebar)
     div.widget {
       
       .shelf {
@@ -366,12 +439,20 @@ input.vTimeField,
       
       // Actual Widgets
       li.node {
+        background: white;
+        overflow: hidden;
         padding: 0px;
+        
+        &.being_dragged {
+          position: fixed; // for draggin
+        }
       
         div.widget {
+          background: white;
           padding: 0px;
           
           div.content {
+            
             p.drag-row {
               @include gradient(#eee,#fff);
               display: block;
@@ -380,17 +461,67 @@ input.vTimeField,
               margin: 0px;
               padding: 10px;
               width: auto;
+              
+              span.title {
+                color: #333333;
+                font-size: 15px;
+                font-weight: normal;
+              }
             }
             
             div.preview {
               @include clearfix;
               @include html;
-              background: white;
               display: block;
               float: none;
               padding: 10px;
               width: auto;
             }
+              
+            // Widget Editor
+            div {
+              padding: 10px;
+              
+              div {
+                padding: 0px;
+                
+                label {
+                  padding: 0 10px 10px 0;
+                }
+                
+                textarea {
+                  width: 98.5%;
+                }
+              }
+              
+              .pagedown-buttonbar {
+                clear: both;
+                margin: 0px 0px 10px 0px;
+                
+                ul {
+                  margin: 0px;
+                }
+              }
+              
+              .pagedown-preview {
+                @include html;
+                @include rounded(3px);
+                border: dashed 1px $lightgrey;
+                margin: 10px 0px;
+                padding: 9px;
+              }
+            }
+            
+            input[type='submit'] {
+              @include button;
+              float: right;
+            }
+          }
+          
+          // Widgets Within Widgets
+          ul.nodeChildren {
+            margin: 0 auto !important;
+            width: 97% !important;
           }
         }
       
@@ -484,54 +615,11 @@ input.vTimeField,
 
 /*| Button Styles
 -----------------------------------------*/
+
+
 .button,
 button {
-  background: white;
-  border: 1px solid $blue;
-  border-radius: 3px;
-  color: $blue;
-  height: auto;
-
-  &:hover {
-    background-color: lighten($blue,35%);
-    color: $blue;
-  }
-
-  &.cancel {
-    background: $darkgrey;
-    opacity: 0.7;
-
-    &:hover {
-      background-color: lighten($darkgrey,35%);
-      opacity: 1;
-    }
-  }
-
-  &.commit,
-  &.edit {
-    padding: 2px;
-  }
-
-  &.delete{
-    background-color: #353535;
-  }
-  
-  &.delete {
-    background: white;
-    border: 1px solid $red;
-    border-radius: 3px;
-    color: $red;
-    height: auto;
-    padding: 2px;
-    
-    &:hover {
-      background-color: lighten($red,35%);
-    }
-  }
-
-  &.loading {
-    @extend %loading;
-  }
+  @include button;
 }
 
 
@@ -542,7 +630,7 @@ div.submit-row p {
 
 /*| Forms
 -----------------------------------------*/
-input, 
+input[type='text'], input[type='password'], input[type='email'], input[type='search'], input[type='number'], 
 textarea, 
 button {
   &:focus {
@@ -550,7 +638,7 @@ button {
   }
 }
 
-input, 
+input[type='text'], input[type='password'], input[type='email'], input[type='search'], input[type='number'], 
 textarea {
   @include inset-shadow($black10,0px,1px,2px);
   border: 0px;
@@ -560,19 +648,6 @@ textarea {
 
 textarea {
   height: 120px;
-}
-
-input[type='submit'] {
-  background: $green;
-  height: auto;
-
-  &:hover {
-    background-color: lighten($green,5%);
-  }
-
-  &.loading {
-    @extend %loading;
-  }
 }
 
 
