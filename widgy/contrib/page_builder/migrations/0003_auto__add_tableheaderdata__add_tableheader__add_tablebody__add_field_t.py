@@ -28,7 +28,7 @@ class Migration(SchemaMigration):
 
         # Adding field 'TableData.column'
         db.add_column('page_builder_tabledata', 'column',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=None, related_name='cells', on_delete=models.PROTECT, to=orm['page_builder.TableHeaderData']),
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=1, related_name='cells', on_delete=models.PROTECT, to=orm['page_builder.TableHeaderData']),
                       keep_default=False)
 
 
