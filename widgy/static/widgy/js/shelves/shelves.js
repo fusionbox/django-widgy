@@ -122,7 +122,7 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
 
   var ShelfItemView = DraggableView.extend({
     tagName: 'li',
-    className: 'node',
+    className: 'shelfItem',
     template: shelf_item_view_template,
 
     // Override the DraggableView events, I want the whole thing draggable, not
