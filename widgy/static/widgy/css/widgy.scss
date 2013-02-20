@@ -12,6 +12,7 @@
 -----------------------------------------*/
 body {
   font-size: 62.5%;
+  line-height: 62.5%;
 }
 
 body, html {
@@ -296,12 +297,11 @@ input.vTimeField,
 #content-main{
   div.widget {
     p.drag-row {
-      span.title {
+      > span.title {
         background-position: 5px 4px;
-        padding: 5px 0 5px 30px;
+        padding: 5px 0 5px 0px;
       }
     }
-    
     
     > ul.nodeChildren{
       width: 88%;
@@ -366,16 +366,16 @@ span.icon-move {
 li.node {   
   border: 1px solid #E0E0E0;
      
-  &.calloutwidget span.title {
+  &.calloutwidget > span.title {
     background: url("../image/widget-callout.png") no-repeat;
   }
   
-  &.demoaccordion span.title {
+  &.demoaccordion > span.title {
     background: url("../image/widget-accordion.png") no-repeat;
   }
   
-  &.emailsuccesshandler span.title,
-  &.emailuserhandler span.title {
+  &.emailsuccesshandler > span.title,
+  &.emailuserhandler > span.title {
     background: url("../image/widget-email.gif") no-repeat;
   }
       
@@ -383,44 +383,44 @@ li.node {
     background: url("../image/widget-image.gif") no-repeat;
   }
   
-  &.form span.title,
-  &.forminput span.title {
+  &.form > span.title,
+  &.forminput > span.title {
     background: url("../image/widget-form.gif") no-repeat;
   }
   
-  &.image span.title {
+  &.image > span.title {
     background: url("../image/widget-image.gif") no-repeat;
   }
 
-  &.markdown span.title {
+  &.markdown > span.title {
     background: url("../image/widget-code.gif") no-repeat;
   }
 
-  &.savedatahandler span.title {
+  &.savedatahandler > span.title {
     background: url("../image/widget-save-data.png") no-repeat;
   }
   
-  &.section span.title {
+  &.section > span.title {
     background: url("../image/widget-section.png") no-repeat;
   }
   
-  &.submitbutton span.title {
+  &.submitbutton > span.title {
     background: url("../image/widget-ok-button.png") no-repeat;
   }
         
-  &.table span.title {
+  &.table > span.title {
     background: url("../image/widget-table.gif") no-repeat;
   }
   
-  &.textarea span.title {
+  &.textarea > span.title {
     background: url("../image/widget-textarea.gif") no-repeat;
   }
   
-  &.uncaptcha span.title {
+  &.uncaptcha > span.title {
     background: url("../image/widget-hidden-field.png") no-repeat;
   }
   
-  &.video span.title {
+  &.video > span.title {
     background: url("../image/widget-video.gif") no-repeat;
   }
 }
