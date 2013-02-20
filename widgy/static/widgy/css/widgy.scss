@@ -443,6 +443,21 @@ input.vTimeField,
         p.title {
           display: none; // hide the form widgets label
         }
+        
+        ul.list.nodeChildren li.shelfItem {
+          padding: 1px 5px 1px 1px;
+          width: auto;
+          
+          span.title {
+            background-position: 5px 5px;
+            font-size: 11px;
+            padding: 2px 0px 2px 26px;
+          }
+          
+          span.icon-move {
+            margin-top: 4px;
+          }
+        }
       }
       
       // Actual Widgets
