@@ -108,7 +108,8 @@ class EmailUserHandler(FormSuccessHandler):
 
     def post_create(self, site):
         email_fields = self.get_email_fields()
-        self.to = email_fields and email_fields[0].node
+        if email_fields:
+            self.to = email_fields[0].node
         self.save()
 
 
