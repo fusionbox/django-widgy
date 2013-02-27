@@ -127,9 +127,6 @@ LANGUAGE_CODE = "en"
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-# Whether a user's session cookie expires when the Web browser is closed.
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
 SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
