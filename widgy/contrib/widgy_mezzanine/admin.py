@@ -65,8 +65,10 @@ class UndeleteField(forms.ModelChoiceField):
         # Is it necessary to query on the HEAD content type _and_ the working
         # copy content type? Can a version tracker's root node content type
         # change?  If it can change, which one should be used here?
+        #
+        # Just filter based on the working copy's layout, as this allows
+        # undeleting a version tracker that never got committed.
         return VersionTracker.objects.orphan().filter(
-            head__root_node__content_type_id__in=layouts,
             working_copy__content_type_id__in=layouts)
 
     def label_from_instance(self, obj):
