@@ -68,9 +68,6 @@ Working:
   - Nice drag and drop: retain the inside node offset (ask Gavin), snap into
     drop targets on mouseover.
   - Follow mouse on scroll while dragging.
-
-Not Working Yet:
-
   - Nicer compatibility (preerrors and aftererrors)
 
 ## Features required before we can show somebody else
@@ -108,5 +105,4 @@ Steps:
 
 # testing
 
-    cd tests/
-    PYTHONPATH=../../ ./runtests.py --settings=test_sqlite --verbosity=2
+    make test
