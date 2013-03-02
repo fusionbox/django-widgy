@@ -159,7 +159,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
     startDrag: function(dragged_view) {
       debug.call(this, 'startDrag', dragged_view);
 
-      if ( ( this.hasShelf() && ! dragged_view.model.id || ! this.model.get('parent_id') )) {
+      if ( ( this.hasShelf() && ! dragged_view.model.id || this.isRootNode() )) {
         this.dragged_view = dragged_view;
 
         var bindToDocument = _.bind(function() {
