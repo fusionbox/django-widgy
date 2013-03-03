@@ -39,19 +39,12 @@ define([
 
     render: function() {
       // asychronous (possibly) template rendering.
-      templates.render(
-          this.model.get('template_url'),
-          'edit_template',
-          this.toJSON(),
-          this.renderHTML
-          );
-
-      return this;
+      return templates.getTemplate(this.model.get('template_url'))
+        .then(this.renderHTML);
     },
 
-    renderHTML: function(html) {
-      this.$el.html(html);
-      this.trigger('render');
+    renderHTML: function(template) {
+      this.$el.html(template.render('edit_template', this.toJSON()));
     },
 
     submit: function() {
@@ -133,13 +126,16 @@ define([
 
       new Backbone.Spinner({el: this.$el.find('.edit')});
 
-      this.listenTo(edit_view, 'close', this.render)
-          .listenTo(edit_view, 'render', function() {
-            this.$el.html(edit_view.el);
-            edit_view.$el.find(':input:first').focus();
-          });
+      this.listenTo(edit_view, 'close', this.render);
 
-      edit_view.render();
+      edit_view.render()
+        .then(_.bind(function(edit_view) {
+          this.$el.html(edit_view.el);
+
+          // TODO: use HTML autofocus property??
+          edit_view.$(':input:first').focus();
+        }, this))
+        .done();
     }
   });
 
