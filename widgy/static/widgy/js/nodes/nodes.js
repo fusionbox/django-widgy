@@ -392,45 +392,17 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
       this.listenTo(shelf, 'startDrag', this.startDrag)
           .listenTo(shelf, 'stopDrag', this.stopDrag);
 
+      var self = this;
+      this.$children.before(shelf.render().el);
       // position sticky
-      if ( false && this.isRootNode() ) {
-        // The shelf needs to be after the children because in state 0 (fixed),
-        // the shelf items will be displayed underneath everything else that is
-        // after it in HTML.
-        this.$children.after(shelf.render().el);
+      if ( this.isRootNode() ) {
+        $(window).scroll(function() {
+          var upper_bound = self.el.offsetTop,
+              lower_bound = upper_bound + self.el.offsetHeight - shelf.el.offsetHeight,
+              margin_top = Math.max(0, Math.min(window.scrollY - upper_bound, lower_bound - upper_bound) - 60);
 
-        var state = -1;
-        $(window).scroll(_.bind(function() {
-          var upper_bound = this.el.offsetTop,
-              lower_bound = upper_bound + this.el.offsetHeight - this.shelf.el.offsetHeight;
-          if ( window.scrollY < upper_bound && state !== -1) {
-            this.shelf.$el.css({
-              position: '',
-              top: '',
-              left: ''
-            });
-            state = -1;
-          }
-          if ( window.scrollY > upper_bound && state !== 0) {
-            this.shelf.$el.css({
-              position: 'fixed',
-              // this 80px is to adjust for Mezzanine's fixed header.
-              top: 80,
-              left: this.shelf.$el.offset().left
-            });
-            state = 0;
-          }
-          if ( window.scrollY > lower_bound && state !== 1) {
-            this.shelf.$el.css({
-              position: 'absolute',
-              top: lower_bound - upper_bound,
-              left: ''
-            });
-            state = 1;
-          }
-        }, this));
-      } else {
-        this.$children.before(shelf.render().el);
+          shelf.el.style.marginTop = margin_top + 'px';
+        });
       }
     },
 
