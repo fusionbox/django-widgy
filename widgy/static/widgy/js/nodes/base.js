@@ -45,6 +45,14 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
       return this;
     },
 
+    renderPromise: function() {
+      return Backbone.View.prototype.renderPromise.apply(this, arguments)
+        .then(function(self) {
+          _.each(self.cssClasses(), self.$el.addClass, self.$el);
+          return self;
+        });
+    },
+
     startBeingDragged: function(event) {
       event.preventDefault();
       event.stopPropagation();

@@ -1,4 +1,4 @@
-define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbone, Mustache) {
+define([ 'jquery', 'underscore', 'backbone', 'mustache', 'lib/q' ], function($, _, Backbone, Mustache, Q) {
 
   Mustache.tags = ['<%', '%>'];
 
@@ -21,6 +21,9 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
       _.bindAll(this,
         'close',
         'render',
+        'renderPromise',
+        'renderHTML',
+        'getTemplate',
         'toJSON',
         'bubble'
       );
@@ -92,6 +95,9 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
      */
     template: false,
 
+    /**
+     * This can return a string template or a promise.
+     */
     getTemplate: function() {
       return this.template;
     },
@@ -104,6 +110,16 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache' ], function($, _, Backbo
         this.$el.html(this.renderTemplate(template, context));
       }
 
+      return this;
+    },
+
+    renderPromise: function() {
+      return Q.fcall(this.getTemplate)
+        .then(this.renderHTML);
+    },
+
+    renderHTML: function(template) {
+      this.$el.html(this.renderTemplate(template, this.toJSON()));
       return this;
     },
 

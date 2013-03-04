@@ -370,12 +370,14 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
         app: this.app
       });
 
-      this.content_view.render();
-
-      // when we are popped out, we need to remove our own pop out button.
-      if ( this.isRootNode() ) {
-        this.$content.find('.pop_out').remove();
-      }
+      this.content_view.renderPromise()
+        .then(_.bind(function(content_view) {
+          // when we are popped out, we need to remove our own pop out button.
+          if ( this.isRootNode() ) {
+            content_view.$('.pop_out').remove();
+          }
+        }, this))
+        .done();
     },
 
     renderShelf: function() {

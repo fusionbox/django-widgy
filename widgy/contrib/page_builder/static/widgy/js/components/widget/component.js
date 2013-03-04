@@ -1,11 +1,13 @@
 define([
 'widgy.backbone',
+'lib/q',
 'widgy.contents',
 'underscore',
 'form',
 'templates'
     ], function(
     Backbone,
+    Q,
     contents,
     _,
     form,
@@ -37,14 +39,9 @@ define([
       );
     },
 
-    render: function() {
-      // asychronous (possibly) template rendering.
+    getTemplate: function() {
       return templates.getTemplate(this.model.get('template_url'))
-        .then(this.renderHTML);
-    },
-
-    renderHTML: function(template) {
-      this.$el.html(template.render('edit_template', this.toJSON()));
+        .invoke('get', 'edit_template');
     },
 
     submit: function() {
@@ -128,7 +125,7 @@ define([
 
       this.listenTo(edit_view, 'close', this.render);
 
-      edit_view.render()
+      edit_view.renderPromise()
         .then(_.bind(function(edit_view) {
           this.$el.html(edit_view.el);
 

@@ -32,8 +32,9 @@ define([ 'widgy.backbone' ], function(Backbone) {
     className: 'content',
 
     initialize: function(options) {
-      this.app = options.app;
+      Backbone.View.prototype.initialize.apply(this, arguments);
 
+      this.app = options.app;
       this.listenTo(this.model, 'change:preview_template', this.render);
     },
 
