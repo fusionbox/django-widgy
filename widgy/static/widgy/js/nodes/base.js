@@ -1,6 +1,10 @@
-define(['underscore', 'widgy.backbone'], function(
-      _, Backbone
+define(['jquery', 'underscore', 'widgy.backbone'], function(
+      $, _, Backbone
       ) {
+
+  var bump = _.throttle(function(amount) {
+    document.body.scrollTop += amount;
+  }, 100);
 
 
   /**
@@ -81,6 +85,23 @@ define(['underscore', 'widgy.backbone'], function(
       });
 
       this.$el.removeClass('being_dragged');
+
+      clearInterval(this.bumpInterval);
+    },
+
+    bumpAmount: function(clientY) {
+      var direction,
+          distance;
+
+      if ( clientY < 100 ) {
+        direction = -1;
+        distance = clientY;
+      } else {
+        direction = 1;
+        distance = Math.min(window.innerHeight - clientY, 100);
+      }
+
+      return direction * Math.pow((100 - distance) / 10, 2);
     },
 
     followMouse: function(mouse) {
@@ -88,6 +109,17 @@ define(['underscore', 'widgy.backbone'], function(
         top: (mouse.clientY - this.cursorOffsetY),
         left: (mouse.clientX - this.cursorOffsetX)
       });
+
+      clearInterval(this.bumpInterval);
+
+      var amount = this.bumpAmount(mouse.clientY);
+      if ( amount ) {
+        bump(amount);
+
+        this.bumpInterval = setInterval(function() {
+          bump(amount);
+        }, 15);
+      }
     }
   });
 

@@ -112,7 +112,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'nodes/nodes',
 
   function actAsPopOut() {
     if ( window.widgyCloseCallback ) {
-      $(window).on('unload', window.widgyCloseCallback);
+      $(window).on('unload.widgyPopOut', window.widgyCloseCallback);
     }
   }
 

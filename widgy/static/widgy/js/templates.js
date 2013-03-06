@@ -1,10 +1,12 @@
 define([
     'widgy.backbone',
     'underscore',
+    'lib/q',
     'modal/modal'
     ], function(
       Backbone,
       _,
+      Q,
       modal
       ) {
 
@@ -24,23 +26,22 @@ define([
     }
   });
 
-  var render = function(template_id, type, context, callback) {
-    var template = templates.get(template_id);
+  var getTemplate = function(template_id) {
+    var deferred = Q.defer(),
+        template = templates.get(template_id);
 
-    if (template) {
-      callback(template.render(type, context, callback));
+    if ( template ) {
+      deferred.resolve(template);
     } else {
       template = new Template({url: template_id});
 
-      template.fetch({
-        success: function(model) {
-          templates.add(model);
-          callback(model.render(type, context));
-        },
-        error: modal.raiseError,
-        cache: false
-      });
+      deferred.resolve(
+        Q.when(template.fetch({cache: false}))
+          .then(templates.add, modal.raiseError)
+          );
     }
+
+    return deferred.promise;
   };
 
   var remove = function(template_id) {
@@ -51,7 +52,7 @@ define([
   };
 
   return {
-    render: render,
+    getTemplate: getTemplate,
     remove: remove
   };
 });

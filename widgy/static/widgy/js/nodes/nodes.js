@@ -36,7 +36,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
       return _.extend({}, DraggableView.prototype.events , {
         'click .delete': 'delete',
         'click .pop_out': 'popOut',
-        'click .pop_in': 'popIn'
+        'click .pop_in': 'closeSubwindow'
       });
     },
 
@@ -57,7 +57,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
         'renderContent',
         'resortChildren',
         'popOut',
-        'popIn'
+        'popIn',
+        'closeSubwindow'
         );
 
       this.collection = this.model.children;
@@ -68,9 +69,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
         .listenTo(this.collection, 'reset', this.renderChildren)
         .listenTo(this.collection, 'sort', this.resortChildren);
 
-      this.list = new Backbone.ViewList();
+      this
+        .listenTo(this.model, 'remove', this.close);
 
-      this.model.ready(this.renderContent);
+      this.list = new Backbone.ViewList();
     },
 
     isRootNode: function() {
@@ -80,8 +82,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
     onClose: function() {
       DraggableView.prototype.onClose.apply(this, arguments);
 
-      this.content_view.close();
-      delete this.content_view;
+      if ( this.content_view ) {
+        this.content_view.close();
+        delete this.content_view;
+      }
 
       this.list.closeAll();
     },
@@ -155,7 +159,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
     startDrag: function(dragged_view) {
       debug.call(this, 'startDrag', dragged_view);
 
-      if ( ( this.hasShelf() && ! dragged_view.model.id || ! this.model.get('parent_id') )) {
+      if ( ( this.hasShelf() && ! dragged_view.model.id || this.isRootNode() )) {
         this.dragged_view = dragged_view;
 
         var bindToDocument = _.bind(function() {
@@ -349,6 +353,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
         this.renderShelf();
       }
 
+      this.model.ready(this.renderContent);
+
       return this;
     },
 
@@ -386,45 +392,17 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
       this.listenTo(shelf, 'startDrag', this.startDrag)
           .listenTo(shelf, 'stopDrag', this.stopDrag);
 
+      var self = this;
+      this.$children.before(shelf.render().el);
       // position sticky
-      if ( false && this.isRootNode() ) {
-        // The shelf needs to be after the children because in state 0 (fixed),
-        // the shelf items will be displayed underneath everything else that is
-        // after it in HTML.
-        this.$children.after(shelf.render().el);
+      if ( this.isRootNode() ) {
+        $(window).scroll(function() {
+          var upper_bound = self.el.offsetTop,
+              lower_bound = upper_bound + self.el.offsetHeight - shelf.el.offsetHeight,
+              margin_top = Math.max(0, Math.min(window.scrollY - upper_bound, lower_bound - upper_bound) - 60);
 
-        var state = -1;
-        $(window).scroll(_.bind(function() {
-          var upper_bound = this.el.offsetTop,
-              lower_bound = upper_bound + this.el.offsetHeight - this.shelf.el.offsetHeight;
-          if ( window.scrollY < upper_bound && state !== -1) {
-            this.shelf.$el.css({
-              position: '',
-              top: '',
-              left: ''
-            });
-            state = -1;
-          }
-          if ( window.scrollY > upper_bound && state !== 0) {
-            this.shelf.$el.css({
-              position: 'fixed',
-              // this 80px is to adjust for Mezzanine's fixed header.
-              top: 80,
-              left: this.shelf.$el.offset().left
-            });
-            state = 0;
-          }
-          if ( window.scrollY > lower_bound && state !== 1) {
-            this.shelf.$el.css({
-              position: 'absolute',
-              top: lower_bound - upper_bound,
-              left: ''
-            });
-            state = 1;
-          }
-        }, this));
-      } else {
-        this.$children.before(shelf.render().el);
+          shelf.el.style.marginTop = margin_top + 'px';
+        });
       }
     },
 
@@ -446,10 +424,12 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
       this.subwindow.widgyCloseCallback = this.popIn;
 
       // If they leave this page, pop back in.
-      $(window).on('unload', this.popIn);
+      $(window).on('unload.widgyPopOut-' + this.cid, this.popIn);
 
       this.collection.reset();
-      this.$content.html(this.renderTemplate(popped_out_template, this.toJSON()));
+      this.content_view.close();
+      delete this.content_view;
+      this.$el.html(this.renderTemplate(popped_out_template, this.toJSON()));
     },
 
     popIn: function(event) {
@@ -458,16 +438,22 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
       event.preventDefault();
       event.stopPropagation();
 
-      if ( ! this.subwindow.closed ) {
-        $(this.subwindow).off('unload', this.popIn);
-        this.subwindow.close();
-      }
+      // we're popped in so don't popIn again when we leave this
+      // page.
+      $(window).off('.widgyPopOut-' + this.cid);
 
       this.model.fetch({
         app: this.app,
-        resort: true
+        resort: true,
+        success: this.render
       });
 
+      return false;
+    },
+
+    closeSubwindow: function() {
+      if ( this.subwindow )
+        this.subwindow.close();
       return false;
     },
 
