@@ -1,10 +1,10 @@
-define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves', 'modal/modal',
+define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/shelves', 'modal/modal',
     'text!./node.html',
     'text!./drop_target.html',
     'text!./popped_out.html',
     'nodes/base',
     'nodes/models'
-    ], function(exports, $, _, Backbone, shelves, modal,
+    ], function(exports, $, _, Backbone, Q, shelves, modal,
       node_view_template,
       drop_target_view_template,
       popped_out_template,
@@ -100,8 +100,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
         return;
 
       this.list.closeAll();
-      this.collection.each(this.addChild);
-      this.resortChildren();
+      var self = this;
+      return Q.all(this.collection.map(this.addChild)).then(function() {
+        self.resortChildren();
+      });
     },
 
     addChild: function(node, collection, options) {
@@ -124,7 +126,12 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
       } else {
         this.list.push(node_view);
       }
-      this.$children.append(node_view.render().el);
+
+      var self = this;
+
+      return node_view.renderPromise().then(function(node_view) {
+        self.$children.append(node_view);
+      });
     },
 
     resortChildren: function() {
@@ -358,6 +365,29 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'shelves/shelves',
       return this;
     },
 
+    renderPromise: function() {
+      return DraggableView.prototype.renderPromise.apply(this, arguments).then(function(view) {
+        view.$children = view.$(' > .widget > .node_children');
+        view.$content = view.$(' > .widget > .content ');
+
+        var promises = [];
+
+        promises.push(view.renderChildren());
+
+        if ( view.hasShelf() ) {
+          promises.push(view.renderShelf());
+        }
+
+        promises.push(view.model.ready(view.renderContent));
+
+        return Q.all(promises).thenResolve(view);
+      });
+    },
+
+    /**
+     * Because of how awesome Q is, renderContent and renderShelf
+     * don't need to return promises, but they could.
+     */
     renderContent: function() {
       if ( this.content_view )
         return;

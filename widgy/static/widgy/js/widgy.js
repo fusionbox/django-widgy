@@ -42,8 +42,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'nodes/nodes',
 
       root_node_view
         .on('created', this.node_view_list.push);
-
-      this.refreshCompatibility();
     },
 
     render: function() {
@@ -53,6 +51,18 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'nodes/nodes',
       this.$editor.append(this.root_node_view.render().el);
 
       return this;
+    },
+
+    renderPromise: function() {
+      return Backbone.View.prototype.renderPromise.apply(this, arguments).then(function(app) {
+        app.$editor = app.$el.children('.editor');
+        app.root_node_view.renderPromise().then(function(view) {
+          app.$editor.append(view.el);
+          app.refreshCompatibility();
+        }).done();
+
+        return app;
+      });
     },
 
     refreshCompatibility: function() {
@@ -107,7 +117,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'nodes/nodes',
       el: $(target)
     });
 
-    this.app.render();
+    this.app.renderPromise().done();
   }
 
   function actAsPopOut() {
