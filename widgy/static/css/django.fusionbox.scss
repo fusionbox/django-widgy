@@ -3,6 +3,7 @@
 -----------------------------------------------*/
 
 $black10: rgba(0,0,0,0.1);
+$black30: rgba(0,0,0,0.3);
 $white20: rgba(255,255,255,0.2);
 $lightgrey:   #bbbbbb;
 $grey:        #999999;
@@ -97,6 +98,7 @@ $green:       #559911;
     margin: 0px 0px 15px 0px !important;
     width: auto !important;
   }
+  ol, ul { padding-left: 30px; }
   .fl { float: left; margin: 0px 25px 15px 0px; }
   .fr { float: right; margin: 0px 0px 15px 25px; }
   img { @include rounded(2px); &.left { float: left; margin: 5px 20px 15px 0px; } &.right { float: right; margin: 5px 0px 15px 20px; }}
@@ -111,7 +113,9 @@ $green:       #559911;
   display: inline-block;
   height: auto;
   font-weight: bold;
-  padding: 2px;
+  font-size: 12px;
+  line-height: 18px;
+  padding: 4px 8px;
   width: auto;
 
   &:hover {
@@ -155,7 +159,11 @@ $green:       #559911;
   }
 }
 
-/* SASS Mixins
+a.button {
+  @include button;
+}
+
+/* Widgy Tools Buttons
 --------------------------------------------------*/
 
 ul.widgy-tools {
@@ -188,6 +196,49 @@ ul.widgy-tools {
         
         &:hover {
           background-color: lighten($red,35%);
+        }
+      }
+    }
+  }
+}
+
+/* History/Basic Page Styles
+--------------------------------------------------*/
+
+section.main {
+  @include clearfix;
+  @include default;
+  @include html;
+  
+  ol.history {
+    list-style: none;
+    padding: 0px !important;
+    
+    li {
+      @include gradient(#eeeeee,#fafafa);
+      @include rounded(5px);
+      @include shadow($black30,0px,2px,0px);
+      margin: 0px 0px 15px 0px;
+      padding: 0px;
+      
+      p.top {
+        border-bottom: 1px solid #cccccc;
+        line-height: 26px;
+        margin: 0px !important;
+        padding: 5px 10px 5px 10px;
+        
+        span.actions {
+          float: right;
+        }
+      }
+      
+      blockquote {
+        border: 0px;
+        margin: 0px;
+        padding: 5px 10px 5px 10px;
+        
+        p {
+          margin: 0px !important;
         }
       }
     }

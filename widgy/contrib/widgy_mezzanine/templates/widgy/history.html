@@ -4,6 +4,7 @@
 {{ block.super }}
 {% compress css %}
 <link rel="stylesheet" href="{% static 'css/jquery.fancybox.css' %}">
+<link rel="stylesheet" href="{% static 'css/django.fusionbox.scss' %}" type="text/x-scss">
 {% endcompress %}
 {% compress js %}
 <script src="{% static 'js/jquery.fancybox.js' %}"></script>
@@ -19,22 +20,30 @@
 {% endblock  %}
 
 {% block content %}
-<ol>
+<section class="main">
+  <h1>Page History</h1>
+<ol class="history">
     {% for commit in commits %}
-    <li>{{ commit.created_at|date:"SHORT_DATETIME_FORMAT" }}{% if commit.author %} by {{ commit.author }}{% endif %}
-    <a href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=commit.root_node.pk %}">view</a>
-    {% if commit.revert_url %}
-    <a class="widgy-fancybox" href="{{ commit.revert_url }}">Revert to this version</a>
-    {% else %}
-    can't revert, this is the same as the current version
-    {% endif %}
-    {% if commit.diff_url %}
-    <a href="{{ commit.diff_url }}">diff</a>
-    {% endif %}
-    {% if commit.message %}
-    <blockquote>{{ commit.message|linebreaks }}</blockquote>
-    {% endif %}
+    <li>
+      <p class="top">
+        <strong>{{ commit.created_at|date:"SHORT_DATETIME_FORMAT" }}</strong>{% if commit.author %} by <strong>{{ commit.author }}</strong>{% endif %}
+        <span class="actions">
+        {% if commit.revert_url %}
+          <a class="button" class="widgy-fancybox" href="{{ commit.revert_url }}">Revert to this Version</a>
+        {% else %}
+          Can't revert; this is the same as the current version.
+        {% endif %}  
+        {% if commit.diff_url %}
+          <a class="button" href="{{ commit.diff_url }}">Diff</a>
+        {% endif %}  
+          <a class="button" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=commit.root_node.pk %}">View</a>  
+        </span>
+      </p>
+      {% if commit.message %}
+        <blockquote>{{ commit.message|linebreaks }}</blockquote>
+      {% endif %}
     </li>
     {% endfor %}
 </ol>
+</section>
 {% endblock %}
