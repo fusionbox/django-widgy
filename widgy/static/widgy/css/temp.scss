@@ -1,0 +1,481 @@
+@import "widgy_common.scss";
+
+
+/* Mixins
+-----------------------------------------*/
+
+
+@mixin button {
+  @include rounded(3px);
+  background: transparent;
+  border: 1px solid $blue;
+  color: $blue;
+  display: inline-block;
+  height: auto;
+  font-weight: bold;
+  padding: 2px;
+  width: auto;
+
+  &:hover {
+    background-color: lighten($blue,35%);
+    color: $blue;
+  }
+
+  &.cancel {
+    border-color: $grey;
+    color: $grey;
+    
+    &:hover {
+      background: lighten($lightgrey,15%);
+    }
+  }
+  
+  &.delete {
+    border-color: $red;
+    color: $red;
+    
+    &:hover {
+      background: lighten($red,35%);
+    }
+  }
+  
+  &.loading {
+    @extend %loading;
+  }
+  
+  &[type='submit'] {
+    @include rounded(3px);
+    border-color: $green;
+    color: $green;
+    height: auto;
+    font-weight: bold;
+    padding: 2px !important;
+    
+    &:hover {
+      background: lighten($green,50%);
+    }
+  }
+  
+}
+
+
+
+/* Placeholder selectors
+-----------------------------------------*/
+%loading {
+  background: url('../image/loading.gif') center no-repeat;
+  color: transparent;
+}
+
+
+/*| Basic Layout
+-----------------------------------------*/
+body {
+  font-size: 62.5%;
+  line-height: 62.5%;
+}
+
+body, html {
+  line-height: normal;
+}
+
+
+/*| Overlay & Overrides
+-----------------------------------------*/
+.overlay {
+  position: fixed;
+  background-color: rgba(255, 255, 255, .3);
+  z-index: 100;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.modal {
+  @include rounded(5px);
+  @include shadow(#999999, 0px, 0px, 10px);
+
+  display: block;
+  background-color: #ffffff;
+  padding: 20px;
+  position: fixed;
+  width: 300px;
+  z-index: 101;
+  margin-top: -50px;
+  margin-left: -150px;
+}
+
+
+// Mezzanine Override
+input[type="text"],
+input[type="password"],
+input.vDateField,
+input.vTimeField,
+.change-list form table .vAutocompleteSearchField,
+.change-list form table .vM2MAutocompleteSearchField,
+.inline-tabular .vAutocompleteSearchField,
+.inline-tabular .vM2MAutocompleteSearchField {
+  width: 200px;
+}
+
+.change-form div.submit-row {
+  z-index: 1000;
+}
+
+
+/* Widgy
+-------------------*/
+
+.widgy {
+  
+  // Main Background (.widgy .editor)
+  .editor {
+    
+    // Root Node (.widgy .editor section.node)
+    section.node {
+
+      // Widgets (.widgy .editor section.node div.widget)
+      div.widget {
+        
+        // Main Editor Area (Left Side) (.widgy .editor section.node div.widget li.maincontent)
+        li.maincontent {
+          .shelf {
+          }
+  
+        }
+
+        // Sub-Widgets Widget Groups (.widgy .editor section.node div.widget div.widget)
+        div.widget {
+  
+          // Actual Widgets (.widgy .editor section.node div.widget div.widget li.node)
+          li.node {
+            background: white;
+            overflow: hidden;
+            padding: 0px;
+
+
+            // Second level
+            & > .widget > .content {
+              span.title {
+                font-size: 1.4em;
+                padding: 5px 0;
+              }
+            }
+  
+            
+            // Sub Widgets (.widgy .editor section.node div.widget div.widget li.node div.widget)
+            div.widget {
+              background: white;
+              padding: 0px;
+      
+              div.content {
+        
+                p.drag-row {
+                  @include gradient(#eee,#fff);
+                  display: block;
+                  float: none;
+                  height: 22px;
+                  margin: 0px;
+                  padding: 10px;
+                  width: auto;
+          
+                  span.title {
+                    color: #333333;
+                    font-size: 15px;
+                    font-weight: normal;
+                  }
+                }
+        
+                div.preview {
+                  @include clearfix;
+                  @include html;
+                  display: block;
+                  float: none;
+                  padding: 10px;
+                  width: auto;
+                }
+          
+                // Widget Editor
+                div {
+                  padding: 10px;
+          
+                  div {
+                    padding: 0px;
+            
+                    &.formField {
+                      margin-bottom: 10px;
+                    }
+            
+                    label {
+                      clear: left;
+                      padding: 0 10px 10px 0;
+                    }
+            
+                    textarea {
+                      width: 98.5%;
+                    }
+                  }
+          
+                  .pagedown-buttonbar {
+                    clear: both;
+                    margin: 0px 0px 10px 0px;
+            
+                    ul {
+                      margin: 0px;
+                    }
+                  }
+          
+                  .pagedown-preview {
+                    @include html;
+                    @include rounded(3px);
+                    border: dashed 1px $lightgrey;
+                    margin: 10px 0px;
+                    padding: 9px;
+                  }
+                }
+        
+                input[type='submit'] {
+                  @include button;
+                  float: right;
+                }
+              }
+      
+              // Widgets Within Widgets
+              ul.nodeChildren {
+                margin: 0 auto !important;
+                width: 97% !important;
+              }
+            }
+        
+            &.being_dragged {
+              position: fixed; // for draggin
+            }
+          }
+        }
+      }
+      
+      // All Nodes (section.node, section.node .node)
+      &, .node {
+
+
+        // Section Nodes (Main Content, Sidebar)
+        .node {
+      
+          // Local Shelf
+          .shelf {
+          }
+      
+          & > .widget > .content > .drag-row > .title {
+            font-weight: bold;
+            font-size: 20px;
+            text-transform: capitalize;
+          }
+        }
+      }
+
+      // Draggin Styles
+    }
+  }
+}
+
+ul.list.nodeChildren {
+  li.shelfItem {
+  }
+}
+
+span.icon-move {
+}
+
+
+
+
+
+
+
+@mixin node-icon ($class, $img) {
+  &.#{$class} > span.title {
+    background: url($img) no-repeat;
+  }
+}
+
+li.node,
+li.shelfItem {   
+  border: 1px solid #E0E0E0;
+     
+  @include node-icon("calloutwidget", "../image/widget-callout.png");
+  @include node-icon("accordion", "../image/widget-accordion.png");
+  @include node-icon("demoaccordion", "../image/widget-accordion.png");
+  @include node-icon("emailsuccesshandler", "../image/widget-email.gif");
+  @include node-icon("emailuserhandler", "../image/widget-email.gif");
+  @include node-icon("figure", "../image/widget-image.gif");
+  @include node-icon("form", "../image/widget-form.gif");
+  @include node-icon("forminput", "../image/widget-form.gif");
+  @include node-icon("image", "../image/widget-image.gif");
+  @include node-icon("markdown", "../image/widget-code.gif");
+  @include node-icon("miniboxes", "../image/widget-miniboxes.gif");
+  @include node-icon("savedatahandler", "../image/widget-save-data.png");
+  @include node-icon("section", "../image/widget-section.png");
+  @include node-icon("submitbutton", "../image/widget-ok-button.png");
+  @include node-icon("table", "../image/widget-table.gif");
+  @include node-icon("textarea", "../image/widget-textarea.gif");
+  @include node-icon("uncaptcha", "../image/widget-hidden-field.png");
+  @include node-icon("video", "../image/widget-video.gif");
+}
+
+
+
+/* Mezzanine Override */ 
+
+input[type="text"], 
+input[type="password"], 
+input.vDateField, 
+input.vTimeField, 
+.change-list form table .vAutocompleteSearchField, 
+.change-list form table .vM2MAutocompleteSearchField, 
+.inline-tabular .vAutocompleteSearchField, 
+.inline-tabular .vM2MAutocompleteSearchField {
+  width: 200px;
+}
+
+
+
+
+/*| Button Styles
+-----------------------------------------*/
+
+.button,
+button {
+  @include button;
+}
+
+
+div.submit-row p {
+  width: auto;
+}
+
+
+/*| Forms
+-----------------------------------------*/
+input[type='text'], input[type='password'], input[type='email'], input[type='search'], input[type='number'], 
+textarea, 
+button {
+  &:focus {
+    @include inset-shadow(lighten($purple,15%), 0px, 1px, 3px);
+    border-color: $purple;
+  }
+}
+
+input[type='text'], input[type='password'], input[type='email'], input[type='search'], input[type='number'], 
+textarea {
+  @include rounded(3px);
+  @include inset-shadow($black10,0px,1px,2px);
+  border: 1px solid $lightgrey;
+  font-weight: normal !important;
+  padding: 6px 4px 5px;
+}
+
+textarea {
+  height: 120px;
+}
+
+
+
+/*| Text Classes
+-----------------------------------------*/
+h1, h2, h3, h4, p, div.list, blockquote {
+  display: inline;
+  float: left;
+  height: auto;
+  width: 100%;
+}
+
+h1, h2, h3, h4, p, blockquote, table {
+  margin: 0px 0px 12px 0px;
+}
+
+p.breadcrumb {
+  border-bottom: 1px dotted #B4A485;
+  color: #a79273;
+  font-size: 12px;
+  padding-bottom: 15px;
+  
+  a:link,
+  a:visited {
+    color: #896f4b;
+    text-decoration: none;
+  }
+  
+  a:hover,
+  a:active {
+    color: #664411;
+    text-decoration: underline;
+  }
+}
+
+h1 {
+  color: #535353;
+  font-family: "Open Sans";
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 38px;
+}
+
+h2 {
+  color: #642d11;
+  font-size: 22px;
+  line-height: 28px;
+}
+
+h3 {
+  color: #C1272D;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 20px;
+}
+
+h4 {
+  color: #c1272d;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+h5{
+  color: #5b3b01;
+  margin: 0px 0px 4px 0px;
+}
+
+
+p.title {
+  color: #353535;
+  font-family: "Open Sans";
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 28px;
+}
+
+span.title {
+  color: #353535;
+  font-family: "Open Sans";
+}
+
+/*| PopOut Styles
+-----------------------------------------*/
+
+.popOut {
+  
+  background: $reallylightgrey;
+  font-family: "Open Sans";
+  font-size: 12px;
+  line-height: 16px;
+  
+  .editor {
+    background: white;
+    
+    .widgy {
+      .node {
+        @extend .node;
+      }
+    }
+  }
+}
