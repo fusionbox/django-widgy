@@ -9,9 +9,6 @@ define([ 'underscore', 'components/widget/component' ], function(_, widget) {
         'unblock',
         'refresh'
       );
-
-      this.listenTo(this.model.node.children, 'refreshTable', this.refresh)
-          .listenTo(this.model.node.children, 'blockTable', this.block);
     },
 
     block: function() {
@@ -26,12 +23,11 @@ define([ 'underscore', 'components/widget/component' ], function(_, widget) {
       }
     },
 
-    refresh: function() {
-      this.model.node.fetch({
+    refresh: function(options) {
+      this.node.fetch(_.extend({
         app: this.app,
-        success: this.unblock,
-        resort: true
-      });
+        success: this.unblock
+      }, options));
     }
   });
 
