@@ -582,17 +582,17 @@ div.submit-row p {
 
 /*| Forms
 -----------------------------------------*/
-input[type='text'], input[type='password'], input[type='email'], input[type='search'], input[type='number'], 
-textarea, 
-button {
+
+$inputFields = input[type='text'], input[type='password'], input[type='email'], input[type='search'], input[type='number'], textarea;
+
+#{$inputFields}, button {
   &:focus {
     @include inset-shadow(lighten($purple,15%), 0px, 1px, 3px);
     border-color: $purple;
   }
 }
 
-input[type='text'], input[type='password'], input[type='email'], input[type='search'], input[type='number'], 
-textarea {
+#{$inputFields} {
   @include rounded(3px);
   @include inset-shadow($black10,0px,1px,2px);
   border: 1px solid $lightgrey;
@@ -742,5 +742,30 @@ span.title {
         }
       }
     }
+  }
+}
+
+/*| Popup Forms and Confirmation Styles
+-----------------------------------------*/
+
+.popUp {
+  width: 500px;
+  
+  #{$inputFields} {
+    width: 98%;
+  }
+  
+  .submitRow {
+    margin-top: 10px;
+    
+    input, a.button {
+      float: right;
+      margin-left: 5px;
+    }
+  }
+  
+  .button {
+    font-size: 12px;
+    padding: 4px;
   }
 }
