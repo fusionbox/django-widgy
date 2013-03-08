@@ -42,8 +42,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'nodes/nodes',
 
       root_node_view
         .on('created', this.node_view_list.push);
-
-      this.refreshCompatibility();
     },
 
     render: function() {
@@ -55,34 +53,50 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'nodes/nodes',
       return this;
     },
 
+    renderPromise: function() {
+      return Backbone.View.prototype.renderPromise.apply(this, arguments).then(function(app) {
+        app.$editor = app.$el.children('.editor');
+        app.root_node_view.renderPromise().then(function(view) {
+          app.$editor.append(view.el);
+          app.refreshCompatibility();
+        }).done();
+
+        return app;
+      });
+    },
+
     refreshCompatibility: function() {
       if ( this.inflight )
         this.inflight.abort();
 
       this.inflight = $.ajax({
         url: this.root_node_view.model.get('available_children_url'),
-        success: this.setCompatibility,
+        success: this.setCompatibility
       });
     },
 
     setCompatibility: function(data) {
-      console.log('setCompatibility', data);
       delete this.inflight;
 
       this.compatibility_data = data;
+      this.updateCompatibility(data);
+    },
+
+    updateCompatibility: function(data) {
       this.node_view_list.each(function(view) {
-        var shelf = view.getShelf()
+        var shelf = view.getShelf();
+
         if ( shelf )
           shelf.addOptions(data[view.model.id]);
       });
       this.node_view_list.each(function(view) {
-        if ( view.hasShelf() )
+        if ( view.hasShelf() && view.shelf )
           view.shelf.filterDuplicates(view);
       });
     },
 
     validateRelationship: function(parent, child) {
-      return _.where(this.compatibility_data[parent.model.id], {'__class__': child.get('__class__')}).length != 0;
+      return _.where(this.compatibility_data[parent.model.id], {'__class__': child.get('__class__')}).length !== 0;
     },
 
     ready: function() {
@@ -107,7 +121,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'nodes/nodes',
       el: $(target)
     });
 
-    this.app.render();
+    this.app.renderPromise().done();
   }
 
   function actAsPopOut() {

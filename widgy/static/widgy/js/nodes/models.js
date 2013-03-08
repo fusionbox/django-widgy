@@ -143,11 +143,11 @@ define([ 'underscore', 'widgy.backbone', 'lib/q',
       var old_success = options.success;
 
       options.success = function(resp, status, xhr) {
-        if ( old_success ) old_success(resp, status, xhr);
-
         if ( options.app && resp.compatibility ) {
           options.app.setCompatibility(resp.compatibility);
         }
+
+        if ( old_success ) old_success(resp, status, xhr);
       };
 
       if ( options.app )
@@ -158,7 +158,7 @@ define([ 'underscore', 'widgy.backbone', 'lib/q',
         options.url =  model_url + '?include_compatibility_for=' + root_url;
       }
 
-      Backbone.sync.call(this, method, model, options);
+      return Backbone.sync.call(this, method, model, options);
     }
   });
 

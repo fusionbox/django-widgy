@@ -27,21 +27,20 @@ define([
   });
 
   var getTemplate = function(template_id) {
-    var deferred = Q.defer(),
-        template = templates.get(template_id);
+    var template = templates.get(template_id);
 
     if ( template ) {
-      deferred.resolve(template);
+      return Q(template);
     } else {
-      template = new Template({url: template_id});
+      return Q(Backbone.ajax({url: template_id, cache: false}))
+        .then(function(template) {
+          var model = new Template(_.extend({url: template_id}, template));
+          templates.add(model);
 
-      deferred.resolve(
-        Q.when(template.fetch({cache: false}))
-          .then(templates.add, modal.raiseError)
-          );
+          return model;
+        })
+        .fail(modal.raiseError);
     }
-
-    return deferred.promise;
   };
 
   var remove = function(template_id) {
