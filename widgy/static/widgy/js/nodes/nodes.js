@@ -56,6 +56,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         'receiveChildView',
         'renderContent',
         'resortChildren',
+        'repositionChild',
         'popOut',
         'popIn',
         'closeSubwindow'
@@ -333,14 +334,14 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
       this.collection.trigger('receive_child');
       dragged_view.model.save(attributes, {
-        success: this.collection.reposition,
+        success: this.repositionChild,
         error: modal.raiseError,
         app: this.app
       });
     },
 
-    saveAt: function(attributes, options) {
-      this.model.save(attributes, options);
+    repositionChild: function(node) {
+      return Q(this.collection.reposition(node));
     },
 
     hasShelf: function() {
@@ -380,7 +381,12 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
         promises.push(view.model.ready(view.renderContent));
 
-        return Q.all(promises).thenResolve(view);
+        return Q.all(promises).then(function() {
+          if ( view.app.compatibility_data )
+            view.app.updateCompatibility(view.app.compatibility_data);
+
+          return view;
+        });
       });
     },
 

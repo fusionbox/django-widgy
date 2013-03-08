@@ -71,28 +71,32 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'nodes/nodes',
 
       this.inflight = $.ajax({
         url: this.root_node_view.model.get('available_children_url'),
-        success: this.setCompatibility,
+        success: this.setCompatibility
       });
     },
 
     setCompatibility: function(data) {
-      console.log('setCompatibility', data);
       delete this.inflight;
 
       this.compatibility_data = data;
+      this.updateCompatibility(data);
+    },
+
+    updateCompatibility: function(data) {
       this.node_view_list.each(function(view) {
-        var shelf = view.getShelf()
+        var shelf = view.getShelf();
+
         if ( shelf )
           shelf.addOptions(data[view.model.id]);
       });
       this.node_view_list.each(function(view) {
-        if ( view.hasShelf() )
+        if ( view.hasShelf() && view.shelf )
           view.shelf.filterDuplicates(view);
       });
     },
 
     validateRelationship: function(parent, child) {
-      return _.where(this.compatibility_data[parent.model.id], {'__class__': child.get('__class__')}).length != 0;
+      return _.where(this.compatibility_data[parent.model.id], {'__class__': child.get('__class__')}).length !== 0;
     },
 
     ready: function() {
