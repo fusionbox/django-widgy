@@ -606,6 +606,7 @@ li.shelfItem {
   border: 1px solid #E0E0E0;
      
   @include node-icon("calloutwidget", "../image/widget-callout.png");
+  @include node-icon("accordion", "../image/widget-accordion.png");
   @include node-icon("demoaccordion", "../image/widget-accordion.png");
   @include node-icon("emailsuccesshandler", "../image/widget-email.gif");
   @include node-icon("emailuserhandler", "../image/widget-email.gif");
@@ -614,6 +615,7 @@ li.shelfItem {
   @include node-icon("forminput", "../image/widget-form.gif");
   @include node-icon("image", "../image/widget-image.gif");
   @include node-icon("markdown", "../image/widget-code.gif");
+  @include node-icon("miniboxes", "../image/widget-miniboxes.gif");
   @include node-icon("savedatahandler", "../image/widget-save-data.png");
   @include node-icon("section", "../image/widget-section.png");
   @include node-icon("submitbutton", "../image/widget-ok-button.png");
