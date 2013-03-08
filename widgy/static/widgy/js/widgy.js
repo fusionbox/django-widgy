@@ -1,7 +1,7 @@
-define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'nodes/nodes',
+define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'lib/q', 'nodes/nodes',
     'nodes/models',
     'text!app.html', 'shelves/shelves'
-    ], function($, _, Backbone, csrf, nodes,
+    ], function($, _, Backbone, csrf, Q, nodes,
       node_models,
       app_template, shelves
       ) {
@@ -32,16 +32,23 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'nodes/nodes',
       // please!
       this.node_view_list = new Backbone.ViewList();
 
-      var root_node_view = this.root_node_view = new nodes.NodeView({
-        model: new node_models.Node(options.root_node),
-        app: this,
-        tagName: 'section'
+      var root_node = this.root_node = new node_models.Node(options.root_node),
+          app = this;
+
+      this.root_node_promise = root_node.ready(function(model) {
+        var root_node_view = new model.component.NodeView({
+          model: model,
+          app: app,
+          tagName: 'section'
+        });
+
+        app.node_view_list.push(root_node_view);
+
+        root_node_view
+          .on('created', app.node_view_list.push);
+
+        return root_node_view;
       });
-
-      this.node_view_list.push(root_node_view);
-
-      root_node_view
-        .on('created', this.node_view_list.push);
     },
 
     render: function() {
@@ -54,15 +61,16 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'nodes/nodes',
     },
 
     renderPromise: function() {
-      return Backbone.View.prototype.renderPromise.apply(this, arguments).then(function(app) {
-        app.$editor = app.$el.children('.editor');
-        app.root_node_view.renderPromise().then(function(view) {
-          app.$editor.append(view.el);
-          app.refreshCompatibility();
-        }).done();
+      return Q.all([Backbone.View.prototype.renderPromise.apply(this, arguments), this.root_node_promise])
+        .spread(function(app, view) {
+          app.$editor = app.$el.children('.editor');
+          view.renderPromise().then(function(view) {
+            app.$editor.append(view.el);
+            app.refreshCompatibility();
+          }).done();
 
-        return app;
-      });
+          return app;
+        });
     },
 
     refreshCompatibility: function() {
@@ -70,7 +78,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'nodes/nodes',
         this.inflight.abort();
 
       this.inflight = $.ajax({
-        url: this.root_node_view.model.get('available_children_url'),
+        url: this.root_node.get('available_children_url'),
         success: this.setCompatibility
       });
     },

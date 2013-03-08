@@ -16,6 +16,5 @@
 <script>
   require([ 'widgy' ], function(Widgy) {
     window.widgy = new Widgy('#' + {{ html_id|json }}, {{ node_dict|json }});
-    window.root_node = widgy.app.root_node_view;
   });
 </script>

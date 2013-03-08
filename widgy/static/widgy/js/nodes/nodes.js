@@ -101,8 +101,11 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         return;
 
       this.list.closeAll();
-      var self = this;
-      return Q.all(this.collection.map(this.addChild)).then(function() {
+      var self = this,
+          addChild = function(node) {
+            return self.addChild(node, this.collection, {resort: false});
+          };
+      return Q.allResolved(this.collection.map(addChild)).then(function() {
         self.resortChildren();
       });
     },
@@ -111,27 +114,39 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       if ( this.dontShowChildren() )
         return;
 
-      var node_view = new NodeView({
-        model: node,
-        parent: this,
-        app: this.app
+      var parent = this;
+
+      options = (options || {});
+      _.defaults(options, {
+        resort: true
       });
 
-      this
-        .listenTo(node_view, 'startDrag', this.startDrag)
-        .listenTo(node_view, 'stopDrag', this.stopDrag);
+      return node.ready(function(model) {
+        var node_view = new model.component.NodeView({
+          model: node,
+          parent: parent,
+          app: parent.app
+        });
 
-      this.app.node_view_list.push(node_view);
-      if ( options && options.index ) {
-        this.list.list.splice(options.index, 0, node_view);
-      } else {
-        this.list.push(node_view);
-      }
+        parent
+          .listenTo(node_view, 'startDrag', parent.startDrag)
+          .listenTo(node_view, 'stopDrag', parent.stopDrag);
 
-      var self = this;
+        parent.app.node_view_list.push(node_view);
+        if ( options && options.index ) {
+          parent.list.list.splice(options.index, 0, node_view);
+        } else {
+          parent.list.push(node_view);
+        }
 
-      return node_view.renderPromise().then(function(node_view) {
-        self.$children.append(node_view);
+        return node_view.renderPromise().then(function(node_view) {
+          parent.$children.append(node_view);
+
+          if ( options.resort ) {
+            parent.resortChildren();
+          }
+          return node_view;
+        });
       });
     },
 

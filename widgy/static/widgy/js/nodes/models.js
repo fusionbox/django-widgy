@@ -153,7 +153,7 @@ define([ 'underscore', 'widgy.backbone', 'lib/q',
       if ( options.app )
       {
         var model_url = _.result(model, 'url'),
-            root_url = _.result(options.app.root_node_view.model, 'url');
+            root_url = _.result(options.app.root_node, 'url');
 
         options.url =  model_url + '?include_compatibility_for=' + root_url;
       }
@@ -245,9 +245,9 @@ define([ 'underscore', 'widgy.backbone', 'lib/q',
         // remove the model from its old position and insert at new index.
         this.models.splice(this.indexOf(node), 1);
         this.models.splice(this.getIndexOf(node.get('right_id')), 0, node);
-      }
 
-      this.trigger('sort');
+        this.trigger('sort');
+      }
       this.trigger('position_child');
     }
   });

@@ -1,15 +1,17 @@
 define([
+'underscore',
 'widgy.backbone',
 'lib/q',
 'widgy.contents',
-'underscore',
+'nodes/nodes',
 'form',
 'templates'
     ], function(
+    _,
     Backbone,
     Q,
     contents,
-    _,
+    nodes,
     form,
     templates) {
 
@@ -139,6 +141,7 @@ define([
 
   return _.extend({}, contents, {
     View: WidgetView,
-    EditorView: EditorView
+    EditorView: EditorView,
+    NodeView: nodes.NodeView
   });
 });
