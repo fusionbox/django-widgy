@@ -241,7 +241,9 @@ input.vTimeField,
           padding: 10px;
 
           div {
+            @include clearfix;
             padding: 0px;
+            position: relative;
 
             &.formField {
               margin-bottom: 10px;
@@ -254,6 +256,12 @@ input.vTimeField,
 
             textarea {
               width: 98.5%;
+            }
+            
+            .cancel {
+              position: absolute;
+              right: 50px;
+              top: 0px;
             }
           }
 
