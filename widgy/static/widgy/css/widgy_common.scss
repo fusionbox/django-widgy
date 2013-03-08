@@ -64,6 +64,14 @@
     background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, $bottom), color-stop(1.00, $top));
 }
 
+@mixin important-gradient($bottom,$top) {
+  background-color: $bottom !important;
+    background-image: -o-linear-gradient(center bottom, $bottom 1%, $top 100%) !important;
+    background-image: -ms-linear-gradient(center bottom, $bottom 1%, $top 100%) !important;
+    background-image: -moz-linear-gradient(center bottom, $bottom 1%, $top 100%) !important;
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, $bottom), color-stop(1.00, $top)) !important;
+}
+
 
 @mixin inner {
   display: block;

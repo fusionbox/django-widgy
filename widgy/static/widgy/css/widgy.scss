@@ -10,6 +10,7 @@
   background: transparent;
   border: 1px solid $blue;
   color: $blue;
+  cursor: pointer;
   display: inline-block;
   height: auto;
   font-weight: bold;
@@ -125,6 +126,179 @@ input.vTimeField,
 
 /* Widgy
 -------------------*/
+
+@mixin widgetNodeChildren {
+  margin: 0 !important;
+  padding: 0 !important;
+    
+  li.node_drop_target {
+    @include rounded(3px);
+    border: 2px dashed $green;
+    background: white;
+    font-size: 1.4em;
+    font-style: italic;
+    height: auto;
+    margin-bottom: 1em;
+    padding: 1em;
+
+    &.active {
+      border: 2px dashed darken($green,10%);
+      background: lighten($green,40%);
+      color: $darken($green,10%);
+    }
+  }
+  
+  // (editor nodes: li.node.form_builder.form...)
+  li.node {
+    @include inset-shadow(transparent,0px,0px,0px);
+    background: white;
+    overflow: hidden;
+    padding: 0px;
+    margin: 0 0 1em 0;
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    // specific node styles
+    &.invisible {
+      background-color: inherit;
+      padding: 0;
+      border: 0 none;
+
+      & > .widget > .nodeChildren:empty {
+        display: none;
+      }
+    }
+
+    &.unknownwidget {
+      background-size: 50px 50px;
+      background-color: #CCCCCC;
+      background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
+                        transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
+                        transparent 75%, transparent);
+      background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
+                        transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
+                        transparent 75%, transparent);
+    }
+
+
+    // drag & drop styles
+    &.being_dragged {
+      @include shadow(#999999, 2px, 2px, 5px);
+      background-color: blue;
+      margin: 0;
+      position: fixed;
+    }
+
+    // second level title bars
+    & > div.widget > div.content {
+      span.title {
+        font-size: 1.4em;
+        padding: 5px 0;
+      }
+    }
+    
+    div.widget {
+      background: white;
+      padding: 0px;
+      
+      div.content {
+
+        p.drag-row {
+          @include clearfix;
+          @include gradient(#eee,#fff);
+          display: block;
+          float: none;
+          height: 22px;
+          margin: 0px;
+          padding: 10px;
+          width: auto;
+          
+          span.title {
+            font-size: 15px;
+            font-weight: normal;
+          }
+        }
+
+        button.edit,
+        button.delete {
+          display: inline;
+          float: right;
+          margin-left: 1em;
+        }
+
+        .dragHandle {
+          left: -5px;
+          float: left;
+          font-size: 20px;
+          position: relative;
+          cursor: pointer;
+        }                      
+      
+        // Widget Form / Editor
+        div {
+          padding: 10px;
+
+          div {
+            padding: 0px;
+
+            &.formField {
+              margin-bottom: 10px;
+            }
+
+            label {
+              clear: left;
+              padding: 0 10px 10px 0;
+            }
+
+            textarea {
+              width: 98.5%;
+            }
+          }
+
+          .pagedown-buttonbar {
+            clear: both;
+            margin: 0px 0px 10px 0px;
+
+            ul {
+              margin: 0px;
+            }
+          }
+
+          .pagedown-preview {
+            @include html;
+            @include rounded(3px);
+            border: dashed 1px $lightgrey;
+            margin: 10px 0px;
+            padding: 9px;
+          }
+        }
+
+        input[type='submit'] {
+          @include button;
+          float: right;
+        }
+  
+        div.preview {
+          @include default;
+          padding: 0;
+    
+          &:not(:empty) {
+            padding: 1em;
+          }
+        }
+      }
+      
+      // nested editors within editors
+      ul.nodeChildren {
+        li.node, li.node_drop_target  {
+          margin: 1em;
+        }
+      }
+    }
+  }
+}
 
 // widgy wrapper
 div.widgy {
@@ -331,178 +505,10 @@ div.widgy {
                 }
               }
               
-              // (main widgets)
+              // (main widget editors)
               ul.nodeChildren {
-                margin: 0 !important;
-                padding: 0 !important;
-                  
-                li.node_drop_target {
-                  @include rounded(3px);
-                  border: 2px dashed $green;
-                  background: white;
-                  font-size: 1.4em;
-                  font-style: italic;
-                  height: auto;
-                  margin-bottom: 1em;
-                  padding: 1em;
-
-                  &.active {
-                    border: 2px dashed darken($green,10%);
-                    background: lighten($green,40%);
-                    color: $darken($green,10%);
-                  }
-                }
+                @include widgetNodeChildren;
                 
-                // (editor nodes: li.node.form_builder.form...)
-                li.node {
-                  @include inset-shadow(transparent,0px,0px,0px);
-                  background: white;
-                  overflow: hidden;
-                  padding: 0px;
-                  margin: 0 0 1em 0;
-    
-                  &:hover {
-                    cursor: pointer;
-                  }
-    
-                  // specific node styles
-                  &.invisible {
-                    background-color: inherit;
-                    padding: 0;
-                    border: 0 none;
-
-                    & > .widget > .nodeChildren:empty {
-                      display: none;
-                    }
-                  }
-            
-                  &.unknownwidget {
-                    background-size: 50px 50px;
-                    background-color: #CCCCCC;
-                    background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
-                                      transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
-                                      transparent 75%, transparent);
-                    background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
-                                      transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
-                                      transparent 75%, transparent);
-                  }
-    
-            
-                  // drag & drop styles
-                  &.being_dragged {
-                    @include shadow(#999999, 2px, 2px, 5px);
-                    background-color: blue;
-                    margin: 0;
-                    position: fixed;
-                  }
-
-                  // second level title bars
-                  & > div.widget > div.content {
-                    span.title {
-                      font-size: 1.4em;
-                      padding: 5px 0;
-                    }
-                  }
-                  
-                  div.widget {
-                    background: white;
-                    padding: 0px;
-                    
-                    div.content {
-        
-                      p.drag-row {
-                        @include clearfix;
-                        @include gradient(#eee,#fff);
-                        display: block;
-                        float: none;
-                        height: 22px;
-                        margin: 0px;
-                        padding: 10px;
-                        width: auto;
-                        
-                        span.title {
-                          font-size: 15px;
-                          font-weight: normal;
-                        }
-                      }
-
-                      button.edit,
-                      button.delete {
-                        display: inline;
-                        float: right;
-                        margin-left: 1em;
-                      }
-
-                      .dragHandle {
-                        left: -5px;
-                        float: left;
-                        font-size: 20px;
-                        position: relative;
-                        cursor: pointer;
-                      }                      
-                    
-                      // Widget Form / Editor
-                      div {
-                        padding: 10px;
-          
-                        div {
-                          padding: 0px;
-            
-                          &.formField {
-                            margin-bottom: 10px;
-                          }
-            
-                          label {
-                            clear: left;
-                            padding: 0 10px 10px 0;
-                          }
-            
-                          textarea {
-                            width: 98.5%;
-                          }
-                        }
-          
-                        .pagedown-buttonbar {
-                          clear: both;
-                          margin: 0px 0px 10px 0px;
-            
-                          ul {
-                            margin: 0px;
-                          }
-                        }
-          
-                        .pagedown-preview {
-                          @include html;
-                          @include rounded(3px);
-                          border: dashed 1px $lightgrey;
-                          margin: 10px 0px;
-                          padding: 9px;
-                        }
-                      }
-        
-                      input[type='submit'] {
-                        @include button;
-                        float: right;
-                      }
-                
-                      div.preview {
-                        @include default;
-                        padding: 0;
-                  
-                        &:not(:empty) {
-                          padding: 1em;
-                        }
-                      }
-                    }
-                    
-                    // nested editors within editors
-                    ul.nodeChildren {
-                      li.node, li.node_drop_target  {
-                        margin: 1em;
-                      }
-                    }
-                  }
-                }
               }
             }
           }
@@ -682,18 +688,58 @@ span.title {
 -----------------------------------------*/
 
 .popOut {
-  
   background: $reallylightgrey;
   font-family: "Open Sans";
   font-size: 12px;
   line-height: 16px;
   
-  .editor {
-    background: white;
+  
+  div.widgy {
     
-    .widgy {
-      .node {
-        @extend .node;
+    div.editor {
+      background: white;
+      
+      section.node {
+        ul.nodeChildren {
+          @include widgetNodeChildren;
+          list-style: none !important;
+          
+          li.node {
+            padding: 0 !important;
+            
+            &.being_dragged {
+              div.preview, div.shelf, ul {
+                display: none !important;
+              }
+            }
+            
+            div.widget {
+              div.content {
+                p.drag-row {
+                  @include important-gradient(#eee,#fff);
+                  
+                  span.title {
+                    font-size: 15px !important;
+                    font-weight: normal !important;
+                  }
+                }
+              }
+              
+              ul.nodeChildren {
+                li.node {
+                  margin: 1em !important;
+                  
+                  div.widget {
+                    div.content {
+                      p.drag-row {
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
