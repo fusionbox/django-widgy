@@ -1,8 +1,6 @@
 define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'lib/q', 'nodes/nodes',
-    'nodes/models',
     'text!app.html', 'shelves/shelves'
     ], function($, _, Backbone, csrf, Q, nodes,
-      node_models,
       app_template, shelves
       ) {
 
@@ -32,11 +30,11 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'lib/q', 'nodes/n
       // please!
       this.node_view_list = new Backbone.ViewList();
 
-      var root_node = this.root_node = new node_models.Node(options.root_node),
+      var root_node = this.root_node = new nodes.Node(options.root_node),
           app = this;
 
       this.root_node_promise = root_node.ready(function(model) {
-        var root_node_view = new model.component.NodeView({
+        var root_node_view = new model.component.View({
           model: model,
           app: app,
           tagName: 'section'

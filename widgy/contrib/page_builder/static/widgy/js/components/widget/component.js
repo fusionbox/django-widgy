@@ -26,11 +26,9 @@ define([
    * EditorView will close if that element is clicked.
    */
   var EditorView = form.FormView.extend({
-    events: function() {
-      return _.extend({}, form.FormView.prototype.events , {
-        'click .cancel': 'close'
-      });
-    },
+    events: Backbone.extendEvents(form.FormView, {
+      'click .cancel': 'close'
+    }),
 
     initialize: function() {
       form.FormView.prototype.initialize.apply(this, arguments);
@@ -42,8 +40,9 @@ define([
     },
 
     getTemplate: function() {
-      return templates.getTemplate(this.model.get('template_url'))
-        .invoke('get', 'edit_template');
+      return templates.getTemplate(this.model.get('template_url')).then(function(template) {
+        return template.get('edit_template');
+      });
     },
 
     submit: function() {
@@ -106,9 +105,9 @@ define([
   var WidgetView = contents.View.extend({
     editorClass: EditorView,
 
-    events: {
+    events: Backbone.extendEvents(contents.View, {
       'click .edit': 'editWidget'
-    },
+    }),
 
     getEditorClass: function() {
       return this.editorClass;
@@ -120,16 +119,16 @@ define([
       var editor_class = this.getEditorClass(),
           edit_view = new editor_class({
             app: this.app,
-            model: this.model
+            model: this.content
           });
 
       new Backbone.Spinner({el: this.$el.find('.edit')});
 
-      this.listenTo(edit_view, 'close', this.render);
+      this.listenTo(edit_view, 'close', this.renderContent);
 
       edit_view.renderPromise()
         .then(_.bind(function(edit_view) {
-          this.$el.html(edit_view.el);
+          this.$content.html(edit_view.el);
 
           // TODO: use HTML autofocus property??
           edit_view.$(':input:first').focus();

@@ -29,16 +29,14 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
    *    `this.model.children`.)
    * -  `this.app` is the instance of AppView
    */
-  var NodeView = DraggableView.extend({
+  var NodeViewBase = DraggableView.extend({
     template: node_view_template,
 
-    events: function() {
-      return _.extend({}, DraggableView.prototype.events , {
-        'click .delete': 'delete',
-        'click .pop_out': 'popOut',
-        'click .pop_in': 'closeSubwindow'
-      });
-    },
+    events: Backbone.extendEvents(DraggableView, {
+      'click .delete': 'delete',
+      'click .pop_out': 'popOut',
+      'click .pop_in': 'closeSubwindow'
+    }),
 
     initialize: function() {
       DraggableView.prototype.initialize.apply(this, arguments);
@@ -54,14 +52,15 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         'stopDragging',
         'dropChildView',
         'receiveChildView',
-        'renderContent',
         'resortChildren',
+        'getRenderPromises',
         'repositionChild',
         'popOut',
         'popIn',
         'closeSubwindow'
         );
 
+      this.content = this.model.content;
       this.collection = this.model.children;
       this.drop_targets_list = new Backbone.ViewList();
 
@@ -122,7 +121,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       });
 
       return node.ready(function(model) {
-        var node_view = new model.component.NodeView({
+        var node_view = new model.component.View({
           model: node,
           parent: parent,
           app: parent.app
@@ -363,40 +362,12 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       return this.model.shelf || this.isRootNode();
     },
 
-    render: function() {
-      debug.call(this, 'render');
-      DraggableView.prototype.render.apply(this, arguments);
-
-      this.$children = this.$el.find(' > .widget > .node_children');
-      this.$content = this.$el.find(' > .widget > .content ');
-
-      this.renderChildren();
-
-      if ( this.hasShelf() ) {
-        this.renderShelf();
-      }
-
-      this.model.ready(this.renderContent);
-
-      return this;
-    },
-
     renderPromise: function() {
       return DraggableView.prototype.renderPromise.apply(this, arguments).then(function(view) {
         view.$children = view.$(' > .widget > .node_children');
         view.$content = view.$(' > .widget > .content ');
 
-        var promises = [];
-
-        promises.push(view.renderChildren());
-
-        if ( view.hasShelf() ) {
-          promises.push(view.renderShelf());
-        }
-
-        promises.push(view.model.ready(view.renderContent));
-
-        return Q.all(promises).then(function() {
+        return Q.all(view.getRenderPromises()).then(function() {
           if ( view.app.compatibility_data )
             view.app.updateCompatibility(view.app.compatibility_data);
 
@@ -405,30 +376,16 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       });
     },
 
-    /**
-     * Because of how awesome Q is, renderContent and renderShelf
-     * don't need to return promises, but they could.
-     */
-    renderContent: function() {
-      if ( this.content_view )
-        return;
+    getRenderPromises: function() {
+      var promises = [
+        this.renderChildren()
+        ];
 
-      console.log(this.model.__class__, 'renderContent');
+      if ( this.hasShelf() ) {
+        promises.push(this.renderShelf());
+      }
 
-      this.content_view = new this.model.component.View({
-        model: this.model.content,
-        el: this.$content,
-        app: this.app
-      });
-
-      this.content_view.renderPromise()
-        .then(_.bind(function(content_view) {
-          // when we are popped out, we need to remove our own pop out button.
-          if ( this.isRootNode() ) {
-            content_view.$('.pop_out').remove();
-          }
-        }, this))
-        .done();
+      return promises;
     },
 
     renderShelf: function() {
@@ -525,10 +482,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       'mouseup': 'dropped'
     },
 
-    events: {
+    events: Backbone.extendEvents(Backbone.View, {
       'mouseenter': 'activate',
       'mouseleave': 'deactivate'
-    },
+    }),
 
     render: function() {
       Backbone.View.prototype.render.apply(this, arguments);
@@ -577,7 +534,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
   return _.extend({}, models, {
     DropTargetView: DropTargetView,
-    NodeView: NodeView
+    NodeViewBase: NodeViewBase
   });
 
 });

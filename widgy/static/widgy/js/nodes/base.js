@@ -16,9 +16,9 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
     tagName: 'li',
     className: 'node',
 
-    events: {
+    events: Backbone.extendEvents(Backbone.View, {
       'mousedown .drag_handle': 'startBeingDragged'
-    },
+    }),
 
     initialize: function(options) {
       Backbone.View.prototype.initialize.apply(this, arguments);

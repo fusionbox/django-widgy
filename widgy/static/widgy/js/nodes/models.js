@@ -1,8 +1,6 @@
-define([ 'underscore', 'widgy.backbone', 'lib/q',
-    'widgy.contents'
+define([ 'underscore', 'widgy.backbone', 'lib/q'
     ], function(
-      _, Backbone, Q,
-      contents
+      _, Backbone, Q
       ) {
 
 
