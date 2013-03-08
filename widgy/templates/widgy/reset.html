@@ -1,14 +1,15 @@
 {% load url from future %}
 <script src="{% static 'js/jquery.form.js' %}'"></script>
 
-<div class="reset">
+<div class="reset popUp">
+  <h2>Reset</h2>
   {% if not has_commits %}
   <p>There are no commits yet, nothing to reset to</p>
   {% elif changed_anything %}
   <p>This will irrevocably destroy all uncommited changes. Are you sure?</p>
     <form method="post" action="{{ reset_url }}">
       {% csrf_token %}
-      <input type=submit value=Yes>
+      <p class="submitRow"><input type=submit value="Yes"></p>
     </form>
     <script>
       $('.reset form').ajaxForm({target: 'div.reset'});
