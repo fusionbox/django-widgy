@@ -29,16 +29,14 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
    *    `this.model.children`.)
    * -  `this.app` is the instance of AppView
    */
-  var NodeView = DraggableView.extend({
+  var NodeViewBase = DraggableView.extend({
     template: node_view_template,
 
-    events: function() {
-      return _.extend({}, DraggableView.prototype.events , {
-        'click .delete': 'delete',
-        'click .pop_out': 'popOut',
-        'click .pop_in': 'closeSubwindow'
-      });
-    },
+    events: Backbone.extendEvents(DraggableView, {
+      'click .delete': 'delete',
+      'click .pop_out': 'popOut',
+      'click .pop_in': 'closeSubwindow'
+    }),
 
     initialize: function() {
       DraggableView.prototype.initialize.apply(this, arguments);
@@ -46,6 +44,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       _.bindAll(this,
         'renderChildren',
         'addChild',
+        'addChildPromise',
         'addDropTargets',
         'createDropTarget',
         'clearDropTargets',
@@ -54,15 +53,16 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         'stopDragging',
         'dropChildView',
         'receiveChildView',
-        'renderContent',
         'resortChildren',
-        'repositionChild',
+        'getRenderPromises',
         'popOut',
         'popIn',
         'closeSubwindow'
         );
 
-      this.collection = this.model.children;
+      this.node = this.model;
+      this.content = this.node.content;
+      this.collection = this.node.children;
       this.drop_targets_list = new Backbone.ViewList();
 
       this
@@ -71,7 +71,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         .listenTo(this.collection, 'sort', this.resortChildren);
 
       this
-        .listenTo(this.model, 'remove', this.close);
+        .listenTo(this.node, 'remove', this.close);
 
       this.list = new Backbone.ViewList();
     },
@@ -83,16 +83,11 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     onClose: function() {
       DraggableView.prototype.onClose.apply(this, arguments);
 
-      if ( this.content_view ) {
-        this.content_view.close();
-        delete this.content_view;
-      }
-
       this.list.closeAll();
     },
 
     dontShowChildren: function() {
-      return this.model.pop_out === 2 && ! this.isRootNode();
+      return this.content.get('pop_out') === 2 && ! this.isRootNode();
     },
 
     renderChildren: function() {
@@ -102,61 +97,83 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
       this.list.closeAll();
       var self = this;
-      return Q.all(this.collection.map(this.addChild)).then(function() {
+      return Q.allResolved(this.collection.map(this.addChildPromise)).then(function() {
         self.resortChildren();
       });
     },
 
-    addChild: function(node, collection, options) {
+    addChildPromise: function(node, collection, options) {
       if ( this.dontShowChildren() )
         return;
+      var parent = this;
 
-      var node_view = new NodeView({
-        model: node,
-        parent: this,
-        app: this.app
+      options = (options || {});
+      _.defaults(options, {
+        sort_now: true
       });
 
-      this
-        .listenTo(node_view, 'startDrag', this.startDrag)
-        .listenTo(node_view, 'stopDrag', this.stopDrag);
+      return node.ready(function(model) {
+        var node_view = new model.component.View({
+          model: node,
+          parent: parent,
+          app: parent.app
+        });
 
-      this.app.node_view_list.push(node_view);
-      if ( options && options.index ) {
-        this.list.list.splice(options.index, 0, node_view);
-      } else {
-        this.list.push(node_view);
-      }
+        parent
+          .listenTo(node_view, 'startDrag', parent.startDrag)
+          .listenTo(node_view, 'stopDrag', parent.stopDrag);
 
-      var self = this;
+        parent.app.node_view_list.push(node_view);
+        if ( options && options.index ) {
+          parent.list.list.splice(options.index, 0, node_view);
+        } else {
+          parent.list.push(node_view);
+        }
 
-      return node_view.renderPromise().then(function(node_view) {
-        self.$children.append(node_view);
+        return node_view.renderPromise().then(function(node_view) {
+          parent.$children.append(node_view);
+
+          return node_view;
+        });
       });
     },
 
+    addChild: function() {
+      var parent = this,
+          promise = this.addChildPromise.apply(this, arguments);
+
+      if ( promise ) {
+        promise.then(function(node_view) {
+          parent.resortChildren();
+        }).done();
+      }
+
+      return promise;
+    },
+
     resortChildren: function() {
-      console.log(this.model.__class__, 'resorting children');
       var new_list = [];
       this.collection.each(function(model) {
         var node_view = this.list.findByModel(model);
-        this.$children.append(node_view.el);
-        new_list.push(node_view);
+        if ( node_view ) {
+          this.$children.append(node_view.el);
+          new_list.push(node_view);
+        }
       }, this);
       this.list.list = new_list;
     },
 
     'delete': function(event) {
       var spinner = new Backbone.Spinner({el: this.$content.find('.delete')}),
-          model = this.model;
+          model = this.node;
 
       var error = function() {
         spinner.restore();
         modal.raiseError.apply(this, arguments);
       };
 
-      this.model.collection.trigger('destroy_child');
-      this.model.destroy({
+      this.node.collection.trigger('destroy_child');
+      this.node.destroy({
         wait: true,
         error: error,
         app: this.app
@@ -225,7 +242,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     getShelf: function() {
-      if ( this.model.pop_out == 2 && ! this.isRootNode() )
+      if ( this.content.get('pop_out') == 2 && ! this.isRootNode() )
         return null;
       else if ( this.hasShelf() )
         return this.shelf;
@@ -247,7 +264,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       if ( parent.list.contains(this) )
         return true;
 
-      return this.app.validateRelationship(parent, this.model.content);
+      return this.app.validateRelationship(parent, this.content);
     },
 
     /**
@@ -328,42 +345,20 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         return;
 
       var attributes = {
-        parent_id: this.model.id,
+        parent_id: this.node.id,
         right_id: right ? right.id : null
       };
 
       this.collection.trigger('receive_child');
       dragged_view.model.save(attributes, {
-        success: this.repositionChild,
+        success: this.collection.reposition,
         error: modal.raiseError,
         app: this.app
       });
     },
 
-    repositionChild: function(node) {
-      return Q(this.collection.reposition(node));
-    },
-
     hasShelf: function() {
-      return this.model.shelf || this.isRootNode();
-    },
-
-    render: function() {
-      debug.call(this, 'render');
-      DraggableView.prototype.render.apply(this, arguments);
-
-      this.$children = this.$el.find(' > .widget > .node_children');
-      this.$content = this.$el.find(' > .widget > .content ');
-
-      this.renderChildren();
-
-      if ( this.hasShelf() ) {
-        this.renderShelf();
-      }
-
-      this.model.ready(this.renderContent);
-
-      return this;
+      return this.content.get('shelf') || this.isRootNode();
     },
 
     renderPromise: function() {
@@ -371,17 +366,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         view.$children = view.$(' > .widget > .node_children');
         view.$content = view.$(' > .widget > .content ');
 
-        var promises = [];
-
-        promises.push(view.renderChildren());
-
-        if ( view.hasShelf() ) {
-          promises.push(view.renderShelf());
-        }
-
-        promises.push(view.model.ready(view.renderContent));
-
-        return Q.all(promises).then(function() {
+        return Q.all(view.getRenderPromises()).then(function() {
           if ( view.app.compatibility_data )
             view.app.updateCompatibility(view.app.compatibility_data);
 
@@ -390,30 +375,16 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       });
     },
 
-    /**
-     * Because of how awesome Q is, renderContent and renderShelf
-     * don't need to return promises, but they could.
-     */
-    renderContent: function() {
-      if ( this.content_view )
-        return;
+    getRenderPromises: function() {
+      var promises = [
+        this.renderChildren()
+        ];
 
-      console.log(this.model.__class__, 'renderContent');
+      if ( this.hasShelf() ) {
+        promises.push(this.renderShelf());
+      }
 
-      this.content_view = new this.model.component.View({
-        model: this.model.content,
-        el: this.$content,
-        app: this.app
-      });
-
-      this.content_view.renderPromise()
-        .then(_.bind(function(content_view) {
-          // when we are popped out, we need to remove our own pop out button.
-          if ( this.isRootNode() ) {
-            content_view.$('.pop_out').remove();
-          }
-        }, this))
-        .done();
+      return promises;
     },
 
     renderShelf: function() {
@@ -422,7 +393,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
       var shelf = this.shelf = new shelves.ShelfView({
         collection: new shelves.ShelfCollection({
-            node: this.model
+            node: this.node
           }),
         app: this.app
       });
@@ -445,9 +416,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     toJSON: function() {
-      var json = this.model.toJSON();
-      if ( this.model.content )
-        json.content = this.model.content.toJSON();
+      var json = this.node.toJSON();
+      if ( this.content )
+        json.content = this.content.toJSON();
 
       return json;
     },
@@ -480,7 +451,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       // page.
       $(window).off('.widgyPopOut-' + this.cid);
 
-      this.model.fetch({
+      this.node.fetch({
         app: this.app,
         resort: true,
         success: this.render
@@ -496,7 +467,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     cssClasses: function() {
-      return this.model.css_classes;
+      return this.content.get('css_classes');
     }
   });
 
@@ -510,10 +481,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       'mouseup': 'dropped'
     },
 
-    events: {
+    events: Backbone.extendEvents(Backbone.View, {
       'mouseenter': 'activate',
       'mouseleave': 'deactivate'
-    },
+    }),
 
     render: function() {
       Backbone.View.prototype.render.apply(this, arguments);
@@ -562,7 +533,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
   return _.extend({}, models, {
     DropTargetView: DropTargetView,
-    NodeView: NodeView
+    NodeViewBase: NodeViewBase
   });
 
 });

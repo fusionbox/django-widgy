@@ -1,8 +1,6 @@
-define([ 'underscore', 'widgy.backbone', 'lib/q',
-    'widgy.contents'
+define([ 'underscore', 'widgy.backbone', 'lib/q'
     ], function(
-      _, Backbone, Q,
-      contents
+      _, Backbone, Q
       ) {
 
 
@@ -55,7 +53,7 @@ define([ 'underscore', 'widgy.backbone', 'lib/q',
 
     ready: function(win, fail) {
       if ( ! this._ready ) {
-        this._ready = this.getComponent(this.component);
+        this._ready = this.getComponent(this._component_name);
       }
 
       if ( win || fail ) {
@@ -90,11 +88,7 @@ define([ 'underscore', 'widgy.backbone', 'lib/q',
       // peek at some stuff we need for timing.
       if ( content ) {
         _.defaults(this, {
-          __class__: content.__class__,
-          css_classes: content.css_classes,
-          component: content.component,
-          pop_out: content.pop_out,
-          shelf: content.shelf
+          _component_name: content.component
         });
 
         if ( this.content ) {
@@ -109,8 +103,8 @@ define([ 'underscore', 'widgy.backbone', 'lib/q',
       if (ret) {
         if (children) {
           this.children.update2(children, options);
-          if ( options && options.resort ) {
-            this.children.sortByRight();
+          if ( options && (options.resort || options.sort_silently) ) {
+            this.children.sortByRight(options);
           }
         }
       }
@@ -153,7 +147,7 @@ define([ 'underscore', 'widgy.backbone', 'lib/q',
       if ( options.app )
       {
         var model_url = _.result(model, 'url'),
-            root_url = _.result(options.app.root_node_view.model, 'url');
+            root_url = _.result(options.app.root_node, 'url');
 
         options.url =  model_url + '?include_compatibility_for=' + root_url;
       }
@@ -223,7 +217,7 @@ define([ 'underscore', 'widgy.backbone', 'lib/q',
 
       this.models = new_order;
 
-      if (!options || !options.silent) this.trigger('sort', this, options);
+      if (!options || !options.silent || !options.sort_silently) this.trigger('sort', this, options);
       return this;
     },
 
@@ -245,9 +239,9 @@ define([ 'underscore', 'widgy.backbone', 'lib/q',
         // remove the model from its old position and insert at new index.
         this.models.splice(this.indexOf(node), 1);
         this.models.splice(this.getIndexOf(node.get('right_id')), 0, node);
-      }
 
-      this.trigger('sort');
+        this.trigger('sort');
+      }
       this.trigger('position_child');
     }
   });

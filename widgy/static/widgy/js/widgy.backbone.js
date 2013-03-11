@@ -239,11 +239,19 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache', 'lib/q' ], function($, 
   });
 
 
+  function extendEvents(parent, events) {
+    return function() {
+      return _.extend({}, _.result(parent.prototype, 'events'), events);
+    };
+  }
+
+
   return _.extend({}, Backbone, {
     Model: Model,
     View: View,
     ViewList: ViewList,
     renderTemplate: renderTemplate,
-    Spinner: Spinner
+    Spinner: Spinner,
+    extendEvents: extendEvents
   });
 });

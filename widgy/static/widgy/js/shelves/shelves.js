@@ -127,9 +127,9 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
 
     // Override the DraggableView events, I want the whole thing draggable, not
     // just the drag handle.
-    events: {
+    events: Backbone.extendEvents(DraggableView, {
       'mousedown': 'startBeingDragged'
-    },
+    }),
 
     canAcceptParent: function(parent) {
       return this.app.validateRelationship(parent, this.model);

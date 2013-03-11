@@ -1,4 +1,4 @@
-define([ 'widgy.backbone' ], function(Backbone) {
+define([ 'widgy.backbone', 'nodes/nodes' ], function(Backbone, nodes) {
 
   /**
    * Base Model for Contents.  A Content holds the non-structure data for a
@@ -22,30 +22,36 @@ define([ 'widgy.backbone' ], function(Backbone) {
   });
 
 
-  /**
-   * Base View for Contents.  A Content View displays the Content and also
-   * provides an interface to edit it.  Usually, the ContentView just shows
-   * Content and when the user wishes to edit the content, it will open another
-   * view.  See `widgy.widgets.js`.
-   */
-  var ContentView = Backbone.View.extend({
-    className: 'content',
+  var NodeContentView = nodes.NodeViewBase.extend({
+    initialize: function() {
+      nodes.NodeViewBase.prototype.initialize.apply(this, arguments);
 
-    initialize: function(options) {
-      Backbone.View.prototype.initialize.apply(this, arguments);
+      _.bindAll(this,
+        'renderContent'
+      );
 
-      this.app = options.app;
-      this.listenTo(this.model, 'change:preview_template', this.render);
+      this
+        .listenTo(this.content, 'change:preview_template', this.renderContent);
     },
 
-    getTemplate: function() {
-      return this.model.get('preview_template');
+    getRenderPromises: function() {
+      var promises = nodes.NodeViewBase.prototype.getRenderPromises.apply(this, arguments);
+
+      promises.push(this.renderContent());
+
+      return promises;
+    },
+
+    renderContent: function() {
+      var template = this.content.get('preview_template'),
+          context = this.content.toJSON();
+      this.$content.html(this.renderTemplate(template, context));
     }
   });
 
 
   return {
     Model: Content,
-    View: ContentView
+    View: NodeContentView
   };
 });

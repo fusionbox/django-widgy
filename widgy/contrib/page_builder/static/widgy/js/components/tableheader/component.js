@@ -1,35 +1,42 @@
-define([ 'underscore', 'components/widget/component' ], function(_, widget) {
+define([ 'underscore', 'lib/q', 'components/widget/component' ], function(_, Q, widget) {
 
   var TableHeaderView = widget.View.extend({
     initialize: function() {
       widget.View.prototype.initialize.apply(this, arguments);
 
-      _.bindAll(this,
-        'refreshTable',
-        'blockTable'
-      );
-
-      this.listenTo(this.model.node.children, 'position_child', this.refreshTable)
-          .listenTo(this.model.node.children, 'destroy', this.refreshTable)
-          .listenTo(this.model.node.children, 'receive_child', this.blockTable)
-          .listenTo(this.model.node.children, 'destroy_child', this.blockTable);
+      this
+        .listenTo(this.collection, 'destroy_child', this.parent.block)
+        .listenTo(this.collection, 'destroy', this.parent.refresh)
+        .listenTo(this.collection, 'receive_child', this.parent.block)
+        .listenTo(this.collection, 'sort', this.moveColumn);
     },
 
-    refreshTable: function() {
-      this.model.node.trigger('refreshTable');
+    moveColumn: function(collection, options) {
+      // Avoid recursion.
+      if ( options && options.moveColumn )
+        return;
+
+      this.parent.refresh({moveColumn: true, resort: true});
     },
 
-    blockTable: function() {
-      this.model.node.trigger('blockTable');
+    addChild: function() {
+      var parent = this,
+          table = this.parent,
+          promise = this.addChildPromise.apply(this, arguments);
+
+      if ( promise ) {
+        promise.then(function(node_view) {
+          return Q(table.refresh({sort_silently: true})).then(function() {
+            parent.resortChildren();
+          });
+        }).done();
+      }
+
+      return promise;
     }
   });
 
-  var TableHeader = widget.Model.extend({
-    viewClass: TableHeaderView
-  });
-
   return _.extend({}, widget, {
-    Model: TableHeader,
     View: TableHeaderView
   });
 });
