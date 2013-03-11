@@ -49,3 +49,18 @@ def mdown(value):
     )
 
     return mark_safe(value)
+
+@register.simple_tag(takes_context=True)
+def render_root(context, root_node):
+    """
+    Renders `root_node` _unless_ `root_node_override` is in the context, in
+    which case the override is rendered instead.
+
+    `root_node_override` is used for stuff like preview, when a view wants to
+    specify exactly what root node to use.
+    """
+    try:
+        root_node = context['root_node_override']
+    except KeyError:
+        pass
+    return render(context, root_node)
