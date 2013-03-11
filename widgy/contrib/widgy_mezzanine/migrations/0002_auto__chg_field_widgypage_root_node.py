@@ -7,7 +7,7 @@ from django.db import models
 
 class Migration(SchemaMigration):
     depends_on = [
-        ('widgy', '0002_auto__add_versiontracker__add_versioncommit'),
+        ('widgy', '0003_auto__add_versiontracker__add_versioncommit'),
     ]
 
     def forwards(self, orm):
