@@ -344,26 +344,26 @@ form .aligned p.keywords-field {
             border: 0px;
             padding: 0px 30px;
           
-            div.widget {
-              div.content {
-                p.drag-row {
+            > div.widget {
+              > div.content {
+                > p.drag-row {
                   background: white;
                   padding: 0px;
                   position: relative;
-                  
+            
                   span.dragHandle {
                     font-size: 15px;
                     left: 0px;
                     top: 2px;
                   }
-                  
+            
                   span.title {
                     display: block;
                     font-size: 13px;
                     line-height: 22px;
                     padding: 0px;
                   }
-                  
+            
                   button.delete {
                     font-size: 8px;
                     line-height: 1em;
@@ -372,9 +372,56 @@ form .aligned p.keywords-field {
                     top: 4px;
                     right: 4px;
                     z-index: 1000;
-                    
+              
                     i {
                       width: 1em;
+                    }
+                  }
+                }
+              }
+              
+              ul.nodeChildren {
+                li.tableheaderdata {
+          
+                  > div.widget {
+                    > div.content {
+                      > p.drag-row {
+                        background: white;
+                        padding: 0px;
+                        position: relative;
+                  
+                        span.dragHandle {
+                          font-size: 15px;
+                          left: 0px;
+                          top: 2px;
+                        }
+                  
+                        span.title {
+                          display: block;
+                          font-size: 13px;
+                          line-height: 22px;
+                          padding: 0px;
+                        }
+                  
+                        button.delete {
+                          font-size: 8px;
+                          line-height: 1em;
+                          padding: 1px;
+                          position: absolute;
+                          top: 4px;
+                          right: 4px;
+                          z-index: 1000;
+                    
+                          i {
+                            width: 1em;
+                          }
+                        }
+                      }
+                    }
+                  
+                    // regular editors within table cells
+                    ul.nodeChildren {
+                      width: auto !important;
                     }
                   }
                 }
@@ -396,11 +443,11 @@ form .aligned p.keywords-field {
                   border: 0px;
                   overflow: visible;
                   
-                  div.widget {
+                  > div.widget {
                     
-                    div.content {
+                    > div.content {
                       
-                      p.drag-row {
+                      > p.drag-row {
                         height: 0px;
                         padding: 0px;
                         
@@ -438,12 +485,14 @@ form .aligned p.keywords-field {
                     ul.nodeChildren {
                       border: 0px;
                       
-                      li.node.tabledata {
-                        div.widget {
-                          div.content {
-                            p.drag-row {
+                      > li.node.tabledata {
+                        > div.widget {
+                          > div.content {
+                            min-height: 22px;
+                            
+                            > p.drag-row {
                               background: white;
-                              height: 22px;
+                              height: 0px;
                             }
                           }
                         }
