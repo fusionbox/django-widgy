@@ -137,18 +137,18 @@ form .aligned p.keywords-field {
     
   li.node_drop_target {
     @include rounded(3px);
-    border: 2px dashed $green;
-    background: white;
-    font-size: 1.4em;
-    font-style: italic;
-    height: auto;
-    margin-bottom: 1em;
-    padding: 1em;
+    border: 2px dashed $green !important;
+    background: white !important;
+    font-size: 1.4em !important;
+    font-style: italic !important;
+    height: auto !important;
+    margin-bottom: 1em !important;
+    padding: 1em !important;
 
     &.active {
-      border: 2px dashed darken($green,10%);
-      background: lighten($green,40%);
-      color: $darken($green,10%);
+      border: 2px dashed darken($green,10%) !important;
+      background: lighten($green,40%) !important;
+      color: $darken($green,10%) !important;
     }
   }
   
@@ -339,6 +339,122 @@ form .aligned p.keywords-field {
       ul.nodeChildren {
         li.node, li.node_drop_target  {
           margin: 1em;
+                  
+          &.tableheader {
+            border: 0px;
+            padding: 0px 30px;
+          
+            div.widget {
+              div.content {
+                p.drag-row {
+                  background: white;
+                  padding: 0px;
+                  position: relative;
+                  
+                  span.dragHandle {
+                    font-size: 15px;
+                    left: 0px;
+                    top: 2px;
+                  }
+                  
+                  span.title {
+                    display: block;
+                    font-size: 13px;
+                    line-height: 22px;
+                    padding: 0px;
+                  }
+                  
+                  button.delete {
+                    font-size: 8px;
+                    line-height: 1em;
+                    padding: 1px;
+                    position: absolute;
+                    top: 4px;
+                    right: 4px;
+                    z-index: 1000;
+                    
+                    i {
+                      width: 1em;
+                    }
+                  }
+                }
+              }
+            }
+          } // tableheader
+          
+          &.invisible {
+            background: transparent;
+            border: 0px;
+            margin: 0px;
+            overflow: visible;
+            padding: 0px 30px;
+            
+            div.widget {
+              ul.nodeChildren {
+                
+                li.node.tablerow {
+                  border: 0px;
+                  overflow: visible;
+                  
+                  div.widget {
+                    
+                    div.content {
+                      
+                      p.drag-row {
+                        height: 0px;
+                        padding: 0px;
+                        
+                        span.dragHandle {
+                          font-size: 14px;
+                          left: -30px;
+                          position: absolute;
+                          top: 3px;
+                        }
+                  
+                        button.delete {
+                          font-size: 8px;
+                          line-height: 1em;
+                          padding: 1px;
+                          position: absolute;
+                          top: 3px;
+                          right: -30px;
+                          z-index: 1000;
+                    
+                          i {
+                            width: 1em;
+                          }
+                          
+                          span {
+                            display: none;
+                          }
+                        }
+                      }
+                      
+                      div.preview {
+                        display: none;
+                      }
+                    }
+                      
+                    ul.nodeChildren {
+                      border: 0px;
+                      
+                      li.node.tabledata {
+                        div.widget {
+                          div.content {
+                            p.drag-row {
+                              background: white;
+                              height: 22px;
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          
         }
       }
     }
@@ -588,6 +704,8 @@ li.shelfItem {
   @include node-icon("section", "../image/widget-section.png");
   @include node-icon("submitbutton", "../image/widget-ok-button.png");
   @include node-icon("table", "../image/widget-table.gif");
+  @include node-icon("tableheaderdata", "../image/widget-tablecolumn.png");
+  @include node-icon("tablerow", "../image/widget-tablerow.png");
   @include node-icon("textarea", "../image/widget-textarea.gif");
   @include node-icon("uncaptcha", "../image/widget-hidden-field.png");
   @include node-icon("video", "../image/widget-video.gif");
