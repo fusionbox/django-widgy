@@ -2,6 +2,7 @@ from django import forms
 from django.template.loader import render_to_string
 from django.forms import widgets
 from django.contrib.contenttypes.models import ContentType
+from django.utils.safestring import mark_safe
 
 from widgy.utils import format_html
 from widgy.models import Node
@@ -61,6 +62,12 @@ class ContentTypeRadioRenderer(widgets.RadioFieldRenderer):
 
 class ContentTypeRadioSelect(widgets.RadioSelect):
     renderer = ContentTypeRadioRenderer
+
+    def render(self, *args, **kwargs):
+        return (mark_safe('<div class="layoutSelect">') +
+                super(ContentTypeRadioSelect, self).render(*args, **kwargs) +
+                mark_safe('</div>') +
+                render_to_string('widgy/layout_css.html'))
 
 
 class WidgyFormField(forms.ModelChoiceField):
