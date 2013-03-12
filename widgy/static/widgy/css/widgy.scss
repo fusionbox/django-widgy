@@ -18,7 +18,7 @@
   width: auto;
 
   &:hover {
-    background-color: lighten($blue,35%);
+    background: lighten($blue,35%);
     color: $blue;
   }
 
