@@ -1,5 +1,54 @@
+@import "widgy_common.scss";
+
 .form-row .layoutSelect {
-  label {
-    background-color: red;
+  display: inline;
+  float: left;
+  width: auto;
+  
+  ul {
+    display: inline;
+    float: left;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    width: auto;
+    
+    li {
+      @include html;
+      display: inline;
+      float: left;
+      height: auto;
+      margin: 0px 10px 0px 0px;
+      padding: 10px;
+      text-align: center;
+      width: 110px;
+      
+      label {
+        display: block;
+        float: none;
+        margin: 0px;
+        padding: 0px;
+        width: auto;
+      }
+      
+      div.previewImage {
+        @include rounded(4px);
+        background: url('/static/widgy/image/layout-sprite.png') no-repeat 0px -400px;
+        border: 1px solid #cccccc;
+        height: 100px;
+        
+        &.defaultlayout {
+          background-position: 0px 0px;
+        }
+      }
+      
+      input {
+        margin: 5px auto;
+      }
+      
+      span.label {
+        display: block;
+      }
+    }
   }
 }
