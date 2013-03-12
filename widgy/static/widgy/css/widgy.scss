@@ -251,6 +251,39 @@ form .aligned p.keywords-field {
 
             &.formField {
               margin-bottom: 10px;
+              
+              &.image {
+                padding-left: 80px;
+                position: relative;
+                
+                label {
+                  display: none;
+                }
+                
+                img {
+                  left: 5px;
+                  position: relative;
+                  
+                  &.quiet {
+                    left: 10px;
+                    position: absolute;
+                    top: 10px;
+                  }
+                }
+                
+                a.related-lookup {
+                  float: right;
+                  height: 10px;
+                  top: 21px;
+                }
+                
+                input {
+                  float: left;
+                  margin-top: 6px;
+                  width: 86%;
+                }
+                
+              }
             }
 
             label {
