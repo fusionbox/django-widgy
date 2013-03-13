@@ -1,11 +1,9 @@
 define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/shelves', 'modal/modal',
-    'text!./node.html',
     'text!./drop_target.html',
     'text!./popped_out.html',
     'nodes/base',
     'nodes/models'
     ], function(exports, $, _, Backbone, Q, shelves, modal,
-      node_view_template,
       drop_target_view_template,
       popped_out_template,
       DraggableView,
@@ -29,9 +27,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
    *    `this.model.children`.)
    * -  `this.app` is the instance of AppView
    */
-  var NodeViewBase = DraggableView.extend({
-    template: node_view_template,
-
+  var NodeView = DraggableView.extend({
     events: Backbone.extendEvents(DraggableView, {
       'click .delete': 'delete',
       'click .pop_out': 'popOut',
@@ -55,6 +51,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         'receiveChildView',
         'resortChildren',
         'getRenderPromises',
+        'rerender',
         'popOut',
         'popIn',
         'closeSubwindow'
@@ -72,6 +69,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
       this
         .listenTo(this.node, 'remove', this.close);
+
+      this
+        .listenTo(this.content, 'change:preview_template', this.rerender);
 
       this.list = new Backbone.ViewList();
     },
@@ -163,7 +163,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     'delete': function(event) {
-      var spinner = new Backbone.Spinner({el: this.$content.find('.delete')}),
+      var spinner = new Backbone.Spinner({el: this.$('.delete:first')}),
           model = this.node;
 
       var error = function() {
@@ -356,10 +356,18 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       return this.content.get('shelf') || this.isRootNode();
     },
 
+    getTemplate: function() {
+      return this.content.get('preview_template');
+    },
+
+    rerender: function() {
+      this.renderPromise().done();
+    },
+
     renderPromise: function() {
       return DraggableView.prototype.renderPromise.apply(this, arguments).then(function(view) {
         view.$children = view.$(' > .widget > .node_children');
-        view.$content = view.$(' > .widget > .content ');
+        view.$preview = view.$(' > .widget > .preview ');
 
         return Q.all(view.getRenderPromises()).then(function() {
           if ( view.app.compatibility_data )
@@ -429,8 +437,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       $(window).on('unload.widgyPopOut-' + this.cid, this.popIn);
 
       this.collection.reset();
-      this.content_view.close();
-      delete this.content_view;
       this.$el.html(this.renderTemplate(popped_out_template, this.toJSON()));
     },
 
@@ -524,7 +530,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
   return _.extend({}, models, {
     DropTargetView: DropTargetView,
-    NodeViewBase: NodeViewBase
+    NodeView: NodeView
   });
 
 });

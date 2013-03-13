@@ -124,11 +124,12 @@ define([
 
       new Backbone.Spinner({el: this.$el.find('.edit')});
 
-      this.listenTo(edit_view, 'close', this.renderContent);
+      this.listenTo(edit_view, 'close', this.rerender);
 
       edit_view.renderPromise()
         .then(_.bind(function(edit_view) {
-          this.$content.html(edit_view.el);
+          this.$preview.html(edit_view.el);
+          this.$('.edit:first').remove();
 
           // TODO: use HTML autofocus property??
           edit_view.$(':input:first').focus();
@@ -140,7 +141,6 @@ define([
 
   return _.extend({}, contents, {
     View: WidgetView,
-    EditorView: EditorView,
-    NodeView: nodes.NodeView
+    EditorView: EditorView
   });
 });

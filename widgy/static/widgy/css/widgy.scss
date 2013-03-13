@@ -196,7 +196,7 @@ form .aligned p.keywords-field {
     }
 
     // second level title bars
-    & > div.widget > div.content {
+    & > div.widget {
       span.title {
         font-size: 1.4em;
         padding: 5px 0;
@@ -207,22 +207,19 @@ form .aligned p.keywords-field {
       background: white;
       padding: 0px;
       
-      div.content {
-
-        p.drag-row {
-          @include clearfix;
-          @include gradient(#eee,#fff);
-          display: block;
-          float: none;
-          height: 22px;
-          margin: 0px;
-          padding: 10px;
-          width: auto;
-          
-          span.title {
-            font-size: 15px;
-            font-weight: normal;
-          }
+      p.drag-row {
+        @include clearfix;
+        @include gradient(#eee,#fff);
+        display: block;
+        float: none;
+        height: 22px;
+        margin: 0px;
+        padding: 10px;
+        width: auto;
+        
+        span.title {
+          font-size: 15px;
+          font-weight: normal;
         }
 
         button.edit,
@@ -239,100 +236,98 @@ form .aligned p.keywords-field {
           position: relative;
           cursor: pointer;
         }                      
-      
-        // Widget Form / Editor
+      }
+
+      // Widget Form / Editor
+      div {
         div {
-          padding: 10px;
+          @include clearfix;
+          padding: 0px;
+          position: relative;
 
-          div {
-            @include clearfix;
-            padding: 0px;
-            position: relative;
-
-            &.formField {
-              margin-bottom: 10px;
+          &.formField {
+            margin-bottom: 10px;
+            
+            &.image {
+              padding-left: 80px;
+              position: relative;
               
-              &.image {
-                padding-left: 80px;
+              label {
+                display: none;
+              }
+              
+              img {
+                left: 5px;
                 position: relative;
                 
-                label {
-                  display: none;
+                &.quiet {
+                  left: 10px;
+                  position: absolute;
+                  top: 10px;
                 }
-                
-                img {
-                  left: 5px;
-                  position: relative;
-                  
-                  &.quiet {
-                    left: 10px;
-                    position: absolute;
-                    top: 10px;
-                  }
-                }
-                
-                a.related-lookup {
-                  float: right;
-                  height: 10px;
-                  top: 21px;
-                }
-                
-                input {
-                  float: left;
-                  margin-top: 6px;
-                  width: 86%;
-                }
-                
               }
-            }
-
-            label {
-              clear: left;
-              padding: 0 10px 10px 0;
-            }
-
-            textarea {
-              max-width: 98.5%;
-              width: 98.5%;
-            }
-            
-            .cancel {
-              position: absolute;
-              right: 50px;
-              top: 0px;
+              
+              a.related-lookup {
+                float: right;
+                height: 10px;
+                top: 21px;
+              }
+              
+              input {
+                float: left;
+                margin-top: 6px;
+                width: 86%;
+              }
+              
             }
           }
 
-          .pagedown-buttonbar {
-            clear: both;
-            margin: 0px 0px 10px 0px;
-
-            ul {
-              margin: 0px;
-            }
+          label {
+            clear: left;
+            padding: 0 10px 10px 0;
           }
 
-          .pagedown-preview {
-            @include html;
-            @include rounded(3px);
-            border: dashed 1px $lightgrey;
-            margin: 10px 0px;
-            padding: 9px;
+          textarea {
+            max-width: 98.5%;
+            width: 98.5%;
+          }
+          
+          .cancel {
+            position: absolute;
+            right: 50px;
+            top: 0px;
           }
         }
 
-        input[type='submit'] {
-          @include button;
-          float: right;
+        .pagedown-buttonbar {
+          clear: both;
+          margin: 0px 0px 10px 0px;
+
+          ul {
+            margin: 0px;
+          }
         }
+
+        .pagedown-preview {
+          @include html;
+          @include rounded(3px);
+          border: dashed 1px $lightgrey;
+          margin: 10px 0px;
+          padding: 9px;
+        }
+      }
+
+      input[type='submit'] {
+        @include button;
+        float: right;
+      }
+
+      div.preview {
+        @include default;
+        padding: 0;
   
-        div.preview {
-          @include default;
-          padding: 0;
-    
-          &:not(:empty) {
-            padding: 1em;
-          }
+        &:not(:empty) {
+          padding: 1em;
         }
       }
       
@@ -346,38 +341,35 @@ form .aligned p.keywords-field {
             padding: 0px 30px;
           
             > div.widget {
-              > div.content {
-                
-                > p.drag-row {
-                  background: white;
+              > p.drag-row {
+                background: white;
+                padding: 0px;
+                position: relative;
+          
+                span.dragHandle {
+                  font-size: 15px;
+                  left: 0px;
+                  top: 2px;
+                }
+          
+                span.title {
+                  display: block;
+                  font-size: 13px;
+                  line-height: 22px;
                   padding: 0px;
-                  position: relative;
+                }
+          
+                button.delete {
+                  font-size: 8px;
+                  line-height: 1em;
+                  padding: 1px;
+                  position: absolute;
+                  top: 4px;
+                  right: 4px;
+                  z-index: 1000;
             
-                  span.dragHandle {
-                    font-size: 15px;
-                    left: 0px;
-                    top: 2px;
-                  }
-            
-                  span.title {
-                    display: block;
-                    font-size: 13px;
-                    line-height: 22px;
-                    padding: 0px;
-                  }
-            
-                  button.delete {
-                    font-size: 8px;
-                    line-height: 1em;
-                    padding: 1px;
-                    position: absolute;
-                    top: 4px;
-                    right: 4px;
-                    z-index: 1000;
-              
-                    i {
-                      width: 1em;
-                    }
+                  i {
+                    width: 1em;
                   }
                 }
               }
@@ -386,37 +378,35 @@ form .aligned p.keywords-field {
                 li.tableheaderdata {
           
                   > div.widget {
-                    > div.content {
-                      > p.drag-row {
-                        background: white;
+                    > p.drag-row {
+                      background: white;
+                      padding: 0px;
+                      position: relative;
+                
+                      span.dragHandle {
+                        font-size: 15px;
+                        left: 0px;
+                        top: 2px;
+                      }
+                
+                      span.title {
+                        display: block;
+                        font-size: 13px;
+                        line-height: 22px;
                         padding: 0px;
-                        position: relative;
+                      }
+                
+                      button.delete {
+                        font-size: 10px;
+                        line-height: 1em;
+                        padding: 1px;
+                        position: absolute;
+                        top: 4px;
+                        right: 4px;
+                        z-index: 1000;
                   
-                        span.dragHandle {
-                          font-size: 15px;
-                          left: 0px;
-                          top: 2px;
-                        }
-                  
-                        span.title {
-                          display: block;
-                          font-size: 13px;
-                          line-height: 22px;
-                          padding: 0px;
-                        }
-                  
-                        button.delete {
-                          font-size: 10px;
-                          line-height: 1em;
-                          padding: 1px;
-                          position: absolute;
-                          top: 4px;
-                          right: 4px;
-                          z-index: 1000;
-                    
-                          i {
-                            width: 1em;
-                          }
+                        i {
+                          width: 1em;
                         }
                       }
                     }
@@ -427,25 +417,23 @@ form .aligned p.keywords-field {
                       
                       li {
                         div.widget {
-                          div.content {
-                            p.drag-row {
-                              span.dragHandle {
-                                font-size: 13px;
-                              }
+                          p.drag-row {
+                            span.dragHandle {
+                              font-size: 13px;
+                            }
+                            
+                            span.title {
+                              font-size: 12px;
+                            }
+                            
+                            button {
+                              font-size: 10px;
+                              line-height: 1em;
+                              margin-left: 0.5em;
+                              padding: 1px;
                               
-                              span.title {
-                                font-size: 12px;
-                              }
-                              
-                              button {
-                                font-size: 10px;
-                                line-height: 1em;
-                                margin-left: 0.5em;
-                                padding: 1px;
-                                
-                                span {
-                                  display: none;
-                                }
+                              span {
+                                display: none;
                               }
                             }
                           }
@@ -474,41 +462,38 @@ form .aligned p.keywords-field {
                   
                   > div.widget {
                     
-                    > div.content {
+                    > p.drag-row {
+                      height: 0px;
+                      padding: 0px;
                       
-                      > p.drag-row {
-                        height: 0px;
-                        padding: 0px;
-                        
-                        span.dragHandle {
-                          font-size: 14px;
-                          left: -30px;
-                          position: absolute;
-                          top: 3px;
-                        }
+                      span.dragHandle {
+                        font-size: 14px;
+                        left: -30px;
+                        position: absolute;
+                        top: 3px;
+                      }
+                
+                      button.delete {
+                        font-size: 8px;
+                        line-height: 1em;
+                        padding: 1px;
+                        position: absolute;
+                        top: 3px;
+                        right: -30px;
+                        z-index: 1000;
                   
-                        button.delete {
-                          font-size: 8px;
-                          line-height: 1em;
-                          padding: 1px;
-                          position: absolute;
-                          top: 3px;
-                          right: -30px;
-                          z-index: 1000;
-                    
-                          i {
-                            width: 1em;
-                          }
-                          
-                          span {
-                            display: none;
-                          }
+                        i {
+                          width: 1em;
+                        }
+                        
+                        span {
+                          display: none;
                         }
                       }
-                      
-                      div.preview {
-                        display: none;
-                      }
+                    }
+                    
+                    div.preview {
+                      display: none;
                     }
                       
                     ul.nodeChildren {
@@ -516,14 +501,12 @@ form .aligned p.keywords-field {
                       
                       > li.node.tabledata {
                         > div.widget {
-                          > div.content {
-                            min-height: 0px;
-                            
-                            > p.drag-row {
-                              background: white;
-                              height: 0px;
-                              padding: 0px;
-                            }
+                          min-height: 0px;
+                          
+                          > p.drag-row {
+                            background: white;
+                            height: 0px;
+                            padding: 0px;
                           }
                         }
                       }
@@ -531,25 +514,23 @@ form .aligned p.keywords-field {
                       // Regular editors within table cells
                       li {
                         div.widget {
-                          div.content {
-                            p.drag-row {
-                              span.dragHandle {
-                                font-size: 13px;
-                              }
+                          p.drag-row {
+                            span.dragHandle {
+                              font-size: 13px;
+                            }
+                            
+                            span.title {
+                              font-size: 12px;
+                            }
+                            
+                            button {
+                              font-size: 10px;
+                              line-height: 1em;
+                              margin-left: 0.5em;
+                              padding: 1px;
                               
-                              span.title {
-                                font-size: 12px;
-                              }
-                              
-                              button {
-                                font-size: 10px;
-                                line-height: 1em;
-                                margin-left: 0.5em;
-                                padding: 1px;
-                                
-                                span {
-                                  display: none;
-                                }
+                              span {
+                                display: none;
                               }
                             }
                           }
@@ -599,15 +580,13 @@ div.widgy {
       
       // only the first widget/title-bar goes full-width
       > div.widget {
-        > div.content {
-          @include default;
-          @include clearfix;
-    
-          span.title {
-            font-family: "Open Sans";
-            font-size: 2.4em;
-            padding: 5px 0;
-          }
+        @include default;
+        @include clearfix;
+  
+        span.title {
+          font-family: "Open Sans";
+          font-size: 2.4em;
+          padding: 5px 0;
         }
       }
       
@@ -615,17 +594,15 @@ div.widgy {
       div.widget {
       
         // title bar
-        div.content {
-          p.drag-row {
-            // first span.title does something? not sure what this is for...
-            & > span.title {
-              background: transparent;
-              padding: 5px 0 5px 0px;
-            }
+        p.drag-row {
+          // first span.title does something? not sure what this is for...
+          & > span.title {
+            background: transparent;
+            padding: 5px 0 5px 0px;
           }
-          // hidden preview bucket
-          div.preview {}
         }
+        // hidden preview bucket
+        div.preview {}
         
         // (widget shelf buttons)
         div.shelf {
@@ -712,21 +689,18 @@ div.widgy {
             position: relative;
             
             div.widget {
-              
-              div.content {
-                -webkit-user-select: auto;
-                -moz-user-select: text;
-                border: 0px none !important;
+              -webkit-user-select: auto;
+              -moz-user-select: text;
+              border: 0px none !important;
 
-                // Section Headers: "Main Content", "Sidebar"
-                p.drag-row {
-                  background: transparent;
-                  
-                  span.title {
-                    font-weight: bold;
-                    font-size: 20px;
-                    text-transform: capitalize;
-                  }
+              // Section Headers: "Main Content", "Sidebar"
+              p.drag-row {
+                background: transparent;
+                
+                span.title {
+                  font-weight: bold;
+                  font-size: 20px;
+                  text-transform: capitalize;
                 }
               }
               
@@ -983,27 +957,18 @@ span.title {
             }
             
             div.widget {
-              div.content {
-                p.drag-row {
-                  @include important-gradient(#eee,#fff);
-                  
-                  span.title {
-                    font-size: 15px !important;
-                    font-weight: normal !important;
-                  }
+              p.drag-row {
+                @include important-gradient(#eee,#fff);
+                
+                span.title {
+                  font-size: 15px !important;
+                  font-weight: normal !important;
                 }
               }
               
               ul.nodeChildren {
                 li.node {
                   margin: 1em !important;
-                  
-                  div.widget {
-                    div.content {
-                      p.drag-row {
-                      }
-                    }
-                  }
                 }
               }
             }

@@ -1,22 +1,25 @@
-{% block before-preview %}{% endblock %}
-<p class="drag-row">
-  {% if self.draggable %}
-  <span class="drag_handle dragHandle icon-move"></span>
-  {% endif %}
-  
-  {% block title %}
-  <span class="title">{{ self.meta.verbose_name|capfirst }}</span>
-  {% endblock %}
-  
-  {% if self.deletable %}
-  <button class="delete"><i class="icon-remove"></i> <span>Delete</span></button>
-  {% endif %}
-  {% if self.editable %}
-  <button class="edit"><i class="icon-edit"></i> <span>Edit</span></button>
-  {% endif %}
-  {% if self.pop_out %}
-  <a href="{{ edit_url }}" class="pop_out">pop out</a>
-  {% endif %}
-</p>
-{# This needs to have no newlines in order to be :empty #}
-<div class="preview">{% block content %}{% endblock %}</div>
+<div class="widget">
+  {% block before-preview %}{% endblock %}
+  <p class="drag-row">
+    {% if self.draggable %}
+    <span class="drag_handle dragHandle icon-move"></span>
+    {% endif %}
+    
+    {% block title %}
+    <span class="title">{{ self.meta.verbose_name|capfirst }}</span>
+    {% endblock %}
+    
+    {% if self.deletable %}
+    <button class="delete"><i class="icon-remove"></i> <span>Delete</span></button>
+    {% endif %}
+    {% if self.editable %}
+    <button class="edit"><i class="icon-edit"></i> <span>Edit</span></button>
+    {% endif %}
+    {% if self.pop_out %}
+    <a href="{{ edit_url }}" class="pop_out">pop out</a>
+    {% endif %}
+  </p>
+  {# This needs to have no newlines in order to be :empty #}
+  <div class="preview">{% block content %}{% endblock %}</div>
+  <ul class="node_children nodeChildren"></ul>
+</div>

@@ -1,5 +1,5 @@
 %horizontalChildren {
-  & > .widget > .content .drag-row {
+  & > .widget > .drag-row {
     span.title {
       display: none;
     }
@@ -13,7 +13,7 @@
       display: table-cell;
       width: auto;
 
-      & > .widget > .content .drag-row {
+      & > .widget > .drag-row {
         span.title,
         .delete span {
           display: none;

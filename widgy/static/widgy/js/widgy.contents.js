@@ -22,36 +22,8 @@ define([ 'widgy.backbone', 'nodes/nodes' ], function(Backbone, nodes) {
   });
 
 
-  var NodeContentView = nodes.NodeViewBase.extend({
-    initialize: function() {
-      nodes.NodeViewBase.prototype.initialize.apply(this, arguments);
-
-      _.bindAll(this,
-        'renderContent'
-      );
-
-      this
-        .listenTo(this.content, 'change:preview_template', this.renderContent);
-    },
-
-    getRenderPromises: function() {
-      var promises = nodes.NodeViewBase.prototype.getRenderPromises.apply(this, arguments);
-
-      promises.push(this.renderContent());
-
-      return promises;
-    },
-
-    renderContent: function() {
-      var template = this.content.get('preview_template'),
-          context = this.content.toJSON();
-      this.$content.html(this.renderTemplate(template, context));
-    }
-  });
-
-
   return {
     Model: Content,
-    View: NodeContentView
+    View: nodes.NodeView
   };
 });
