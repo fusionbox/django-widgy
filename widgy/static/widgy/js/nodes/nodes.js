@@ -96,14 +96,12 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
       this.list.closeAll();
       var self = this;
-      return Q.allResolved(this.collection.map(this.addChildPromise)).then(function() {
+      return Q.all(this.collection.map(this.addChildPromise)).then(function() {
         self.resortChildren();
       });
     },
 
     addChildPromise: function(node, collection, options) {
-      if ( this.dontShowChildren() )
-        return;
       var parent = this;
 
       options = (options || {});
@@ -138,6 +136,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     addChild: function() {
+      if ( this.dontShowChildren() )
+        return;
+
       var parent = this,
           promise = this.addChildPromise.apply(this, arguments);
 

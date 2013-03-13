@@ -62,12 +62,10 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'lib/q', 'nodes/n
       return Q.all([Backbone.View.prototype.renderPromise.apply(this, arguments), this.root_node_promise])
         .spread(function(app, view) {
           app.$editor = app.$el.children('.editor');
-          view.renderPromise().then(function(view) {
+          return view.renderPromise().then(function(view) {
             app.$editor.append(view.el);
             app.refreshCompatibility();
-          }).done();
-
-          return app;
+          }).thenResolve(app);
         });
     },
 
