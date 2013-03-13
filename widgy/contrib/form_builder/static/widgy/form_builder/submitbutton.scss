@@ -13,11 +13,10 @@
 }
 
 input[type='submit'], button[type='submit'] {
-  background: red !important;
-  border: solid 10px red !important;
+  @include clearfix;
   clear: both;
   float: right;
-  margin-left: 10px;
+  margin: 0px 0px 15px 10px;
   
   & + input[type='submit'], & + button[type='submit'] {
     clear: none;
