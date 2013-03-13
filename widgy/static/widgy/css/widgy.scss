@@ -346,6 +346,7 @@ form .aligned p.keywords-field {
           
             > div.widget {
               > div.content {
+                
                 > p.drag-row {
                   background: white;
                   padding: 0px;
@@ -404,7 +405,7 @@ form .aligned p.keywords-field {
                         }
                   
                         button.delete {
-                          font-size: 8px;
+                          font-size: 10px;
                           line-height: 1em;
                           padding: 1px;
                           position: absolute;
@@ -419,9 +420,36 @@ form .aligned p.keywords-field {
                       }
                     }
                   
-                    // regular editors within table cells
+                    // regular editors within table header cells
                     ul.nodeChildren {
                       width: auto !important;
+                      
+                      li {
+                        div.widget {
+                          div.content {
+                            p.drag-row {
+                              span.dragHandle {
+                                font-size: 13px;
+                              }
+                              
+                              span.title {
+                                font-size: 12px;
+                              }
+                              
+                              button {
+                                font-size: 10px;
+                                line-height: 1em;
+                                margin-left: 0.5em;
+                                padding: 1px;
+                                
+                                span {
+                                  display: none;
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 }
@@ -488,11 +516,40 @@ form .aligned p.keywords-field {
                       > li.node.tabledata {
                         > div.widget {
                           > div.content {
-                            min-height: 22px;
+                            min-height: 0px;
                             
                             > p.drag-row {
                               background: white;
                               height: 0px;
+                              padding: 0px;
+                            }
+                          }
+                        }
+                      }
+                      
+                      // Regular editors within table cells
+                      li {
+                        div.widget {
+                          div.content {
+                            p.drag-row {
+                              span.dragHandle {
+                                font-size: 13px;
+                              }
+                              
+                              span.title {
+                                font-size: 12px;
+                              }
+                              
+                              button {
+                                font-size: 10px;
+                                line-height: 1em;
+                                margin-left: 0.5em;
+                                padding: 1px;
+                                
+                                span {
+                                  display: none;
+                                }
+                              }
                             }
                           }
                         }
@@ -503,7 +560,6 @@ form .aligned p.keywords-field {
               }
             }
           }
-          
         }
       }
     }
