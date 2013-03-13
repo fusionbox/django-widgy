@@ -1,6 +1,6 @@
 {% load widgy_tags %}
-<ol class="accordion">
+<div class="accordion">
   {% for child in self.get_children %}
-  <li>{% render child %}</li>
+  {% render child %}
   {% endfor %}
-</ol>
+</div>

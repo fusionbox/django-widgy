@@ -1,7 +1,7 @@
 {% load widgy_tags %}
-<div class="section">
-  <h1>{{ self.title }}</h1>
+<details>
+  <summary>{{ self.title }}</summary>
   {% for child in self.get_children %}
     {% render child %}
   {% endfor %}
-</div>
+</details>

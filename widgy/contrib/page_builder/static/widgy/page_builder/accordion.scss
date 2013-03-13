@@ -1,0 +1,25 @@
+.no-details details {
+  > * {
+    position: absolute;
+    visibility: hidden;
+  }
+
+  > summary, &[open] > * {
+    position: static;
+    visibility: visible;
+  }
+
+
+  > summary {
+    display: block;
+    &:before {
+      content: "\25ba"; // BLACK RIGHT-POINTING TRIANGLE
+      padding-right: 5px;
+      font-size: 11px;
+    }
+  }
+
+  &[open] > summary:before {
+    content:"\25bc"; // BLACK DOWN-POINTING TRIANGLE
+  }
+}
