@@ -91,7 +91,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     renderChildren: function() {
-      debug.call(this, 'renderChildren');
       if ( this.dontShowChildren() )
         return;
 
@@ -182,8 +181,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     startDrag: function(dragged_view) {
-      debug.call(this, 'startDrag', dragged_view);
-
       if ( ( this.hasShelf() && ! dragged_view.model.id || this.isRootNode() )) {
         this.dragged_view = dragged_view;
 
@@ -231,8 +228,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     stopDrag: function(callback) {
-      debug.call(this, 'stopDrag', callback);
-
       if ( this.hasShelf() && this.dragged_view ) {
         callback(this.stopDragging());
       } else {
@@ -424,8 +419,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     popOut: function(event) {
-      debug.call(this, 'popOut');
-
       event.preventDefault();
       event.stopPropagation(); // our parent nodes
 
@@ -442,8 +435,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     popIn: function(event) {
-      debug.call(this, 'popIn');
-
       event.preventDefault();
       event.stopPropagation();
 
