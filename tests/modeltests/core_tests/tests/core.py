@@ -828,6 +828,11 @@ class TestSite(TestCase):
         # widgy.Content will never have an scss file
         self.assertNotIn('widgy/models/content.scss', scss_files)
 
+    def test_js_files(self):
+        js_files = widgy_site.js_files
+        self.assertIn('widgy/core_tests/rawtextwidget.js', js_files)
+        self.assertNotIn('widgy/models/content.js', js_files)
+
 
 class TestFindProblems(RootNodeTestCase):
     def setUp(self):

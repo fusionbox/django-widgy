@@ -40,6 +40,18 @@ def scss_files(site):
     return site.scss_files
 
 
+@register.filter
+def js_files(site):
+    try:
+        site = getattr(settings, site)
+    except AttributeError:
+        pass
+
+    site = fancy_import(site)
+
+    return site.js_files
+
+
 @register.filter(name='markdown')
 def mdown(value):
     value = markdown.markdown(

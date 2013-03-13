@@ -161,3 +161,7 @@ class WidgySite(object):
     @cached_property
     def scss_files(self):
         return self.find_media_files('.scss')
+
+    @cached_property
+    def js_files(self):
+        return self.find_media_files('.js')

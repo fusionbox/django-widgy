@@ -10,6 +10,13 @@
 {% endfor %}
 {% endblock %}
 
+{% block js %}
+{{ block.super }}
+{% for js_file in 'WIDGY_MEZZANINE_SITE'|js_files %}
+<script src="{% static js_file %}"></script>
+{% endfor %}
+{% endblock %}
+
 {% block seo_description %}{{ page.description }}{% endblock %}
 {% block seo_keywords %}{{ page.keywords_string }}{% endblock %}
 
