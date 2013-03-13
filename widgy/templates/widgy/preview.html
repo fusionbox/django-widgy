@@ -1,5 +1,5 @@
 <div class="widget">
-  {% block before-preview %}{% endblock %}
+  {% block drag-row %}
   <p class="drag-row">
     {% if self.draggable %}
     <span class="drag_handle dragHandle icon-move"></span>
@@ -19,6 +19,8 @@
     <a href="{{ edit_url }}" class="pop_out">pop out</a>
     {% endif %}
   </p>
+  {% endblock %}
+
   {# This needs to have no newlines in order to be :empty #}
   <div class="preview">{% block content %}{% endblock %}</div>
   <ul class="node_children nodeChildren"></ul>
