@@ -23,5 +23,8 @@
 
   {# This needs to have no newlines in order to be :empty #}
   <div class="preview">{% block content %}{% endblock %}</div>
+
+  {% block children %}
   <ul class="node_children nodeChildren"></ul>
+  {% endblock %}
 </div>

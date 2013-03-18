@@ -224,7 +224,6 @@ form .aligned p.keywords-field {
 
         button.edit,
         button.delete {
-          display: inline;
           float: right;
           margin-left: 1em;
         }
@@ -323,7 +322,6 @@ form .aligned p.keywords-field {
       }
 
       div.preview {
-        @include default;
         padding: 0;
   
         &:not(:empty) {

@@ -1,0 +1,15 @@
+.widgy .tabbed > .widget > .nodeChildren > li {
+  display: inline-block;
+
+  .drag-row {
+    .edit, // functionality for editing the tab doesn't exist yet.
+    .delete span {
+      display: none;
+    }
+  }
+
+  .preview,
+  .nodeChildren {
+    display: none;
+  }
+}

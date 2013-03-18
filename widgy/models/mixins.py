@@ -44,3 +44,18 @@ class InvisibleMixin(object):
         defaults.update(**kwargs)
 
         return defaults
+
+
+class TabbedContainer(object):
+    css_classes = ('tabbed',)
+    component_name = 'tabbed'
+
+    @classmethod
+    def get_template_kwargs(cls, **kwargs):
+        defaults = {
+            'app_label': 'mixins',
+            'module_name': 'tabbed',
+        }
+        defaults.update(**kwargs)
+
+        return defaults
