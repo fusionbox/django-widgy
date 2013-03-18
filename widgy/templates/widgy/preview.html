@@ -6,7 +6,7 @@
     {% endif %}
     
     {% block title %}
-    <span class="title">{{ self.meta.verbose_name|capfirst }}</span>
+    <span class="title">{{ self.display_name|capfirst }}</span>
     {% endblock %}
     
     {% if self.deletable %}

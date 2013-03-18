@@ -454,6 +454,10 @@ class Content(models.Model):
         }
 
     @property
+    def display_name(self):
+        return self._meta.verbose_name
+
+    @property
     def class_name(self):
         """
         :Returns: a fully qualified classname including app_label and module_name
