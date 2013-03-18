@@ -17,6 +17,7 @@ define([ 'underscore', 'widgy.backbone', 'components/widget/component' ], functi
     renderPromise: function() {
       return widget.View.prototype.renderPromise.apply(this, arguments).then(function(view) {
         view.$current = view.$('.current:last');
+        return view;
       });
     }
   });
