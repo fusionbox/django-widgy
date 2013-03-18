@@ -16,5 +16,6 @@ class WidgyPage(Page):
         ))
 
     class Meta:
+        app_label = 'widgy_mezzanine'
         verbose_name = _('widgy page')
         verbose_name_plural = _('widgy pages')
