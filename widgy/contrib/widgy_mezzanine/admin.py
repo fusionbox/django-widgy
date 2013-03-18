@@ -1,8 +1,11 @@
+from __future__ import unicode_literals
+
 from django.contrib import admin
 from django.conf import settings
 from django import forms
 from django.core.urlresolvers import reverse
 from django.contrib.admin.util import quote
+from django.utils.translation import ugettext_lazy as _, ugettext
 
 from mezzanine.pages.admin import PageAdmin
 try:
@@ -27,7 +30,7 @@ class WidgyPageAdminForm(PageAdminForm):
         status = self.cleaned_data.get('status')
         if (status == CONTENT_STATUS_PUBLISHED and (not self.instance.root_node or
                                                     not self.instance.root_node.head)):
-            raise forms.ValidationError('You must commit before you can publish')
+            raise forms.ValidationError(_('You must commit before you can publish'))
         return status
 
 
@@ -74,7 +77,7 @@ class UndeleteField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         url = reverse('widgy.contrib.widgy_mezzanine.views.preview',
                       kwargs={'node_pk': obj.working_copy.pk})
-        return format_html('<a href="{url}">preview</a>', url=url)
+        return format_html('<a href="{url}">{preview}</a>', url=url, preview=ugettext('preview'))
 
 
 class UndeletePageAdmin(WidgyPageAdmin):
@@ -86,7 +89,8 @@ class UndeletePageAdmin(WidgyPageAdmin):
         return type(base.__class__)(base.__class__.__name__, (base,), {
             'root_node': UndeleteField(site=base_field.site,
                                        queryset=base_field.queryset,
-                                       empty_label=None)
+                                       empty_label=None,
+                                       label=_('root node'))
         })
 
     def response_add(self, request, obj, *args, **kwargs):
@@ -107,7 +111,7 @@ class UndeletePage(WidgyPage):
     class Meta:
         proxy = True
         app_label = WidgyPage._meta.app_label
-        verbose_name = 'Restore deleted page'
+        verbose_name = _('restore deleted page')
 
     def __init__(self, *args, **kwargs):
         self._meta = super(UndeletePage, self)._meta

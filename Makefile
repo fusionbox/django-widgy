@@ -20,4 +20,18 @@ test-js: js_tests/node_modules
 		-s 5 \
 		$(JS_FILES)
 
+widgy/locale/en/LC_MESSAGES/django.po: $(shell find . -type f -iregex '.*\.\(html\|py\|md\)$$' | grep -v .tox)
+
+	cd widgy && django-admin.py makemessages -l en
+
+widgy/locale/xx_pseudo/LC_MESSAGES/django.po: widgy/locale/en/LC_MESSAGES/django.po
+	-rm -r "`dirname $@`"
+	potpie $< $@
+
+widgy/locale/xx_pseudo/LC_MESSAGES/django.mo: widgy/locale/xx_pseudo/LC_MESSAGES/django.po
+	cd widgy && django-admin.py compilemessages
+
+t10n: widgy/locale/xx_pseudo/LC_MESSAGES/django.mo
+
+
 .PHONY: test coverage browser test-py test-js

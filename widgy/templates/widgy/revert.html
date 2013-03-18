@@ -1,4 +1,5 @@
 {% load url from future %}
+{% load i18n %}
 <script src="{% static 'js/jquery.form.js' %}'"></script>
 
 <div class="commit popUp">
@@ -10,7 +11,7 @@
     <p class="submitRow">
     <input type="submit" value="Commit">
     {# TODO: this is dependent on widgy_mezzanine #}
-    <a class="button" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=object.root_node.pk %}">Preview</a>
+    <a class="button" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=object.root_node.pk %}">{% trans "Preview" %}</a>
     </p>
   </form>
   <script>

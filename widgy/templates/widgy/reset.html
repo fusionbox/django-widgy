@@ -1,21 +1,22 @@
 {% load url from future %}
+{% load i18n %}
 <script src="{% static 'js/jquery.form.js' %}'"></script>
 
 <div class="reset popUp">
-  <h2>Reset</h2>
+  <h2>{% trans "Reset" %}</h2>
   {% if not has_commits %}
-  <p>There are no commits yet, nothing to reset to</p>
+  <p>{% trans "There are no commits yet, nothing to reset to" %}</p>
   {% elif changed_anything %}
-  <p>This will irrevocably destroy all uncommited changes. Are you sure?</p>
+  <p>{% trans "This will irrevocably destroy all uncommited changes. Are you sure?" %}</p>
     <form method="post" action="{{ reset_url }}">
       {% csrf_token %}
-      <p class="submitRow"><input type=submit value="Yes"></p>
+      <p class="submitRow"><input type=submit value="{% trans 'Yes' %}"></p>
     </form>
     <script>
       $('.reset form').ajaxForm({target: 'div.reset'});
     </script>
   {% else %}
-    <p>Nothing has changed -- no need to reset.</p>
+    <p>{% trans "Nothing has changed -- no need to reset." %}</p>
   {% endif %}
 </div>
 </body>

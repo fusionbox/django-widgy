@@ -1,3 +1,4 @@
+{% load i18n %}
 <form>
   {{ form.media }}
   {{ form.non_field_errors }}
@@ -9,8 +10,8 @@
   {% block submit-row-outer %}
     <div>
       {% block submit-row-inner %}
-        <button class="cancel" type="button">Cancel</button>
-        <input type="submit" value="Save">
+        <button class="cancel" type="button">{% trans "Cancel" %}</button>
+        <input type="submit" value="{% trans 'Save' %}">
       {% endblock %}
     </div>
   {% endblock %}

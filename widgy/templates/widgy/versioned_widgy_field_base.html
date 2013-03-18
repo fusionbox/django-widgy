@@ -1,4 +1,5 @@
-{% extends "widgy/widgy_field.html" %}{% load compress %}{% load static %}
+{% extends "widgy/widgy_field.html" %}
+{% load compress static i18n %}
 {% block widgy_container %}
 {% compress css %}
 <link rel="stylesheet" href="{% static 'css/jquery.fancybox.css' %}">
@@ -6,8 +7,8 @@
 {% endcompress %}
 <ul class="widgy-tools">
   {% block widgy_tools %}
-  <li><a class="widgy-fancybox commit" href="{{ commit_url }}">Commit</a></li>
-  <li><a class="widgy-fancybox reset" href="{{ reset_url }}">Reset</a></li>
+  <li><a class="widgy-fancybox commit" href="{{ commit_url }}">{% trans "Commit" %}</a></li>
+  <li><a class="widgy-fancybox reset" href="{{ reset_url }}">{% trans "Reset" %}</a></li>
   {% endblock %}
 </ul>
 {% compress js %}

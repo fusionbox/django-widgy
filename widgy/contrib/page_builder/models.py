@@ -3,6 +3,7 @@ import os
 from django import forms
 from django.db import models
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _, ugettext
 
 from filer.fields.file import FilerFileField
 from filer.models.filemodels import File
@@ -47,6 +48,10 @@ class MainContent(Bucket):
     def valid_child_of(cls, parent, obj=None):
         return isinstance(parent, Layout)
 
+    class Meta:
+        verbose_name = _('main content')
+        verbose_name_plural = _('main contents')
+
 
 @widgy.register
 class Sidebar(Bucket):
@@ -65,6 +70,10 @@ class Sidebar(Bucket):
     def valid_child_of(cls, parent, obj=None):
         return isinstance(parent, Layout)
 
+    class Meta:
+        verbose_name = _('sidebar')
+        verbose_name_plural = _('sidebars')
+
 
 @widgy.register
 class DefaultLayout(Layout):
@@ -72,7 +81,8 @@ class DefaultLayout(Layout):
     On creation, creates a left and right bucket.
     """
     class Meta:
-        verbose_name = 'Default layout'
+        verbose_name = _('default layout')
+        verbose_name_plural = _('default layouts')
 
     default_children = [
         (MainContent, (), {}),
@@ -82,11 +92,16 @@ class DefaultLayout(Layout):
 
 @widgy.register
 class Markdown(Content):
-    content = MarkdownField(blank=True)
+    content = MarkdownField(blank=True, verbose_name=_('content'))
     rendered = models.TextField(editable=False)
 
     editable = True
     component_name = 'markdown'
+
+    class Meta:
+        verbose_name = _('markdown')
+        verbose_name_plural = _('markdowns')
+
 
 
 @widgy.register
@@ -101,16 +116,20 @@ class CalloutBucket(Bucket):
 
 
 class Callout(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, verbose_name=_('name'))
     root_node = WidgyField(
         site=settings.WIDGY_MEZZANINE_SITE,
-        verbose_name='Widgy Content',
+        verbose_name=_('Widgy Content'),
         root_choices=(
             'CalloutBucket',
         ))
 
     def __unicode__(self):
         return self.name
+
+    class Meta:
+        verbose_name = _('callout')
+        verbose_name_plural = _('callouts')
 
 
 @widgy.register
@@ -123,6 +142,10 @@ class CalloutWidget(Content):
     def valid_child_of(cls, parent, obj=None):
         return isinstance(parent, Sidebar)
 
+    class Meta:
+        verbose_name = _('callout widget')
+        verbose_name_plural = _('callout widgets')
+
 
 @widgy.register
 class Accordion(Bucket):
@@ -132,10 +155,14 @@ class Accordion(Bucket):
     def valid_parent_of(self, cls, obj=None):
         return issubclass(cls, Section)
 
+    class Meta:
+        verbose_name = _('accordion')
+        verbose_name_plural = _('accordions')
+
 
 @widgy.register
 class Section(Content):
-    title = models.CharField(max_length=1023)
+    title = models.CharField(max_length=1023, verbose_name=_('title'))
 
     editable = True
     accepting_children = True
@@ -143,6 +170,10 @@ class Section(Content):
     @classmethod
     def valid_child_of(cls, parent, obj=None):
         return isinstance(parent, Accordion)
+
+    class Meta:
+        verbose_name = _('section')
+        verbose_name_plural = _('sections')
 
 def validate_image(file_pk):
     file = File.objects.get(pk=file_pk)
@@ -158,10 +189,13 @@ class Image(Content):
 
     # What should happen on_delete.  Set to models.PROTECT so this is harder to
     # ignore and forget about.
-    image = FilerFileField(null=True, blank=True,
+    image = FilerFileField(null=True, blank=True, verbose_name=_('image'),
                            validators=[validate_image],
                            related_name='image_widgets',
                            on_delete=models.PROTECT)
+    class Meta:
+        verbose_name = _('image')
+        verbose_name_plural = _('images')
 
 
 class TableElement(Content):
@@ -197,6 +231,10 @@ class TableRow(TableElement):
     def post_create(self, site):
         for column in self.table.header.get_children():
             self.add_child(site, TableData)
+
+    class Meta:
+        verbose_name = _('tablerow')
+        verbose_name_plural = _('tablerows')
 
 
 @widgy.register
@@ -248,6 +286,10 @@ class TableHeaderData(TableElement):
         for (i, new_right) in zip(self.table.cells_at_index(prev_index), new_rights):
             i.reposition(site, new_right, i.get_parent())
 
+    class Meta:
+        verbose_name = _('table header data')
+        verbose_name_plural = _('table header datas')
+
 
 @widgy.register
 class TableData(TableElement):
@@ -286,6 +328,10 @@ class TableHeader(TableElement):
     def valid_parent_of(self, cls, obj=None):
         return issubclass(cls, TableHeaderData)
 
+    class Meta:
+        verbose_name = _('table header')
+        verbose_name_plural = _('table headers')
+
 
 @widgy.register
 class TableBody(InvisibleMixin, TableElement):
@@ -306,6 +352,10 @@ class TableBody(InvisibleMixin, TableElement):
                 return True
         else:
             return issubclass(cls, TableRow)
+
+    class Meta:
+        verbose_name = _('table body')
+        verbose_name_plural = _('table bodies')
 
 
 @widgy.register
@@ -331,24 +381,36 @@ class Table(StrictDefaultChildrenMixin, TableElement):
     def cells_at_index(self, index):
         return [list(i.get_children())[index] for i in self.body.get_children()]
 
+    class Meta:
+        verbose_name = _('table')
+        verbose_name_plural = _('tables')
+
 
 @widgy.register
 class Figure(Content):
     editable = True
     accepting_children = True
 
-    position = models.CharField(default='center', max_length=50, choices=[
-        ('left', 'Float left'),
-        ('right', 'Float right'),
-        ('center', 'Center'),
+    position = models.CharField(default=lambda: ugettext('center'), verbose_name=_('position'), max_length=50, choices=[
+        ('left', _('Float left')),
+        ('right', _('Float right')),
+        ('center', _('Center')),
     ])
 
-    title = models.CharField(blank=True, null=True, max_length=1023)
-    caption = models.TextField(blank=True, null=True)
+    title = models.CharField(blank=True, null=True, max_length=1023, verbose_name=_('title'))
+    caption = models.TextField(blank=True, null=True, verbose_name=_('caption'))
+
+    class Meta:
+        verbose_name = _('figure')
+        verbose_name_plural = _('figures')
 
 
 @widgy.register
 class Video(Content):
-    video = VideoField()
+    video = VideoField(verbose_name=_('video'))
 
     editable = True
+
+    class Meta:
+        verbose_name = _('video')
+        verbose_name_plural = _('videos')
