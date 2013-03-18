@@ -120,20 +120,21 @@ define([
           edit_view = new editor_class({
             app: this.app,
             model: this.content
-          });
+          }),
+          widget = this;
 
-      new Backbone.Spinner({el: this.$el.find('.edit')});
+      new Backbone.Spinner({el: this.$el.find('.edit:first')});
 
       this.listenTo(edit_view, 'close', this.rerender);
 
       edit_view.renderPromise()
-        .then(_.bind(function(edit_view) {
-          this.$preview.html(edit_view.el);
-          this.$('.edit:first').remove();
+        .then(function(edit_view) {
+          widget.$preview.html(edit_view.el);
+          widget.$('.edit:first').remove();
 
           // TODO: use HTML autofocus property??
           edit_view.$(':input:first').focus();
-        }, this))
+        })
         .done();
     }
   });

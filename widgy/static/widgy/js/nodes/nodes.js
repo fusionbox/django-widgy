@@ -365,11 +365,17 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       this.renderPromise().done();
     },
 
-    renderPromise: function() {
+    renderNode: function() {
       return DraggableView.prototype.renderPromise.apply(this, arguments).then(function(view) {
         view.$children = view.$(' > .widget > .node_children');
         view.$preview = view.$(' > .widget > .preview ');
 
+        return view;
+      });
+    },
+
+    renderPromise: function() {
+      return this.renderNode().then(function(view) {
         return Q.all(view.getRenderPromises()).then(function() {
           if ( view.app.compatibility_data )
             view.app.updateCompatibility(view.app.compatibility_data);
