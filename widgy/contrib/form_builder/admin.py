@@ -3,6 +3,7 @@ import csv
 from django.contrib import admin
 from django.contrib.admin.util import unquote
 from django.http import HttpResponse
+from django.utils.translation import ugettext_lazy as _
 
 from .models import Form
 
@@ -29,5 +30,9 @@ class FormAdmin(admin.ModelAdmin):
         for row in values:
             writer.writerow(row)
         return resp
+
+    def submission_count(self, obj):
+        return obj.submission_count
+    submission_count.short_description = _('submission count')
 
 admin.site.register(Form, FormAdmin)
