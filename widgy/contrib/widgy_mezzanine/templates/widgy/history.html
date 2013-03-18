@@ -1,4 +1,6 @@
-{% extends "admin/base_site.html" %}{% load url from future %}{% load compress %}
+{% extends "admin/base_site.html" %}
+{% load url from future %}
+{% load compress i18n %}
 
 {% block extrahead %}
 {{ block.super }}
@@ -21,22 +23,23 @@
 
 {% block content %}
 <section class="main">
-  <h1>Page History</h1>
+  <h1>{% trans "Page History" %}</h1>
 <ol class="history">
     {% for commit in commits %}
     <li>
       <p class="top">
-        <strong>{{ commit.created_at|date:"SHORT_DATETIME_FORMAT" }}</strong>{% if commit.author %} by <strong>{{ commit.author }}</strong>{% endif %}
+        <strong>{{ commit.created_at|date:"SHORT_DATETIME_FORMAT" }}</strong>
+        {% if commit.author %}{% blocktrans with author=commit.author %} by <strong>{{ author }}</strong>{% endblocktrans %}{% endif %}
         <span class="actions">
         {% if commit.revert_url %}
-          <a class="button" class="widgy-fancybox" href="{{ commit.revert_url }}">Revert to this Version</a>
+          <a class="button" class="widgy-fancybox" href="{{ commit.revert_url }}">{% trans "Revert to this Version" %}</a>
         {% else %}
-          Can't revert; this is the same as the current version.
+          {% trans "Can't revert; this is the same as the current version." %}
         {% endif %}  
         {% if commit.diff_url %}
-          <a class="button" href="{{ commit.diff_url }}">Diff</a>
+          <a class="button" href="{{ commit.diff_url }}">{% trans "Diff" %}</a>
         {% endif %}  
-          <a class="button" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=commit.root_node.pk %}">View</a>  
+          <a class="button" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=commit.root_node.pk %}">{% trans "View" %}</a>  
         </span>
       </p>
       {% if commit.message %}

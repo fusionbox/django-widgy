@@ -1,8 +1,9 @@
 {% load url from future %}
+{% load i18n %}
 <script src="{% static 'js/jquery.form.js' %}'"></script>
 
 <div class="commit popUp">
-  <h2>Commit Changes</h2>
+  <h2>{% trans "Commit Changes" %}</h2>
   {% if changed_anything %}
     <form method="post" class="commit_form" action="{{ commit_url }}">
       {% csrf_token %}
@@ -11,11 +12,11 @@
       {% endfor %}
       
       <p class="submitRow">
-        <input type="submit" value="Commit">
+        <input type="submit" value="{% trans 'Commit' %}">
       {# TODO: this is dependent on widgy_mezzanine #}
-        <a class="button" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=object.working_copy.pk %}">Preview</a>
+        <a class="button" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=object.working_copy.pk %}">{% trans "Preview" %}</a>
       {% if diff_url %}
-        <a class="button" href="{{ diff_url }}">Diff</a>
+        <a class="button" href="{{ diff_url }}">{% trans "Diff" %}</a>
       {% endif %}
       </p>
     </form>
@@ -23,7 +24,7 @@
       $('.commit_form').ajaxForm({target: 'div.commit'});
     </script>
   {% else %}
-    <p>Nothing has changed -- no need to commit.</p>
+    <p>{% trans "Nothing has changed -- no need to commit." %}</p>
   {% endif %}
 </div>
 </body>

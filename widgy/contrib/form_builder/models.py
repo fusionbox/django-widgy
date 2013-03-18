@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models.query import QuerySet
+from django.utils.translation import ugettext_lazy as _, ugettext
 
 from fusionbox import behaviors
 from fusionbox.db.models import QuerySetManager
@@ -58,13 +59,17 @@ class FormReponseHandler(FormSuccessHandler):
 
 @widgy.register
 class EmailSuccessHandler(FormSuccessHandler):
-    to = models.EmailField()
-    content = MarkdownField(blank=True)
+    to = models.EmailField(verbose_name=_('to'))
+    content = MarkdownField(blank=True, verbose_name=_('content'))
 
     component_name = 'markdown'
 
     def execute(self, request, form):
         send_mail('Subject', self.content, settings.SERVER_EMAIL, [self.to])
+
+    class Meta:
+        verbose_name = _('email success handler')
+        verbose_name_plural = _('email success handlers')
 
 
 @widgy.register
@@ -76,6 +81,10 @@ class SaveDataHandler(FormSuccessHandler):
             form=self.parent_form,
             data=form.cleaned_data
         )
+
+    class Meta:
+        verbose_name = _('save data handler')
+        verbose_name_plural = _('save data handlers')
 
 
 class EmailUserHandlerForm(forms.ModelForm):
@@ -93,9 +102,9 @@ class EmailUserHandler(FormSuccessHandler):
     form = EmailUserHandlerForm
 
     # an input in our form
-    to = models.ForeignKey(Node, related_name='+', null=True)
-    subject = models.CharField(max_length=255)
-    content = MarkdownField(blank=True)
+    to = models.ForeignKey(Node, related_name='+', null=True, verbose_name=_('to'))
+    subject = models.CharField(max_length=255, verbose_name=_('subject'))
+    content = MarkdownField(blank=True, verbose_name=_('content'))
 
     def execute(self, request, form):
         to = self.to.content
@@ -112,10 +121,14 @@ class EmailUserHandler(FormSuccessHandler):
             self.to = email_fields[0].node
         self.save()
 
+    class Meta:
+        verbose_name = _('email user handler')
+        verbose_name_plural = _('email user handlers')
+
 
 @widgy.register
 class SubmitButton(DefaultChildrenMixin, FormElement):
-    text = models.CharField(max_length=255, default='submit')
+    text = models.CharField(max_length=255, default=lambda: ugettext('submit'), verbose_name=_('text'))
 
     default_children = [
         (SaveDataHandler, (), {}),
@@ -136,19 +149,25 @@ class SubmitButton(DefaultChildrenMixin, FormElement):
 
         return issubclass(cls, FormSuccessHandler)
 
+    class Meta:
+        verbose_name = _('submit button')
+        verbose_name_plural = _('submit buttons')
+
 
 def untitled_form():
-    n = Form.objects.filter(name__startswith='Untitled form ').exclude(
+    untitled = ugettext('Untitled form')
+    n = Form.objects.filter(name__startswith=untitled + ' ').exclude(
         _nodes__is_frozen=True
     ).count() + 1
-    return 'Untitled form %d' % n
+    return '%s %d' % (untitled, n)
 
 
 @widgy.register
 class Form(DefaultChildrenMixin, Content):
-    name = models.CharField(max_length=255,
+    name = models.CharField(verbose_name=_('Name'),
+                            max_length=255,
                             default=untitled_form,
-                            help_text="A name to help identify this form. Only admins see this.")
+                            help_text=_("A name to help identify this form. Only admins see this."))
 
     # associates instances of the same logical form across versions
     ident = UUIDField()
@@ -162,6 +181,10 @@ class Form(DefaultChildrenMixin, Content):
     ]
 
     objects = QuerySetManager()
+
+    class Meta:
+        verbose_name = _('form')
+        verbose_name_plural = _('forms')
 
     class QuerySet(QuerySet):
         def annotate_submission_count(self):
@@ -306,10 +329,10 @@ class BaseFormField(FormElement):
 class FormField(BaseFormField):
     widget = None
 
-    label = models.CharField(max_length=255)
-    required = models.BooleanField(default=True)
+    label = models.CharField(max_length=255, verbose_name=_('label'))
+    required = models.BooleanField(default=True, verbose_name=_('required'))
 
-    help_text = models.TextField(blank=True)
+    help_text = models.TextField(blank=True, verbose_name=_('help text'))
     # associates instances of the same logical field across versions
     ident = UUIDField()
 
@@ -350,16 +373,16 @@ class FormInput(FormField):
     }
 
     FORM_INPUT_TYPES = (
-        ('text', 'Text'),
-        ('number', 'Number'),
-        ('email', 'Email'),
-        ('tel', 'Telephone'),
+        ('text', _('Text')),
+        ('number', _('Number')),
+        ('email', _('Email')),
+        ('tel', _('Telephone')),
     )
 
     formfield_class = forms.CharField
     form = FormInputForm
 
-    type = models.CharField(choices=FORM_INPUT_TYPES, max_length=255)
+    type = models.CharField(choices=FORM_INPUT_TYPES, max_length=255, verbose_name=_('type'))
 
     @property
     def formfield_class(self):
@@ -375,6 +398,10 @@ class FormInput(FormField):
 
         return forms.TextInput(attrs=attrs)
 
+    class Meta:
+        verbose_name = _('form input')
+        verbose_name_plural = _('form inputs')
+
 
 @widgy.register
 class Textarea(FormField):
@@ -387,6 +414,10 @@ class Textarea(FormField):
         if self.required:
             attrs['required'] = 'required'
         return forms.Textarea(attrs=attrs)
+
+    class Meta:
+        verbose_name = _('text area')
+        verbose_name_plural = _('text areas')
 
 
 @widgy.register
@@ -401,7 +432,7 @@ class Uncaptcha(BaseFormField):
         def clean(form):
             value = form.cleaned_data[self.get_formfield_name()]
             if value != form.data.get('csrfmiddlewaretoken'):
-                raise forms.ValidationError('Incorrect Uncaptcha value')
+                raise forms.ValidationError(_('Incorrect Uncaptcha value'))
         UncaptchaMixin = type('UncaptchaMixin', (object,), {
             'clean_%s' % self.get_formfield_name(): clean
         })
@@ -418,6 +449,10 @@ class Uncaptcha(BaseFormField):
             return False
         else:
             return super(Uncaptcha, cls).valid_child_of(parent, obj)
+
+    class Meta:
+        verbose_name = _('uncaptcha')
+        verbose_name_plural = _('uncaptchas')
 
 
 class FormSubmission(behaviors.Timestampable, models.Model):
@@ -473,6 +508,10 @@ class FormSubmission(behaviors.Timestampable, models.Model):
         for value in self.values.all():
             ret[value.field_ident] = value.value
         return ret
+
+    class Meta:
+        verbose_name = _('form submission')
+        verbose_name_plural = _('form submissions')
 
 
 class FormValue(models.Model):

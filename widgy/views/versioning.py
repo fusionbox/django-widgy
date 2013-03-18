@@ -7,6 +7,7 @@ from django.views.generic import FormView, DetailView, TemplateView
 from django.views.generic.detail import SingleObjectMixin
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
 from BeautifulSoup import BeautifulSoup
 
@@ -28,7 +29,7 @@ def diff_url(site, before, after):
 
 class CommitForm(forms.Form):
     message = forms.CharField(widget=forms.Textarea,
-                              label='Notes (optional)',
+                              label=_('Notes (optional)'),
                               required=False)
 
 
@@ -139,7 +140,7 @@ class RevertView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, FormView)
         self.object = self.get_object()
         kwargs = super(RevertView, self).get_form_kwargs()
         kwargs['initial'] = {
-            'message': 'Revert to version %s' % self.object,
+            'message': _('Revert to version %(version)s') % {'version': self.object},
         }
         return kwargs
 
