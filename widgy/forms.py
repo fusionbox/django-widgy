@@ -3,6 +3,7 @@ from django.template.loader import render_to_string
 from django.forms import widgets
 from django.contrib.contenttypes.models import ContentType
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
 
 from widgy.utils import format_html
 from widgy.models import Node
@@ -98,7 +99,7 @@ class WidgyFormField(forms.ModelChoiceField):
         elif len(choices) == 2:
             self._value = choices[1][0]
             self.widget = DisplayWidget(display_name=choices[1][1])
-            self.help_text = 'You must save before you can edit this.'
+            self.help_text = _('You must save before you can edit this.')
         else:
             self.widget = ContentTypeRadioSelect(
                 # remove the empty choice

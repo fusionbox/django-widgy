@@ -113,6 +113,9 @@ class CalloutBucket(Bucket):
     def valid_parent_of(self, cls, obj=None):
         return issubclass(cls, (Markdown,))
 
+    class Meta:
+        verbose_name = _('callout bucket')
+        verbose_name_plural = _('callout buckets')
 
 
 class Callout(models.Model):

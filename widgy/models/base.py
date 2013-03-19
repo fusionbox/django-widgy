@@ -55,7 +55,7 @@ class Node(MP_Node):
         app_label = 'widgy'
 
     def __unicode__(self):
-        return str(self.content)
+        return unicode(self.content)
 
     def to_json(self, site):
         children = [c.to_json(site) for c in self.get_children()]
