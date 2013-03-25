@@ -15,7 +15,10 @@ define([ 'underscore', 'widgy.backbone', 'lib/q'
    * content type.  See `widgy.contents.js` for more information.
    */
   var Node = Backbone.Model.extend({
-    urlRoot: '/admin/widgy/node/',
+
+    // This needs to be set in order to use this model.  See the Widgy
+    // constructor for an example of how to set it.
+    urlRoot: false,
 
     constructor: function() {
       this.children = new NodeCollection(null, {

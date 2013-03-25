@@ -119,11 +119,13 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'lib/q', 'nodes/n
    * constructor, we are encouraged to think of the Widgy editor as an
    * instance.  This way we don't have global variables in our code.
    */
-  function Widgy(target, root_node) {
+  function Widgy(target, root_node, url_root) {
     this.app = new AppView({
       root_node: root_node,
       el: $(target)
     });
+
+    nodes.Node.prototype.urlRoot = url_root;
 
     this.app.renderPromise().done();
   }

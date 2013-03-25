@@ -3,6 +3,7 @@ from django.template.loader import render_to_string
 from django.forms import widgets
 from django.contrib.contenttypes.models import ContentType
 from django.utils.safestring import mark_safe
+from django.core.urlresolvers import reverse
 
 from widgy.utils import format_html
 from widgy.models import Node
@@ -34,6 +35,7 @@ class WidgyWidget(forms.HiddenInput):
             'html_id': attrs['id'],
             'node_dict': self.node.to_json(self.site),
             'node': self.node,
+            'node_view': reverse(self.site.node_view),
         }
         defaults.update(context)
         return render_to_string(self.template_name, defaults)

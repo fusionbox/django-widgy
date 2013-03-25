@@ -15,6 +15,6 @@
 {% endblock %}
 <script>
   require([ 'widgy' ], function(Widgy) {
-    window.widgy = new Widgy('#' + {{ html_id|json }}, {{ node_dict|json }});
+    window.widgy = new Widgy('#' + {{ html_id|json }}, {{ node_dict|json }}, {{ node_view|json }});
   });
 </script>
