@@ -6,6 +6,7 @@ from django import forms
 from django.core.urlresolvers import reverse
 from django.contrib.admin.util import quote
 from django.utils.translation import ugettext_lazy as _, ugettext
+from django.contrib.admin.widgets import AdminSplitDateTime
 
 from mezzanine.pages.admin import PageAdmin
 try:
@@ -22,6 +23,22 @@ from widgy.utils import fancy_import, format_html
 
 
 class WidgyPageAdminForm(PageAdminForm):
+    publish_date = forms.SplitDateTimeField(
+        label=_("Published from"),
+        help_text=_("If you enter a date here, the page will not be viewable on the site until then"),
+        required=False,
+        widget=AdminSplitDateTime,
+    )
+    expiry_date = forms.SplitDateTimeField(
+        label=_("Expires on"),
+        help_text=_("If you enter a date here, the page will not be viewable after this time"),
+        required=False,
+        widget=AdminSplitDateTime,
+    )
+
+    class Meta:
+        model = WidgyPage
+
     def __init__(self, *args, **kwargs):
         super(WidgyPageAdminForm, self).__init__(*args, **kwargs)
         self.fields['status'].initial = CONTENT_STATUS_DRAFT

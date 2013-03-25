@@ -1,0 +1,6 @@
+{% extends "widgy/preview.html" %}
+{% load i18n %}
+{% block content %}
+<p>{% trans "Title" %}: {{ self.title|default:"" }}</p>
+<p>{% trans "Caption" %}: {{ self.caption|default:"" }}</p>
+{% endblock %}
