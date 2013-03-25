@@ -1,7 +1,9 @@
 {% load widgy_tags %}
 <details>
   <summary>{{ self.title }}</summary>
+  <div class="accordionContent">
   {% for child in self.get_children %}
     {% render child %}
   {% endfor %}
+  </div>
 </details>
