@@ -8,7 +8,8 @@ from widgy.contrib.widgy_mezzanine.models import WidgyPage
 from widgy.models import Node
 
 
-def get_page_from_node(root_node):
+def get_page_from_node(node):
+    root_node = node.get_root()
     try:
         # try to find a page that uses this root node
         return get_object_or_404(
