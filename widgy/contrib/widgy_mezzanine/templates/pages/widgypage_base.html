@@ -2,7 +2,7 @@
 {% load widgy_tags %}
 {% load pages_tags %}
 
-{% block title %}{{ page.title }} {{ block.super }}{% endblock %}
+{% block title %}{{ page.meta_title }} {{ block.super }}{% endblock %}
 {% block css %}
 {{ block.super }}
 {% for scss_file in 'WIDGY_MEZZANINE_SITE'|scss_files %}
