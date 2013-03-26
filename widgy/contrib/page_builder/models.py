@@ -4,12 +4,14 @@ from django import forms
 from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _, ugettext
+from django.contrib.contenttypes.models import ContentType
 
 from filer.fields.file import FilerFileField
 from filer.models.filemodels import File
 
 from widgy.models import Content
 from widgy.models.mixins import StrictDefaultChildrenMixin, InvisibleMixin
+from widgy.models.links import LinkField, LinkFormField, LinkFormMixin
 from widgy.db.fields import WidgyField
 from widgy.contrib.page_builder.db.fields import MarkdownField, VideoField
 import widgy
@@ -111,7 +113,7 @@ class CalloutBucket(Bucket):
         return False
 
     def valid_parent_of(self, cls, obj=None):
-        return issubclass(cls, (Markdown,))
+        return issubclass(cls, (Markdown, Button))
 
     class Meta:
         verbose_name = _('callout bucket')
@@ -417,3 +419,24 @@ class Video(Content):
     class Meta:
         verbose_name = _('video')
         verbose_name_plural = _('videos')
+
+
+class ButtonForm(LinkFormMixin, forms.ModelForm):
+    link = LinkFormField(label=_('Link'), required=False)
+
+
+@widgy.register
+class Button(Content):
+    text = models.CharField(max_length=255, verbose_name=_('text'), null=True, blank=True)
+
+    link_content_type = models.ForeignKey(ContentType, related_name='+', null=True, editable=False)
+    link_object_id = models.PositiveIntegerField(null=True, editable=False)
+    link = LinkField('link_content_type', 'link_object_id')
+
+    css_classes = ('page_builder', 'buttonwidget')
+    form = ButtonForm
+    editable = True
+
+    class Meta:
+        verbose_name = _('button')
+        verbose_name_plural = _('buttons')
