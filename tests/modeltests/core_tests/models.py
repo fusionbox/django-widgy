@@ -2,7 +2,11 @@ from django.db import models
 
 from widgy.models import Content
 from widgy.db.fields import WidgyField, VersionedWidgyField
+from django.contrib.contenttypes.models import ContentType
 from widgy import registry
+
+from widgy.models.links import LinkableMixin, LinkField
+
 
 class Layout(Content):
     accepting_children = True
@@ -68,6 +72,7 @@ class VowelBucket(Bucket):
 
 class UndeletableRawTextWidget(RawTextWidget):
     deletable = False
+
     class Meta:
         proxy = True
 
@@ -131,3 +136,17 @@ class ForeignKeyWidget(Content):
     foo = models.ForeignKey(Related, on_delete=models.CASCADE)
 
 registry.register(ForeignKeyWidget)
+
+
+class LinkableThing(LinkableMixin, models.Model):
+    pass
+
+
+class AnotherLinkableThing(LinkableMixin, models.Model):
+    pass
+
+
+class ThingWithLink(models.Model):
+    linkable_content_type = models.ForeignKey(ContentType, related_name='+')
+    linkable_object_id = models.PositiveIntegerField()
+    link = LinkField('linkable_content_type', 'linkable_object_id')
