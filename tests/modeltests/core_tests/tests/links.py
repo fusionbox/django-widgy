@@ -1,8 +1,9 @@
+from django import forms
 from django.test import TestCase
 
 from widgy.models.links import (
     get_all_linkable_classes, get_all_linker_classes,
-    get_link_field_from_model
+    get_link_field_from_model, LinkFormMixin, LinkFormField
 )
 
 from modeltests.core_tests.models import (
@@ -48,3 +49,24 @@ class TestLinkRelations(TestCase):
         choices = get_link_field_from_model(ThingWithLink, 'link').get_choices()
 
         self.assertEqual(list(choices), [l1, l2, l3])
+
+
+class LinkForm(LinkFormMixin, forms.ModelForm):
+    link = LinkFormField()
+
+    class Meta:
+        model = ThingWithLink
+        fields = ('link',)
+
+
+class TestLinkForm(TestCase):
+    def test_save_and_create(self):
+        page = LinkableThing.objects.create()
+        form = LinkForm()
+        choice = form.fields['link'].choices[-1][0]
+        form = LinkForm({
+            'link': choice,
+        })
+        self.assertTrue(form.is_valid())
+        instance = form.save(commit=False)
+        self.assertEqual(instance.link, page)
