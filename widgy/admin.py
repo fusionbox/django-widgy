@@ -10,7 +10,7 @@ class WidgyAdmin(ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         form = super(WidgyAdmin, self).get_form(request, obj, **kwargs)
 
-        if not issubclass(form, WidgyAdmin):
+        if not issubclass(form, WidgyFormMixin):
             class form(WidgyFormMixin, form):
                 pass
 
