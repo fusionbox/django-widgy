@@ -824,7 +824,7 @@ div.submit-row p {
 /*| Forms
 -----------------------------------------*/
 
-$inputFields = input[type='text'], input[type='password'], input[type='email'], input[type='search'], input[type='number'], textarea;
+$inputFields: "input[type='text'], input[type='password'], input[type='email'], input[type='search'], input[type='number'], textarea";
 
 #{$inputFields}, button {
   &:focus {
