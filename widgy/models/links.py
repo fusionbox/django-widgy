@@ -50,6 +50,9 @@ class LinkableMixin(object):
 
 
 class LinkField(WidgyGenericForeignKey):
+    """
+    TODO: Explore the consequences of using add_field in contribute_to_class.
+    """
     def get_choices(self):
         all_qs = (model._default_manager.all()
                   for model in get_all_linkable_classes())
@@ -114,9 +117,10 @@ class LinkFormMixin(object):
                 if isinstance(field, LinkFormField))
 
     def save(self, *args, **kwargs):
-        cleaned_data = self.cleaned_data
+        if not self.errors:
+            cleaned_data = self.cleaned_data
 
-        for name, field in self.get_link_form_fields():
-            setattr(self.instance, name, cleaned_data[name])
+            for name, field in self.get_link_form_fields():
+                setattr(self.instance, name, cleaned_data[name])
 
         return super(LinkFormMixin, self).save(*args, **kwargs)

@@ -70,3 +70,9 @@ class TestLinkForm(TestCase):
         self.assertTrue(form.is_valid())
         instance = form.save(commit=False)
         self.assertEqual(instance.link, page)
+
+        form2 = LinkForm({
+            'link': choice,
+        })
+        # save without validating.
+        form2.save(commit=False)
