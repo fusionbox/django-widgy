@@ -2,8 +2,8 @@
 {% load compress static i18n %}
 {% block widgy_container %}
 {% compress css %}
-<link rel="stylesheet" href="{% static 'css/jquery.fancybox.css' %}">
-<link rel="stylesheet" href="{% static 'css/django.fusionbox.scss' %}" type="text/x-scss">
+<link rel="stylesheet" href="{% static 'widgy/css/jquery.fancybox.css' %}">
+<link rel="stylesheet" href="{% static 'widgy/css/django.fusionbox.scss' %}" type="text/x-scss">
 {% endcompress %}
 <ul class="widgy-tools">
   {% block widgy_tools %}
@@ -12,7 +12,7 @@
   {% endblock %}
 </ul>
 {% compress js %}
-<script src="{% static 'js/jquery.fancybox.js' %}"></script>
+<script src="{% static 'widgy/js/lib/jquery.fancybox.js' %}"></script>
 <script>
   $(function() {
     $('a.widgy-fancybox').fancybox({
