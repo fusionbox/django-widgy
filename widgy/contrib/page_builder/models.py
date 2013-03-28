@@ -103,7 +103,6 @@ class Markdown(Content):
         verbose_name_plural = _('markdowns')
 
 
-
 @widgy.register
 class CalloutBucket(Bucket):
     @classmethod
@@ -178,6 +177,7 @@ class Section(Content):
         verbose_name = _('section')
         verbose_name_plural = _('sections')
 
+
 def validate_image(file_pk):
     file = File.objects.get(pk=file_pk)
     iext = os.path.splitext(file.file.path)[1].lower()
@@ -186,16 +186,33 @@ def validate_image(file_pk):
     return file_pk
 
 
+def ImageField(*args, **kwargs):
+    """
+    This is a convenience function to wrap the default args that we always
+    want.  This is implemented as a function to avoid invoking the wrath of
+    South's model introspection.
+    """
+    defaults = {
+        'null': True,
+        'blank': True,
+        'verbose_name': _('image'),
+        'validators': [validate_image],
+        'related_name': '+',
+        # What should happen on_delete.  Set to models.PROTECT so this is harder to
+        # ignore and forget about.
+        'on_delete': models.PROTECT,
+    }
+    defaults.update(kwargs)
+
+    return FilerFileField(*args, **defaults)
+
+
 @widgy.register
 class Image(Content):
     editable = True
 
-    # What should happen on_delete.  Set to models.PROTECT so this is harder to
-    # ignore and forget about.
-    image = FilerFileField(null=True, blank=True, verbose_name=_('image'),
-                           validators=[validate_image],
-                           related_name='image_widgets',
-                           on_delete=models.PROTECT)
+    image = ImageField()
+
     class Meta:
         verbose_name = _('image')
         verbose_name_plural = _('images')
