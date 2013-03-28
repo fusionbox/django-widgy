@@ -119,4 +119,4 @@ class LinkFormMixin(object):
         for name, field in self.get_link_form_fields():
             setattr(self.instance, name, cleaned_data[name])
 
-        super(LinkFormMixin, self).save(*args, **kwargs)
+        return super(LinkFormMixin, self).save(*args, **kwargs)
