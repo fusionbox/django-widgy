@@ -17,12 +17,12 @@ except ImportError:
 from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
 
-from widgy.admin import WidgyAdmin
+from widgy.forms import WidgyFormMixin
 from widgy.contrib.widgy_mezzanine.models import WidgyPage
 from widgy.utils import fancy_import, format_html
 
 
-class WidgyPageAdminForm(PageAdminForm):
+class WidgyPageAdminForm(WidgyFormMixin, PageAdminForm):
     publish_date = forms.SplitDateTimeField(
         label=_("Published from"),
         help_text=_("If you enter a date here, the page will not be viewable on the site until then"),
@@ -51,7 +51,7 @@ class WidgyPageAdminForm(PageAdminForm):
         return status
 
 
-class WidgyPageAdmin(PageAdmin, WidgyAdmin):
+class WidgyPageAdmin(PageAdmin):
     change_form_template = 'widgy/page_builder/widgypage_change_form.html'
     form = WidgyPageAdminForm
 

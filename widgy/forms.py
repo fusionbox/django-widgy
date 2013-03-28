@@ -28,6 +28,11 @@ class WidgyWidget(forms.HiddenInput):
     template_name = 'widgy/widgy_field.html'
 
     def render(self, name, value, attrs=None, context={}):
+        # If this fails, perhaps they aren't using the WidgyFormMixin.  If you
+        # can't use the WidgyFormMixin (report it) and make sure that you call
+        # conform_to_value on the WidgyFormField.
+        assert hasattr(self, 'node'), "You must set the node on a WidgyWidget prior to rendering it."
+
         self.node.maybe_prefetch_tree()
         defaults = {
             'html_name': name,
@@ -59,7 +64,7 @@ class ContentTypeRadioRenderer(widgets.RadioFieldRenderer):
             yield ContentTypeRadioInput(self.name, self.value, self.attrs.copy(), choice, i)
 
     def __getitem__(self, idx):
-        choice = self.choices[idx] # Let the IndexError propogate
+        choice = self.choices[idx]  # Let the IndexError propogate
         return ContentTypeRadioInput(self.name, self.value, self.attrs.copy(), choice, idx)
 
 
@@ -92,7 +97,13 @@ class WidgyFormField(forms.ModelChoiceField):
         """
         choices = list(self.choices)
         if isinstance(value, Node):
-            self.node = self.widget.node = value
+            self.node = value
+            try:
+                # Sometimes the WidgyWidget is wrapped in a
+                # RelatedFieldWidgetWrapper
+                self.widget.widget.node = value
+            except AttributeError:
+                self.widget = value
             try:
                 self.widget.stylesheets = self.node.content.editor_stylesheets
             except AttributeError:
@@ -108,7 +119,10 @@ class WidgyFormField(forms.ModelChoiceField):
                 choices=[c for c in choices if c[0]]
             )
 
-        self.widget.site = self.site
+        try:
+            self.widget.widget.site = self.site
+        except AttributeError:
+            self.widget.site = self.site
 
     def clean(self, value):
         value = getattr(self, '_value', value)
@@ -163,3 +177,7 @@ class WidgyFormMixin(object):
                 else:
                     value = None
                 field.conform_to_value(value)
+
+
+class WidgyForm(WidgyFormMixin, forms.ModelForm):
+    pass

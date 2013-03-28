@@ -1,17 +1,10 @@
 from django.contrib.admin import ModelAdmin
 
-from widgy.forms import WidgyFormMixin
+from widgy.forms import WidgyForm
 
 
 class WidgyAdmin(ModelAdmin):
     """
-    Abstract base class for ModelAdmins whose models contain WidgyFields.
+    Base class for ModelAdmins whose models contain WidgyFields.
     """
-    def get_form(self, request, obj=None, **kwargs):
-        form = super(WidgyAdmin, self).get_form(request, obj, **kwargs)
-
-        if not issubclass(form, WidgyFormMixin):
-            class form(WidgyFormMixin, form):
-                pass
-
-        return form
+    form = WidgyForm
