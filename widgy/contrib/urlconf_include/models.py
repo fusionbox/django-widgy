@@ -1,10 +1,15 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from mezzanine.pages.models import Page
 
+URLCONF_INCLUDE_CHOICES = getattr(settings, 'URLCONF_INCLUDE_CHOICES', None)
+
+
 class UrlconfIncludePage(Page):
-    urlconf_name = models.CharField(max_length=255, verbose_name=_('urlconf name'))
+    urlconf_name = models.CharField(max_length=255, verbose_name=_('urlconf name'),
+                                    choices=URLCONF_INCLUDE_CHOICES)
 
     def can_add(self, request):
         return False
