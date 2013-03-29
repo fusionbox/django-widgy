@@ -51,12 +51,36 @@ class LinkableMixin(object):
 
 class LinkField(WidgyGenericForeignKey):
     """
-    TODO: Explore the consequences of using add_field in contribute_to_class.
+    TODO: Explore the consequences of using add_field in contribute_to_class to
+    make this a real field instead of a virtual_field.
     """
+    def __init__(self, ct_field=None, fk_field=None, *args, **kwargs):
+        self.null = kwargs.pop('null', False)
+        super(LinkField, self).__init__(ct_field, fk_field, *args, **kwargs)
+
     def get_choices(self):
         all_qs = (model._default_manager.all()
                   for model in get_all_linkable_classes())
         return itertools.chain.from_iterable(all_qs)
+
+    def contribute_to_class(self, cls, name):
+        if self.ct_field is None:
+            self.ct_field = '%s_content_type' % name
+
+        if self.fk_field is None:
+            self.fk_field = '%s_object_id' % name
+
+        if self.ct_field not in cls._meta.get_all_field_names():
+            ct_field = models.ForeignKey(ContentType, related_name='+',
+                                         null=self.null, editable=False)
+            cls.add_to_class(self.ct_field, ct_field)
+
+        if self.fk_field not in cls._meta.get_all_field_names():
+            fk_field = models.PositiveIntegerField(null=self.null,
+                                                   editable=False)
+            cls.add_to_class(self.fk_field, fk_field)
+
+        super(LinkField, self).contribute_to_class(cls, name)
 
 
 def get_composite_key(linkable):

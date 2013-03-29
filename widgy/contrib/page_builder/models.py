@@ -4,7 +4,6 @@ from django import forms
 from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _, ugettext
-from django.contrib.contenttypes.models import ContentType
 
 from filer.fields.file import FilerFileField
 from filer.models.filemodels import File
@@ -429,9 +428,7 @@ class ButtonForm(LinkFormMixin, forms.ModelForm):
 class Button(Content):
     text = models.CharField(max_length=255, verbose_name=_('text'), null=True, blank=True)
 
-    link_content_type = models.ForeignKey(ContentType, related_name='+', null=True, editable=False)
-    link_object_id = models.PositiveIntegerField(null=True, editable=False)
-    link = LinkField('link_content_type', 'link_object_id')
+    link = LinkField()
 
     css_classes = ('page_builder', 'buttonwidget')
     form = ButtonForm

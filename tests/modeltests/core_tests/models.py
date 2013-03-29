@@ -2,7 +2,6 @@ from django.db import models
 
 from widgy.models import Content
 from widgy.db.fields import WidgyField, VersionedWidgyField
-from django.contrib.contenttypes.models import ContentType
 from widgy import registry
 
 from widgy.models.links import LinkableMixin, LinkField
@@ -147,6 +146,4 @@ class AnotherLinkableThing(LinkableMixin, models.Model):
 
 
 class ThingWithLink(models.Model):
-    linkable_content_type = models.ForeignKey(ContentType, related_name='+')
-    linkable_object_id = models.PositiveIntegerField()
     link = LinkField('linkable_content_type', 'linkable_object_id')
