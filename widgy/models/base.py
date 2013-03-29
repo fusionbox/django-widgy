@@ -676,7 +676,7 @@ class Content(models.Model):
         request = kwargs.pop("request", None)
         formfield = db_field.formfield(**kwargs)
 
-        if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
+        if formfield and isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
             from django.contrib.admin import site as admin_site
             related_modeladmin = admin_site._registry.get(db_field.rel.to)
             can_add_related = bool(related_modeladmin and
