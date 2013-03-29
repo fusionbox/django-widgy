@@ -657,8 +657,6 @@ class Content(models.Model):
 
     def render(self, context, template=None):
         """
-        Renders the node in the given context.
-
         A ``template`` kwarg can be passed to use an explictly defined template
         instead of the default template list.
         """

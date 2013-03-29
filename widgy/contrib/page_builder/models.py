@@ -164,6 +164,14 @@ class Accordion(Bucket):
 
 
 @widgy.register
+class Tabs(Accordion):
+    class Meta:
+        proxy = True
+        verbose_name = _('tabs')
+        verbose_name_plural = _('tabs')
+
+
+@widgy.register
 class Section(Content):
     title = models.CharField(max_length=1023, verbose_name=_('title'))
 
@@ -177,6 +185,9 @@ class Section(Content):
     class Meta:
         verbose_name = _('section')
         verbose_name_plural = _('sections')
+
+    def __unicode__(self):
+        return self.title
 
 
 def validate_image(file_pk):
