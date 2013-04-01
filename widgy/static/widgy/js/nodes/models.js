@@ -236,7 +236,9 @@ define([ 'underscore', 'widgy.backbone', 'lib/q'
 
     reposition: function(node) {
       if ( node.collection !== this ) {
-        node.collection.remove(node);
+        if ( node.collection ) {
+          node.collection.remove(node);
+        }
         this.add(node, {at: this.getIndexOf(node.get('right_id'))});
       } else {
         // remove the model from its old position and insert at new index.
