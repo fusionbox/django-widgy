@@ -407,7 +407,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
     renderShelf: function() {
       if (this.shelf)
-        return false;
+        this.shelf.remove();
 
       var shelf = this.shelf = new shelves.ShelfView({
         collection: new shelves.ShelfCollection({
