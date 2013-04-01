@@ -443,8 +443,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       // If they leave this page, pop back in.
       $(window).on('unload.widgyPopOut-' + this.cid, this.popIn);
 
-      this.collection.reset();
-      this.$el.html(this.renderTemplate(popped_out_template, this.toJSON()));
+      this.$el.addClass('poppedOut');
+      this.$preview.html(this.renderTemplate(popped_out_template, this.toJSON()));
     },
 
     popIn: function(event) {
@@ -454,6 +454,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       // we're popped in so don't popIn again when we leave this
       // page.
       $(window).off('.widgyPopOut-' + this.cid);
+
+      this.$el.removeClass('poppedOut');
 
       this.node.fetch({
         app: this.app,

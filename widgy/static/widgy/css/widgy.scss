@@ -754,6 +754,14 @@ div.widgy {
         }       
       }
     }                
+
+    .node.poppedOut {
+      button,
+      a,
+      .nodeChildren {
+        display: none;
+      }
+    }
   }
 }   
 
