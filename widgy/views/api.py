@@ -4,6 +4,7 @@ for Widgy nodes and Content objects.
 """
 from django.http import Http404
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 from django.views.generic import DetailView
@@ -205,8 +206,11 @@ class NodeEditView(WidgyViewMixin, NodeSingleObjectMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(NodeEditView, self).get_context_data(**kwargs)
-        kwargs['html_id'] = 'node_%s' % (self.object.pk)
-        kwargs['node_dict'] = self.object.to_json(self.site)
+        kwargs.update(
+            html_id='node_%s' % (self.object.pk),
+            node_dict=self.object.to_json(self.site),
+            api_url=reverse(self.site.node_view),
+        )
         return kwargs
 
 

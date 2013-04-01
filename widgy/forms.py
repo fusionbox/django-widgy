@@ -41,7 +41,7 @@ class WidgyWidget(forms.HiddenInput):
             'html_id': attrs['id'],
             'node_dict': self.node.to_json(self.site),
             'node': self.node,
-            'node_view': reverse(self.site.node_view),
+            'api_url': reverse(self.site.node_view),
         }
         defaults.update(context)
         return render_to_string(self.template_name, defaults)
