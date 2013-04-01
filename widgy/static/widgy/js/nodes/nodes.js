@@ -370,6 +370,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         view.$children = view.$(' > .widget > .node_children');
         view.$preview = view.$(' > .widget > .preview ');
 
+        if ( view.isRootNode() && view.content.get('pop_out') ) {
+          view.$('.pop_out:first').remove();
+        }
+
         return view;
       });
     },
