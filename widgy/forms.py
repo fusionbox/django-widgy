@@ -103,7 +103,7 @@ class WidgyFormField(forms.ModelChoiceField):
                 # RelatedFieldWidgetWrapper
                 self.widget.widget.node = value
             except AttributeError:
-                self.widget = value
+                self.widget.node = value
             try:
                 self.widget.stylesheets = self.node.content.editor_stylesheets
             except AttributeError:
