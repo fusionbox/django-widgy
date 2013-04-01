@@ -756,8 +756,8 @@ div.widgy {
     }                
 
     .node.poppedOut {
-      button,
-      a,
+      .drag-row button,
+      .drag-row a,
       .nodeChildren {
         display: none;
       }

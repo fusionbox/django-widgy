@@ -385,6 +385,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       });
     },
 
+    render: function() {
+      throw new Error("You may not use NodeView.render, please use NodeView.renderPromise.");
+    },
+
     getRenderPromises: function() {
       var promises = [
         this.renderChildren()
@@ -460,7 +464,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       this.node.fetch({
         app: this.app,
         resort: true,
-        success: this.render
+        success: this.rerender
       });
 
       return false;
