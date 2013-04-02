@@ -369,6 +369,7 @@ li.node_drop_target {
               
               ul.nodeChildren {
                 li.tableheaderdata {
+                  @include rounded(0px);
           
                   > div.widget {
                     > p.drag-row {
@@ -383,19 +384,20 @@ li.node_drop_target {
                       }
                 
                       span.title {
+                        color: $grey;
                         display: block;
-                        font-size: 13px;
+                        font-size: 11px;
                         line-height: 22px;
                         padding: 0px;
                       }
                 
                       button.delete {
-                        font-size: 10px;
-                        line-height: 1em;
-                        padding: 1px;
+                        font-size: 8px;
+                        line-height: 8px;
+                        padding: 3px 0px 1px 1px;
                         position: absolute;
-                        top: 4px;
-                        right: 4px;
+                        top: 3px;
+                        right: 3px;
                         z-index: 1000;
                   
                         i {
@@ -468,8 +470,8 @@ li.node_drop_target {
                 
                       button.delete {
                         font-size: 8px;
-                        line-height: 1em;
-                        padding: 1px;
+                        line-height: 8px;
+                        padding: 3px 0px 1px 1px;
                         position: absolute;
                         top: 3px;
                         right: -30px;
@@ -493,8 +495,10 @@ li.node_drop_target {
                       border: 0px;
                       
                       > li.node.tabledata {
+                        @include rounded(0px);
+                  
                         > div.widget {
-                          min-height: 0px;
+                          min-height: 20px;
                           
                           > p.drag-row {
                             background: white;
