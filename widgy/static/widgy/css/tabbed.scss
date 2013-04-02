@@ -7,6 +7,7 @@
 }
 
 div.widgy div.editor section.tabbed > div.widget > ul.nodeChildren {
+  width: 100%;
 
   > li {
     @include rounded(4px 4px 0px 0px);
