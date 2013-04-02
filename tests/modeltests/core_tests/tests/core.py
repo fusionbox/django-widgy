@@ -563,20 +563,19 @@ class TestVersioning(RootNodeTestCase):
         a.delete()
         self.assertEqual(list(VersionTracker.objects.orphan()), [vt])
 
-    @unittest.expectedFailure
     def test_orphan_no_related_name(self):
         # VersionedPage3 doesn't have a related_name on its
-        # VersionedWidgyField. I don't know if it's even possible to make this
-        # test pass. This could also be helpful -- not having a related name
-        # could be how you opt-out of the orphan checking.
+        # VersionedWidgyField. Not having a related name is how you
+        # opt-out of the orphan checking.
         vt, a, b, c = self.orphan_helper()
         self.assertEqual(list(VersionTracker.objects.orphan()), [])
         a.delete()
         b.delete()
         c.delete()
 
+        self.assertEqual(list(VersionTracker.objects.orphan()), [vt])
         d = VersionedPage3.objects.create(foo=vt)
-        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        self.assertEqual(list(VersionTracker.objects.orphan()), [vt])
 
     def test_deletion_prevented(self):
         """

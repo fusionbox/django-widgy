@@ -90,6 +90,14 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       return this.content.get('pop_out') === 2 && ! this.isRootNode();
     },
 
+    startBeingDragged: function(event) {
+      if ( $(event.target).is('.title, .drag-row, .drag_handle') ) {
+        return DraggableView.prototype.startBeingDragged.apply(this, arguments);
+      } else {
+        return false;
+      }
+    },
+
     renderChildren: function() {
       if ( this.dontShowChildren() )
         return;
