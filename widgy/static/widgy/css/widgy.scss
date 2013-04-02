@@ -565,6 +565,8 @@ div.widgy {
     // another wrapper
     section.node {
       @include rounded(0px);
+      @include clearfix;
+
       display: block;
       float: none;
       margin: 0 !important;
