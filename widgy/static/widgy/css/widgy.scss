@@ -328,6 +328,45 @@ li.node_drop_target {
       ul.nodeChildren {
         li.node, li.node_drop_target  {
           margin: 1em;
+          
+          /* table layout display properties ONLY (other styles go elsewhere, yo!)
+          &.table {
+            display: table;
+            table-layout: fixed;
+            width: 96.5%;
+
+            div.widget {
+              
+              p.drag-row {
+              }
+              
+              div.shelf {
+              }
+              
+              ul.nodeChildren {
+                display: table-row;
+                
+                li.tableheader {
+                  
+                  li.tableheaderdata {
+                    display: table-cell;
+                  }
+                }
+                
+                li.invisible {
+                  
+                  li.tablerow {
+                  
+                    li.tabledata {
+                      display: table-cell;
+                    }
+                  }
+                }
+              }
+            }
+          }
+           */
+           
                   
           &.tableheader {
             border: 0px;
