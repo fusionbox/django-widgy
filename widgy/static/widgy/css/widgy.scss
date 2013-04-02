@@ -130,32 +130,35 @@ form .aligned p.keywords-field {
 
 /* Widgy
 -------------------*/
+    
+li.node_drop_target {
+  @include rounded(3px);
+  border: 2px dashed $green !important;
+  background: white !important;
+  font-size: 1.4em !important;
+  font-style: italic !important;
+  height: auto !important;
+  margin-bottom: 1em !important;
+  padding: 1em !important;
+
+  &.active {
+    border: 2px dashed darken($green,10%) !important;
+    background: lighten($green,40%) !important;
+    color: $darken($green,10%) !important;
+  }
+}
 
 @mixin widgetNodeChildren {
   margin: 0 !important;
   padding: 0 !important;
-    
-  li.node_drop_target {
-    @include rounded(3px);
-    border: 2px dashed $green !important;
-    background: white !important;
-    font-size: 1.4em !important;
-    font-style: italic !important;
-    height: auto !important;
-    margin-bottom: 1em !important;
-    padding: 1em !important;
-
-    &.active {
-      border: 2px dashed darken($green,10%) !important;
-      background: lighten($green,40%) !important;
-      color: $darken($green,10%) !important;
-    }
-  }
   
-  // (editor nodes: li.node.form_builder.form...)
+  // (basic editor nodes: li.node.form_builder.form...)
   li.node {
+    @include rounded(4px);
+    @include shadow($black10,1px,1px,0px);
     @include inset-shadow(transparent,0px,0px,0px);
     background: white;
+    list-style: none;
     overflow: hidden;
     padding: 0px;
     margin: 0 0 1em 0;
@@ -193,14 +196,6 @@ form .aligned p.keywords-field {
       background-color: blue;
       margin: 0;
       position: fixed;
-    }
-
-    // second level title bars
-    & > div.widget {
-      span.title {
-        font-size: 1.4em;
-        padding: 5px 0;
-      }
     }
     
     div.widget {
@@ -543,6 +538,74 @@ form .aligned p.keywords-field {
         }
       }
     }
+    
+    
+    // major section container styles
+    &.maincontent,
+    &.sidebar {
+      background: transparent;
+      padding: 10px;
+      
+      > div.widget {
+        background-color: transparent;
+        
+        > p.drag-row {
+          background: transparent;
+          padding-bottom: 0px;
+          
+          > span.title {
+            font-weight: bold;
+            font-size: 20px;
+            text-transform: capitalize;
+          }
+        }
+      }
+    }
+    
+
+    
+    // internal shelves (form, email widget)
+    div.shelf {
+      border-bottom: 2px solid $lightgrey;
+      display: block;
+      float: none;
+      margin: 10px;
+      padding: 0px 0px 10px 0px;
+      width: auto;
+
+      p.title {
+        display: none; // hide the form widgets label
+      }
+      
+      > ul.list.nodeChildren {
+        // inner shelfItem stacking
+        
+        li.drag_placeholder {
+          display: inline-block;
+          height: 8px;
+          padding: 1px 2px; // account for the border
+          width: auto;
+        }
+        
+        li.shelfItem {
+          display: inline-block;
+          padding: 1px 1px 1px 1px;
+          width: auto;
+
+          span.title {
+            background-position: 5px 5px;
+            font-size: 11px;
+            padding: 2px 0px 2px 26px;
+          }
+
+          span.icon-move {
+            float: right;
+            margin-top: 4px;
+          }
+        }
+      }
+    }
+    
   }
 }
 
@@ -676,84 +739,16 @@ div.widgy {
         // (actual editor sections: all .nodeChildren, first one contains the left-hand editor area)
         // TOP INSTANCE of .nodeChildren
         ul.nodeChildren {
+          @include widgetNodeChildren; // moving this around to test tabbed/callout layouts
           
-          // (li.node.page_builder.maincontent, .page_builder.sidebar, etc.)
-          // TOP INSTANCE of .node / content & sidebar section wrapper
           li.node {
-            @include rounded(4px);
-            @include shadow($black10,1px,1px,0px);
-            @include inset-shadow(#ffffff,-1px,1px,0px);
-            margin: 0 0 1em 0;
-            list-style: none;
-            padding: 10px;
-            position: relative;
-            
             div.widget {
-              -webkit-user-select: auto;
-              -moz-user-select: text;
-              border: 0px none !important;
-
-              // Section Headers: "Main Content", "Sidebar"
-              p.drag-row {
-                background: transparent;
-                
-                span.title {
-                  font-weight: bold;
-                  font-size: 20px;
-                  text-transform: capitalize;
-                }
-              }
-              
-              // internal shelves (form widget)
-              div.shelf {
-                border-bottom: 2px solid $lightgrey;
-                display: block;
-                float: none;
-                margin: 10px;
-                padding: 0px 0px 10px 0px;
-                width: auto;
-    
-                p.title {
-                  display: none; // hide the form widgets label
-                }
-
-                ul.list.nodeChildren {
-                  // inner shelfItem stacking
-                  
-                  li.drag_placeholder {
-                    display: inline-block;
-                    height: 8px;
-                    padding: 1px 2px; // account for the border
-                    width: auto;
-                  }
-                  
-                  li.shelfItem {
-                    display: inline-block;
-                    padding: 1px 1px 1px 1px;
-                    width: auto;
-      
-                    span.title {
-                      background-position: 5px 5px;
-                      font-size: 11px;
-                      padding: 2px 0px 2px 26px;
-                    }
-      
-                    span.icon-move {
-                      float: right;
-                      margin-top: 4px;
-                    }
-                  }
-                }
-              }
-              
-              // (main widget editors)
               ul.nodeChildren {
-                @include widgetNodeChildren;
                 
               }
             }
           }
-        }       
+        }
       }
     }                
 
