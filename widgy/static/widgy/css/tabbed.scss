@@ -1,28 +1,70 @@
-.widgy .tabbed > .widget > .nodeChildren > li {
-  display: inline-block;
+@mixin rounded($radius) {
+  border-radius: $radius !important;
+    -o-border-radius: $radius !important;
+    -ms-border-radius: $radius !important;
+    -moz-border-radius: $radius !important;
+    -webkit-border-radius: $radius !important;
+}
 
-  .drag-row {
-    .edit, // functionality for editing the tab doesn't exist yet.
-    .delete span {
+div.widgy div.editor section.tabbed > div.widget > ul.nodeChildren {
+
+  > li {
+    @include rounded(4px 4px 0px 0px);
+    background: #eeeeee !important;
+    border-color: #cccccc;
+    border-width: 1px 1px 0px 1px;
+    color: #999999;
+    display: inline-block;
+    float: left;
+    margin: 0 0 0 .5em !important;
+    padding: 0px !important;
+    position: relative;
+    top: 2px;
+    z-index: 10;
+    
+    .widget {
+      background: transparent !important;
+
+      .drag-row {
+        @include rounded(0px);
+        background: transparent !important;
+        
+        span.title {
+          color: inherit;
+        }
+        
+        .edit, // functionality for editing the tab doesn't exist yet.
+        .delete span {
+          display: none;
+        }
+
+        .preview {
+          background: transparent;
+          display: inline;
+        }
+      }
+    }
+
+    .preview,
+    .nodeChildren {
       display: none;
     }
-
-    .preview {
-      display: inline;
+    
+    &:hover {
+      background-color: white !important;
     }
-  }
 
-  .preview,
-  .nodeChildren {
-    display: none;
-  }
-
-  &.active {
-    background-color: red;
+    &.active {
+      background-color: #fafafa !important;
+      border-bottom: 2px solid #fafafa;
+      color: #555555;
+    }
   }
 }
 
 .widgy section.tabbed > .widget > .current {
-  width: 63%;
+  border-top: 2px solid #cccccc;
   clear: left;
+  padding-top: 10px;
+  width: 63%;
 }
