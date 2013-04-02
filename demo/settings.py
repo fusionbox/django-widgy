@@ -120,6 +120,11 @@ USE_TZ = True
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = "en"
+ugettext = lambda s: s
+LANGUAGES = (
+    ('en', ugettext('English')),
+    ('es', ugettext('Chinese'))
+)
 
 # A boolean that turns on/off debug mode. When set to ``True``, stack traces
 # are displayed for error pages. Should always be set to ``False`` in
@@ -266,6 +271,7 @@ INSTALLED_APPS = (
     'widgy.contrib.page_builder',
     'widgy.contrib.form_builder',
     'widgy.contrib.widgy_mezzanine',
+    'widgy.contrib.widgy_i18n',
     "django.contrib.admin",
     #"mezzanine.galleries",
     #"mezzanine.twitter",

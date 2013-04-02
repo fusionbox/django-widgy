@@ -1,5 +1,10 @@
-from widgy.contrib.page_builder.models import Layout, MainContent, Accordion
+from django.db import models
+from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
+
 from widgy import registry
+from widgy.db.fields import WidgyField
+from widgy.contrib.page_builder.models import Layout, MainContent, Accordion
 
 
 class TwoContentLayout(Layout):
@@ -12,6 +17,7 @@ class TwoContentLayout(Layout):
         verbose_name = 'Two Content Layout'
 
 registry.register(TwoContentLayout)
+
 
 class DemoAccordion(Accordion):
     class Meta:
@@ -30,3 +36,18 @@ class DemoAccordion(Accordion):
 
 registry.unregister(Accordion)
 registry.register(DemoAccordion)
+
+
+class I18NThing(models.Model):
+    name = models.CharField(_('name'), max_length=255)
+
+    description = WidgyField(
+        site=settings.WIDGY_MEZZANINE_SITE,
+        verbose_name=_('description'),
+        root_choices=(
+            'widgy_i18n.I18NLayoutContainer',
+        ))
+
+    class Meta:
+        verbose_name = _('event')
+        verbose_name_plural = _('events')
