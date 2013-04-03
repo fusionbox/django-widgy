@@ -6,6 +6,9 @@
     -webkit-border-radius: $radius !important;
 }
 
+div.widgy div.editor section.node div.widget > ul.nodeChildren {
+  width: 100% !important;
+}
 div.widgy div.editor section.tabbed > div.widget > ul.nodeChildren {
 
   > li {
