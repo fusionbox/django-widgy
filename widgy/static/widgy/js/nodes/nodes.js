@@ -91,7 +91,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     startBeingDragged: function(event) {
-      if ( $(event.target).is('.title, .drag-row, .drag_handle') ) {
+      if ( $(event.target).is('.title, .drag-row, .drag_handle') && this.content.get('draggable') ) {
         return DraggableView.prototype.startBeingDragged.apply(this, arguments);
       } else {
         return false;
