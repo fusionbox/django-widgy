@@ -3,6 +3,8 @@ from django.utils.safestring import mark_safe
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.template.loader import render_to_string
 
+import bleach
+
 
 PAGEDOWN_EDITOR_TEMPLATE = u'''
 <div class="pagedown-buttonbar"></div>
@@ -29,6 +31,39 @@ class MarkdownField(forms.CharField):
 
 class CKEditorWidget(forms.Textarea):
     CONFIG = {
+        'toolbar': [
+            {'name': 'clipboard', 'groups': ['clipboard', 'undo'], 'items': ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']},
+            {'name': 'editing', 'groups': ['find', 'selection', 'spellchecker'], 'items': ['Scayt']},
+            {'name': 'links', 'items': ['Link', 'Unlink', 'Anchor']},
+            {'name': 'insert', 'items': ['HorizontalRule', 'SpecialChar']},
+            {'name': 'tools', 'items': ['Maximize']},
+            {'name': 'document', 'groups': ['mode', 'document', 'doctools'], 'items': ['Source']},
+            {'name': 'others', 'items': ['-']},
+            '/',
+            {'name': 'basicstyles', 'groups': ['basicstyles', 'cleanup'], 'items': ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat']},
+            {'name': 'paragraph', 'groups': ['list', 'indent', 'blocks', 'align'], 'items': ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote']},
+            {'name': 'styles', 'items': ['Styles', 'Format']},
+            {'name': 'about', 'items': ['About']}
+        ],
+        'stylesSet': [
+            {'name': 'Big', 'element': 'big'},
+            {'name': 'Small', 'element': 'small'},
+            {'name': 'Typewriter', 'element': 'tt'},
+
+            {'name': 'Computer Code', 'element': 'code'},
+            {'name': 'Keyboard Phrase', 'element': 'kbd'},
+            {'name': 'Sample Text', 'element': 'samp'},
+            {'name': 'Variable', 'element': 'var'},
+
+            {'name': 'Deleted Text', 'element': 'del'},
+            {'name': 'Inserted Text', 'element': 'ins'},
+
+            {'name': 'Cited Work', 'element': 'cite'},
+            {'name': 'Inline Quotation', 'element': 'q'},
+
+            {'name': 'Language: RTL', 'element': 'span', 'attributes': {'dir': 'rtl'}},
+            {'name': 'Language: LTR', 'element': 'span', 'attributes': {'dir': 'ltr'}},
+        ]
     }
 
     def __init__(self, *args, **kwargs):
@@ -43,3 +78,45 @@ class CKEditorWidget(forms.Textarea):
             'ckeditor_path': staticfiles_storage.url('widgy/js/lib/ckeditor/'),
             'config': self.CONFIG,
         })
+
+
+class CKEditorField(forms.CharField):
+    widget = CKEditorWidget
+
+    ALLOWED_ATTRIBUTES = {
+        '*': ['class', 'dir', 'title'],
+        'a': ['href', 'target', 'rel', 'name'],
+        'time': ['datetime', 'pubdate'],
+        'img': ['src'],
+
+        'table': ['border'],
+        'colgroup': ['span'],
+        'col': ['span'],
+        'td': ['colspan', 'rowspan', 'headers'],
+        'th': ['colspan', 'rowspan', 'headers', 'scope'],
+    }
+    ALLOWED_TAGS = [
+        'a', 'abbr', 'acronym', 'address', 'b', 'big', 'br', 'cite', 'code',
+        'del', 'dfn', 'div', 'em', 'hr', 'i', 'ins', 'kbd', 'mark', 'p', 'pre',
+        'q', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'time', 'u',
+        'var', 'wbr', 's',
+
+        'ul', 'ol', 'li',
+
+        'dl', 'dt', 'dd',
+
+        'blockquote', 'details', 'summary',
+
+        'hgroup', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+
+        'figure', 'figcaption', 'img',
+
+        'caption', 'col', 'colgroup', 'table', 'tbody', 'td', 'tfoot', 'th',
+        'thead', 'tr',
+    ]
+
+    def clean(self, value):
+        value = super(CKEditorField, self).clean(value)
+        return bleach.clean(value,
+                            tags=self.ALLOWED_TAGS,
+                            attributes=self.ALLOWED_ATTRIBUTES)

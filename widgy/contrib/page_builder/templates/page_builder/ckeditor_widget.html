@@ -11,6 +11,6 @@
     The defer is required only if ckeditor has already been loaded and
     requirejs is calling us synchronously.
     {% endcomment %}
-    _.defer(CKEDITOR.replace, {{ html_id|json }});
+    _.defer(CKEDITOR.replace, {{ html_id|json }}, {{ config|json }});
   });
 </script>

@@ -13,7 +13,7 @@ from widgy.models.mixins import StrictDefaultChildrenMixin, InvisibleMixin
 from widgy.models.links import LinkField, LinkFormField, LinkFormMixin
 from widgy.db.fields import WidgyField
 from widgy.contrib.page_builder.db.fields import MarkdownField, VideoField
-from widgy.contrib.page_builder.forms import CKEditorWidget
+from widgy.contrib.page_builder.forms import CKEditorField
 import widgy
 
 
@@ -106,10 +106,7 @@ class Markdown(Content):
 
 
 class HtmlForm(forms.ModelForm):
-    class Meta:
-        widgets = {
-            'content': CKEditorWidget,
-        }
+    content = CKEditorField(required=False, label=_('Content'))
 
 
 @widgy.register

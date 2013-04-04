@@ -21,6 +21,7 @@ install_requires = [
     'PyScss == 1.1.5',
     'six',
     'markdown',
+    'bleach',
     'django-compressor',
     'django-extensions',
 ]
