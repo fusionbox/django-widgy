@@ -13,6 +13,7 @@ from widgy.models.mixins import StrictDefaultChildrenMixin, InvisibleMixin
 from widgy.models.links import LinkField, LinkFormField, LinkFormMixin
 from widgy.db.fields import WidgyField
 from widgy.contrib.page_builder.db.fields import MarkdownField, VideoField
+from widgy.contrib.page_builder.forms import CKEditorWidget
 import widgy
 
 
@@ -102,6 +103,25 @@ class Markdown(Content):
     class Meta:
         verbose_name = _('markdown')
         verbose_name_plural = _('markdowns')
+
+
+class HtmlForm(forms.ModelForm):
+    class Meta:
+        widgets = {
+            'content': CKEditorWidget,
+        }
+
+
+@widgy.register
+class Html(Content):
+    content = models.TextField(null=True, blank=True)
+
+    form = HtmlForm
+    editable = True
+
+    class Meta:
+        verbose_name = _('html')
+        verbose_name_plural = _('html editors')
 
 
 @widgy.register
@@ -456,7 +476,7 @@ class ButtonForm(LinkFormMixin, forms.ModelForm):
 class Button(Content):
     text = models.CharField(max_length=255, verbose_name=_('text'), null=True, blank=True)
 
-    link = LinkField()
+    link = LinkField(null=True)
 
     css_classes = ('page_builder', 'buttonwidget')
     form = ButtonForm

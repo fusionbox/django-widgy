@@ -11,21 +11,30 @@ define([
       _,
       templates) {
 
-  $.fn.serializeObject = function()
-  {
-    var o = {};
-    var a = this.serializeArray();
-    $.each(a, function() {
-      if (o[this.name] !== undefined) {
-        if (!o[this.name].push) {
-          o[this.name] = [o[this.name]];
+  $.fn.getValue = function() {
+    if ( window.CKEDITOR && window.CKEDITOR.instances[this[0].id] ) {
+      return window.CKEDITOR.instances[this[0].id].getData();
+    }
+    return this.val() || '';
+  };
+
+  $.fn.serializeObject = function() {
+    var ret = {};
+    this.each(function() {
+      var name = this.name;
+      if (! name)
+        return;
+
+      if (ret[name] !== undefined) {
+        if (!ret[name].push) {
+          ret[name] = [ret[name]];
         }
-        o[this.name].push(this.value || '');
+        ret[name] = $(this).getValue(); 
       } else {
-        o[this.name] = this.value || '';
+        ret[name] = $(this).getValue();
       }
     });
-    return o;
+    return ret;
   };
 
   var FormView = Backbone.View.extend({
@@ -65,6 +74,16 @@ define([
         });
         return false;
       }
+    },
+
+    close: function() {
+      if (window.CKEDITOR) {
+        this.$('.widgy_ckeditor').each(function() {
+          var editor = window.CKEDITOR.instances[this.id];
+          if (editor) editor.destroy();
+        });
+      }
+      Backbone.View.prototype.close.apply(this, arguments);
     },
 
     serialize: function() {

@@ -52,7 +52,7 @@ class ContentView(WidgyView):
     def put(self, request, app_label, object_name, object_pk):
         obj = self.get_object(app_label, object_name, object_pk)
         data = self.data()['attributes']
-        form = obj.get_form_class(request)(data=data or None, instance=obj)
+        form = obj.get_form(request, data=data)
         if not form.is_valid():
             raise ValidationError(form.errors)
         form.save()

@@ -508,6 +508,12 @@ class Content(models.Model):
         }
         return modelform_factory(self.__class__, **defaults)
 
+    def get_form(self, request, **form_kwargs):
+        form_class = self.get_form_class(request)
+        form_kwargs.setdefault('instance', self)
+        form_kwargs.setdefault('prefix', self.node.pk)
+        return form_class(**form_kwargs)
+
     def valid_parent_of(self, cls, obj=None):
         """
         Given a content class, can it be _added_ as our child?
@@ -640,7 +646,7 @@ class Content(models.Model):
         """
         if not context:
             context = RequestContext(request)
-        with update_context(context, {'form': self.get_form_class(request)(instance=self)}):
+        with update_context(context, {'form': self.get_form(request)}):
             return render_to_string(template or self.edit_templates, context)
 
     def get_preview_template(self, site):
