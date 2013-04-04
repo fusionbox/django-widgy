@@ -99,7 +99,7 @@ class CKEditorField(forms.CharField):
         'a', 'abbr', 'acronym', 'address', 'b', 'big', 'br', 'cite', 'code',
         'del', 'dfn', 'div', 'em', 'hr', 'i', 'ins', 'kbd', 'mark', 'p', 'pre',
         'q', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'time', 'u',
-        'var', 'wbr', 's',
+        'var', 'wbr', 's', 'tt',
 
         'ul', 'ol', 'li',
 
