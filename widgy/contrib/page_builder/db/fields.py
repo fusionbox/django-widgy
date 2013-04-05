@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import urlparse
 import re
 
@@ -65,6 +67,9 @@ class VideoField(models.URLField):
     __metaclass__ = models.SubfieldBase
 
     def __init__(self, *args, **kwargs):
+        kwargs.setdefault('help_text', _('Please enter a link to the YouTube or'
+                                         ' Vimeo page for this video.  i.e.'
+                                         ' http://www.youtube.com/watch?v=9bZkp7q19f0'))
         super(VideoField, self).__init__(*args, **kwargs)
         self.validators.append(validators_video_url)
 
