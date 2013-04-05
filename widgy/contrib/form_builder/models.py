@@ -216,7 +216,10 @@ class Form(DefaultChildrenMixin, Content):
                 return False
         return super(Form, cls).valid_child_of(parent, obj)
 
-    def get_form(self):
+    def build_form_class(self):
+        """
+        Returns a django.forms.Form class based on my child widgets.
+        """
         fields = SortedDict((child.get_formfield_name(), child.get_formfield())
                             for child in self.depth_first_order() if isinstance(child, BaseFormField))
 
@@ -233,9 +236,11 @@ class Form(DefaultChildrenMixin, Content):
 
     def render(self, context):
         if self.context_var in context:
+            # when the form fails validation, the submission view passes
+            # the existing instance back to us in the context
             form = context[self.context_var]
         else:
-            form = self.get_form()()
+            form = self.build_form_class()()
 
         with update_context(context, {'form': form}):
             return super(Form, self).render(context)

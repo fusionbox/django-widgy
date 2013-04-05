@@ -8,6 +8,8 @@ Replace this with more appropriate tests for your application.
 from django.test import TestCase
 from django import forms
 
+import mock
+
 from modeltests.core_tests.widgy_config import widgy_site
 from widgy.contrib.form_builder.models import Form, FormInput, Textarea, FormSubmission, FormField
 
@@ -27,7 +29,7 @@ class GetFormTest(TestCase):
         input2.label = 'Test 2'
         input2.save()
 
-        form_class = self.form.get_form()
+        form_class = self.form.build_form_class()
 
         data = {
             input1.get_formfield_name(): 'foo',
@@ -183,4 +185,18 @@ class TestForm(TestCase):
             self.fields[0].ident: 'updated',
             self.fields[1].ident: 'field 2',
             self.fields[2].ident: 'field 3',
+        })
+
+    def test_serialize_value(self):
+        with mock.patch('widgy.contrib.form_builder.models.Textarea.serialize_value') as serialize:
+            serialize.return_value = 'serialize.return_value'
+
+            submission = self.submit('1', '2', '3')
+
+        serialize.assert_called_with('3')
+
+        self.assertEqual(submission.as_dict(), {
+            self.fields[0].ident: '1',
+            self.fields[1].ident: '2',
+            self.fields[2].ident: serialize.return_value,
         })

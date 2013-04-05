@@ -35,7 +35,7 @@ def handle_form(request, node_pk):
         # form_node in its tree.
         Node.prefetch_trees(form_node, root_node)
 
-        form_class = form_node.content.get_form()
+        form_class = form_node.content.build_form_class()
         form = form_class(request.POST, request.FILES)
 
         if form.is_valid():
