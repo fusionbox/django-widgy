@@ -23,7 +23,7 @@ define([ 'underscore', 'components/widget/component', 'pagedown' ], function(_, 
     renderHTML: function() {
       widget.EditorView.prototype.renderHTML.apply(this, arguments);
 
-      var textarea = this.$('textarea[name=content]')[0],
+      var textarea = this.$('textarea[name=' + this.getPrefixedFieldName('content') + ']')[0],
           preview = this.$('.pagedown-preview')[0],
           buttonBar = this.$('.pagedown-buttonbar')[0],
           converter = Markdown.getSanitizingConverter();
