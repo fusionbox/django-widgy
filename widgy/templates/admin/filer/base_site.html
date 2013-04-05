@@ -1,0 +1,10 @@
+{% extends "admin/base_site.html" %}
+{% load i18n filermedia %}
+{% load compress %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% filer_staticmedia_prefix %}css/admin_style.css" />
+{% compress css %}
+<link rel="stylesheet" type="text/x-scss" href="{% static 'widgy/css/admin_filer_override.scss' %}">
+{% endcompress %}
+{% endblock %}
