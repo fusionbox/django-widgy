@@ -515,7 +515,6 @@ class Content(models.Model):
     def get_form(self, request, **form_kwargs):
         form_class = self.get_form_class(request)
         form_kwargs.setdefault('instance', self)
-        form_kwargs.setdefault('prefix', self.get_form_prefix())
         return form_class(**form_kwargs)
 
     def valid_parent_of(self, cls, obj=None):
@@ -650,7 +649,7 @@ class Content(models.Model):
         """
         if not context:
             context = RequestContext(request)
-        with update_context(context, {'form': self.get_form(request)}):
+        with update_context(context, {'form': self.get_form(request, prefix=self.get_form_prefix())}):
             return render_to_string(template or self.edit_templates, context)
 
     def get_preview_template(self, site):

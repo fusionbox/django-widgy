@@ -1,15 +1,11 @@
 define([
     'jquery',
     'widgy.backbone',
-    'widgy.contents',
-    'underscore',
-    'templates'
+    'underscore'
     ], function(
       $,
       Backbone,
-      contents,
-      _,
-      templates) {
+      _) {
 
   $.fn.getValue = function() {
     if ( window.CKEDITOR && window.CKEDITOR.instances[this[0].id] ) {
@@ -22,14 +18,15 @@ define([
     var ret = {};
     this.each(function() {
       var name = this.name;
-      if (! name)
+
+      if (! name || (_.contains(['checkbox', 'radio'], this.type) && ! this.checked))
         return;
 
-      if (ret[name] !== undefined) {
+      if (_.contains(ret, name)) {
         if (!ret[name].push) {
           ret[name] = [ret[name]];
         }
-        ret[name] = $(this).getValue(); 
+        ret[name].push($(this).getValue()); 
       } else {
         ret[name] = $(this).getValue();
       }

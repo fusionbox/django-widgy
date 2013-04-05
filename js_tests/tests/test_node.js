@@ -80,7 +80,7 @@ describe('Node', function() {
       });
     });
 
-    it('doesn\'t have timing issues', function() {
+    it.skip('doesn\'t have timing issues', function() {
       var node = new nodes.Node({
         content: {
           component: 'testcomponent',
@@ -91,8 +91,7 @@ describe('Node', function() {
       node.set({content: { title: 'bar' } });
 
       return node.ready(function(node) {
-        // this is an expected failure
-        // assert.equal(node.content.get('test'), 'bar');
+        assert.equal(node.content.get('test'), 'bar');
       });
     });
   });
