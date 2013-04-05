@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.db import models
 from django import forms
 from django.utils.datastructures import SortedDict
@@ -223,7 +225,7 @@ class Form(DefaultChildrenMixin, Content):
             if hasattr(child, 'get_form_mixins'):
                 mixins.extend(child.get_form_mixins())
 
-        return type('WidgyForm', tuple(mixins + [forms.BaseForm]), {'base_fields': fields})
+        return type(str('WidgyForm'), tuple(mixins + [forms.BaseForm]), {'base_fields': fields})
 
     @property
     def context_var(self):
@@ -352,6 +354,14 @@ class FormField(BaseFormField):
     def __unicode__(self):
         return self.label
 
+    def serialize_value(self, value):
+        """
+        Used to turn the python object from cleaned_data into a string
+        to store in the db. The return value with also be used in the
+        CSV download of form data.
+        """
+        return unicode(value)
+
 
 class FormInputForm(forms.ModelForm):
     class Meta:
@@ -418,6 +428,92 @@ class Textarea(FormField):
     class Meta:
         verbose_name = _('text area')
         verbose_name_plural = _('text areas')
+
+
+class BaseChoiceField(FormField):
+    choices = models.TextField()
+
+    class Meta:
+        abstract = True
+
+    def get_formfield_kwargs(self):
+        kwargs = super(BaseChoiceField, self).get_formfield_kwargs()
+        kwargs['choices'] = self.get_choices()
+        return kwargs
+
+    def get_choices(self):
+        if self.EMPTY_LABEL:
+            choices = [('', self.EMPTY_LABEL)]
+        else:
+            choices = []
+        return choices + [(i.strip(), i.strip()) for i in self.choices.splitlines()]
+
+    @property
+    def widget(self):
+        attrs = self.widget_attrs
+        return self.widget_class(attrs=attrs)
+
+    @property
+    def widget_attrs(self):
+        return {
+            'required': self.required,
+        }
+
+    @property
+    def widget_class(self):
+        return self.WIDGET_CLASSES[self.type]
+
+
+@widgy.register
+class ChoiceField(BaseChoiceField):
+    WIDGET_CLASSES = {
+        'select': forms.Select,
+        'radios': forms.RadioSelect,
+    }
+
+    EMPTY_LABEL = '---------'
+
+    formfield_class = forms.ChoiceField
+
+    type = models.CharField(max_length=25, verbose_name=_('type'), choices=[
+        ('select', _('Dropdown')),
+        ('radios', _('Radio buttons')),
+    ])
+
+
+@widgy.register
+class MultipleChoiceField(BaseChoiceField):
+    WIDGET_CLASSES = {
+        'checkboxes': forms.CheckboxSelectMultiple,
+        'select': forms.SelectMultiple,
+    }
+
+    EMPTY_LABEL = None
+
+    formfield_class = forms.MultipleChoiceField
+
+    type = models.CharField(max_length=25, verbose_name=_('type'), choices=[
+        ('checkboxes', _('Checkboxes')),
+        ('select', _('Multi-select')),
+    ])
+
+    @property
+    def widget_attrs(self):
+        attrs = super(MultipleChoiceField, self).widget_attrs
+        if 'required' in attrs and self.type == 'checkboxes':
+            # required would go on every single checkbox, which isn't what we
+            # want
+            del attrs['required']
+        return attrs
+
+    def serialize_value(self, value):
+        """
+        `value` is the list of chosen choices. Join them together with
+        commas, escaping literal commas in the choice with a backslash.
+        This quoting method was chosen to not cause any ambiguity when
+        choices contain commas.
+        """
+        return ','.join(i.replace('\\', '\\\\').replace(',', '\\,') for i in value)
 
 
 @widgy.register
@@ -495,11 +591,12 @@ class FormSubmission(behaviors.Timestampable, models.Model):
             )
 
             for name, field in form.get_fields().iteritems():
+                value = field.serialize_value(data[name])
                 submission.values.create(
                     field_node=field.node,
                     field_name=field.label,
                     field_ident=field.ident,
-                    value=data[name]
+                    value=value,
                 )
             return submission
 
