@@ -62,6 +62,10 @@ define([
       this.close();
     },
 
+    getPrefixedFieldname: function(name) {
+      return this.model.get('form_prefix') + '-' + name;
+    },
+
     handleError: function(model, xhr, options){
       var response,
           error_func = this['handleError' + parseInt(xhr.status, 3)];
@@ -78,7 +82,7 @@ define([
         if ( field_name === '__all__' ) {
           this.$el.prepend(error_list);
         } else {
-          this.$('[name="' + field_name + '"]').parent().prepend(error_list);
+          this.$('[name="'+ this.getPrefixedFieldname(field_name) +'"]').parent().prepend(error_list);
         }
 
         _.each(messages, function(msg){

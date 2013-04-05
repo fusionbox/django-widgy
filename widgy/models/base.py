@@ -431,7 +431,8 @@ class Content(models.Model):
             'pop_out': self.pop_out,
             'edit_url': site.reverse(site.node_edit_view, kwargs=node_pk_kwargs),
             'shelf': self.shelf,
-            'attributes': self.get_attributes()
+            'attributes': self.get_attributes(),
+            'form_prefix': self.get_form_prefix(),
         }
         return data
 
@@ -508,10 +509,13 @@ class Content(models.Model):
         }
         return modelform_factory(self.__class__, **defaults)
 
+    def get_form_prefix(self):
+        return self.node.pk
+
     def get_form(self, request, **form_kwargs):
         form_class = self.get_form_class(request)
         form_kwargs.setdefault('instance', self)
-        form_kwargs.setdefault('prefix', self.node.pk)
+        form_kwargs.setdefault('prefix', self.get_form_prefix())
         return form_class(**form_kwargs)
 
     def valid_parent_of(self, cls, obj=None):

@@ -18,6 +18,10 @@ define([ 'widgy.backbone', 'nodes/nodes' ], function(Backbone, nodes) {
       // debugging: this will go away later probably.
       this.type = this.get('model');
       this.node = options.node;
+    },
+
+    formPrefix: function() {
+      return this.node.formPrefix();
     }
   });
 
