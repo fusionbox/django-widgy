@@ -7,6 +7,7 @@ from widgy.exceptions import ParentChildRejection
 
 from widgy.contrib.page_builder.models import (Table, TableRow,
         TableHeaderData, TableHeader, TableBody)
+from widgy.contrib.page_builder.forms import CKEditorField
 
 
 widgy_site = WidgySite()
@@ -183,3 +184,36 @@ class TestTableWidget(TestCase):
         table2.header.add_child(widgy_site, TableHeaderData)
         with self.assertRaises(ParentChildRejection):
             row.reposition(widgy_site, parent=table2.body)
+
+
+class TestHtmlCleaning(TestCase):
+    def test_it(self):
+        """
+        Make sure some common XSS vectors are filtered
+        """
+
+        test_cases = [
+            ('<script>1', '<script>'),
+            ('<a onclick="a">asdf</a>', 'onclick'),
+            ("<IMG SRC=JaVaScRiPt:alert('XSS')>", 'XSS'),
+            ('<div style="background: url("asdf");"></div>', 'url'),
+            ('<a href="javascript:foo"></a>', 'javascript'),
+            ('<link rel=stylesheet href=http://asdf>', '<link'),
+            ('<meta HTTP-EQUIV="refresh" CONTENT="0;url=javascript:alert(1);">', '<meta'),
+            ('<TABLE BACKGROUND="javascript:alert(1)">', 'javascript:'),
+            (r"<DIV STYLE=\"background-image:\0075\0072\006C\0028'\006a\0061\0076\0061\0073\0063\0072\0069\0070\0074\003a\0061\006c\0065\0072\0074\0028.1027\0058.1053\0053\0027\0029'\0029\"></div>", 'background-image'),
+            ('<p style="margin-left: expression(alert(1))">foo</p>', 'margin-left'),
+            ('<HEAD><META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=UTF-7"> </HEAD>+ADw-SCRIPT+AD4-alert(1);+ADw-/SCRIPT+AD4-', '<meta'),
+            ('<style>foo</style>', '<style'),
+            ('<p style="-moz-binding: url("http://example.com")">asdf</p>', '-moz-binding'),
+            ('<!--<script></script>-->', '<script>'),
+            ('<img """><script>alert("xss")</script>">', '<script'),
+            ('<img src= onmouseover="alert(1)">', ' onmouseover'),
+            ('<html xmlns:xss><?import namespace="xss" implementation="http://ha.ckers.org/xss.htc"><xss:xss>ss</xss:xss></html>',
+             '<?import'),
+            ('<!--[if gte IE 4]><script>alert(1);</script><![endif]-->', '<script>'),
+        ]
+
+        for html, must_not_occur in test_cases:
+            cleaned = CKEditorField().clean(html)
+            self.assertNotIn(must_not_occur, cleaned)
