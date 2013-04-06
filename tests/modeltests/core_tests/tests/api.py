@@ -1,5 +1,7 @@
 import json
 
+from django.core import urlresolvers
+
 from widgy.views import extract_id
 from widgy.models import Node
 
@@ -212,3 +214,60 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         resp = self.delete(node.get_api_url(widgy_site))
         self.assertEqual(resp.status_code, 409)
         self.assertTrue(Node.objects.get(pk=node.pk))
+
+    def test_node_templates_view(self):
+        left, right = make_a_nice_tree(self.root_node)
+
+        r = self.get(left.content.to_json(widgy_site)['template_url'])
+
+        # not sure there's much else we can test here
+        self.assertIn('<form', json.loads(r.content)['edit_template'])
+
+
+    def test_node_edit_view(self):
+        r = self.client.get(self.root_node.content.to_json(widgy_site)['edit_url'])
+        self.assertEqual(r.status_code, 200)
+
+        # this is a template view, so there's not much we can test.
+        self.assertIn('new Widgy', r.content)
+        self.assertIn(urlresolvers.reverse(widgy_site.node_view), r.content)
+
+
+    def test_node_404(self):
+        left, right = make_a_nice_tree(self.root_node)
+
+        before_json = self.root_node.to_json(widgy_site)
+        # make a fake url
+        right.pk += 9000
+        r = self.put(left.get_api_url(widgy_site), {
+            'right_id': None,
+            'parent_id': right.get_api_url(widgy_site),
+        })
+        right.pk -= 9000
+
+        self.assertEqual(r.status_code, 404)
+
+        self.assertEqual(before_json, Node.objects.get(pk=self.root_node.pk).to_json(widgy_site))
+
+    def test_nonexistant_content_type(self):
+        new_child = self.post(self.node_url, {
+            '__class__': 'corcwaasdfe_tests.rawtextwidgetasdfa1',
+            'parent_id': None,
+            'right_id': None,
+        })
+
+        self.assertEqual(new_child.status_code, 404)
+
+    def test_add_with_right_id(self):
+        left, right = make_a_nice_tree(self.root_node)
+
+        before_children = len(left.get_children())
+        new_child = self.post(self.node_url, {
+            '__class__': 'core_tests.rawtextwidget',
+            'right_id': left.get_children()[0].get_api_url(widgy_site),
+        })
+
+        self.assertEqual(new_child.status_code, 201)
+
+        left = Node.objects.get(pk=left.pk)
+        self.assertEqual(before_children + 1, len(left.get_children()))
