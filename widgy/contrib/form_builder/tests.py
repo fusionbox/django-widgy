@@ -11,7 +11,7 @@ from django import forms
 import mock
 
 from modeltests.core_tests.widgy_config import widgy_site
-from widgy.contrib.form_builder.models import Form, FormInput, Textarea, FormSubmission, FormField
+from widgy.contrib.form_builder.models import Form, FormInput, Textarea, FormSubmission, FormField, Uncaptcha
 
 
 class GetFormTest(TestCase):
@@ -52,6 +52,11 @@ class GetFormTest(TestCase):
 
         self.assertTrue(isinstance(field, forms.CharField))
         self.assertEqual(field.label, 'Test')
+
+    def test_with_uncaptcha(self):
+        uncaptcha = self.form.add_child(widgy_site, Uncaptcha)
+        form_class = self.form.build_form_class()
+        self.assertTrue(hasattr(form_class, 'clean_%s' % uncaptcha.get_formfield_name()))
 
 
 class TestForm(TestCase):

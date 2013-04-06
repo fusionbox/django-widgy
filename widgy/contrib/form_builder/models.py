@@ -534,7 +534,7 @@ class Uncaptcha(BaseFormField):
             value = form.cleaned_data[self.get_formfield_name()]
             if value != form.data.get('csrfmiddlewaretoken'):
                 raise forms.ValidationError(_('Incorrect Uncaptcha value'))
-        UncaptchaMixin = type('UncaptchaMixin', (object,), {
+        UncaptchaMixin = type(str('UncaptchaMixin'), (object,), {
             'clean_%s' % self.get_formfield_name(): clean
         })
         return [UncaptchaMixin]
