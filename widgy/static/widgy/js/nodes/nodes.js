@@ -431,13 +431,16 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       this.$children.before(shelf.render().el);
       // position sticky
       if ( this.isRootNode() ) {
+        var mezzanine_fixed_toolbar_height = 60,
+            // TODO: figure out what is at the root of this.
+            fix_overscrolling_pixels = 4;
+
         $(window).scroll(function() {
           // upper_bound is the highest the top of the shelf can be
           // lower_bound is the lower the top of the shelf can be
           var upper_bound = self.el.offsetTop,
               lower_bound = upper_bound + self.el.offsetHeight - shelf.el.offsetHeight,
-              mezzanine_fixed_toolbar_height = 60,
-              margin_top = Math.max(0, Math.min(window.scrollY - upper_bound, lower_bound - upper_bound) - mezzanine_fixed_toolbar_height);
+              margin_top = Math.max(0, Math.min(window.scrollY, lower_bound) - upper_bound - mezzanine_fixed_toolbar_height - fix_overscrolling_pixels);
 
           shelf.el.style.marginTop = margin_top + 'px';
         });
