@@ -59,9 +59,11 @@ class LinkField(WidgyGenericForeignKey):
         super(LinkField, self).__init__(ct_field, fk_field, *args, **kwargs)
 
     def get_choices(self):
-        all_qs = (model._default_manager.all()
-                  for model in get_all_linkable_classes())
-        return itertools.chain.from_iterable(all_qs)
+        return itertools.chain.from_iterable(choices for _, choices in self.get_choices_by_class())
+
+    def get_choices_by_class(self):
+        return ((Model, Model._default_manager.all())
+                for Model in get_all_linkable_classes())
 
     def contribute_to_class(self, cls, name):
         if self.ct_field is None:
@@ -112,8 +114,11 @@ class LinkFormField(forms.ChoiceField):
         else:
             return None
 
-    def populate_choices(self, choices):
-        choices = map(convert_linkable_to_choice, choices)
+    def populate_choices(self, choice_map):
+        choices = [(Model._meta.verbose_name_plural, map(convert_linkable_to_choice, choices))
+                   for Model, choices in choice_map
+                   if len(choices)]
+
         if not self.required and self.empty_label is not None:
             choices.insert(0, ('', self.empty_label))
 
@@ -133,7 +138,7 @@ class LinkFormMixin(object):
             value = getattr(self.instance, name, None)
             model_field = get_link_field_from_model(self.instance, name)
             field.initial = get_composite_key(value) if value else None
-            field.populate_choices(model_field.get_choices())
+            field.populate_choices(model_field.get_choices_by_class())
 
     def get_link_form_fields(self):
         return ((name, field)
