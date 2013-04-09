@@ -1,4 +1,6 @@
 {% extends "widgy/preview.html" %}
 {% block content %}
-{{ self.content|safe|truncatewords_html:50 }}
+<div class="htmlOutput">
+  {{ self.content|safe|truncatewords_html:50 }}
+</div>
 {% endblock %}

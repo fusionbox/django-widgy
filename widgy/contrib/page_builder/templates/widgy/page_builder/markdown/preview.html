@@ -1,5 +1,6 @@
 {% extends "widgy/preview.html" %}
-{% load widgy_tags %}
 {% block content %}
-{{ self.content|markdown|truncatewords_html:50 }}
+<div class="htmlOutput">
+  {{ self.content|markdown|truncatewords_html:50 }}
+</div>
 {% endblock %}
