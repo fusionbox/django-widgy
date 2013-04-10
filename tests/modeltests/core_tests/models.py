@@ -138,7 +138,10 @@ registry.register(ForeignKeyWidget)
 
 
 class LinkableThing(LinkableMixin, models.Model):
-    pass
+    name = models.CharField(max_length=255, default='')
+
+    def __unicode__(self):
+        return self.name
 
 
 class AnotherLinkableThing(LinkableMixin, models.Model):

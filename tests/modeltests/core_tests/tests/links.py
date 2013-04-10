@@ -80,16 +80,16 @@ class TestLinkForm(TestCase):
         form2.save(commit=False)
 
     def test_choices(self):
-        page1 = LinkableThing.objects.create()
-        page2 = LinkableThing.objects.create()
+        page1 = LinkableThing.objects.create(name='z')
+        page2 = LinkableThing.objects.create(name='a')
         page3 = AnotherLinkableThing.objects.create()
         form = LinkForm()
 
         # TODO: this has an implicit ordering check, that might be brittle.
         self.assertEqual(form.fields['link'].choices, [
             (LinkableThing._meta.verbose_name_plural, [
-                convert_linkable_to_choice(page1),
                 convert_linkable_to_choice(page2),
+                convert_linkable_to_choice(page1),
             ]),
             (AnotherLinkableThing._meta.verbose_name_plural, [
                 convert_linkable_to_choice(page3),
