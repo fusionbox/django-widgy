@@ -111,7 +111,7 @@ class HtmlForm(forms.ModelForm):
 
 @widgy.register
 class Html(Content):
-    content = models.TextField(null=True, blank=True)
+    content = models.TextField(null=False, default='')
 
     form = HtmlForm
     editable = True
