@@ -5,11 +5,11 @@
 {% block extrahead %}
 {{ block.super }}
 {% compress css %}
-<link rel="stylesheet" href="{% static 'css/jquery.fancybox.css' %}">
+<link rel="stylesheet" href="{% static 'widgy/css/jquery.fancybox.css' %}">
 <link rel="stylesheet" href="{% static 'widgy/css/django.fusionbox.scss' %}" type="text/x-scss">
 {% endcompress %}
 {% compress js %}
-<script src="{% static 'js/jquery.fancybox.js' %}"></script>
+<script src="{% static 'widgy/js/lib/jquery.fancybox.js' %}"></script>
 <script>
   $(function() {
     $('a.widgy-fancybox').fancybox({
