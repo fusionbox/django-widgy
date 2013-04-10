@@ -80,7 +80,7 @@ class TestLinkForm(TestCase):
         form2.save(commit=False)
 
     def test_choices(self):
-        page1 = LinkableThing.objects.create(name='z')
+        page1 = LinkableThing.objects.create(name='Z')
         page2 = LinkableThing.objects.create(name='a')
         page3 = AnotherLinkableThing.objects.create()
         form = LinkForm()

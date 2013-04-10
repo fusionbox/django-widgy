@@ -115,7 +115,7 @@ class LinkFormField(forms.ChoiceField):
             return None
 
     def populate_choices(self, choice_map):
-        keyfn = lambda x: x[1]
+        keyfn = lambda x: x[1].lower()
 
         choices = [(Model._meta.verbose_name_plural,
                     sorted(map(convert_linkable_to_choice, choices), key=keyfn))
