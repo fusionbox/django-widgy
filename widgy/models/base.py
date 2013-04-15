@@ -499,15 +499,20 @@ class Content(models.Model):
         return self._meta
 
     def get_form_class(self, request):
-        """
-        .. todo::
-            memoize
-        """
         defaults = {
             "form": self.form,
             "formfield_callback": partial(self.formfield_for_dbfield, request=request),
         }
-        return modelform_factory(self.__class__, **defaults)
+        form_class = modelform_factory(self.__class__, **defaults)
+        # Rather than make everybody subclass a special form, add the
+        # required_css_class and error_css_class manually here, because we know
+        # we need it in the widgy editor.  If need be, we can make the actual
+        # classes configurable somehow later.
+        if not hasattr(form_class, 'required_css_class'):
+            form_class.required_css_class = 'required'
+        if not hasattr(form_class, 'error_css_class'):
+            form_class.error_css_class = 'error'
+        return form_class
 
     def get_form_prefix(self):
         return self.node.pk
