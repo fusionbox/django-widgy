@@ -785,11 +785,14 @@ li.shelfItem {
   @include node-icon("figure", "../image/widget-figure.png");
   @include node-icon("form", "../image/widget-form.gif");
   @include node-icon("forminput", "../image/widget-form.gif");
+  @include node-icon("homebucket", "../image/widget-bucket.gif");
+  @include node-icon("html", "../image/widget-html.gif");
   @include node-icon("image", "../image/widget-image.gif");
   @include node-icon("markdown", "../image/widget-code.gif");
   @include node-icon("miniboxes", "../image/widget-miniboxes.gif");
   @include node-icon("savedatahandler", "../image/widget-save-data.png");
   @include node-icon("section", "../image/widget-section.png");
+  @include node-icon("slide", "../image/widget-slide.png");
   @include node-icon("submitbutton", "../image/widget-ok-button.png");
   @include node-icon("table", "../image/widget-table.gif");
   @include node-icon("tableheaderdata", "../image/widget-tablecolumn.png");
@@ -797,6 +800,7 @@ li.shelfItem {
   @include node-icon("tabs", "../image/widget-tab.png");
   @include node-icon("textarea", "../image/widget-textarea.gif");
   @include node-icon("uncaptcha", "../image/widget-hidden-field.png");
+  @include node-icon("upcomingevents", "../image/widget-calendar.png");
   @include node-icon("video", "../image/widget-video.gif");
 }
 
