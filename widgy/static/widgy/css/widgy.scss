@@ -832,11 +832,19 @@ input.vTimeField,
   ul {
     list-style: disc;
     padding: 0px 0px 0px 30px;
+    
+    li {
+      list-style-type: disc;
+    }
   }
   
   ol {
     list-style: decimal;
     padding: 0px 0px 0px 30px;
+    
+    li {
+      list-style-type: decimal;
+    }
   }
 }
 
