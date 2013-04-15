@@ -62,12 +62,13 @@ class FormReponseHandler(FormSuccessHandler):
 @widgy.register
 class EmailSuccessHandler(FormSuccessHandler):
     to = models.EmailField(verbose_name=_('to'))
+    subject = models.CharField(max_length=255, verbose_name=_('subject'))
     content = MarkdownField(blank=True, verbose_name=_('content'))
 
     component_name = 'markdown'
 
     def execute(self, request, form):
-        send_mail('Subject', self.content, settings.SERVER_EMAIL, [self.to])
+        send_mail(self.subject, self.content, settings.SERVER_EMAIL, [self.to])
 
     class Meta:
         verbose_name = _('admin success email')
