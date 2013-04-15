@@ -820,6 +820,25 @@ input.vTimeField,
 }
 
 
+/*| HTML and Markdown Preview Pane
+-----------------------------------------*/
+
+.htmlOutput {
+  
+  code {
+    font-family: monospace;
+  }
+  
+  ul {
+    list-style: disc;
+    padding: 0px 0px 0px 30px;
+  }
+  
+  ol {
+    list-style: decimal;
+    padding: 0px 0px 0px 30px;
+  }
+}
 
 
 /*| Button Styles
