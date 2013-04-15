@@ -838,6 +838,10 @@ input.vTimeField,
     li {
       list-style-type: disc;
     }
+    
+    ol, ol li {
+      list-style-type: decimal;
+    }
   }
   
   ol {
@@ -846,6 +850,10 @@ input.vTimeField,
     
     li {
       list-style-type: decimal;
+    }
+    
+    ul, ul li {
+      list-style-type: disc;
     }
   }
 }
