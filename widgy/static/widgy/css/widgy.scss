@@ -314,23 +314,13 @@ li.node_drop_target {
             }
             
             &.error {
-              #{$inputFields} {
+              #{$inputFields}, textarea {
                 border-color: $red;
               }
               
               ul.errorlist {
                 li.error {
                   padding-left: 115px;
-                }
-              }
-              
-              &.choices {
-                ul.errorlist {
-                  padding-left: 0px;
-                  
-                  li.error {
-                    padding-left: 0px;
-                  }
                 }
               }
             }
