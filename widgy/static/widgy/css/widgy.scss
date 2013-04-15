@@ -779,6 +779,7 @@ li.shelfItem {
   @include node-icon("accordion", "../image/widget-accordion.png");
   @include node-icon("button", "../image/widget-button.png");
   @include node-icon("calloutwidget", "../image/widget-callout.png");
+  @include node-icon("choicefield", "../image/widget-radio.png");
   @include node-icon("demoaccordion", "../image/widget-accordion.png");
   @include node-icon("emailsuccesshandler", "../image/widget-email.gif");
   @include node-icon("emailuserhandler", "../image/widget-email.gif");
@@ -790,10 +791,11 @@ li.shelfItem {
   @include node-icon("image", "../image/widget-image.gif");
   @include node-icon("markdown", "../image/widget-code.gif");
   @include node-icon("miniboxes", "../image/widget-miniboxes.gif");
+  @include node-icon("multiplechoicefield", "../image/widget-checkbox.png");
   @include node-icon("savedatahandler", "../image/widget-save-data.png");
   @include node-icon("section", "../image/widget-section.png");
   @include node-icon("slide", "../image/widget-slide.png");
-  @include node-icon("submitbutton", "../image/widget-ok-button.png");
+  @include node-icon("submitbutton", "../image/widget-button.png");
   @include node-icon("table", "../image/widget-table.gif");
   @include node-icon("tableheaderdata", "../image/widget-tablecolumn.png");
   @include node-icon("tablerow", "../image/widget-tablerow.png");
@@ -890,6 +892,7 @@ $inputFields: "input[type='text'], input[type='password'], input[type='email'], 
   @include inset-shadow($black10,0px,1px,2px);
   border: 1px solid $lightgrey;
   font-weight: normal !important;
+  height: auto;
   padding: 6px 4px 5px;
 }
 
