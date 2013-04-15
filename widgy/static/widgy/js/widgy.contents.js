@@ -109,14 +109,17 @@ define([
 
       this.spinner.restore();
       response = $.parseJSON(xhr.responseText);
-      $('ul.errorlist').remove();
+      this.$('ul.errorlist').remove();
+      this.$('.formField.error').removeClass('error');
       _.each(response, function(messages, field_name){
         var error_list = $('<ul class="errorlist">');
 
         if ( field_name === '__all__' ) {
           this.$el.prepend(error_list);
         } else {
-          this.$('[name="'+ this.getPrefixedFieldName(field_name) +'"]').parent().prepend(error_list);
+          this.$('[name="'+ this.getPrefixedFieldName(field_name) +'"]').parent()
+            .addClass('error')
+            .append(error_list);
         }
 
         _.each(messages, function(msg){
