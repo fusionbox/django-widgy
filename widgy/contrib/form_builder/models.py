@@ -447,11 +447,7 @@ class BaseChoiceField(FormField):
         return kwargs
 
     def get_choices(self):
-        if self.EMPTY_LABEL:
-            choices = [('', self.EMPTY_LABEL)]
-        else:
-            choices = []
-        return choices + [(i.strip(), i.strip()) for i in self.choices.splitlines()]
+        return [(i.strip(), i.strip()) for i in self.choices.splitlines()]
 
     @property
     def widget(self):
@@ -485,6 +481,12 @@ class ChoiceField(BaseChoiceField):
         ('radios', _('Radio buttons')),
     ])
 
+    def get_choices(self):
+        choices = super(ChoiceField, self).get_choices()
+        if self.type == 'select':
+            choices.insert(0, ('', self.EMPTY_LABEL))
+        return choices
+
 
 @widgy.register
 class MultipleChoiceField(BaseChoiceField):
@@ -492,8 +494,6 @@ class MultipleChoiceField(BaseChoiceField):
         'checkboxes': forms.CheckboxSelectMultiple,
         'select': forms.SelectMultiple,
     }
-
-    EMPTY_LABEL = None
 
     formfield_class = forms.MultipleChoiceField
 
