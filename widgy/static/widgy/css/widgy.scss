@@ -833,7 +833,7 @@ input.vTimeField,
   
   ul {
     list-style: disc;
-    padding: 0px 0px 0px 30px;
+    padding: 0px 0px 0px 30px !important;
     
     li {
       list-style-type: disc;
@@ -842,7 +842,7 @@ input.vTimeField,
   
   ol {
     list-style: decimal;
-    padding: 0px 0px 0px 30px;
+    padding: 0px 0px 0px 30px !important;
     
     li {
       list-style-type: decimal;
