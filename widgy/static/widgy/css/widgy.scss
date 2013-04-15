@@ -892,6 +892,7 @@ $inputFields: "input[type='text'], input[type='password'], input[type='email'], 
   @include inset-shadow($black10,0px,1px,2px);
   border: 1px solid $lightgrey;
   font-weight: normal !important;
+  height: auto;
   padding: 6px 4px 5px;
 }
 
