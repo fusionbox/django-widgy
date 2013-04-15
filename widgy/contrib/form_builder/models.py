@@ -70,8 +70,8 @@ class EmailSuccessHandler(FormSuccessHandler):
         send_mail('Subject', self.content, settings.SERVER_EMAIL, [self.to])
 
     class Meta:
-        verbose_name = _('email success handler')
-        verbose_name_plural = _('email success handlers')
+        verbose_name = _('admin success email')
+        verbose_name_plural = _('admin success emails')
 
 
 @widgy.register
@@ -124,8 +124,8 @@ class EmailUserHandler(FormSuccessHandler):
         self.save()
 
     class Meta:
-        verbose_name = _('email user handler')
-        verbose_name_plural = _('email user handlers')
+        verbose_name = _('user success email')
+        verbose_name_plural = _('user success emails')
 
 
 @widgy.register
