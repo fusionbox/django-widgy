@@ -1,6 +1,15 @@
 {% load widgy_tags %}
-<div class="accordion">
-  {% for child in self.get_children %}
-  {% render child %}
+
+<div class="{{ self.accordion_css_class }}">
+  <ul class="tabs">
+    {% for section in self.get_children %}
+    <li><a href="#{{ section|slugify }}">{{ section }}</a></li>
+    {% endfor %}
+  </ul>
+
+  {% for section in self.get_children %}
+  <div id="{{ section|slugify }}" class="tabContent{% if forloop.first %} active{% endif %}">
+    {% render section %}
+  </div>
   {% endfor %}
 </div>

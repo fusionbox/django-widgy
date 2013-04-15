@@ -1,18 +1,7 @@
 {% load widgy_tags %}
 
-{% if section_behavior == 'tabs' %}
-  <p class="title">{{ self.title }}:</p>
+<p class="title">{{ self.title }}:</p>
 
-  {% for child in self.get_children %}
-    {% render child %}
-  {% endfor %}
-{% else %}
-  <details>
-    <summary>{{ self.title }}</summary>
-    <div class="accordionContent">
-    {% for child in self.get_children %}
-      {% render child %}
-    {% endfor %}
-    </div>
-  </details>
-{% endif %}
+{% for child in self.get_children %}
+{% render child %}
+{% endfor %}
