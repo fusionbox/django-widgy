@@ -779,6 +779,7 @@ li.shelfItem {
   @include node-icon("accordion", "../image/widget-accordion.png");
   @include node-icon("button", "../image/widget-button.png");
   @include node-icon("calloutwidget", "../image/widget-callout.png");
+  @include node-icon("choicefield", "../image/widget-radio.png");
   @include node-icon("demoaccordion", "../image/widget-accordion.png");
   @include node-icon("emailsuccesshandler", "../image/widget-email.gif");
   @include node-icon("emailuserhandler", "../image/widget-email.gif");
@@ -790,6 +791,7 @@ li.shelfItem {
   @include node-icon("image", "../image/widget-image.gif");
   @include node-icon("markdown", "../image/widget-code.gif");
   @include node-icon("miniboxes", "../image/widget-miniboxes.gif");
+  @include node-icon("multiplechoicefield", "../image/widget-checkbox.png");
   @include node-icon("savedatahandler", "../image/widget-save-data.png");
   @include node-icon("section", "../image/widget-section.png");
   @include node-icon("slide", "../image/widget-slide.png");
