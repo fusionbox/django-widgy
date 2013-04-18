@@ -3,12 +3,18 @@ import subprocess
 import contextlib
 
 from django import forms
-from django.views.generic import FormView, DetailView, TemplateView
+from django.views.generic import (
+    FormView,
+    DetailView,
+    TemplateView,
+    RedirectView,
+)
 from django.views.generic.detail import SingleObjectMixin
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.contrib import messages
 
 from BeautifulSoup import BeautifulSoup
 
@@ -34,6 +40,23 @@ class CommitForm(forms.Form):
                               required=False)
     publish_at = forms.DateTimeField(required=True,
                                      initial=timezone.now)
+
+    def commit(self, obj, user):
+        obj.commit(user, **self.cleaned_data)
+
+
+class ReviewedCommitForm(CommitForm):
+    approve_it = forms.BooleanField(label=_('Approve the commit'),
+                                     required=False)
+
+    def commit(self, obj, user):
+        cleaned_data = self.cleaned_data.copy()
+        approve_it = cleaned_data.pop('approve_it')
+
+        commit = obj.commit(user, **cleaned_data)
+
+        if approve_it:
+            commit.approve(user)
 
 
 class RevertForm(CommitForm):
@@ -69,14 +92,16 @@ class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        object = self.get_object()
-        object.commit(user=self.request.user,
-                      **form.cleaned_data)
+        obj = self.get_object()
+        form.commit(obj, self.request.user)
         return self.response_class(
             request=self.request,
             template='widgy/commit_success.html',
             context=self.get_context_data(),
         )
+
+    def get_form_class(self):
+        return self.site.get_commit_form(self.request.user)
 
 
 class ResetView(AuthorizedMixin, VersionTrackerMixin, TemplateView):
@@ -106,17 +131,33 @@ class HistoryView(AuthorizedMixin, VersionTrackerMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(HistoryView, self).get_context_data(**kwargs)
+        kwargs['site'] = self.site
         kwargs['commits'] = self.object.get_history_list()
+        kwargs['history_item_template'] = self.site.get_version_tracker_model().item_partial_template
         for commit in kwargs['commits']:
-            if commit.root_node != commit.tracker.head.root_node:
-                commit.revert_url = self.site.reverse(
-                    self.site.revert_view,
-                    kwargs={'pk': commit.tracker.pk, 'commit_pk': commit.pk})
             if commit.parent_id:
                 commit.diff_url = diff_url(self.site,
                                            commit.parent.root_node,
                                            commit.root_node)
         return kwargs
+
+
+class ApproveView(AuthorizedMixin, VersionTrackerMixin, RedirectView):
+    http_method_names = ['post']
+
+    def get_redirect_url(self, pk, commit_pk):
+        vt = get_object_or_404(self.get_queryset(), pk=pk)
+        commit = get_object_or_404(vt.commits.select_related('root_node'),
+                                   pk=commit_pk)
+        commit.tracker = vt
+
+        commit.approve(self.request.user)
+        commit.save()
+        messages.success(self.request, _('Commit has been approved'))
+
+        return self.site.reverse(self.site.history_view, kwargs={
+            'pk': vt.pk
+        })
 
 
 class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
