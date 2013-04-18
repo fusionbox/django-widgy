@@ -8,6 +8,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 
 from BeautifulSoup import BeautifulSoup
 
@@ -31,6 +32,8 @@ class CommitForm(forms.Form):
     message = forms.CharField(widget=forms.Textarea,
                               label=_('Notes (optional)'),
                               required=False)
+    publish_at = forms.DateTimeField(required=True,
+                                     initial=timezone.now)
 
 
 class RevertForm(CommitForm):

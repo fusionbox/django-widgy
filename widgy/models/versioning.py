@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models.query import QuerySet
+from django.utils import timezone
 
 from fusionbox.db.models import QuerySetManager
 
@@ -73,7 +74,10 @@ class VersionTracker(models.Model):
         old_working_copy.delete()
 
     def get_published_node(self, request):
-        return self.head and self.head.root_node
+        for commit in self.get_history():
+            if commit.is_published:
+                return commit.root_node
+        return None
 
     def get_history(self):
         """
@@ -117,6 +121,11 @@ class VersionCommit(models.Model):
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now=True)
     message = models.TextField(blank=True, null=True)
+    publish_at = models.DateTimeField(default=timezone.now)
+
+    @property
+    def is_published(self):
+        return self.publish_at <= timezone.now()
 
     class Meta:
         app_label = 'widgy'
