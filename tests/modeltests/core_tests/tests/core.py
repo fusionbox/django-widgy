@@ -23,7 +23,7 @@ from modeltests.core_tests.models import (
     Layout, Bucket, RawTextWidget, CantGoAnywhereWidget, PickyBucket,
     ImmovableBucket, AnotherLayout, VowelBucket, VersionedPage, VersionedPage2,
     VersionedPage3, VersionedPage4, VersionPageThrough, Related,
-    ForeignKeyWidget, WeirdPkBucket
+    ForeignKeyWidget, WeirdPkBucket, ReviewedVersionedPage
 )
 
 
@@ -804,6 +804,21 @@ class TestVersioning(RootNodeTestCase):
         tracker.commit()
         tracker.revert_to(commit)
         tracker.delete()
+
+    def test_foreign_key_to_proxy_works(self):
+        """
+        If ReviewedVersionTracker is implemented as a proxy, ensure a
+        foreign key returns a ReviewedVersionTracker instance (instead
+        of the base model).
+        """
+        tracker, commit1 = self.make_commit(vt_class=ReviewedVersionTracker)
+        page = ReviewedVersionedPage.objects.create(
+            version_tracker=tracker,
+        )
+
+        page = ReviewedVersionedPage.objects.get(pk=page.pk)
+        self.assertIsInstance(page.version_tracker, ReviewedVersionTracker)
+        self.assertEqual(page.version_tracker, tracker)
 
 
 class TestPrefetchTree(RootNodeTestCase):
