@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.db.models.deletion import ProtectedError
+from django.utils.translation import ugettext_lazy as _
 
 from fusionbox.db.models import QuerySetManager
 
@@ -15,6 +16,8 @@ User = get_user_model()
 class VersionTracker(models.Model):
     head = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT, unique=True)
     working_copy = models.ForeignKey(Node, on_delete=models.PROTECT, unique=True)
+
+    item_partial_template = 'widgy/_history_item_versioned.html'
 
     class Meta:
         app_label = 'widgy'
@@ -138,6 +141,20 @@ class VersionTracker(models.Model):
             root_node.content.delete()
 
 
+class ReviewedVersionTracker(VersionTracker):
+
+    item_partial_template = 'widgy/_history_item_reviewed.html'
+
+    class Meta:
+        proxy = True
+
+    def get_published_node(self, request):
+        for commit in self.get_history():
+            if commit.is_published and commit.is_approved:
+                return commit.root_node
+        return None
+
+
 class VersionCommit(models.Model):
     tracker = models.ForeignKey(VersionTracker, related_name='commits')
     parent = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT)
@@ -146,10 +163,22 @@ class VersionCommit(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     message = models.TextField(blank=True, null=True)
     publish_at = models.DateTimeField(default=timezone.now)
+    approved_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL,
+                                    related_name='+')
+    approved_at = models.DateTimeField(default=None, null=True)
 
     @property
     def is_published(self):
         return self.publish_at <= timezone.now()
+
+    @property
+    def is_approved(self):
+        return bool(self.approved_by and self.approved_at)
+
+    def approve(self, user):
+        self.approved_at = timezone.now()
+        self.approved_by = user
+        self.save()
 
     class Meta:
         app_label = 'widgy'

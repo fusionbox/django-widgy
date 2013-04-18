@@ -9,8 +9,10 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils import unittest, timezone
 from django.db.models.deletion import ProtectedError
+from django.contrib.auth.models import Permission
 
-from widgy.models import Node, UnknownWidget, VersionTracker, Content
+from widgy.models import (Node, UnknownWidget, VersionTracker,
+                          ReviewedVersionTracker, Content)
 from widgy.exceptions import (
     ParentWasRejected, ChildWasRejected, MutualRejection, InvalidTreeMovement,
     InvalidOperation)
@@ -246,9 +248,9 @@ class TestTreesEqual(RootNodeTestCase):
 
 class TestVersioning(RootNodeTestCase):
 
-    def make_commit(self, delta=datetime.timedelta(0)):
+    def make_commit(self, delta=datetime.timedelta(0), vt_class=VersionTracker):
         root_node = RawTextWidget.add_root(widgy_site, text='first').node
-        tracker = VersionTracker.objects.create(working_copy=root_node)
+        tracker = vt_class.objects.create(working_copy=root_node)
         commit = tracker.commit(publish_at=timezone.now() + delta)
 
         return (tracker, commit)
@@ -734,6 +736,29 @@ class TestVersioning(RootNodeTestCase):
         time.sleep(.1)
         commit.save()
         self.assertEqual(created_at, commit.created_at)
+
+    def test_review_queue(self):
+        tracker, commit1 = self.make_commit(vt_class=ReviewedVersionTracker)
+
+        p = Permission.objects.get(codename='change_versioncommit')
+        user = User.objects.create()
+        user.user_permissions.add(p)
+        user.save()
+
+        request_factory = RequestFactory()
+
+        self.assertFalse(tracker.get_published_node(request_factory.get('/')))
+        commit1.approve(user)
+        self.assertEqual(tracker.get_published_node(request_factory.get('/')),
+                         commit1.root_node)
+
+        commit2 = tracker.commit(publish_at=timezone.now())
+        self.assertEqual(tracker.get_published_node(request_factory.get('/')),
+                         commit1.root_node)
+
+        commit2.approve(user)
+        self.assertEqual(tracker.get_published_node(request_factory.get('/')),
+                         commit2.root_node)
 
     def test_cloning_multi_table_inheritance(self):
         root = PickyBucket.add_root(widgy_site)

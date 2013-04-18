@@ -14,6 +14,7 @@ from widgy.views import (
     NodeParentsView,
     CommitView,
     HistoryView,
+    ApproveView,
     RevertView,
     DiffView,
     ResetView,
@@ -174,3 +175,30 @@ class WidgySite(object):
                 'widgy/{app_label}/{module_name}.admin{extension}',
                 'widgy/{app_label}/admin{extension}',
             ])
+
+    def get_commit_form(self, user):
+        from widgy.views.versioning import CommitForm
+        return CommitForm
+
+
+class ReviewedWidgySite(WidgySite):
+
+    def get_version_tracker_model(self):
+        from widgy.models import ReviewedVersionTracker
+        return ReviewedVersionTracker
+
+    def get_urls(self):
+        return super(ReviewedWidgySite, self).get_urls() + patterns('',
+            url('^approve/(?P<pk>[^/]+)/(?P<commit_pk>[^/]+)/$', self.approve_view),
+        )
+
+    def get_commit_form(self, user):
+        from widgy.views.versioning import CommitForm, ReviewedCommitForm
+        if user.has_perm('widgy.change_versioncommit'):
+            return ReviewedCommitForm
+        else:
+            return CommitForm
+
+    @cached_property
+    def approve_view(self):
+        return ApproveView.as_view(site=self)
