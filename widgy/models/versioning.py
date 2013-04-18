@@ -146,6 +146,7 @@ class ReviewedVersionTracker(VersionTracker):
     item_partial_template = 'widgy/_history_item_reviewed.html'
 
     class Meta:
+        app_label = 'widgy'
         proxy = True
 
     def get_published_node(self, request):
