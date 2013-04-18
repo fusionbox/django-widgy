@@ -174,7 +174,7 @@ class VersionedWidgyField(WidgyField):
 
             return version_tracker.pk
 
-        return super(WidgyField, self).pre_save(model_instance, add)
+        return super(VersionedWidgyField, self).pre_save(model_instance, add)
 
     def formfield(self, **kwargs):
         from widgy.forms import VersionedWidgyFormField
