@@ -722,6 +722,13 @@ class TestVersioning(RootNodeTestCase):
         self.assertEqual(tracker.get_published_node(request_factory.get('/')),
                           commit2.root_node)
 
+    def test_created_at(self):
+        tracker, commit = self.make_commit()
+        created_at = commit.created_at
+        time.sleep(.1)
+        commit.save()
+        self.assertEqual(created_at, commit.created_at)
+
 
 class TestPrefetchTree(RootNodeTestCase):
     def setUp(self):

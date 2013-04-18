@@ -119,7 +119,7 @@ class VersionCommit(models.Model):
     parent = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT)
     root_node = WidgyField(on_delete=models.PROTECT)
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-    created_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     message = models.TextField(blank=True, null=True)
     publish_at = models.DateTimeField(default=timezone.now)
 
