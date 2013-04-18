@@ -123,6 +123,9 @@ def setup(verbosity, test_labels):
     from mezzanine.utils.conf import set_dynamic_settings
     set_dynamic_settings(vars(settings._wrapped))
 
+    # mezzanine sets this to a tuple, but we need ot to be a list
+    settings.INSTALLED_APPS = list(settings.INSTALLED_APPS)
+
     # Load all the ALWAYS_INSTALLED_APPS.
     # (This import statement is intentionally delayed until after we
     # access settings because of the USE_I18N dependency.)
