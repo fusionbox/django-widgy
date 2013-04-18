@@ -12,12 +12,7 @@
       {% endfor %}
       
       <p class="submitRow">
-        <input type="submit" value="{% trans 'Commit' %}">
-      {# TODO: this is dependent on widgy_mezzanine #}
-        <a class="button" target="_blank" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=object.working_copy.pk %}">{% trans "Preview" %}</a>
-      {% if diff_url %}
-        <a class="button" target="_blank" href="{{ diff_url }}">{% trans "Diff" %}</a>
-      {% endif %}
+        {% include submitrow_template with commit=object.working_copy %}
       </p>
     </form>
     <script>

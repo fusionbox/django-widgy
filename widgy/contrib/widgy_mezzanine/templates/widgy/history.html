@@ -22,30 +22,7 @@
       <p class="top">
         <strong>{{ commit.created_at|date:"SHORT_DATETIME_FORMAT" }}</strong>
         {% if commit.author %}{% blocktrans with author=commit.author %} by <strong>{{ author }}</strong>{% endblocktrans %}{% endif %}
-        {% if commit.publish_at > commit.created_at  %}
-          (
-          {% if not commit.is_published %}
-            <span title="Not live yet">
-              {% trans "Scheduled to be published at" %}
-          {% else %}
-            {% trans "Published at" %}
-          {% endif %}
-          {{ commit.publish_at|date:"SHORT_DATETIME_FORMAT" }})
-          {% if not commit.is_published %}
-            *</span>
-          {% endif %}
-        {% endif %}
-        <span class="actions">
-        {% if commit.revert_url %}
-          <a class="button widgy-fancybox" href="{{ commit.revert_url }}">{% trans "Revert to this Version" %}</a>
-        {% else %}
-          {% trans "Can't revert; this is the same as the current version." %}
-        {% endif %}  
-        {% if commit.diff_url %}
-          <a class="button" href="{{ commit.diff_url }}">{% trans "Diff" %}</a>
-        {% endif %}  
-          <a class="button" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=commit.root_node.pk %}">{% trans "View" %}</a>  
-        </span>
+        {% include history_item_template %}
       </p>
       {% if commit.message %}
         <blockquote>{{ commit.message|linebreaks }}</blockquote>
