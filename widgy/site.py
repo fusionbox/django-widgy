@@ -26,19 +26,6 @@ from widgy.exceptions import (
 
 
 class WidgySite(object):
-    def __init__(self):
-        self.node_view = self.get_node_view()
-        self.content_view = self.get_content_view()
-        self.shelf_view = self.get_shelf_view()
-        self.node_edit_view = self.get_node_edit_view()
-        self.node_templates_view = self.get_node_templates_view()
-        self.node_parents_view = self.get_node_parents_view()
-        self.commit_view = self.get_commit_view()
-        self.history_view = self.get_history_view()
-        self.revert_view = self.get_revert_view()
-        self.diff_view = self.get_diff_view()
-        self.reset_view = self.get_reset_view()
-
     def get_registry(self):
         return registry
 
@@ -85,37 +72,50 @@ class WidgySite(object):
         if not request.user.is_authenticated():
             raise PermissionDenied
 
-    def get_node_view(self):
+    # These must return the same instance throughout the whole lifetime
+    # of the widgy site for reverse to work.
+    @cached_property
+    def node_view(self):
         return NodeView.as_view(site=self)
 
-    def get_content_view(self):
+    @cached_property
+    def content_view(self):
         return ContentView.as_view(site=self)
 
-    def get_shelf_view(self):
+    @cached_property
+    def shelf_view(self):
         return ShelfView.as_view(site=self)
 
-    def get_node_edit_view(self):
+    @cached_property
+    def node_edit_view(self):
         return NodeEditView.as_view(site=self)
 
-    def get_node_templates_view(self):
+    @cached_property
+    def node_templates_view(self):
         return NodeTemplatesView.as_view(site=self)
 
-    def get_node_parents_view(self):
+    @cached_property
+    def node_parents_view(self):
         return NodeParentsView.as_view(site=self)
 
-    def get_commit_view(self):
+    @cached_property
+    def commit_view(self):
         return CommitView.as_view(site=self)
 
-    def get_history_view(self):
+    @cached_property
+    def history_view(self):
         return HistoryView.as_view(site=self)
 
-    def get_revert_view(self):
+    @cached_property
+    def revert_view(self):
         return RevertView.as_view(site=self)
 
-    def get_diff_view(self):
+    @cached_property
+    def diff_view(self):
         return DiffView.as_view(site=self)
 
-    def get_reset_view(self):
+    @cached_property
+    def reset_view(self):
         return ResetView.as_view(site=self)
 
     def valid_parent_of(self, parent, child_class, child=None):
