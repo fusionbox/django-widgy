@@ -34,9 +34,9 @@
           (
           {% if not commit.is_published %}
             <span title="Not live yet">
-              Scheduled to be published at
+              {% trans "Scheduled to be published at" %}
           {% else %}
-              Published at
+            {% trans "Published at" %}
           {% endif %}
           {{ commit.publish_at|date:"SHORT_DATETIME_FORMAT" }})
           {% if not commit.is_published %}
