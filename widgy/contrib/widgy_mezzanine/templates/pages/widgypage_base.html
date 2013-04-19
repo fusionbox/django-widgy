@@ -1,20 +1,25 @@
 {% extends "base.html" %}
 {% load widgy_tags %}
 {% load pages_tags %}
+{% load compress %}
 
 {% block title %}{{ page.meta_title }} {{ block.super }}{% endblock %}
 {% block css %}
 {{ block.super }}
+{% compress css %}
 {% for scss_file in 'WIDGY_MEZZANINE_SITE'|scss_files %}
 <link rel="stylesheet" href="{% static scss_file %}" type="text/x-scss">
 {% endfor %}
+{% endcompress %}
 {% endblock %}
 
 {% block js %}
 {{ block.super }}
+{% compress js %}
 {% for js_file in 'WIDGY_MEZZANINE_SITE'|js_files %}
 <script src="{% static js_file %}"></script>
 {% endfor %}
+{% endcompress %}
 {% endblock %}
 
 {% block seo_description %}{{ page.description }}{% endblock %}

@@ -1,0 +1,10 @@
+.tabify {
+  .tabContent {
+    display: none;
+    padding: 10px 10px;
+    
+    &.active {
+      display: block;
+    }
+  }
+}
