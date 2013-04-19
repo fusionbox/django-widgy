@@ -68,7 +68,8 @@ class EmailSuccessHandler(FormSuccessHandler):
     component_name = 'markdown'
 
     def execute(self, request, form):
-        send_mail(self.subject, self.content, settings.SERVER_EMAIL, [self.to])
+        from widgy.templatetags.widgy_tags import mdown
+        send_mail(self.subject, mdown(self.content), settings.SERVER_EMAIL, [self.to])
 
     class Meta:
         verbose_name = _('admin success email')
@@ -110,9 +111,10 @@ class EmailUserHandler(FormSuccessHandler):
     content = MarkdownField(blank=True, verbose_name=_('content'))
 
     def execute(self, request, form):
+        from widgy.templatetags.widgy_tags import mdown
         to = self.to.content
         to_email = form.cleaned_data[to.get_formfield_name()]
-        send_mail(self.subject, self.content, settings.SERVER_EMAIL, [to_email])
+        send_mail(self.subject, mdown(self.content), settings.SERVER_EMAIL, [to_email])
 
     def get_email_fields(self):
         return [i for i in self.parent_form.depth_first_order()
