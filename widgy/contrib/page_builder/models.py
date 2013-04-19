@@ -172,8 +172,6 @@ class Accordion(Bucket):
     draggable = True
     deletable = True
 
-    accordion_css_class = 'accordion'
-
     def valid_parent_of(self, cls, obj=None):
         return issubclass(cls, Section)
 
@@ -184,8 +182,6 @@ class Accordion(Bucket):
 
 @widgy.register
 class Tabs(Accordion):
-    accordion_css_class = 'tabify'
-
     class Meta:
         proxy = True
         verbose_name = _('tabs')

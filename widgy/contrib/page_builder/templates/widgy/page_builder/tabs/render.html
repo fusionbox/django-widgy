@@ -1,0 +1,16 @@
+{% load widgy_tags %}
+
+<ul class="tabs">
+  {% for tab in self.get_children %}
+  <li><a href="#{{ tab|slugify }}">{{ tab }}</a></li>
+  {% endfor %}
+</ul>
+
+
+{% with section_behavior='tabs' %}
+{% for tab in self.get_children %}
+<div id="{{ tab|slugify }}" class="tabContent{% if forloop.first %} active{% endif %}">
+  {% render tab %}
+</div>
+{% endfor %}
+{% endwith %}
