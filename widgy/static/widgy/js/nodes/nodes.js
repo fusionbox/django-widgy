@@ -177,7 +177,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
       var error = function() {
         spinner.restore();
-        modal.raiseError.apply(this, arguments);
+        modal.ajaxError.apply(this, arguments);
       };
 
       this.node.collection.trigger('destroy_child');
@@ -356,7 +356,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       this.collection.trigger('receive_child');
       dragged_view.model.save(attributes, {
         success: this.collection.reposition,
-        error: modal.raiseError,
+        error: modal.ajaxError,
         app: this.app
       });
     },

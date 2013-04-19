@@ -39,7 +39,7 @@ define([
 
           return model;
         })
-        .fail(modal.raiseError);
+        .fail(modal.ajaxError);
     }
   };
 

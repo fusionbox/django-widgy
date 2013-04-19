@@ -4,6 +4,7 @@ define([
     'lib/q',
     'nodes/nodes',
     'form',
+    'modal/modal',
     'templates'
     ], function(
       _,
@@ -11,6 +12,7 @@ define([
       Q,
       nodes,
       form,
+      modal,
       templates
       ) {
 
@@ -175,6 +177,10 @@ define([
 
           // TODO: use HTML autofocus property??
           edit_view.$(':input:first').focus();
+        })
+        .fail(function(err) {
+          modal.raiseError(err);
+          edit_view.close();
         })
         .done();
     }

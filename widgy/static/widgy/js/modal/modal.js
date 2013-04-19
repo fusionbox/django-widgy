@@ -22,6 +22,14 @@ define([ 'widgy.backbone',
       return {
         message: this.message
       };
+    },
+
+    open: function() {
+      $(document.body).append(this.render().$el.css({
+        left: $(window).width()/2,
+        top: $(window).height()/2,
+        position: 'fixed'
+      }));
     }
   });
 
@@ -30,7 +38,15 @@ define([ 'widgy.backbone',
     className: 'errorMessage'
   });
 
-  var raiseError = function(model, resp, options) {
+  function raiseError(message) {
+    var error_view = new ErrorView({
+      message: message
+    });
+
+    error_view.open();
+  }
+
+  function ajaxError(model, resp, options) {
     var data = JSON.parse(resp.responseText);
     var message;
     if ( data.message )
@@ -40,17 +56,13 @@ define([ 'widgy.backbone',
     else
       message = 'Unkown error';
 
-    var error_view = new ErrorView({
-      message: message
-    });
-    $(document.body).append(error_view.render().$el.css({
-      left: $(window).width()/2,
-      top: $(window).height()/2,
-      position: 'fixed'
-    }));
-  };
+    raiseError({message: message});
+  }
 
   return {
-    raiseError: raiseError
+    ModalView: ModalView,
+    ErrorView: ErrorView,
+    raiseError: raiseError,
+    ajaxError: ajaxError
   };
 });
