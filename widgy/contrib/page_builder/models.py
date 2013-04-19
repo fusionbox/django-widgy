@@ -9,7 +9,9 @@ from filer.fields.file import FilerFileField
 from filer.models.filemodels import File
 
 from widgy.models import Content
-from widgy.models.mixins import StrictDefaultChildrenMixin, InvisibleMixin
+from widgy.models.mixins import (
+    StrictDefaultChildrenMixin, InvisibleMixin, TitleDisplayNameMixin,
+)
 from widgy.models.links import LinkField, LinkFormField, LinkFormMixin
 from widgy.db.fields import WidgyField
 from widgy.contrib.page_builder.db.fields import MarkdownField, VideoField
@@ -199,7 +201,7 @@ class Tabs(Accordion):
 
 
 @widgy.register
-class Section(Content):
+class Section(TitleDisplayNameMixin, Content):
     title = models.CharField(max_length=1023, verbose_name=_('title'))
 
     editable = True

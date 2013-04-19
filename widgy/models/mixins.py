@@ -1,3 +1,8 @@
+from __future__ import unicode_literals
+
+from operator import attrgetter
+
+
 class DefaultChildrenMixin(object):
     """
     With this mixin, you can specify which children your Content will have.  It
@@ -59,3 +64,31 @@ class TabbedContainer(object):
         defaults.update(**kwargs)
 
         return defaults
+
+
+def DisplayNameMixin(fn):
+    """
+    Helper for making nicer display names.  Example usage:
+
+        class Thing(DisplayNameMixin(lambda x: x.title), Content):
+            ...
+
+        thing = Thing()
+        thing.display_name  # Thing
+        thing.title = 'Title'
+        thing.display_name  # Thing - title
+    """
+    class cls(object):
+        @property
+        def display_name(self):
+            name = super(cls, self).display_name
+            extra = fn(self)
+            if extra:
+                name = '%s - %s' % (name, extra)
+
+            return name
+
+    return cls
+
+
+TitleDisplayNameMixin = DisplayNameMixin(attrgetter('title'))
