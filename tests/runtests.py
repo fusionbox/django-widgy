@@ -57,6 +57,7 @@ ALWAYS_INSTALLED_APPS = [
     "compressor",
     "fusionbox.core",
     "filer",
+    "south",
 ]
 
 def get_test_modules():
@@ -164,8 +165,13 @@ def teardown(state):
 
 def django_tests(verbosity, interactive, failfast, test_labels):
     from django.conf import settings
+
     state = setup(verbosity, test_labels)
     extra_tests = []
+
+    # must be imported after settings are set up
+    from south.management.commands import patch_for_test_db_setup
+    patch_for_test_db_setup()
 
     # Run the test suite, including the extra validation tests.
     from django.test.utils import get_runner
