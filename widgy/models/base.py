@@ -182,10 +182,13 @@ class Node(MP_Node):
         """
         Given a list of nodes, attach each one's Content. Efficiently.
         """
-        contents = cls.fetch_content_instances(nodes)
-        for node in nodes:
+        needed_nodes = [i for i in nodes if '_content_cache' not in i.__dict__]
+        contents = cls.fetch_content_instances(needed_nodes)
+        for node in needed_nodes:
             node.content = contents[node.content_type_id][node.content_id]
+        for node in nodes:
             node.content.node = node
+        return nodes
 
     @classmethod
     def prefetch_trees(cls, *root_nodes):
@@ -490,10 +493,25 @@ class Content(models.Model):
         return self.node.get_root().content
 
     def get_ancestors(self):
-        return [ancestor.content for ancestor in self.node.get_ancestors()]
+        ancestors = Node.attach_content_instances(self.node.get_ancestors())
+        return [node.content for node in ancestors]
 
     def depth_first_order(self):
-        return [node.content for node in self.node.depth_first_order()]
+        nodes = Node.attach_content_instances(self.node.depth_first_order())
+        return [node.content for node in nodes]
+
+    def get_children(self):
+        node_children = Node.attach_content_instances(self.node.get_children())
+        return [node.content for node in node_children]
+
+    def get_next_sibling(self):
+        sib = self.node.get_next_sibling()
+        return sib and sib.content
+
+    def get_parent(self):
+        parent = self.node.get_parent()
+        return parent and parent.content
+
 
     def meta(self):
         return self._meta
@@ -578,17 +596,6 @@ class Content(models.Model):
 
         obj.post_create(site)
         return obj
-
-    def get_children(self):
-        return [i.content for i in self.node.get_children()]
-
-    def get_next_sibling(self):
-        sib = self.node.get_next_sibling()
-        return sib and sib.content
-
-    def get_parent(self):
-        parent = self.node.get_parent()
-        return parent and parent.content
 
     def post_create(self, site):
         """

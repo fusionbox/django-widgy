@@ -454,6 +454,8 @@ class TestVersioning(RootNodeTestCase):
             node.is_frozen = True
             node.save()
 
+        left, right = Node.objects.get(pk=self.root_node.pk).get_children()
+
         before_ids = [i.id for i in self.root_node.depth_first_order()]
 
         with self.assertRaises(InvalidOperation):
@@ -862,6 +864,22 @@ class TestPrefetchTree(RootNodeTestCase):
                              a.depth_first_order())
             self.assertEqual(a.depth_first_order(),
                              b.depth_first_order())
+
+    def test_attach_content_instances(self):
+        nodes = self.root_node.depth_first_order()
+        nodes = Node.attach_content_instances(nodes)
+
+        with self.assertNumQueries(0):
+            for node in nodes:
+                self.assertEqual(node.content.node, node)
+
+    def test_content_node_is_set(self):
+        # access .content
+        self.root_node.content
+        Node.attach_content_instances([self.root_node])
+        with self.assertNumQueries(0):
+            # node.content.node must get set even if node.content has already been accessed
+            self.assertEqual(self.root_node.content.node, self.root_node)
 
 
 class TestSite(TestCase):
