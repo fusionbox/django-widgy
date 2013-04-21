@@ -1,53 +1,79 @@
 import uuid
 
 from django.test import TestCase
-from django.test.client import RequestFactory
 from django.template import Template, Context
 
 from widgy.models import VersionTracker
 
 from modeltests.core_tests.widgy_config import widgy_site
-from modeltests.core_tests.models import RawTextWidget
+from modeltests.core_tests.models import RawTextWidget, HasAWidgy, VersionedPage
 
 from widgy.templatetags.widgy_tags import mdown
 
+
 TEMPLATE = """
 {% load widgy_tags %}
-{% render node %}
+{% render_root owner field_name %}
 """
+
 
 class TestTemplate(TestCase):
     string_to_look_for = uuid.uuid4().hex
 
     def render(self, context):
-        defaults = {
-            'request': RequestFactory().get('/'),
-        }
-        defaults.update(context)
         t = Template(TEMPLATE)
-        c = Context(defaults)
+        c = Context(context)
         return t.render(c)
 
-    def test_render_node(self):
+    def plain_model(self):
         node = RawTextWidget.add_root(widgy_site,
                                       text=self.string_to_look_for).node
-        self.assertIn(self.string_to_look_for,
-                      self.render({'node': node}))
+        return HasAWidgy.objects.create(
+            widgy=node,
+        )
 
-    def test_render_content(self):
-        content = RawTextWidget.add_root(widgy_site,
-                                      text=self.string_to_look_for)
+    def test_render_node(self):
+        owner = self.plain_model()
         self.assertIn(self.string_to_look_for,
-                      self.render({'node': content}))
+                      self.render({'owner': owner, 'field_name': 'widgy'}))
 
-    def test_render_versiontracker(self):
+    def test_root_node_override(self):
+        owner = self.plain_model()
+
+        override_string = uuid.uuid4().hex
+        override = RawTextWidget.add_root(widgy_site, text=override_string).node
+
+        rendered = self.render({'owner': owner, 'field_name': 'widgy', 'root_node_override': override})
+
+        self.assertNotIn(self.string_to_look_for, rendered)
+        self.assertIn(override_string, rendered)
+
+    def versioned_model(self):
         node = RawTextWidget.add_root(widgy_site,
                                       text=self.string_to_look_for).node
         vt = VersionTracker.objects.create(working_copy=node)
         vt.commit()
 
+        return VersionedPage.objects.create(
+            version_tracker=vt
+        )
+
+    def test_render_versiontracker(self):
+        owner = self.versioned_model()
         self.assertIn(self.string_to_look_for,
-                      self.render({'node': vt}))
+                      self.render({'owner': owner, 'field_name': 'version_tracker'}))
+
+    def test_versioned_override(self):
+        owner = self.versioned_model()
+
+        override_string = uuid.uuid4().hex
+        override = RawTextWidget.add_root(widgy_site, text=override_string).node
+
+        rendered = self.render({'owner': owner, 'field_name': 'version_tracker', 'root_node_override': override})
+
+        self.assertNotIn(self.string_to_look_for, rendered)
+        self.assertIn(override_string, rendered)
+
 
 class TestMarkdownXss(TestCase):
     def test_it(self):

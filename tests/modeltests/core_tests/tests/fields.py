@@ -1,14 +1,19 @@
+import copy
+
 from django.test import TestCase
 from django import forms
 from django.contrib.contenttypes.models import ContentType
+from django.template import Context
+
+import mock
 
 from widgy.forms import WidgyFormMixin, WidgyFormField
 from widgy.models import Node, VersionTracker
 
 from modeltests.core_tests.widgy_config import widgy_site
-from modeltests.core_tests.models import (HasAWidgy, Layout,
-                                          HasAWidgyOnlyAnotherLayout,
-                                          AnotherLayout, VersionedPage)
+from modeltests.core_tests.models import (
+    HasAWidgy, Layout, HasAWidgyOnlyAnotherLayout, AnotherLayout,
+    VersionedPage, RawTextWidget)
 
 
 class TestWidgyField(TestCase):
@@ -219,3 +224,56 @@ class TestVersionedModelForm(TestCase):
         x = VersionedWidgiedForm(instance=instance)
         url = widgy_site.reverse(widgy_site.commit_view, kwargs={'pk': instance.pk})
         self.assertIn(url, x.as_p())
+
+
+def copy_call_args(mock):
+    """
+    `copy.copy`s a mock's call_args to handle mutable arguments.
+
+    Like template Context
+    """
+    new_mock = mock.Mock()
+    def side_effect(*args, **kwargs):
+        new_args = tuple(copy.copy(i) for i in args)
+        new_kwargs = dict((k, copy.copy(v)) for k, v in kwargs.iteritems())
+        new_mock(*new_args, **new_kwargs)
+        return mock.DEFAULT
+    mock.side_effect = side_effect
+    return new_mock
+
+
+class TestRender(TestCase):
+    def setUp(self):
+        self.widgied = HasAWidgy()
+        self.widgied.widgy = Layout.add_root(widgy_site).node
+        self.widgied.save()
+        self.widgied.widgy.get_children()[1].content.add_child(widgy_site, RawTextWidget, text='asdf')
+
+        self.widgy_field = HasAWidgy._meta.get_field_by_name('widgy')[0]
+
+    def test_simple(self):
+        rendered = self.widgy_field.render(self.widgied)
+        self.assertIn('asdf', rendered)
+
+    def test_widgy_env(self):
+        with mock.patch.object(Layout, 'render') as patched_render:
+            patched_render = copy_call_args(patched_render)
+            self.widgy_field.render(self.widgied)
+
+        args, kwargs = patched_render.call_args
+        context = args[0]
+        widgy = context['widgy']
+        self.assertEqual(widgy['site'], widgy_site)
+        self.assertEqual(widgy['owner'], self.widgied)
+
+    def test_parent(self):
+        parent_widgy = object()
+        context = Context({'widgy': parent_widgy})
+        with mock.patch.object(Layout, 'render') as patched_render:
+            patched_render = copy_call_args(patched_render)
+            self.widgy_field.render(self.widgied, context)
+
+        args, kwargs = patched_render.call_args
+        context = args[0]
+        widgy = context['widgy']
+        self.assertIs(widgy['parent'], parent_widgy)

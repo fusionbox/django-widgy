@@ -6,7 +6,7 @@ test-py:
 	cd tests && $(COVERAGE_COMMAND) ./runtests.py --settings=test_multidb --verbosity=2 $(TESTS)
 
 coverage:
-	+make test COVERAGE_COMMAND='coverage run --source=widgy'
+	+make test-py COVERAGE_COMMAND='coverage run --source=widgy'
 	cd tests && coverage html --omit='../widgy/migrations/*,../widgy/contrib/*/migrations/*'
 
 browser: coverage

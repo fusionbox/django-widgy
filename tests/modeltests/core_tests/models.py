@@ -21,9 +21,14 @@ class Layout(Content):
         self.add_child(site, Bucket)
         self.add_child(site, Bucket)
 
+    def render(self, context, template=None):
+        return ''.join(i.render(context) for i in self.get_children())
 
 class Bucket(Content):
     accepting_children = True
+
+    def render(self, context, template=None):
+        return ''.join(i.render(context) for i in self.get_children())
 
 
 class RawTextWidget(Content):

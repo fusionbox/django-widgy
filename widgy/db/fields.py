@@ -7,7 +7,7 @@ from django.db.models.loading import get_app
 from django.utils.functional import SimpleLazyObject
 from django.contrib.contenttypes.models import ContentType
 
-from widgy.utils import fancy_import
+from widgy.utils import fancy_import, update_context
 
 from south.modelsinspector import add_introspection_rules
 
@@ -121,6 +121,22 @@ class WidgyField(models.ForeignKey):
         # we need to return a queryset, not a list.
         return ContentType.objects.filter(qs)
 
+    def render(self, model_instance, context=None, node=None):
+        root_node = node or getattr(model_instance, self.name)
+        if not root_node:
+            return 'no content'
+
+        root_node.prefetch_tree()
+        env = {
+            'widgy': {
+                'site': self.site,
+                'owner': model_instance,
+                'parent': context and context.get('widgy'),
+            },
+        }
+        with update_context(context, env) as context:
+            return root_node.render(context)
+
 
 class VersionedWidgyField(WidgyField):
     def __init__(self, site=None, to=None, root_choices=None, **kwargs):
@@ -155,3 +171,8 @@ class VersionedWidgyField(WidgyField):
         return super(VersionedWidgyField, self).formfield(
             form_class=VersionedWidgyFormField,
             **kwargs)
+
+    def render(self, model_instance, context=None, node=None):
+        version_tracker = getattr(model_instance, self.name)
+        node = node or version_tracker.get_published_node(context and context.get('request'))
+        return super(VersionedWidgyField, self).render(model_instance, context=context, node=node)
