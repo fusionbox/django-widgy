@@ -1,13 +1,15 @@
 from __future__ import unicode_literals
 
+import urllib
+
 from django.db import models
 from django import forms
 from django.utils.datastructures import SortedDict
-from django.core.urlresolvers import reverse
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _, ugettext
+from django.shortcuts import redirect
 
 from fusionbox import behaviors
 from fusionbox.db.models import QuerySetManager
@@ -207,13 +209,6 @@ class Form(DefaultChildrenMixin, Content):
     def __unicode__(self):
         return self.name
 
-    @property
-    def action_url(self):
-        return reverse('widgy.contrib.widgy_mezzanine.views.handle_form',
-                       kwargs={
-                           'node_pk': self.node.pk,
-                       })
-
     def valid_parent_of(self, cls, obj=None):
         return True
 
@@ -242,6 +237,9 @@ class Form(DefaultChildrenMixin, Content):
     def context_var(self):
         return 'form_instance_{node_pk}'.format(node_pk=self.node.pk)
 
+    def action_url(self, owner):
+        return owner.form_action_url(self)
+
     def render(self, context):
         if self.context_var in context:
             # when the form fails validation, the submission view passes
@@ -250,12 +248,28 @@ class Form(DefaultChildrenMixin, Content):
         else:
             form = self.build_form_class()()
 
-        with update_context(context, {'form': form}):
+        request = context.get('request')
+        action_url = '%s?%s' % (
+            context['widgy']['owner'].form_action_url(self),
+            urllib.urlencode({
+                'from': request and (request.GET.get('from') or request.path),
+            })
+        )
+        ctx = {
+            'form': form,
+            'action_url': action_url,
+            'success': request and request.GET.get('success') == str(self.node.pk),
+        }
+
+        with update_context(context, ctx):
             return super(Form, self).render(context)
 
     def execute(self, request, form):
+        # does this redirect belong here or in the view?
+        resp = redirect('%s?%s' % (request.GET['from'], urllib.urlencode({
+            'success': self.node.pk,
+        })))
         # TODO: only call the handlers for the submit button that was pressed.
-        resp = None
         for child in self.depth_first_order():
             if isinstance(child, FormReponseHandler):
                 resp = child.execute(request, form)
@@ -429,7 +443,6 @@ class FormInput(FormField):
 @widgy.register
 class Textarea(FormField):
     formfield_class = forms.CharField
-
 
     @property
     def widget(self):
