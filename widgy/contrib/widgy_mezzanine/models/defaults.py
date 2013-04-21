@@ -1,4 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
+from django.core import urlresolvers
 from django.conf import settings
 
 from mezzanine.pages.models import Page
@@ -20,3 +21,10 @@ class WidgyPage(LinkableMixin, Page):
         app_label = 'widgy_mezzanine'
         verbose_name = _('widgy page')
         verbose_name_plural = _('widgy pages')
+
+    def form_action_url(self, form):
+        return urlresolvers.reverse(
+            'widgy.contrib.widgy_mezzanine.views.handle_form',
+            kwargs={
+                'node_pk': form.node.pk,
+            })

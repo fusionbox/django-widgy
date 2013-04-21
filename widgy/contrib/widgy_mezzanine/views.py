@@ -39,15 +39,16 @@ def handle_form(request, node_pk):
         form = form_class(request.POST, request.FILES)
 
         if form.is_valid():
-            resp = form_node.content.execute(request, form)
-            return resp or redirect(page.get_absolute_url())
+            return form_node.content.execute(request, form)
         return page_view(request, page.slug, extra_context={
             'page': page,
             'root_node_override': root_node,
             form_node.content.context_var: form,
         })
     else:
-        return redirect(page.get_absolute_url())
+        # This will raise a KeyError when `from` is for some reason
+        # missing. What should it actually do?
+        return redirect(request.GET['from'])
 
 
 def preview(request, node_pk, node=None):
