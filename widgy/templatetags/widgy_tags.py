@@ -11,20 +11,6 @@ register = template.Library()
 
 @register.simple_tag(takes_context=True)
 def render(context, node):
-    from widgy.models import Content
-
-    assert 'request' in context, "Widgy rendering requires that request is in context."
-
-    if isinstance(node, Content):
-        node = node.node
-    elif hasattr(node, 'get_published_node'):
-        node = node.get_published_node(context['request'])
-
-    if not node:
-        return 'no content'
-
-    node.maybe_prefetch_tree()
-
     return node.render(context)
 
 
@@ -62,8 +48,9 @@ def mdown(value):
 
     return mark_safe(value)
 
+
 @register.simple_tag(takes_context=True)
-def render_root(context, root_node):
+def render_root(context, owner, field_name):
     """
     Renders `root_node` _unless_ `root_node_override` is in the context, in
     which case the override is rendered instead.
@@ -71,8 +58,6 @@ def render_root(context, root_node):
     `root_node_override` is used for stuff like preview, when a view wants to
     specify exactly what root node to use.
     """
-    try:
-        root_node = context['root_node_override']
-    except KeyError:
-        pass
-    return render(context, root_node)
+    root_node = context.get('root_node_override')
+    field = owner._meta.get_field_by_name(field_name)[0]
+    return field.render(owner, context=context, node=root_node)
