@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Q
 from django.http import Http404
+from django.views.generic import FormView
+from django.views.generic.detail import SingleObjectMixin
 
 from mezzanine.pages.views import page as page_view
 
@@ -24,31 +26,42 @@ def get_page_from_node(node):
         )
 
 
-def handle_form(request, node_pk):
-    form_node = get_object_or_404(Node, pk=node_pk)
-    root_node = form_node.get_root()
-    page = get_page_from_node(root_node)
+class HandleFormView(SingleObjectMixin, FormView):
+    pk_url_kwarg = 'node_pk'
+    model = Node
 
-    if request.method == 'POST':
-        # not really necessary to prefetch two trees here, but if we just
-        # prefetched root_node we would have to find a prefetched instance of
-        # form_node in its tree.
-        Node.prefetch_trees(form_node, root_node)
-
-        form_class = form_node.content.build_form_class()
-        form = form_class(request.POST, request.FILES)
-
-        if form.is_valid():
-            return form_node.content.execute(request, form)
-        return page_view(request, page.slug, extra_context={
-            'page': page,
-            'root_node_override': root_node,
-            form_node.content.context_var: form,
-        })
-    else:
+    def get(self, request, node_pk):
         # This will raise a KeyError when `from` is for some reason
         # missing. What should it actually do?
         return redirect(request.GET['from'])
+
+    def get_form_class(self):
+        self.form_node = self.get_object()
+        self.root_node = self.form_node.get_root()
+
+        # not really necessary to prefetch two trees here, but if we just
+        # prefetched root_node we would have to find a prefetched instance of
+        # form_node in its tree.
+        Node.prefetch_trees(self.form_node, self.root_node)
+
+        return self.form_node.content.build_form_class()
+
+    def form_valid(self, form):
+        return self.form_node.content.execute(self.request, form)
+
+    def get_page(self):
+        return get_page_from_node(self.root_node)
+
+    def form_invalid(self, form):
+        page = self.get_page()
+
+        return page_view(self.request, page.slug, extra_context={
+            'page': page,
+            'root_node_override': self.root_node,
+            self.form_node.content.context_var: form,
+        })
+
+handle_form = HandleFormView.as_view()
 
 
 def preview(request, node_pk, node=None):
