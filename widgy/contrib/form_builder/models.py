@@ -239,11 +239,11 @@ class Form(DefaultChildrenMixin, Content):
 
     def action_url(self, widgy, tried=()):
         # the `tried` argument is just for nice error reporting
-        assert widgy, 'form_action_url not found in any owners. Tried: %s' % (tried,)
+        assert widgy, 'get_form_action_url not found in any owners. Tried: %s' % (tried,)
 
         owner = widgy['owner']
-        if hasattr(owner, 'form_action_url'):
-            return owner.form_action_url(self, widgy)
+        if hasattr(owner, 'get_form_action_url'):
+            return owner.get_form_action_url(self, widgy)
         else:
             return self.action_url(widgy['parent'], tried=tried + (owner,))
 
@@ -270,7 +270,9 @@ class Form(DefaultChildrenMixin, Content):
             return super(Form, self).render(context)
 
     def execute(self, request, form):
-        # does this redirect belong here or in the view?
+        # TODO: does this redirect belong here or in the view?  We populate
+        # request.GET['form'] in the model, so we should probable handle it in
+        # the model too.
         resp = redirect(build_url(
             request.GET['from'],
             success=self.node.pk,

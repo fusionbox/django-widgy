@@ -24,7 +24,7 @@ class TestFormHandler(TestCase):
 
     def test_get(self):
         req = self.factory.get('/?from=/foo/')
-        resp = handle_form(req, node_pk=self.form.node.pk)
+        resp = handle_form(req, form_node_pk=self.form.node.pk)
 
         self.assertEqual(resp['Location'], '/foo/')
 
@@ -33,7 +33,7 @@ class TestFormHandler(TestCase):
 
         with mock.patch.object(Form, 'execute') as form_execute:
             form_execute.return_value = object()
-            resp = handle_form(req, node_pk=self.form.node.pk)
+            resp = handle_form(req, form_node_pk=self.form.node.pk)
 
         args, kwargs = form_execute.call_args
         self.assertIs(args[0], req)
@@ -54,7 +54,7 @@ class TestFormHandler(TestCase):
         with mock.patch.object(Form, 'execute') as form_execute:
             with mock.patch('widgy.contrib.widgy_mezzanine.views.page_view') as page_view:
                 page_view.return_value = object()
-                resp = handle_form(req, node_pk=self.form.node.pk)
+                resp = handle_form(req, form_node_pk=self.form.node.pk)
 
         form_execute.assert_not_called()
 
