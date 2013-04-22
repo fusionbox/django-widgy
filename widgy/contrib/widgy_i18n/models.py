@@ -76,7 +76,7 @@ class I18NLayoutContainer(StrictDefaultChildrenMixin, I18NTabbedContainer):
     @property
     def default_children(self):
         return [
-            (self.child_class, (), {'language_code': l[0]})
+            (l[0], self.child_class, (), {'language_code': l[0]})
             for l in settings.LANGUAGES
         ]
 
