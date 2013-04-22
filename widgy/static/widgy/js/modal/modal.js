@@ -12,12 +12,6 @@ define([ 'widgy.backbone',
       'click .overlay': 'close'
     },
 
-    initialize: function(options) {
-      Backbone.View.prototype.initialize.apply(this, arguments);
-
-      this.message = options.message;
-    },
-
     toJSON: function() {
       return {
         message: this.message
@@ -35,7 +29,13 @@ define([ 'widgy.backbone',
 
 
   var ErrorView = ModalView.extend({
-    className: 'errorMessage'
+    className: 'errorMessage',
+
+    initialize: function(options) {
+      Backbone.View.prototype.initialize.apply(this, arguments);
+
+      this.message = options.message;
+    }
   });
 
   function raiseError(message) {
@@ -47,16 +47,22 @@ define([ 'widgy.backbone',
   }
 
   function ajaxError(model, resp, options) {
-    var data = JSON.parse(resp.responseText);
-    var message;
-    if ( data.message )
-       message =  data.message;
-    else if ( resp.status == 404 )
-      message = 'Try refreshing the page';
-    else
-      message = 'Unkown error';
+    if ( _.contains(resp.getResponseHeader('content-type', 'application/json')) ) {
+      var data = JSON.parse(resp.responseText);
+      var message;
+      if ( data.message )
+         message =  data.message;
+      else if ( resp.status == 404 )
+        message = 'Try refreshing the page';
+      else
+        message = 'Unkown error';
 
-    raiseError({message: message});
+      raiseError({message: message});
+    } else {
+      model = new ModalView();
+      model.open();
+      model.$el.html(resp.responseText);
+    }
   }
 
   return {
