@@ -43,11 +43,11 @@ class TestFormHandler(TestCase):
         self.assertIs(resp, form_execute.return_value)
 
     def test_post_rerender(self):
-        self.form.add_child(widgy_site, FormInput,
-                            label='foo',
-                            required=True,
-                            type='text',
-                            )
+        self.form.children['fields'].add_child(widgy_site, FormInput,
+                                               label='foo',
+                                               required=True,
+                                               type='text',
+                                               )
 
         req = self.factory.post('/?from=/foo/')
 

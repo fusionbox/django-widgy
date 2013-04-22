@@ -19,12 +19,12 @@ class GetFormTest(TestCase):
         self.form = Form.add_root(widgy_site)
 
     def test_get_form(self):
-        input1 = self.form.add_child(widgy_site, FormInput)
+        input1 = self.form.children['fields'].add_child(widgy_site, FormInput)
         input1.type = 'text'
         input1.label = 'Test'
         input1.save()
 
-        input2 = self.form.add_child(widgy_site, FormInput)
+        input2 = self.form.children['fields'].add_child(widgy_site, FormInput)
         input2.type = 'text'
         input2.label = 'Test 2'
         input2.save()
@@ -43,7 +43,7 @@ class GetFormTest(TestCase):
     def test_get_formfield(self):
         self.form = Form.add_root(widgy_site)
 
-        input = self.form.add_child(widgy_site, FormInput)
+        input = self.form.children['fields'].add_child(widgy_site, FormInput)
         input.type = 'text'
         input.label = 'Test'
         input.save()
@@ -63,14 +63,14 @@ class TestForm(TestCase):
     def make_form(self):
         form = Form.add_root(widgy_site)
         fields = []
-        fields.append(form.add_child(widgy_site, FormInput,
-                                     label='field 1',
-                                     type='text'))
-        fields.append(form.add_child(widgy_site, FormInput,
-                                     label='field 2',
-                                     type='text'))
-        fields.append(form.add_child(widgy_site, Textarea,
-                                     label='field 3',))
+        fields.append(form.children['fields'].add_child(widgy_site, FormInput,
+                                                        label='field 1',
+                                                        type='text'))
+        fields.append(form.children['fields'].add_child(widgy_site, FormInput,
+                                                        label='field 2',
+                                                        type='text'))
+        fields.append(form.children['fields'].add_child(widgy_site, Textarea,
+                                                        label='field 3',))
         return form, fields
 
     def setUp(self):
@@ -78,7 +78,7 @@ class TestForm(TestCase):
 
     def submit(self, a, b, c, form=None):
         form = form or self.form
-        fields = [i for i in form.get_children() if isinstance(i, FormField)]
+        fields = [i for i in form.children['fields'].get_children() if isinstance(i, FormField)]
 
         return FormSubmission.objects.submit(
             form=form or self.form,
@@ -90,13 +90,13 @@ class TestForm(TestCase):
 
     def test_delete_doesnt_delete(self):
         form = Form.add_root(widgy_site)
-        input = form.add_child(widgy_site, FormInput)
+        input = form.children['fields'].add_child(widgy_site, FormInput)
 
         form.delete()
 
         form = Form.objects.get(pk=form.pk)
         self.assertTrue(form.node.is_root())
-        self.assertIn(input, form.get_children())
+        self.assertIn(input, form.children['fields'].get_children())
 
     def test_as_dict(self):
         submission = self.submit('a', 'b', 'c')
@@ -179,7 +179,7 @@ class TestForm(TestCase):
 
         self.submit('a', 'b', 'c')
 
-        f = [i for i in new_form.get_children() if hasattr(i, 'label') and i.label == 'field 1'][0]
+        f = [i for i in new_form.children['fields'].get_children() if hasattr(i, 'label') and i.label == 'field 1'][0]
         f.label = 'updated'
         f.save()
 
