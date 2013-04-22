@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import urllib
-
 from django.db import models
 from django import forms
 from django.utils.datastructures import SortedDict
@@ -17,9 +15,10 @@ from django_extensions.db.fields import UUIDField
 from fusionbox.forms.fields import PhoneNumberField
 
 from widgy.models import Content, Node
-from widgy.models.mixins import DefaultChildrenMixin
+from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, DisplayNameMixin
 from widgy.utils import update_context, build_url
 from widgy.contrib.page_builder.db.fields import MarkdownField
+from widgy.contrib.page_builder.models import Bucket, Html
 import widgy
 
 
@@ -40,7 +39,7 @@ class FormElement(Content):
     @classmethod
     def valid_child_of(cls, parent, obj=None):
         for p in list(parent.get_ancestors()) + [parent]:
-            if isinstance(p, Form):
+            if isinstance(p, FormBody):
                 return super(FormElement, cls).valid_child_of(parent, obj)
         return False
 
@@ -53,7 +52,7 @@ class FormSuccessHandler(FormElement):
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
-        return isinstance(parent, SubmitButton)
+        return isinstance(parent, SuccessHandlers)
 
 
 class FormReponseHandler(FormSuccessHandler):
@@ -139,27 +138,12 @@ class EmailUserHandler(FormSuccessHandler):
 
 
 @widgy.register
-class SubmitButton(DefaultChildrenMixin, FormElement):
+class SubmitButton(FormElement):
     text = models.CharField(max_length=255, default=lambda: ugettext('submit'), verbose_name=_('text'))
-
-    default_children = [
-        (SaveDataHandler, (), {}),
-    ]
 
     @property
     def deletable(self):
         return len([i for i in self.parent_form.depth_first_order() if isinstance(i, SubmitButton)]) > 1
-
-    def valid_parent_of(self, cls, obj=None):
-        if obj in self.get_children():
-            return True
-
-        # only accept one FormReponseHandler
-        if issubclass(cls, FormReponseHandler) and any([isinstance(child, FormReponseHandler)
-                                                        for child in self.get_children()]):
-            return False
-
-        return issubclass(cls, FormSuccessHandler)
 
     class Meta:
         verbose_name = _('submit button')
@@ -174,8 +158,78 @@ def untitled_form():
     return '%s %d' % (untitled, n)
 
 
+class SuccessMessageBucket(DefaultChildrenMixin, Bucket):
+    default_children = [
+        (Html, (), {'content': 'Thank you.'}),
+    ]
+
+    class Meta:
+        verbose_name = _('success message')
+        verbose_name_plural = _('success messages')
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        return isinstance(parent, FormMeta)
+
+
+class SuccessHandlers(DefaultChildrenMixin, Bucket):
+    default_children = [
+        (SaveDataHandler, (), {}),
+    ]
+
+    class Meta:
+        verbose_name = _('success handlers')
+        verbose_name_plural = _('success handlers')
+
+    def valid_parent_of(self, cls, obj=None):
+        if obj in self.get_children():
+            return True
+
+        # only accept one FormReponseHandler
+        if issubclass(cls, FormReponseHandler) and any([isinstance(child, FormReponseHandler)
+                                                        for child in self.get_children()]):
+            return False
+
+        return issubclass(cls, FormSuccessHandler)
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        return isinstance(parent, FormMeta)
+
+
+class FormBody(DefaultChildrenMixin, Bucket):
+    default_children = [
+        (SubmitButton, (), {}),
+    ]
+    shelf = True
+
+    class Meta:
+        verbose_name = _('fields')
+        verbose_name_plural = _('fields')
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        return isinstance(parent, Form)
+
+
+class FormMeta(StrictDefaultChildrenMixin, Bucket):
+    default_children = [
+        ('message', SuccessMessageBucket, (), {}),
+        ('handlers', SuccessHandlers, (), {}),
+    ]
+    shelf = True
+
+    class Meta:
+        verbose_name = _('settings')
+        verbose_name_plural = _('settings')
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        return isinstance(parent, Form)
+
+
 @widgy.register
-class Form(DefaultChildrenMixin, Content):
+class Form(DisplayNameMixin(lambda x: x.name), StrictDefaultChildrenMixin, Content):
     name = models.CharField(verbose_name=_('Name'),
                             max_length=255,
                             default=untitled_form,
@@ -184,12 +238,11 @@ class Form(DefaultChildrenMixin, Content):
     # associates instances of the same logical form across versions
     ident = UUIDField()
 
-    accepting_children = True
-    shelf = True
     editable = True
 
     default_children = [
-        (SubmitButton, (), {}),
+        ('fields', FormBody, (), {}),
+        ('meta', FormMeta, (), {}),
     ]
 
     objects = QuerySetManager()
@@ -208,9 +261,6 @@ class Form(DefaultChildrenMixin, Content):
 
     def __unicode__(self):
         return self.name
-
-    def valid_parent_of(self, cls, obj=None):
-        return True
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
@@ -363,7 +413,7 @@ class BaseFormField(FormElement):
         return []
 
 
-class FormField(BaseFormField):
+class FormField(DisplayNameMixin(lambda x: x.label), BaseFormField):
     widget = None
 
     label = models.CharField(max_length=255, verbose_name=_('label'))
