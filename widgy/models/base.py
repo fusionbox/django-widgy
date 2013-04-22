@@ -156,9 +156,9 @@ class Node(MP_Node):
             }
         """
         # Build a mapping of content_types -> ids
-        contents = defaultdict(list)
+        contents = defaultdict(set)
         for node in nodes:
-            contents[node.content_type_id].append(node.content_id)
+            contents[node.content_type_id].add(node.content_id)
 
         # Convert that mapping to content_types -> Content instances
         for content_type_id, content_ids in contents.iteritems():
