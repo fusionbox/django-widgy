@@ -30,14 +30,14 @@ class HandleFormView(SingleObjectMixin, FormView):
     pk_url_kwarg = 'node_pk'
     model = Node
 
-    def get(self, request, node_pk):
+    def get(self, request, node_pk, root_node_pk):
         # This will raise a KeyError when `from` is for some reason
         # missing. What should it actually do?
         return redirect(request.GET['from'])
 
     def get_form_class(self):
         self.form_node = self.get_object()
-        self.root_node = self.form_node.get_root()
+        self.root_node = get_object_or_404(Node, pk=self.kwargs['root_node_pk'])
 
         # not really necessary to prefetch two trees here, but if we just
         # prefetched root_node we would have to find a prefetched instance of

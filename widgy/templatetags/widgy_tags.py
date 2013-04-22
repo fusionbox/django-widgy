@@ -4,7 +4,7 @@ from django.utils.safestring import mark_safe
 
 import markdown
 
-from widgy.utils import fancy_import
+from widgy.utils import fancy_import, update_context
 
 register = template.Library()
 
@@ -60,4 +60,5 @@ def render_root(context, owner, field_name):
     """
     root_node = context.get('root_node_override')
     field = owner._meta.get_field_by_name(field_name)[0]
-    return field.render(owner, context=context, node=root_node)
+    with update_context(context, {'root_node_override': None}):
+        return field.render(owner, context=context, node=root_node)

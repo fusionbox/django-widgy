@@ -22,9 +22,10 @@ class WidgyPage(LinkableMixin, Page):
         verbose_name = _('widgy page')
         verbose_name_plural = _('widgy pages')
 
-    def form_action_url(self, form):
+    def form_action_url(self, form, widgy):
         return urlresolvers.reverse(
             'widgy.contrib.widgy_mezzanine.views.handle_form',
             kwargs={
                 'node_pk': form.node.pk,
+                'root_node_pk': widgy['root_node'].pk,
             })

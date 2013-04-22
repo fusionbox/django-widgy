@@ -18,7 +18,7 @@ from fusionbox.forms.fields import PhoneNumberField
 
 from widgy.models import Content, Node
 from widgy.models.mixins import DefaultChildrenMixin
-from widgy.utils import update_context
+from widgy.utils import update_context, build_url
 from widgy.contrib.page_builder.db.fields import MarkdownField
 import widgy
 
@@ -237,8 +237,15 @@ class Form(DefaultChildrenMixin, Content):
     def context_var(self):
         return 'form_instance_{node_pk}'.format(node_pk=self.node.pk)
 
-    def action_url(self, owner):
-        return owner.form_action_url(self)
+    def action_url(self, widgy, tried=()):
+        # the `tried` argument is just for nice error reporting
+        assert widgy, 'form_action_url not found in any owners. Tried: %s' % (tried,)
+
+        owner = widgy['owner']
+        if hasattr(owner, 'form_action_url'):
+            return owner.form_action_url(self, widgy)
+        else:
+            return self.action_url(widgy['parent'], tried=tried + (owner,))
 
     def render(self, context):
         if self.context_var in context:
@@ -249,11 +256,9 @@ class Form(DefaultChildrenMixin, Content):
             form = self.build_form_class()()
 
         request = context.get('request')
-        action_url = '%s?%s' % (
-            context['widgy']['owner'].form_action_url(self),
-            urllib.urlencode({
-                'from': request and (request.GET.get('from') or request.path),
-            })
+        action_url = build_url(
+            self.action_url(context['widgy']),
+            **{'from': request and (request.GET.get('from') or request.path)}
         )
         ctx = {
             'form': form,
@@ -266,9 +271,10 @@ class Form(DefaultChildrenMixin, Content):
 
     def execute(self, request, form):
         # does this redirect belong here or in the view?
-        resp = redirect('%s?%s' % (request.GET['from'], urllib.urlencode({
-            'success': self.node.pk,
-        })))
+        resp = redirect(build_url(
+            request.GET['from'],
+            success=self.node.pk,
+        ))
         # TODO: only call the handlers for the submit button that was pressed.
         for child in self.depth_first_order():
             if isinstance(child, FormReponseHandler):

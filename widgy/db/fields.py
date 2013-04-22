@@ -129,6 +129,7 @@ class WidgyField(models.ForeignKey):
             'widgy': {
                 'site': self.site,
                 'owner': model_instance,
+                'root_node': root_node,
                 'parent': context and context.get('widgy'),
             },
         }

@@ -1,6 +1,8 @@
 """
 Some utility functions used throughout the project.
 """
+import urllib
+
 from contextlib import contextmanager
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
@@ -76,3 +78,8 @@ def update_context(context, dict):
     context.update(dict)
     yield context
     context.pop()
+
+def build_url(path, **kwargs):
+    if kwargs:
+        path += '?' + urllib.urlencode(kwargs)
+    return path
