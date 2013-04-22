@@ -4,7 +4,6 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from django.db.models.loading import get_app
-from django.utils.functional import SimpleLazyObject
 from django.contrib.contenttypes.models import ContentType
 
 from widgy.utils import fancy_import
@@ -51,8 +50,7 @@ class WidgyField(models.ForeignKey):
         defaults.update(kwargs)
 
         if isinstance(site, basestring):
-            # prevent a circular import by lazily importing the site
-            self.site = SimpleLazyObject(lambda: fancy_import(site))
+            self.site = fancy_import(site)
         else:
             self.site = site
 
