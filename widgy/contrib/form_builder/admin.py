@@ -7,6 +7,7 @@ from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
 from django.conf.urls import patterns, url
+from django.template.defaultfilters import slugify
 
 from .models import Form
 
@@ -43,11 +44,17 @@ class FormAdmin(admin.ModelAdmin):
             'app_label': opts.app_label,
             'headers': headers,
             'rows': rows,
+            'csv_file_name': self.csv_file_name(obj),
         })
+
+    def csv_file_name(self, obj):
+        # slugify not only for readability, but for header injection as well.
+        return '%s-submissions.csv' % slugify(obj.name)
 
     def download_view(self, request, object_id, *args, **kwargs):
         obj = self.get_object(request, unquote(object_id))
         resp = HttpResponse(content_type='text/csv')
+        resp['Content-Disposition'] = 'attachment; filename="%s"' % self.csv_file_name(obj)
 
         values = obj.submissions.as_dictionaries()
         headers = obj.submissions.field_names()
