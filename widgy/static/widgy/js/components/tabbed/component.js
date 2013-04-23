@@ -8,6 +8,8 @@ define([ 'underscore', 'widgy.backbone', 'components/widget/component' ], functi
     showTabClick: function(event) {
       var view = this.list.findByEl($(event.target).parents('.node')[0]);
       this.showTab(view);
+
+      return false;
     },
 
     showTab: function(view) {
@@ -21,6 +23,10 @@ define([ 'underscore', 'widgy.backbone', 'components/widget/component' ], functi
       this.$current.children().hide();
       view.$preview.show();
       view.$children.show();
+
+      if ( view.hasShelf() ) {
+        view.shelf.$el.show();
+      }
 
       return false;
     },
@@ -46,6 +52,10 @@ define([ 'underscore', 'widgy.backbone', 'components/widget/component' ], functi
     addChildPromise: function() {
       var parent = this;
       return widget.View.prototype.addChildPromise.apply(this, arguments).then(function(child_view) {
+        if ( child_view.hasShelf() ) {
+          console.log('addChildPromise');
+          child_view.shelf.$el.hide().appendTo(parent.$current);
+        }
         child_view.$preview.hide().appendTo(parent.$current);
         child_view.$children.hide().appendTo(parent.$current);
 

@@ -229,7 +229,7 @@ class FormMeta(StrictDefaultChildrenMixin, Bucket):
 
 
 @widgy.register
-class Form(DisplayNameMixin(lambda x: x.name), StrictDefaultChildrenMixin, Content):
+class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChildrenMixin, Content):
     name = models.CharField(verbose_name=_('Name'),
                             max_length=255,
                             default=untitled_form,
