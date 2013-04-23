@@ -481,7 +481,7 @@ class FormInput(FormField):
 
     @property
     def formfield_class(self):
-        return self.FORMFIELD_CLASSES[self.type]
+        return self.FORMFIELD_CLASSES.get(self.type, forms.CharField)
 
     @property
     def widget(self):
