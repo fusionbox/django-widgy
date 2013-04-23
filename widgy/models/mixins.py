@@ -52,7 +52,7 @@ class StrictDefaultChildrenMixin(DefaultChildrenMixin):
         if obj and obj in self.get_children():
             return True
 
-        return (issubclass(cls, tuple([child_class[0] for child_class in self.default_children])) and
+        return (issubclass(cls, tuple([child_class[1] for child_class in self.default_children])) and
                 len(self.get_children()) < len(self.default_children))
 
 
