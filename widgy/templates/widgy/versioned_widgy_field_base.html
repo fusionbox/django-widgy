@@ -7,20 +7,9 @@
 {% endcompress %}
 <ul class="widgy-tools">
   {% block widgy_tools %}
-  <li><a class="widgy-fancybox commit" href="{{ commit_url }}">{% trans "Commit" %}</a></li>
-  <li><a class="widgy-fancybox reset" href="{{ reset_url }}">{% trans "Reset" %}</a></li>
+  <li><a class="commit" href="{{ commit_url }}">{% trans "Commit" %}</a></li>
+  <li><a class="reset" href="{{ reset_url }}">{% trans "Reset" %}</a></li>
   {% endblock %}
 </ul>
-{% compress js %}
-<script src="{% static 'widgy/js/lib/jquery.fancybox.js' %}"></script>
-<script>
-  $(function() {
-    $('a.widgy-fancybox').fancybox({
-      type: 'ajax'
-    });
-    window.closeFancybox = $.fancybox.close;
-  });
-</script>
-{% endcompress %}
 {{ block.super }}
 {% endblock %}

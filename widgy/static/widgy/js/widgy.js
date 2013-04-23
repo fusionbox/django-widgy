@@ -1,6 +1,6 @@
-define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'lib/q', 'nodes/nodes',
+define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'lib/q', 'nodes/nodes', 'modal/modal',
     'text!app.html', 'shelves/shelves'
-    ], function($, _, Backbone, csrf, Q, nodes,
+    ], function($, _, Backbone, csrf, Q, nodes, modal,
       app_template, shelves
       ) {
 
@@ -128,6 +128,12 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'lib/q', 'nodes/n
     nodes.Node.prototype.urlRoot = url_root;
 
     this.app.renderPromise().done();
+
+    $('.widgy-tools a').on('click', function(event) {
+      event.preventDefault();
+
+      window.closeFancybox = modal.iframe(this.href).close;
+    });
   }
 
   function actAsPopOut() {

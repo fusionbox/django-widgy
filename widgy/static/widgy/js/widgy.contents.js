@@ -47,13 +47,15 @@ define([
       'click .cancel': 'close'
     }),
 
-    initialize: function() {
+    initialize: function(options) {
       form.FormView.prototype.initialize.apply(this, arguments);
       _.bindAll(this,
         'handleSuccess',
         'handleError',
         'renderHTML'
       );
+
+      this.app = options.app;
     },
 
     getTemplate: function() {
@@ -76,6 +78,7 @@ define([
     handleSuccess: function(model, response, options) {
       // kill the template cache.
       templates.remove(model.get('template_url'));
+      this.app.refreshCompatibility();
       this.close();
     },
 

@@ -1,7 +1,9 @@
 define([ 'widgy.backbone',
-    'text!./modal.html'
+    'text!./modal.html',
+    'text!./error.html'
     ], function(Backbone,
-      modal_template
+      modal_template,
+      error_template
       ) {
 
   var ModalView = Backbone.View.extend({
@@ -28,11 +30,35 @@ define([ 'widgy.backbone',
   });
 
 
+  var HTMLModal = ModalView.extend({
+    initialize: function(options) {
+      ModalView.prototype.initialize.apply(this, arguments);
+
+      this.html = options.html;
+    },
+
+    render: function() {
+      ModalView.prototype.render.apply(this, arguments);
+      this.$('.modal').append(this.html);
+      return this;
+    }
+  });
+
+
+  function iframe(url) {
+    var modal = new HTMLModal({html: $('<iframe>').attr('src', url)});
+    modal.open();
+
+    return modal;
+  }
+
+
   var ErrorView = ModalView.extend({
     className: 'errorMessage',
+    template: error_template,
 
     initialize: function(options) {
-      Backbone.View.prototype.initialize.apply(this, arguments);
+      ModalView.prototype.initialize.apply(this, arguments);
 
       this.message = options.message;
     }
@@ -59,9 +85,8 @@ define([ 'widgy.backbone',
 
       raiseError({message: message});
     } else {
-      model = new ModalView();
-      model.open();
-      model.$el.html(resp.responseText);
+      modal = new HTMLModal({html: resp.responseText});
+      modal.open();
     }
   }
 
@@ -69,6 +94,7 @@ define([ 'widgy.backbone',
     ModalView: ModalView,
     ErrorView: ErrorView,
     raiseError: raiseError,
-    ajaxError: ajaxError
+    ajaxError: ajaxError,
+    iframe: iframe
   };
 });

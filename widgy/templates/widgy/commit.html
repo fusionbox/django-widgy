@@ -1,6 +1,11 @@
 {% load url from future %}
 {% load i18n %}
+{% load compress %}
+
+{% compress js %}
+<script src="{% static 'widgy/js/lib/jquery.js' %}'"></script>
 <script src="{% static 'widgy/js/lib/jquery.form.js' %}'"></script>
+{% endcompress %}
 
 <div class="commit popUp">
   <h2>{% trans "Commit Changes" %}</h2>
@@ -20,11 +25,11 @@
       {% endif %}
       </p>
     </form>
-    <script>
-      $('.commit_form').ajaxForm({target: 'div.commit'});
-    </script>
   {% else %}
     <p>{% trans "Nothing has changed -- no need to commit." %}</p>
   {% endif %}
 </div>
-</body>
+
+<script>
+  $('.commit_form').ajaxForm({target: 'div.commit'});
+</script>
