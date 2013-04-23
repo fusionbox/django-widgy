@@ -414,6 +414,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     renderShelf: function() {
+      console.log('renderShelf');
       if (this.shelf)
         this.shelf.remove();
 
