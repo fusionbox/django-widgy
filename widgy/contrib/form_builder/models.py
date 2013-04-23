@@ -655,9 +655,11 @@ class FormSubmission(behaviors.Timestampable, models.Model):
 
             uuids = FormValue.objects.filter(
                 submission__in=self,
-            ).values('field_ident').distinct().values_list('field_ident', flat=True)
+            ).values('field_ident').distinct().order_by('field_node__path').values_list('field_ident', flat=True)
 
-            ret = {}
+            ret = SortedDict([
+                ('created_at', ugettext('Created at')),
+            ])
             for field_uuid in uuids:
                 latest_value = FormValue.objects.filter(
                     field_ident=field_uuid,
@@ -667,6 +669,11 @@ class FormSubmission(behaviors.Timestampable, models.Model):
 
         def as_dictionaries(self):
             return (i.as_dict() for i in self.all())
+
+        def as_ordered_dictionaries(self, order):
+            for submission in self.as_dictionaries():
+                # TODO: why does this not work in the template as a genexp?
+                yield [submission.get(ident, '') for ident in order]
 
         def submit(self, form, data):
             submission = self.create(
@@ -685,7 +692,7 @@ class FormSubmission(behaviors.Timestampable, models.Model):
             return submission
 
     def as_dict(self):
-        ret = {}
+        ret = {'created_at': self.created_at}
         for value in self.values.all():
             ret[value.field_ident] = value.value
         return ret
