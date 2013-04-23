@@ -1,0 +1,32 @@
+{% extends "admin/change_form.html" %}
+
+{% load i18n %}
+
+{% block content %}
+<div id="content-main">
+  {% block object-tools %}
+  <ul class="object-tools">
+    <li><a href="{% url 'admin:form_builder_form_download' object_id %}">{% trans 'Download as CSV' %}</a></li>
+  </ul>
+  {% endblock %}
+
+  <table>
+    <thead>
+      <tr>
+        {% for ident, header in headers.items %}
+        <th>{{ header }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        {% for value in row %}
+        <td>{{ value }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
