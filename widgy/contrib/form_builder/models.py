@@ -317,7 +317,7 @@ class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChi
         }
 
         with update_context(context, ctx):
-            return super(Form, self).render(context)
+            return super(Form, self).render(context, template='widgy/form_builder/form/render.html')
 
     def execute(self, request, form):
         # TODO: does this redirect belong here or in the view?  We populate
