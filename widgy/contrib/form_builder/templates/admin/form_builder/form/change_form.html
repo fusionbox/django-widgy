@@ -1,4 +1,5 @@
 {% extends "admin/change_form.html" %}
+{% load url from future %}
 
 {% load i18n %}
 
@@ -6,7 +7,7 @@
 <div id="content-main">
   {% block object-tools %}
   <ul class="object-tools">
-    <li><a href="{% url 'admin:form_builder_form_download' object_id %}">{% trans 'Download as CSV' %}</a></li>
+    <li><a href="{% url 'admin:form_builder_form_download' object_id %}" download="{{ csv_file_name }}">{% trans 'Download as CSV' %}</a></li>
   </ul>
   {% endblock %}
 
