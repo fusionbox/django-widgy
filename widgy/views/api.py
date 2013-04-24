@@ -204,12 +204,34 @@ class NodeEditView(WidgyViewMixin, NodeSingleObjectMixin, DetailView):
 
     template_name = 'widgy/views/edit_node.html'
 
+    def get_media(self):
+        # TODO: don't copy this directly from ModelAdmin.  Either figure out
+        # how to use that implementation or figure something else out.  This is
+        # currently necessary to support things like the
+        # RelatedFieldWidgetWrapper (and I suspect also filer's widgets).
+        #
+        # Doing this is very admin-oriented, we would have to rethink this for
+        # frontend widgy editing.
+        from django.contrib.admin.templatetags.admin_static import static
+        from django.conf import settings
+        from django import forms
+        extra = '' if settings.DEBUG else '.min'
+        js = [
+            'core.js',
+            'admin/RelatedObjectLookups.js',
+            'jquery%s.js' % extra,
+            'jquery.init.js'
+        ]
+        return forms.Media(js=[static('admin/js/%s' % url) for url in js])
+
     def get_context_data(self, **kwargs):
         kwargs = super(NodeEditView, self).get_context_data(**kwargs)
         kwargs.update(
             html_id='node_%s' % (self.object.pk),
             node_dict=self.object.to_json(self.site),
             api_url=reverse(self.site.node_view),
+            is_popup=True,
+            media=self.get_media(),
         )
         return kwargs
 
