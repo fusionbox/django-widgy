@@ -672,8 +672,8 @@ class FormSubmission(behaviors.Timestampable, models.Model):
 
         def as_ordered_dictionaries(self, order):
             for submission in self.as_dictionaries():
-                # TODO: why does this not work in the template as a genexp?
-                yield [submission.get(ident, '') for ident in order]
+                yield SortedDict((ident, submission.get(ident, ''))
+                                 for ident in order)
 
         def submit(self, form, data):
             submission = self.create(

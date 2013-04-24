@@ -184,13 +184,33 @@ class TestForm(TestCase):
         })
 
     def test_as_dictionaries(self):
+        letters = self.submit('a', 'b', 'c')
+        numbers = self.submit('1', '2', '3')
+
+        letters_dict, numbers_dict = FormSubmission.objects.as_dictionaries()
+
+        self.assertEqual(letters.as_dict(), letters_dict)
+        self.assertEqual(numbers.as_dict(), numbers_dict)
+
+    def test_as_ordered_dictionaries(self):
         with mock_now() as first:
             self.submit('a', 'b', 'c')
+
         with mock_now() as second:
             self.submit('1', '2', '3')
 
-        self.assertEqual([sorted(map(str, i.values())) for i in FormSubmission.objects.as_dictionaries()],
-                         [sorted([str(first), 'a', 'b', 'c']), sorted([str(second), '1', '2', '3'])])
+        field_name_order = [
+            'created_at',
+            self.fields[2].ident,
+            self.fields[0].ident,
+            self.fields[1].ident,
+        ]
+
+        letters_dict, numbers_dict = list(FormSubmission.objects.as_ordered_dictionaries(field_name_order))
+
+        self.assertEqual(letters_dict.keys(), field_name_order)
+        self.assertEqual(letters_dict.values(), [first, 'c', 'a', 'b'])
+        self.assertEqual(numbers_dict.values(), [second, '3', '1', '2'])
 
     def test_parent_form(self):
         for field in self.fields:
