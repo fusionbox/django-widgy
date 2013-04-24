@@ -1,8 +1,10 @@
 {% load widgy_tags %}
 
-<form action="{{ self.action_url }}" method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+{% if success %}
+  {% render self.children.meta.children.message %}
+{% else %}
+<form action="{{ action_url }}" method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
   {% csrf_token %}
-  {% for child in self.get_children %}
-    {% render child %}
-  {% endfor %}
+  {% render self.children.fields %}
 </form>
+{% endif %}

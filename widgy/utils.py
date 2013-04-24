@@ -1,9 +1,12 @@
 """
 Some utility functions used throughout the project.
 """
+import urllib
+
 from contextlib import contextmanager
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
+from django.template import Context
 
 try:
     from django.contrib.auth import get_user_model
@@ -70,6 +73,13 @@ def fancy_import(name):
 
 @contextmanager
 def update_context(context, dict):
+    if context is None:
+        context = Context()
     context.update(dict)
     yield context
     context.pop()
+
+def build_url(path, **kwargs):
+    if kwargs:
+        path += '?' + urllib.urlencode(kwargs)
+    return path

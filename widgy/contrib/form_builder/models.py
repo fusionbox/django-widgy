@@ -3,11 +3,11 @@ from __future__ import unicode_literals
 from django.db import models
 from django import forms
 from django.utils.datastructures import SortedDict
-from django.core.urlresolvers import reverse
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _, ugettext
+from django.shortcuts import redirect
 
 from fusionbox import behaviors
 from fusionbox.db.models import QuerySetManager
@@ -15,9 +15,10 @@ from django_extensions.db.fields import UUIDField
 from fusionbox.forms.fields import PhoneNumberField
 
 from widgy.models import Content, Node
-from widgy.models.mixins import DefaultChildrenMixin
-from widgy.utils import update_context
+from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, DisplayNameMixin
+from widgy.utils import update_context, build_url
 from widgy.contrib.page_builder.db.fields import MarkdownField
+from widgy.contrib.page_builder.models import Bucket, Html
 import widgy
 
 
@@ -38,7 +39,7 @@ class FormElement(Content):
     @classmethod
     def valid_child_of(cls, parent, obj=None):
         for p in list(parent.get_ancestors()) + [parent]:
-            if isinstance(p, Form):
+            if isinstance(p, FormBody):
                 return super(FormElement, cls).valid_child_of(parent, obj)
         return False
 
@@ -51,7 +52,7 @@ class FormSuccessHandler(FormElement):
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
-        return isinstance(parent, SubmitButton)
+        return isinstance(parent, SuccessHandlers)
 
 
 class FormReponseHandler(FormSuccessHandler):
@@ -137,27 +138,12 @@ class EmailUserHandler(FormSuccessHandler):
 
 
 @widgy.register
-class SubmitButton(DefaultChildrenMixin, FormElement):
+class SubmitButton(FormElement):
     text = models.CharField(max_length=255, default=lambda: ugettext('submit'), verbose_name=_('text'))
-
-    default_children = [
-        (SaveDataHandler, (), {}),
-    ]
 
     @property
     def deletable(self):
         return len([i for i in self.parent_form.depth_first_order() if isinstance(i, SubmitButton)]) > 1
-
-    def valid_parent_of(self, cls, obj=None):
-        if obj in self.get_children():
-            return True
-
-        # only accept one FormReponseHandler
-        if issubclass(cls, FormReponseHandler) and any([isinstance(child, FormReponseHandler)
-                                                        for child in self.get_children()]):
-            return False
-
-        return issubclass(cls, FormSuccessHandler)
 
     class Meta:
         verbose_name = _('submit button')
@@ -172,8 +158,78 @@ def untitled_form():
     return '%s %d' % (untitled, n)
 
 
+class SuccessMessageBucket(DefaultChildrenMixin, Bucket):
+    default_children = [
+        (Html, (), {'content': 'Thank you.'}),
+    ]
+
+    class Meta:
+        verbose_name = _('success message')
+        verbose_name_plural = _('success messages')
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        return isinstance(parent, FormMeta)
+
+
+class SuccessHandlers(DefaultChildrenMixin, Bucket):
+    default_children = [
+        (SaveDataHandler, (), {}),
+    ]
+
+    class Meta:
+        verbose_name = _('success handlers')
+        verbose_name_plural = _('success handlers')
+
+    def valid_parent_of(self, cls, obj=None):
+        if obj in self.get_children():
+            return True
+
+        # only accept one FormReponseHandler
+        if issubclass(cls, FormReponseHandler) and any([isinstance(child, FormReponseHandler)
+                                                        for child in self.get_children()]):
+            return False
+
+        return issubclass(cls, FormSuccessHandler)
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        return isinstance(parent, FormMeta)
+
+
+class FormBody(DefaultChildrenMixin, Bucket):
+    default_children = [
+        (SubmitButton, (), {}),
+    ]
+    shelf = True
+
+    class Meta:
+        verbose_name = _('fields')
+        verbose_name_plural = _('fields')
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        return isinstance(parent, Form)
+
+
+class FormMeta(StrictDefaultChildrenMixin, Bucket):
+    default_children = [
+        ('message', SuccessMessageBucket, (), {}),
+        ('handlers', SuccessHandlers, (), {}),
+    ]
+    shelf = True
+
+    class Meta:
+        verbose_name = _('settings')
+        verbose_name_plural = _('settings')
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        return isinstance(parent, Form)
+
+
 @widgy.register
-class Form(DefaultChildrenMixin, Content):
+class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChildrenMixin, Content):
     name = models.CharField(verbose_name=_('Name'),
                             max_length=255,
                             default=untitled_form,
@@ -182,12 +238,11 @@ class Form(DefaultChildrenMixin, Content):
     # associates instances of the same logical form across versions
     ident = UUIDField()
 
-    accepting_children = True
-    shelf = True
     editable = True
 
     default_children = [
-        (SubmitButton, (), {}),
+        ('fields', FormBody, (), {}),
+        ('meta', FormMeta, (), {}),
     ]
 
     objects = QuerySetManager()
@@ -206,16 +261,6 @@ class Form(DefaultChildrenMixin, Content):
 
     def __unicode__(self):
         return self.name
-
-    @property
-    def action_url(self):
-        return reverse('widgy.contrib.widgy_mezzanine.views.handle_form',
-                       kwargs={
-                           'node_pk': self.node.pk,
-                       })
-
-    def valid_parent_of(self, cls, obj=None):
-        return True
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
@@ -242,6 +287,16 @@ class Form(DefaultChildrenMixin, Content):
     def context_var(self):
         return 'form_instance_{node_pk}'.format(node_pk=self.node.pk)
 
+    def action_url(self, widgy, tried=()):
+        # the `tried` argument is just for nice error reporting
+        assert widgy, 'get_form_action_url not found in any owners. Tried: %s' % (tried,)
+
+        owner = widgy['owner']
+        if hasattr(owner, 'get_form_action_url'):
+            return owner.get_form_action_url(self, widgy)
+        else:
+            return self.action_url(widgy['parent'], tried=tried + (owner,))
+
     def render(self, context):
         if self.context_var in context:
             # when the form fails validation, the submission view passes
@@ -250,12 +305,29 @@ class Form(DefaultChildrenMixin, Content):
         else:
             form = self.build_form_class()()
 
-        with update_context(context, {'form': form}):
-            return super(Form, self).render(context)
+        request = context.get('request')
+        action_url = build_url(
+            self.action_url(context['widgy']),
+            **{'from': request and (request.GET.get('from') or request.path)}
+        )
+        ctx = {
+            'form': form,
+            'action_url': action_url,
+            'success': request and request.GET.get('success') == str(self.node.pk),
+        }
+
+        with update_context(context, ctx):
+            return super(Form, self).render(context, template='widgy/form_builder/form/render.html')
 
     def execute(self, request, form):
+        # TODO: does this redirect belong here or in the view?  We populate
+        # request.GET['form'] in the model, so we should probable handle it in
+        # the model too.
+        resp = redirect(build_url(
+            request.GET['from'],
+            success=self.node.pk,
+        ))
         # TODO: only call the handlers for the submit button that was pressed.
-        resp = None
         for child in self.depth_first_order():
             if isinstance(child, FormReponseHandler):
                 resp = child.execute(request, form)
@@ -341,7 +413,7 @@ class BaseFormField(FormElement):
         return []
 
 
-class FormField(BaseFormField):
+class FormField(DisplayNameMixin(lambda x: x.label), BaseFormField):
     widget = None
 
     label = models.CharField(max_length=255, verbose_name=_('label'))
@@ -409,7 +481,7 @@ class FormInput(FormField):
 
     @property
     def formfield_class(self):
-        return self.FORMFIELD_CLASSES[self.type]
+        return self.FORMFIELD_CLASSES.get(self.type, forms.CharField)
 
     @property
     def widget(self):
@@ -429,7 +501,6 @@ class FormInput(FormField):
 @widgy.register
 class Textarea(FormField):
     formfield_class = forms.CharField
-
 
     @property
     def widget(self):
@@ -584,9 +655,11 @@ class FormSubmission(behaviors.Timestampable, models.Model):
 
             uuids = FormValue.objects.filter(
                 submission__in=self,
-            ).values('field_ident').distinct().values_list('field_ident', flat=True)
+            ).values('field_ident').distinct().order_by('field_node__path').values_list('field_ident', flat=True)
 
-            ret = {}
+            ret = SortedDict([
+                ('created_at', ugettext('Created at')),
+            ])
             for field_uuid in uuids:
                 latest_value = FormValue.objects.filter(
                     field_ident=field_uuid,
@@ -596,6 +669,11 @@ class FormSubmission(behaviors.Timestampable, models.Model):
 
         def as_dictionaries(self):
             return (i.as_dict() for i in self.all())
+
+        def as_ordered_dictionaries(self, order):
+            for submission in self.as_dictionaries():
+                # TODO: why does this not work in the template as a genexp?
+                yield [submission.get(ident, '') for ident in order]
 
         def submit(self, form, data):
             submission = self.create(
@@ -614,7 +692,7 @@ class FormSubmission(behaviors.Timestampable, models.Model):
             return submission
 
     def as_dict(self):
-        ret = {}
+        ret = {'created_at': self.created_at}
         for value in self.values.all():
             ret[value.field_ident] = value.value
         return ret

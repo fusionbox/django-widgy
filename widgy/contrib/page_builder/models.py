@@ -427,17 +427,17 @@ class Table(StrictDefaultChildrenMixin, TableElement):
     shelf = True
 
     default_children = [
-        (TableHeader, (), {}),
-        (TableBody, (), {}),
+        ('header', TableHeader, (), {}),
+        ('body', TableBody, (), {}),
     ]
 
     @property
     def header(self):
-        return self.get_children()[0]
+        return self.children['header']
 
     @property
     def body(self):
-        return self.get_children()[1]
+        return self.children['body']
 
     def cells_at_index(self, index):
         return [list(i.get_children())[index] for i in self.body.get_children()]

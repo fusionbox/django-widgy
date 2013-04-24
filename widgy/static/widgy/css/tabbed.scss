@@ -6,10 +6,15 @@
     -webkit-border-radius: $radius !important;
 }
 
+/*
 div.widgy div.editor section.node div.widget > ul.nodeChildren {
   width: 100% !important;
 }
+*/
+
 div.widgy div.editor section.tabbed > div.widget > ul.nodeChildren {
+  float: left !important;
+  width: 63% !important;
 
   > li {
     @include rounded(4px 4px 0px 0px);

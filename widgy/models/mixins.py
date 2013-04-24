@@ -25,11 +25,34 @@ class DefaultChildrenMixin(object):
 
 
 class StrictDefaultChildrenMixin(DefaultChildrenMixin):
+    """
+    StrictDefaultChildrenMixin works slightly differently from
+    DefaultChildrenMixin, in that it also provides validation to ensure that
+    only those children specified in default_children are compatible.
+
+    It also provides a property called children that provides named access to
+    the children.  You have to specify the children like this.
+
+        default_children = [
+            ('main', MainContent, (), {}),
+            ('sidebar', Sidebar, (), {}),
+        ]
+    """
+    def post_create(self, site):
+        for name, cls, args, kwargs in self.default_children:
+            self.add_child(site, cls, *args, **kwargs)
+
+    @property
+    def children(self):
+        return dict(
+            (self.default_children[index][0], child) for index, child in enumerate(self.get_children())
+        )
+
     def valid_parent_of(self, cls, obj=None):
         if obj and obj in self.get_children():
             return True
 
-        return (issubclass(cls, tuple([child_class[0] for child_class in self.default_children])) and
+        return (issubclass(cls, tuple([child_class[1] for child_class in self.default_children])) and
                 len(self.get_children()) < len(self.default_children))
 
 

@@ -102,6 +102,7 @@ body, html {
   padding: 20px;
   position: fixed;
   width: 300px;
+  height: 500px;
   z-index: 101;
   margin-top: -50px;
   margin-left: -150px;
@@ -223,6 +224,62 @@ li.node_drop_target {
       background-color: blue;
       margin: 0;
       position: fixed;
+    }
+
+    // tabbed form nodes
+    &.tabbed {
+      
+      div.current {
+        clear: both;
+      }
+      
+      // tab container
+      > .widget > .nodeChildren {
+        @include default;
+        border-bottom: 2px solid $grey;
+        margin-bottom: 15px !important;
+        padding: 15px 15px 0px 15px !important;
+        width: 100% !important;
+      
+        li.node.formbody,
+        li.node.formmeta {
+          @include rounded(4px 4px 0px 0px);
+          background: #eeeeee !important;
+          border-color: #cccccc;
+          border-width: 1px 1px 0px 1px;
+          color: #999999;
+          display: inline-block;
+          float: left;
+          margin: 0 0 0 .5em !important;
+          padding: 0px !important;
+          position: relative;
+          top: 2px;
+          z-index: 10;
+    
+          .widget {
+            background: transparent !important;
+
+            .drag-row {
+              @include rounded(0px);
+              background: transparent !important;
+        
+              span.title {
+                color: inherit;
+              }
+            }
+          }
+    
+          &:hover {
+            background-color: #fafafa !important;
+          }
+
+          &.active {
+            background-color: white !important;
+            border-bottom: 2px solid white;
+            color: #555555;
+          }
+        }
+      }
     }
     
     div.widget {
@@ -779,10 +836,10 @@ div.widgy {
         // (only the first nodeChildren gets floated left, the other nested nodeChildren are full-width)
         > ul.nodeChildren {
           clear: left;
-          width: 63%;
+          width: 63% !important;
   
           ul.nodeChildren {
-            width: 100%;
+            width: 100% !important;
           }
         }
          

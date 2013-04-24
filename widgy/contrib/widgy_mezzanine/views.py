@@ -1,9 +1,11 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Q
 from django.http import Http404
+from django.views.generic import View
 
 from mezzanine.pages.views import page as page_view
 
+from widgy.contrib.form_builder.views import HandleFormMixin
 from widgy.contrib.widgy_mezzanine.models import WidgyPage
 from widgy.models import Node
 
@@ -24,30 +26,26 @@ def get_page_from_node(node):
         )
 
 
-def handle_form(request, node_pk):
-    form_node = get_object_or_404(Node, pk=node_pk)
-    root_node = form_node.get_root()
-    page = get_page_from_node(root_node)
+class HandleFormView(HandleFormMixin, View):
+    def get(self, request, *args, **kwargs):
+        # This will raise a KeyError when `from` is for some reason
+        # missing. What should it actually do?
+        return redirect(request.GET['from'])
 
-    if request.method == 'POST':
-        # not really necessary to prefetch two trees here, but if we just
-        # prefetched root_node we would have to find a prefetched instance of
-        # form_node in its tree.
-        Node.prefetch_trees(form_node, root_node)
+    def form_invalid(self, form):
+        try:
+            root_node = get_object_or_404(Node, pk=self.kwargs['root_node_pk'])
+        except KeyError:
+            root_node = self.form_node.get_root()
+        page = get_page_from_node(root_node)
 
-        form_class = form_node.content.build_form_class()
-        form = form_class(request.POST, request.FILES)
+        return page_view(self.request, page.slug, extra_context=self.get_context_data(
+            form=form,
+            page=page,
+            root_node_override=root_node,
+        ))
 
-        if form.is_valid():
-            resp = form_node.content.execute(request, form)
-            return resp or redirect(page.get_absolute_url())
-        return page_view(request, page.slug, extra_context={
-            'page': page,
-            'root_node_override': root_node,
-            form_node.content.context_var: form,
-        })
-    else:
-        return redirect(page.get_absolute_url())
+handle_form = HandleFormView.as_view()
 
 
 def preview(request, node_pk, node=None):
