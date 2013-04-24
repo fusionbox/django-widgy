@@ -1,0 +1,19 @@
+p.file-upload {
+  float: left;
+  width: 692px;
+  
+  span.clearable-file-input {
+    
+    input {
+      margin: 0px;
+    }
+    
+    label {
+      display: inline-block;
+      float: none;
+      width: auto;
+    }
+    
+  }
+
+}
