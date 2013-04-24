@@ -22,7 +22,7 @@
     <tbody>
       {% for row in rows %}
       <tr>
-        {% for value in row %}
+        {% for ident, value in row.items %}
         <td>{{ value }}</td>
         {% endfor %}
       </tr>
