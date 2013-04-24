@@ -4,9 +4,13 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
+from __future__ import unicode_literals
+
+import contextlib
 
 from django.test import TestCase
 from django import forms
+from django.utils import timezone
 
 import mock
 
@@ -59,6 +63,14 @@ class GetFormTest(TestCase):
         self.assertTrue(hasattr(form_class, 'clean_%s' % uncaptcha.get_formfield_name()))
 
 
+@contextlib.contextmanager
+def mock_now():
+    now = timezone.now()
+    with mock.patch('django.utils.timezone.now') as tz_now:
+        tz_now.return_value = now
+        yield now
+
+
 class TestForm(TestCase):
     def make_form(self):
         form = Form.add_root(widgy_site)
@@ -99,8 +111,10 @@ class TestForm(TestCase):
         self.assertIn(input, form.children['fields'].get_children())
 
     def test_as_dict(self):
-        submission = self.submit('a', 'b', 'c')
+        with mock_now() as now:
+            submission = self.submit('a', 'b', 'c')
         expected = {
+            'created_at': now,
             self.fields[0].ident: 'a',
             self.fields[1].ident: 'b',
             self.fields[2].ident: 'c',
@@ -109,7 +123,9 @@ class TestForm(TestCase):
 
     def test_field_names(self):
         self.submit('a', 'b', 'c')
-        self.assertEqual(FormSubmission.objects.field_names(), {
+        field_names = FormSubmission.objects.field_names()
+        field_names.pop('created_at')
+        self.assertEqual(field_names, {
             self.fields[0].ident: 'field 1',
             self.fields[1].ident: 'field 2',
             self.fields[2].ident: 'field 3',
@@ -120,7 +136,9 @@ class TestForm(TestCase):
 
         self.submit('a', 'b', 'c')
 
-        self.assertEqual(FormSubmission.objects.field_names(), {
+        field_names = FormSubmission.objects.field_names()
+        field_names.pop('created_at')
+        self.assertEqual(field_names, {
             self.fields[0].ident: 'field 1 edited',
             self.fields[1].ident: 'field 2',
             self.fields[2].ident: 'field 3',
@@ -157,18 +175,42 @@ class TestForm(TestCase):
         ident = self.fields[0].ident
         self.fields[0].delete()
 
-        self.assertEqual(FormSubmission.objects.field_names(), {
+        field_names = FormSubmission.objects.field_names()
+        field_names.pop('created_at')
+        self.assertEqual(field_names, {
             ident: 'field 1',
             self.fields[1].ident: 'field 2',
             self.fields[2].ident: 'field 3',
         })
 
     def test_as_dictionaries(self):
-        self.submit('a', 'b', 'c')
-        self.submit('1', '2', '3')
+        letters = self.submit('a', 'b', 'c')
+        numbers = self.submit('1', '2', '3')
 
-        self.assertEqual([sorted(i.values()) for i in FormSubmission.objects.as_dictionaries()],
-                         [sorted(['a', 'b', 'c']), sorted(['1', '2', '3'])])
+        letters_dict, numbers_dict = FormSubmission.objects.as_dictionaries()
+
+        self.assertEqual(letters.as_dict(), letters_dict)
+        self.assertEqual(numbers.as_dict(), numbers_dict)
+
+    def test_as_ordered_dictionaries(self):
+        with mock_now() as first:
+            self.submit('a', 'b', 'c')
+
+        with mock_now() as second:
+            self.submit('1', '2', '3')
+
+        field_name_order = [
+            'created_at',
+            self.fields[2].ident,
+            self.fields[0].ident,
+            self.fields[1].ident,
+        ]
+
+        letters_dict, numbers_dict = list(FormSubmission.objects.as_ordered_dictionaries(field_name_order))
+
+        self.assertEqual(letters_dict.keys(), field_name_order)
+        self.assertEqual(letters_dict.values(), [first, 'c', 'a', 'b'])
+        self.assertEqual(numbers_dict.values(), [second, '3', '1', '2'])
 
     def test_parent_form(self):
         for field in self.fields:
@@ -186,7 +228,9 @@ class TestForm(TestCase):
         self.submit('1', '2', '3', form=new_form)
 
         self.assertEqual(new_form.submission_count, 2)
-        self.assertEqual(new_form.submissions.field_names(), {
+        field_names = new_form.submissions.field_names()
+        field_names.pop('created_at')
+        self.assertEqual(field_names, {
             self.fields[0].ident: 'updated',
             self.fields[1].ident: 'field 2',
             self.fields[2].ident: 'field 3',
@@ -200,8 +244,4 @@ class TestForm(TestCase):
 
         serialize.assert_called_with('3')
 
-        self.assertEqual(submission.as_dict(), {
-            self.fields[0].ident: '1',
-            self.fields[1].ident: '2',
-            self.fields[2].ident: serialize.return_value,
-        })
+        self.assertEqual(submission.as_dict()[self.fields[2].ident], serialize.return_value)
