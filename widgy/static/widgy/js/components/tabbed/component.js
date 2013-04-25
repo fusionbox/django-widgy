@@ -6,6 +6,9 @@ define([ 'underscore', 'widgy.backbone', 'components/widget/component' ], functi
     }),
 
     showTabClick: function(event) {
+      if ( $(event.target).is('.preview') )
+        return;
+
       var view = this.list.findByEl($(event.target).parents('.node')[0]);
       this.showTab(view);
 
