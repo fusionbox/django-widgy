@@ -119,8 +119,11 @@ class WidgyField(models.ForeignKey):
         # we need to return a queryset, not a list.
         return ContentType.objects.filter(qs)
 
+    def get_render_node(self, model_instance, context):
+        return getattr(model_instance, self.name)
+
     def render(self, model_instance, context=None, node=None):
-        root_node = node or getattr(model_instance, self.name)
+        root_node = node or self.get_render_node(model_instance, context)
         if not root_node:
             return 'no content'
 
@@ -171,7 +174,9 @@ class VersionedWidgyField(WidgyField):
             form_class=VersionedWidgyFormField,
             **kwargs)
 
-    def render(self, model_instance, context=None, node=None):
+    def get_render_node(self, model_instance, context):
         version_tracker = getattr(model_instance, self.name)
-        node = node or version_tracker.get_published_node(context and context.get('request'))
-        return super(VersionedWidgyField, self).render(model_instance, context=context, node=node)
+        if version_tracker:
+            return version_tracker.get_published_node(context and context.get('request'))
+        else:
+            return None

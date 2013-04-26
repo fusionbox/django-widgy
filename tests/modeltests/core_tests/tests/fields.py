@@ -277,3 +277,34 @@ class TestRender(TestCase):
         context = args[0]
         widgy = context['widgy']
         self.assertIs(widgy['parent'], parent_widgy)
+
+    def test_null(self):
+        """
+        Rendering a NULL WidgyField
+        """
+        self.widgied.widgy = None
+        self.widgied.save()
+        # doesn't matter what happens as long as it doesn't throw an exception
+        self.widgy_field.render(self.widgied)
+
+    def test_null_versioned(self):
+        """
+        Rendering a NULL VersionedWidgyField
+        """
+        page = VersionedPage.objects.create()
+        field = VersionedPage._meta.get_field_by_name('version_tracker')[0]
+        # doesn't matter what happens as long as it doesn't throw an exception
+        field.render(page)
+
+    def test_no_commits(self):
+        """
+        Rendering a VersionedWidgyField without any commits
+        """
+        page = VersionedPage.objects.create(
+            version_tracker=VersionTracker.objects.create(
+                working_copy=Layout.add_root(widgy_site).node,
+            )
+        )
+        field = VersionedPage._meta.get_field_by_name('version_tracker')[0]
+        # doesn't matter what happens as long as it doesn't throw an exception
+        field.render(page)
