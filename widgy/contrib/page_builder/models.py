@@ -89,8 +89,8 @@ class DefaultLayout(Layout):
         verbose_name_plural = _('default layouts')
 
     default_children = [
-        (MainContent, (), {}),
-        (Sidebar, (), {}),
+        ('main', MainContent, (), {}),
+        ('sidebar', Sidebar, (), {}),
     ]
 
 
