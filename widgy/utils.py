@@ -92,7 +92,7 @@ def html_to_plaintext(html):
 
     def get_text(node):
         IGNORED_TAGS = ['script', 'style', 'head']
-        INDEXED_ATTRIBUTES = ['title']
+        INDEXED_ATTRIBUTES = ['title', 'alt']
         if node.name in IGNORED_TAGS:
             pass
         else:

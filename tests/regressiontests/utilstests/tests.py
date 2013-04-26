@@ -77,3 +77,14 @@ class HtmlToText(TestCase):
             html_to_plaintext('<p title="title">content</p><p title="title2">content2</p>'),
             'title content title2 content2'
         )
+
+    def test_alt_attribute(self):
+        self.assertContainsSameWords(
+            html_to_plaintext('<img alt="image description" />'),
+            'image description'
+        )
+
+        self.assertContainsSameWords(
+            html_to_plaintext('<p>content</p><img alt="image description" />'),
+            'content image description'
+        )
