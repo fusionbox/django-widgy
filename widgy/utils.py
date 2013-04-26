@@ -74,7 +74,9 @@ def fancy_import(name):
 @contextmanager
 def update_context(context, dict):
     if context is None:
-        context = Context()
+        context = {}
+    if not isinstance(context, Context):
+        context = Context(context)
     context.update(dict)
     yield context
     context.pop()
