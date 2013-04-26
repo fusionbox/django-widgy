@@ -758,6 +758,11 @@ div.widgy {
           font-size: 2.4em;
           padding: 5px 0;
         }
+        
+        ul.nodeChildren {
+          clear: left;
+          width: 63% !important;
+        }
       }
       
       // yet another wrapper
@@ -834,10 +839,7 @@ div.widgy {
         }
         
         // (only the first nodeChildren gets floated left, the other nested nodeChildren are full-width)
-        > ul.nodeChildren {
-          clear: left;
-          width: 63% !important;
-  
+        > ul.nodeChildren {  
           ul.nodeChildren {
             width: 100% !important;
           }
