@@ -88,3 +88,19 @@ class HtmlToText(TestCase):
             html_to_plaintext('<p>content</p><img alt="image description" />'),
             'content image description'
         )
+
+    def test_other_attributes(self):
+        self.assertContainsSameWords(
+            html_to_plaintext('<a href="http://example.com">example.com</a>'),
+            'example.com'
+        )
+
+        self.assertContainsSameWords(
+            html_to_plaintext('<body onload="javascript:alert(\'hello\')">content</body>'),
+            'content'
+        )
+
+        self.assertContainsSameWords(
+            html_to_plaintext('<span lang="en" onclick="javascript:void(0)">content</span>'),
+            'content'
+        )
