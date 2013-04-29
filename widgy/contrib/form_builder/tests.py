@@ -3,13 +3,20 @@ from __future__ import unicode_literals
 import contextlib
 
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django import forms
 from django.utils import timezone
+from django.core import mail
 
 import mock
 
 from modeltests.core_tests.widgy_config import widgy_site
-from widgy.contrib.form_builder.models import Form, FormInput, Textarea, FormSubmission, FormField, Uncaptcha
+from widgy.contrib.form_builder.models import (
+    Form, FormInput, Textarea, FormSubmission, FormField, Uncaptcha,
+    EmailUserHandler,
+)
+from widgy.utils import build_url
+from widgy.models import VersionTracker
 
 
 class GetFormTest(TestCase):
@@ -239,3 +246,54 @@ class TestForm(TestCase):
         serialize.assert_called_with('3')
 
         self.assertEqual(submission.as_dict()[self.fields[2].ident], serialize.return_value)
+
+
+class TestFormHandler(TestCase):
+    def setUp(self):
+        self.form = form = Form.add_root(widgy_site)
+
+        self.to_field = to_field = form.children['fields'].add_child(widgy_site, FormInput)
+        to_field.type = 'email'
+        to_field.save()
+
+        self.email_handler = email_handler = form.children['meta'].children['handlers'].add_child(widgy_site, EmailUserHandler)
+        email_handler.to_ident = to_field.ident
+        email_handler.save()
+
+    def test_email_success_handler(self):
+        self.email_handler.execute(*self.get_execute_args(self.form, {
+            self.to_field.get_formfield_name(): '1@example.com',
+        }))
+
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].to, ['1@example.com'])
+
+    def test_email_success_handler_to_pointer_works_after_being_committed(self):
+        tracker = VersionTracker.objects.create(working_copy=self.form.node)
+        tracker.commit()
+
+        form = tracker.head.root_node.content
+        email_handler = [i for i in form.depth_first_order() if isinstance(i, EmailUserHandler)][0]
+        to_field = [i for i in form.depth_first_order() if isinstance(i, FormInput)][0]
+
+        form_obj = form.build_form_class()({
+            to_field.get_formfield_name(): '1@example.com',
+        })
+        assert form_obj.is_valid()
+        self.assertEqual(email_handler.get_to_emails(form_obj), ['1@example.com'])
+
+    def test_email_success_handler_pre_delete(self):
+        from django.db.models import ProtectedError
+        self.assertRaises(ProtectedError, self.to_field.delete)
+
+    def get_execute_args(self, form, data):
+        request_factory = RequestFactory()
+        request = request_factory.post(build_url('/', **{'from': '/'}), data)
+        form_obj = form.build_form_class()(request.POST)
+
+        assert form_obj.is_valid()
+        return request, form_obj
+
+    def test_post_create_autofill(self):
+        email_handler2 = self.form.children['meta'].children['handlers'].add_child(widgy_site, EmailUserHandler)
+        self.assertEqual(email_handler2.to_ident, self.to_field.ident)

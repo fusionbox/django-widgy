@@ -25,6 +25,7 @@ from widgy.exceptions import (
     ParentChildRejection,
     RootDisplacementError
 )
+from widgy.signals import pre_delete_widget
 from widgy.generic import WidgyGenericForeignKey, ProxyGenericRelation
 from widgy.utils import exception_to_bool, update_context
 
@@ -724,16 +725,9 @@ class Content(models.Model):
         else:
             assert right or parent
 
-    def pre_delete(self):
-        """
-        Called right before deletion, when our node still exists.
-        """
-        pass
-
     def delete(self, raw=False):
         self.check_frozen()
-        if not raw:
-            self.pre_delete()
+        pre_delete_widget.send(self.__class__, instance=self, raw=raw)
         self.node.delete()
         super(Content, self).delete()
 
