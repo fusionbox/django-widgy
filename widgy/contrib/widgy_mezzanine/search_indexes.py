@@ -20,3 +20,6 @@ class PageIndex(indexes.SearchIndex, indexes.Indexable):
     def prepare_text(self, obj):
         html = render_root({}, obj, 'root_node')
         return html_to_plaintext(html)
+
+    def prepare_keywords(self, obj):
+        return [unicode(k) for k in obj.keywords.all()]
