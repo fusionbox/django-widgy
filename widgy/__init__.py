@@ -21,3 +21,4 @@ class Registry(dict):
 
 registry = Registry()
 register = registry.register
+unregister = registry.unregister
