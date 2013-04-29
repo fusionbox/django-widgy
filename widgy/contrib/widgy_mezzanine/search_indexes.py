@@ -5,9 +5,9 @@ from widgy.templatetags.widgy_tags import render_root
 from widgy.utils import html_to_plaintext
 
 class PageIndex(indexes.SearchIndex, indexes.Indexable):
-    title = indexes.CharField()
+    title = indexes.CharField(model_attr='title')
     date = indexes.DateTimeField(model_attr='publish_date')
-    description = indexes.CharField()
+    description = indexes.CharField(model_attr='description')
     keywords = indexes.MultiValueField()
     text = indexes.CharField(document=True)
 
