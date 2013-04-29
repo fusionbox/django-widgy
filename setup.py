@@ -24,6 +24,7 @@ install_requires = [
     'bleach',
     'django-compressor',
     'django-extensions',
+    'beautifulsoup4',
 ]
 
 version = (0, 0, 1, 'alpha')

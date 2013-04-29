@@ -3,6 +3,7 @@ Some utility functions used throughout the project.
 """
 import urllib
 
+import bs4
 from contextlib import contextmanager
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
@@ -85,3 +86,27 @@ def build_url(path, **kwargs):
     if kwargs:
         path += '?' + urllib.urlencode(kwargs)
     return path
+
+
+def html_to_plaintext(html):
+
+    def get_text(node):
+        IGNORED_TAGS = ['script', 'style', 'head']
+        INDEXED_ATTRIBUTES = ['title', 'alt']
+        if node.name in IGNORED_TAGS:
+            pass
+        else:
+            for c in node.children:
+                if isinstance(c, unicode):
+                    if not isinstance(c, bs4.Comment):
+                        yield c.strip()
+                elif isinstance(c, bs4.Tag):
+                    for attr in INDEXED_ATTRIBUTES:
+                        if c.has_attr(attr):
+                            yield c[attr]
+                    for t in get_text(c):
+                        yield t
+
+    soup = bs4.BeautifulSoup(html)
+    text = ' '.join(get_text(soup))
+    return text
