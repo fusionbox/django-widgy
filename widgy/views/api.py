@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 from django.views.generic import DetailView
 from django.views.generic.detail import SingleObjectMixin
-from django.db.models import get_model
+from django.db.models import get_model, ProtectedError
 
 from fusionbox.views.rest import RestView
 
@@ -143,9 +143,11 @@ class NodeView(WidgyView):
         if not node.content.deletable:
             raise InvalidTreeMovement({'message': "You can't delete me"})
 
-        node.content.delete()
-
-        return self.render_as_node(None)
+        try:
+            node.content.delete()
+            return self.render_as_node(None)
+        except ProtectedError as e:
+            raise ValidationError({'message': e.args[0]})
 
     def options(self, request, node_pk=None):
         response = super(NodeView, self).options(request, node_pk)

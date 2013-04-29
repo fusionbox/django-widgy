@@ -8,6 +8,7 @@ from django.conf import settings
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.shortcuts import redirect
+from django.dispatch import receiver
 
 from fusionbox import behaviors
 from fusionbox.db.models import QuerySetManager
@@ -15,6 +16,7 @@ from django_extensions.db.fields import UUIDField
 from fusionbox.forms.fields import PhoneNumberField
 
 from widgy.models import Content, Node
+from widgy.signals import pre_delete_widget
 from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, DisplayNameMixin
 from widgy.utils import update_context, build_url
 from widgy.contrib.page_builder.db.fields import MarkdownField
@@ -61,22 +63,6 @@ class FormReponseHandler(FormSuccessHandler):
 
 
 @widgy.register
-class EmailSuccessHandler(FormSuccessHandler):
-    to = models.EmailField(verbose_name=_('to'))
-    subject = models.CharField(max_length=255, verbose_name=_('subject'))
-    content = MarkdownField(blank=True, verbose_name=_('content'))
-
-    component_name = 'markdown'
-
-    def execute(self, request, form):
-        send_markdown_mail(self.subject, self.content, settings.SERVER_EMAIL, [self.to])
-
-    class Meta:
-        verbose_name = _('admin success email')
-        verbose_name_plural = _('admin success emails')
-
-
-@widgy.register
 class SaveDataHandler(FormSuccessHandler):
     editable = False
 
@@ -91,14 +77,6 @@ class SaveDataHandler(FormSuccessHandler):
         verbose_name_plural = _('save data handlers')
 
 
-class EmailUserHandlerForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(EmailUserHandlerForm, self).__init__(*args, **kwargs)
-        self.fields['to'].queryset = Node.objects.filter(
-            id__in=[i.node.id for i in self.instance.get_email_fields()]
-        )
-
-
 def send_markdown_mail(subject, content, from_email, to):
     from widgy.templatetags.widgy_tags import mdown
     msg = EmailMultiAlternatives(subject, content, from_email, to)
@@ -106,21 +84,58 @@ def send_markdown_mail(subject, content, from_email, to):
     msg.send()
 
 
-@widgy.register
-class EmailUserHandler(FormSuccessHandler):
-    editable = True
-    component_name = 'markdown'
-    form = EmailUserHandlerForm
-
-    # an input in our form
-    to = models.ForeignKey(Node, related_name='+', null=True, verbose_name=_('to'))
+class EmailSuccessHandlerBase(FormSuccessHandler):
     subject = models.CharField(max_length=255, verbose_name=_('subject'))
     content = MarkdownField(blank=True, verbose_name=_('content'))
 
+    component_name = 'markdown'
+
+    class Meta:
+        abstract = True
+
     def execute(self, request, form):
-        to = self.to.content
-        to_email = form.cleaned_data[to.get_formfield_name()]
-        send_markdown_mail(self.subject, self.content, settings.SERVER_EMAIL, [to_email])
+        send_markdown_mail(self.subject, self.content, settings.SERVER_EMAIL, self.get_to_emails(form))
+
+
+@widgy.register
+class EmailSuccessHandler(EmailSuccessHandlerBase):
+    to = models.EmailField(verbose_name=_('to'))
+
+    class Meta:
+        verbose_name = _('admin success email')
+        verbose_name_plural = _('admin success emails')
+
+    def get_to_emails(self):
+        return [self.to]
+
+
+class EmailUserHandlerForm(forms.ModelForm):
+    to_ident = forms.ChoiceField(label=_('To'), choices=[])
+
+    class Meta:
+        fields = ('to_ident', 'subject', 'content')
+
+    def __init__(self, *args, **kwargs):
+        super(EmailUserHandlerForm, self).__init__(*args, **kwargs)
+        self.fields['to_ident'].choices = [('', _('------'))] + [(i.ident, i) for i in self.instance.get_email_fields()]
+
+
+@widgy.register
+class EmailUserHandler(EmailSuccessHandlerBase):
+    editable = True
+    form = EmailUserHandlerForm
+
+    # an input in our form
+    to_ident = models.CharField(_('to'), max_length=36)
+
+    class Meta:
+        verbose_name = _('user success email')
+        verbose_name_plural = _('user success emails')
+
+    def get_to_emails(self, form):
+        to = [f for f in self.parent_form.depth_first_order()
+              if hasattr(f, 'ident') and f.ident == self.to_ident][0]
+        return [form.cleaned_data[to.get_formfield_name()]]
 
     def get_email_fields(self):
         return [i for i in self.parent_form.depth_first_order()
@@ -129,12 +144,8 @@ class EmailUserHandler(FormSuccessHandler):
     def post_create(self, site):
         email_fields = self.get_email_fields()
         if email_fields:
-            self.to = email_fields[0].node
+            self.to_ident = email_fields[0].ident
         self.save()
-
-    class Meta:
-        verbose_name = _('user success email')
-        verbose_name_plural = _('user success emails')
 
 
 @widgy.register
@@ -327,7 +338,6 @@ class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChi
             request.GET['from'],
             success=self.node.pk,
         ))
-        # TODO: only call the handlers for the submit button that was pressed.
         for child in self.depth_first_order():
             if isinstance(child, FormReponseHandler):
                 resp = child.execute(request, form)
@@ -725,3 +735,12 @@ class FormValue(models.Model):
             return self.field_node.content.label
         else:
             return self.field_name
+
+
+@receiver(pre_delete_widget, sender=FormInput)
+def protect_emailuserhandler_to_ident_field(sender, instance, raw, **kwargs):
+    from django.db.models import ProtectedError
+
+    for child in instance.parent_form.depth_first_order():
+        if isinstance(child, EmailUserHandler) and child.to_ident == instance.ident:
+            raise ProtectedError("This cannot be deleted because it is being referenced by a %s." % (child.display_name,), [child])
