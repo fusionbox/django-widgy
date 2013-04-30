@@ -47,7 +47,7 @@ define([ 'widgy.backbone',
   }
 
   function ajaxError(model, resp, options) {
-    if ( _.contains(resp.getResponseHeader('content-type', 'application/json')) ) {
+    if ( resp.getResponseHeader('content-type').indexOf('application/json') !== -1 ) {
       var data = JSON.parse(resp.responseText);
       var message;
       if ( data.message )
@@ -57,11 +57,9 @@ define([ 'widgy.backbone',
       else
         message = 'Unkown error';
 
-      raiseError({message: message});
+      raiseError(message);
     } else {
-      model = new ModalView();
-      model.open();
-      model.$el.html(resp.responseText);
+      raiseError(resp.responseText);
     }
   }
 
