@@ -4,6 +4,7 @@ from django import forms
 from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _, ugettext
+from django.dispatch import receiver
 
 from filer.fields.file import FilerFileField
 from filer.models.filemodels import File
@@ -16,6 +17,7 @@ from widgy.models.links import LinkField, LinkFormField, LinkFormMixin
 from widgy.db.fields import WidgyField
 from widgy.contrib.page_builder.db.fields import MarkdownField, VideoField
 from widgy.contrib.page_builder.forms import CKEditorField
+from widgy.signals import pre_delete_widget
 import widgy
 
 
@@ -317,6 +319,10 @@ class TableHeaderData(TableElement):
         else:
             return isinstance(parent, TableHeader)
 
+    def delete_column(self):
+        for i in self.table.cells_at_index(self.sibling_index):
+            i.node.delete()
+
     def post_create(self, site):
         right = self.get_next_sibling()
         if right:
@@ -325,10 +331,6 @@ class TableHeaderData(TableElement):
         else:
             for row in self.table.body.get_children():
                 row.add_child(site, TableData)
-
-    def pre_delete(self):
-        for i in self.table.cells_at_index(self.sibling_index):
-            i.node.delete()
 
     def reposition(self, site, right=None, parent=None):
         # we must always stay in the same table
@@ -351,6 +353,11 @@ class TableHeaderData(TableElement):
         verbose_name = _('table header data')
         verbose_name_plural = _('table header datas')
 
+
+@receiver(pre_delete_widget, sender=TableHeaderData)
+def delete_column(sender, instance, raw, **kwargs):
+    if not raw:
+        instance.delete_column()
 
 @widgy.register
 class TableData(TableElement):
