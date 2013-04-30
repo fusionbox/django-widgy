@@ -119,8 +119,8 @@ class Html(Content):
     editable = True
 
     class Meta:
-        verbose_name = _('html')
-        verbose_name_plural = _('html editors')
+        verbose_name = _('HTML')
+        verbose_name_plural = _('HTML editors')
 
 
 @widgy.register

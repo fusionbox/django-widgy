@@ -15,6 +15,7 @@ from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.contrib.admin.options import FORMFIELD_FOR_DBFIELD_DEFAULTS
 from django.contrib.admin import widgets
+from django.template.defaultfilters import capfirst
 
 from treebeard.mp_tree import MP_Node
 
@@ -450,13 +451,13 @@ class Content(models.Model):
         """
         return {
             '__class__': "%s.%s" % (cls._meta.app_label, cls._meta.module_name),
-            'title': cls._meta.verbose_name.title(),
+            'title': capfirst(cls._meta.verbose_name),
             'css_classes': (cls._meta.app_label, cls._meta.module_name),
         }
 
     @property
     def display_name(self):
-        return self._meta.verbose_name
+        return capfirst(self._meta.verbose_name)
 
     @property
     def class_name(self):
