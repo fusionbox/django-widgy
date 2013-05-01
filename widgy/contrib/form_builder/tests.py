@@ -13,7 +13,7 @@ import mock
 from modeltests.core_tests.widgy_config import widgy_site
 from widgy.contrib.form_builder.models import (
     Form, FormInput, Textarea, FormSubmission, FormField, Uncaptcha,
-    EmailUserHandler,
+    EmailUserHandler, EmailSuccessHandler
 )
 from widgy.utils import build_url
 from widgy.models import VersionTracker
@@ -267,6 +267,18 @@ class TestFormHandler(TestCase):
 
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].to, ['1@example.com'])
+
+    def test_admin_email_success_handler(self):
+        email_handler = self.form.children['meta'].children['handlers'].add_child(widgy_site, EmailSuccessHandler)
+        email_handler.to = '2@example.com'
+        email_handler.save()
+
+        email_handler.execute(*self.get_execute_args(self.form, {
+            self.to_field.get_formfield_name(): 'ignore@example.com',
+        }))
+
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].to, ['2@example.com'])
 
     def test_email_success_handler_to_pointer_works_after_being_committed(self):
         tracker = VersionTracker.objects.create(working_copy=self.form.node)

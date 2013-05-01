@@ -96,6 +96,9 @@ class EmailSuccessHandlerBase(FormSuccessHandler):
     def execute(self, request, form):
         send_markdown_mail(self.subject, self.content, settings.SERVER_EMAIL, self.get_to_emails(form))
 
+    def get_to_emails(self, form):
+        raise NotImplemented
+
 
 @widgy.register
 class EmailSuccessHandler(EmailSuccessHandlerBase):
@@ -105,7 +108,7 @@ class EmailSuccessHandler(EmailSuccessHandlerBase):
         verbose_name = _('admin success email')
         verbose_name_plural = _('admin success emails')
 
-    def get_to_emails(self):
+    def get_to_emails(self, form):
         return [self.to]
 
 
