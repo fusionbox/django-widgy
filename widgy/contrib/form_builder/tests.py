@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import contextlib
+import unittest
 
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -15,6 +16,7 @@ from widgy.contrib.form_builder.models import (
     Form, FormInput, Textarea, FormSubmission, FormField, Uncaptcha,
     EmailUserHandler, EmailSuccessHandler
 )
+from widgy.exceptions import ParentChildRejection
 from widgy.utils import build_url
 from widgy.models import VersionTracker
 
@@ -59,7 +61,7 @@ class GetFormTest(TestCase):
         self.assertEqual(field.label, 'Test')
 
     def test_with_uncaptcha(self):
-        uncaptcha = self.form.add_child(widgy_site, Uncaptcha)
+        uncaptcha = self.form.children['fields'].add_child(widgy_site, Uncaptcha)
         form_class = self.form.build_form_class()
         self.assertTrue(hasattr(form_class, 'clean_%s' % uncaptcha.get_formfield_name()))
 
@@ -309,3 +311,14 @@ class TestFormHandler(TestCase):
     def test_post_create_autofill(self):
         email_handler2 = self.form.children['meta'].children['handlers'].add_child(widgy_site, EmailUserHandler)
         self.assertEqual(email_handler2.to_ident, self.to_field.ident)
+
+
+class TestFormCompatibility(TestCase):
+    @unittest.expectedFailure
+    def test_uncaptcha_compatibility(self):
+        form = Form.add_root(widgy_site)
+        fields = form.children['fields']
+        fields.add_child(widgy_site, Uncaptcha)
+
+        assert not Uncaptcha.valid_child_of(fields)
+        self.assertRaises(ParentChildRejection, fields.add_child, widgy_site, Uncaptcha)

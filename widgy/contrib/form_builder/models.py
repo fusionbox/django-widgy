@@ -634,11 +634,11 @@ class Uncaptcha(BaseFormField):
     @classmethod
     def valid_child_of(cls, parent, obj=None):
         # only allow 1 uncaptcha per form
-        if not isinstance(parent, Form):
+        if not isinstance(parent, FormBody):
             return False
-        if obj in parent.get_children():
+        if obj in parent.depth_first_order():
             return True
-        if [i for i in parent.get_children() if isinstance(i, cls)]:
+        if [i for i in parent.depth_first_order() if isinstance(i, cls)]:
             return False
         else:
             return super(Uncaptcha, cls).valid_child_of(parent, obj)
