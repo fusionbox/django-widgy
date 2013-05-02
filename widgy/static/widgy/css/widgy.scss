@@ -301,7 +301,8 @@ li.node_drop_target {
         @include gradient(#eee,#fff);
         display: block;
         float: none;
-        height: 22px;
+        height: auto;
+        min-height: 22px;
         margin: 0px;
         padding: 10px;
         position: relative;
