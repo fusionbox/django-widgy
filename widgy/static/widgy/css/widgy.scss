@@ -31,7 +31,17 @@
     }
   }
   
+  &.edit {
+    background: #f4f4f4;
+
+    &:hover {
+      background: lighten($blue,35%);
+      color: $blue;
+    }
+  }
+  
   &.delete {
+    background: #f4f4f4;
     border-color: $red;
     color: $red;
     
@@ -294,6 +304,7 @@ li.node_drop_target {
         height: 22px;
         margin: 0px;
         padding: 10px;
+        position: relative;
         width: auto;
         
         span.title {
@@ -303,8 +314,16 @@ li.node_drop_target {
 
         button.edit,
         button.delete {
-          float: right;
-          margin-left: 1em;
+          float: none;
+          margin-left: 0;
+          position: absolute;
+          top: 9px;
+          right: 9px;
+          z-index: 100;
+          
+          &.edit {
+            right: 80px;
+          }
         }
 
         .dragHandle {
