@@ -5,6 +5,7 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.dispatch import receiver
+from django.template.defaultfilters import truncatechars
 
 from filer.fields.file import FilerFileField
 from filer.models.filemodels import File
@@ -12,12 +13,14 @@ from filer.models.filemodels import File
 from widgy.models import Content
 from widgy.models.mixins import (
     StrictDefaultChildrenMixin, InvisibleMixin, TitleDisplayNameMixin,
+    DisplayNameMixin,
 )
 from widgy.models.links import LinkField, LinkFormField, LinkFormMixin
 from widgy.db.fields import WidgyField
 from widgy.contrib.page_builder.db.fields import MarkdownField, VideoField
 from widgy.contrib.page_builder.forms import CKEditorField
 from widgy.signals import pre_delete_widget
+from widgy.utils import build_url
 import widgy
 
 
@@ -501,3 +504,66 @@ class Button(Content):
     class Meta:
         verbose_name = _('button')
         verbose_name_plural = _('buttons')
+
+
+@widgy.register
+class GoogleMap(DisplayNameMixin(lambda x: truncatechars(x.address, 35)), Content):
+    MAP_CHOICES = (
+        ('roadmap', _('Road map')),
+        ('satellite', _('Satellite')),
+        ('hybrid', _('Hybrid')),
+        ('terrain', _('Terrain')),
+    )
+
+    address = models.CharField(_('address'), max_length=500)
+    type = models.CharField(_('type'), max_length=20,
+                            choices=MAP_CHOICES,
+                            default=MAP_CHOICES[0][0])
+
+    editable = True
+
+    zoom = 15
+
+    class Meta:
+        verbose_name = _('Google map')
+        verbose_name_plural = _('Google maps')
+
+    def get_maptype_short(self):
+        return {
+            'roadmap': 'm',
+            'satellite': 'k',
+            'hybrid': 'h',
+            'terrain': 'p',
+        }.get(self.type, 'm')
+
+    def get_map_options(self):
+        from django.utils.translation import get_language
+        return {
+            'q': self.address,
+            'hl': get_language(),
+            'ie': 'UTF8',
+            'iwloc': 'addr',
+            't': self.get_maptype_short(),
+            'vector': 1,
+            'z': self.zoom,
+        }
+
+    def get_embed_url(self):
+        options = self.get_map_options()
+        options['output'] = 'embed'
+        return build_url('https://maps.google.com/', **options)
+
+    def get_absolute_url(self):
+        options = self.get_map_options()
+        options['source'] = 'embed'
+        return build_url('https://maps.google.com/', **options)
+
+    def get_preview_url(self):
+        options = {
+            'size': '300x200',
+            'zoom': self.zoom,
+            'maptype': self.type,
+            'sensor': 'true',
+            'markers': '|%s' % self.address,
+        }
+        return build_url('https://maps.googleapis.com/maps/api/staticmap', **options)

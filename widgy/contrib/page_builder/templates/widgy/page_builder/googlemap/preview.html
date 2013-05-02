@@ -1,0 +1,7 @@
+{% extends "widgy/preview.html" %}
+
+{% block content %}{% spaceless %}
+{% if self.address %}
+<img src="{{ self.get_preview_url }}">
+{% endif %}
+{% endspaceless %}{% endblock %}
