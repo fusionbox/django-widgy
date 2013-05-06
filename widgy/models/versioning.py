@@ -5,6 +5,7 @@ from django.db.models.deletion import ProtectedError
 from django.utils.translation import ugettext_lazy as _
 
 from fusionbox.db.models import QuerySetManager
+from fusionbox.behaviors import QuerySetManagerModel
 
 from widgy.utils import get_user_model
 from widgy.db.fields import WidgyField
@@ -17,7 +18,8 @@ class VersionTracker(models.Model):
     head = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT, unique=True)
     working_copy = models.ForeignKey(Node, on_delete=models.PROTECT, unique=True)
 
-    item_partial_template = 'widgy/_history_item_versioned.html'
+    history_item_partial_template = 'widgy/_history_item_versioned.html'
+    commit_submitrow = 'widgy/_commit_submitrow_versioned.html'
 
     class Meta:
         app_label = 'widgy'
@@ -143,7 +145,8 @@ class VersionTracker(models.Model):
 
 class ReviewedVersionTracker(VersionTracker):
 
-    item_partial_template = 'widgy/_history_item_reviewed.html'
+    history_item_partial_template = 'widgy/_history_item_reviewed.html'
+    commit_submitrow = 'widgy/_commit_submitrow_reviewed.html'
 
     class Meta:
         app_label = 'widgy'
@@ -156,7 +159,8 @@ class ReviewedVersionTracker(VersionTracker):
         return None
 
 
-class VersionCommit(models.Model):
+class VersionCommit(QuerySetManagerModel, models.Model):
+
     tracker = models.ForeignKey(VersionTracker, related_name='commits')
     parent = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT)
     root_node = WidgyField(on_delete=models.PROTECT)
@@ -168,6 +172,16 @@ class VersionCommit(models.Model):
                                     related_name='+')
     approved_at = models.DateTimeField(default=None, null=True)
 
+    class Meta:
+        app_label = 'widgy'
+        verbose_name = _('unapproved commit')
+        verbose_name_plural = _('unapproved commits')
+
+    class QuerySet(QuerySet):
+        def get_non_approved(self):
+            return self.filter(approved_at__isnull=True,
+                               approved_by__isnull=True)
+
     @property
     def is_published(self):
         return self.publish_at <= timezone.now()
@@ -176,13 +190,17 @@ class VersionCommit(models.Model):
     def is_approved(self):
         return bool(self.approved_by and self.approved_at)
 
-    def approve(self, user):
+    def approve(self, user, commit=True):
         self.approved_at = timezone.now()
         self.approved_by = user
-        self.save()
+        if commit:
+            self.save()
 
-    class Meta:
-        app_label = 'widgy'
+    def unapprove(self, user, commit=True):
+        self.approved_at = None
+        self.approved_by = None
+        if commit:
+            self.save()
 
     def __unicode__(self):
         if self.message:

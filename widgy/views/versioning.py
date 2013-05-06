@@ -10,7 +10,7 @@ from django.views.generic import (
     RedirectView,
 )
 from django.views.generic.detail import SingleObjectMixin
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -18,6 +18,7 @@ from django.contrib import messages
 
 from BeautifulSoup import BeautifulSoup
 
+from widgy.utils import format_html
 from widgy.views.base import AuthorizedMixin
 from widgy.models import Node
 
@@ -46,21 +47,15 @@ class CommitForm(forms.Form):
 
 
 class ReviewedCommitForm(CommitForm):
-    approve_it = forms.BooleanField(label=_('Approve the commit'),
-                                     required=False)
 
     def commit(self, obj, user):
         cleaned_data = self.cleaned_data.copy()
-        approve_it = cleaned_data.pop('approve_it')
+        approve_it = 'approve_it' in self.data
 
         commit = obj.commit(user, **cleaned_data)
 
         if approve_it:
             commit.approve(user)
-
-
-class RevertForm(CommitForm):
-    pass
 
 
 class VersionTrackerMixin(SingleObjectMixin):
@@ -73,7 +68,6 @@ class VersionTrackerMixin(SingleObjectMixin):
 
 class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
     template_name = 'widgy/commit.html'
-    form_class = CommitForm
 
     def get_context_data(self, **kwargs):
         self.object = self.get_object()
@@ -88,6 +82,7 @@ class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
 
         # lazy because the template doesn't always use it
         kwargs['changed_anything'] = lambda: self.object.has_changes()
+        kwargs['submitrow_template'] = self.site.get_version_tracker_model().commit_submitrow
 
         return kwargs
 
@@ -133,7 +128,7 @@ class HistoryView(AuthorizedMixin, VersionTrackerMixin, DetailView):
         kwargs = super(HistoryView, self).get_context_data(**kwargs)
         kwargs['site'] = self.site
         kwargs['commits'] = self.object.get_history_list()
-        kwargs['history_item_template'] = self.site.get_version_tracker_model().item_partial_template
+        kwargs['history_item_template'] = self.site.get_version_tracker_model().history_item_partial_template
         for commit in kwargs['commits']:
             if commit.parent_id:
                 commit.diff_url = diff_url(self.site,
@@ -142,7 +137,22 @@ class HistoryView(AuthorizedMixin, VersionTrackerMixin, DetailView):
         return kwargs
 
 
-class ApproveView(AuthorizedMixin, VersionTrackerMixin, RedirectView):
+class ReviewedHistoryView(HistoryView):
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ReviewedHistoryView, self).get_context_data(**kwargs)
+        try:
+            self.site.authorize(self.request, self.site.approve_view.view_instance)
+            kwargs['can_approve_commit'] = True
+        except PermissionDenied:
+            kwargs['can_approve_commit'] = False
+        return kwargs
+
+
+class ApprovalChangeBaseView(AuthorizedMixin, VersionTrackerMixin, RedirectView):
+    """
+    Abstract class for approving or unapproving commits
+    """
     http_method_names = ['post']
 
     def get_redirect_url(self, pk, commit_pk):
@@ -151,19 +161,61 @@ class ApproveView(AuthorizedMixin, VersionTrackerMixin, RedirectView):
                                    pk=commit_pk)
         commit.tracker = vt
 
-        commit.approve(self.request.user)
-        commit.save()
-        messages.success(self.request, _('Commit has been approved'))
+        self.action(commit)
 
-        return self.site.reverse(self.site.history_view, kwargs={
+        history_url = self.site.reverse(self.site.history_view, kwargs={
             'pk': vt.pk
         })
+
+        messages.success(self.request, self.get_message(commit, history_url))
+
+        return history_url
+
+    def action(self, commit):
+        raise NotImplementedError("action should be implemented in subclass")
+
+    def get_message(self, commit, history_url):
+        raise NotImplementedError("get_message should be implemented in subclass")
+
+
+class ApproveView(ApprovalChangeBaseView):
+
+    def action(self, commit):
+        commit.approve(self.request.user)
+        commit.save()
+
+    def get_message(self, commit, history_url):
+        # XXX: Avoid circular import
+        from widgy.forms import UndoApprovalsForm
+        from widgy.admin import HTML_IN_MESSAGES
+
+        message = _('Commit %s has been approved') % commit
+        if HTML_IN_MESSAGES:
+            message = format_html('{0} {1}',
+                message,
+                UndoApprovalsForm(
+                    initial={
+                        'actions': [commit.pk],
+                        'referer': history_url,
+                    }
+                ).render(self.request, self.site)
+            )
+        return message
+
+
+class UnapproveView(ApprovalChangeBaseView):
+
+    def action(self, commit):
+        commit.unapprove(self.request.user)
+        commit.save()
+
+    def get_message(self, commit, history_url):
+        return _('Commit %s has been unapproved') % commit
 
 
 class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
     template_name = 'widgy/revert.html'
     pk_url_kwarg = 'commit_pk'
-    form_class = RevertForm
 
     def get_context_data(self, **kwargs):
         kwargs['object'] = self.object
@@ -171,6 +223,7 @@ class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
         kwargs['revert_url'] = self.site.reverse(
             self.site.revert_view,
             kwargs={'pk': self.object.tracker.pk, 'commit_pk': self.object.pk})
+        kwargs['submitrow_template'] = self.site.get_version_tracker_model().commit_submitrow
         return kwargs
 
     def get_object(self, queryset=None):
@@ -200,6 +253,9 @@ class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
             context=self.get_context_data(),
         )
 
+    def get_form_class(self):
+        return self.site.get_commit_form(self.request.user)
+
 
 class DiffView(AuthorizedMixin, TemplateView):
     template_name = 'widgy/diff.html'
@@ -218,6 +274,31 @@ class DiffView(AuthorizedMixin, TemplateView):
         kwargs['diff'] = daisydiff(a.rendered_content, b.rendered_content)
 
         return kwargs
+
+
+class UndoApprovalsView(AuthorizedMixin, FormView):
+    http_method_names = ['post']
+
+    def get_form_class(self):
+        # XXX: Avoid circular import
+        from widgy.forms import UndoApprovalsForm
+        return UndoApprovalsForm
+
+    def form_valid(self, form):
+        # XXX: Avoid circular import
+        from widgy.models import VersionCommit
+        approved_commits = form.cleaned_data['actions']
+        if not isinstance(approved_commits, list) or \
+           not all([isinstance(i, int) for i in approved_commits]):
+            return self.form_invalid()
+
+        commits = VersionCommit.objects.filter(pk__in=approved_commits)
+        for c in commits:
+            c.unapprove(self.request.user)
+        return redirect(form.cleaned_data['referer'])
+
+    def form_invalid(self, form):
+        return redirect('/')
 
 
 def daisydiff(before, after):

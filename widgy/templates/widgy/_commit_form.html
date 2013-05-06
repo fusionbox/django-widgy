@@ -1,0 +1,10 @@
+<form method="post" class="commit_form" action="{{ commit_url }}">
+  {% csrf_token %}
+  {% for field in form %}
+    {% include "widgy/field_as_div.html" %}
+  {% endfor %}
+  
+  <p class="submitRow">
+    {% include submitrow_template %}
+  </p>
+</form>
