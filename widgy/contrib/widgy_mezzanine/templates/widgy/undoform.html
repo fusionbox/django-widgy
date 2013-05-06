@@ -1,0 +1,9 @@
+{% load i18n %}
+{% load widgy_tags %}
+<form method="POST" action="{% reverse_site_url site 'undo_approvals_view' %}">
+  {% for field in form %}
+    {{ field }}
+  {% endfor %}
+  {% csrf_token %}
+  <input type="submit" value="{% trans "Undo" %}" />
+</form>

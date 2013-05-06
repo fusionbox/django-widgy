@@ -10,7 +10,7 @@ from django.views.generic import (
     RedirectView,
 )
 from django.views.generic.detail import SingleObjectMixin
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -142,6 +142,18 @@ class HistoryView(AuthorizedMixin, VersionTrackerMixin, DetailView):
         return kwargs
 
 
+class ReviewedHistoryView(HistoryView):
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ReviewedHistoryView, self).get_context_data(**kwargs)
+        try:
+            self.site.authorize(self.request, self.site.approve_view.view_instance)
+            kwargs['can_approve_commit'] = True
+        except PermissionDenied:
+            kwargs['can_approve_commit'] = False
+        return kwargs
+
+
 class ApproveView(AuthorizedMixin, VersionTrackerMixin, RedirectView):
     http_method_names = ['post']
 
@@ -158,6 +170,7 @@ class ApproveView(AuthorizedMixin, VersionTrackerMixin, RedirectView):
         return self.site.reverse(self.site.history_view, kwargs={
             'pk': vt.pk
         })
+
 
 
 class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
@@ -218,6 +231,31 @@ class DiffView(AuthorizedMixin, TemplateView):
         kwargs['diff'] = daisydiff(a.rendered_content, b.rendered_content)
 
         return kwargs
+
+
+class UndoApprovalsView(AuthorizedMixin, FormView):
+    http_method_names = ['post']
+
+    def get_form_class(self):
+        # XXX: Avoid circular import
+        from widgy.forms import UndoApprovalsForm
+        return UndoApprovalsForm
+
+    def form_valid(self, form):
+        # XXX: Avoid circular import
+        from widgy.models import VersionCommit
+        approved_commits = form.cleaned_data['actions']
+        if not isinstance(approved_commits, list) or \
+           not all([isinstance(i, int) for i in approved_commits]):
+            return self.form_invalid()
+
+        commits = VersionCommit.objects.filter(pk__in=approved_commits)
+        for c in commits:
+            c.unapprove(self.request.user)
+        return redirect(form.cleaned_data['referer'])
+
+    def form_invalid(self, form):
+        return redirect('/')
 
 
 def daisydiff(before, after):

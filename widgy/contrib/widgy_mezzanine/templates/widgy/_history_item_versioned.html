@@ -24,6 +24,6 @@
   {% endif %}
   {% if commit.diff_url %}
     <a class="button" href="{{ commit.diff_url }}">{% trans "Diff" %}</a>
-  {% endif %}  
-  <a class="button" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=commit.root_node.pk %}">{% trans "View" %}</a>  
+  {% endif %}
+  <a class="button" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=commit.root_node.pk %}">{% trans "View" %}</a>
 </span>
