@@ -393,10 +393,12 @@ class Content(models.Model):
     shelf = False
 
     component_name = 'widget'
-    # 0: can not pop out
-    # 1: can pop out
-    # 2: must pop out
-    pop_out = 0
+
+    CANNOT_POP_OUT = 0
+    CAN_POP_OUT = 1
+    MUST_POP_OUT = 2
+
+    pop_out = CANNOT_POP_OUT
 
     form = ModelForm
     formfield_overrides = {}
