@@ -125,9 +125,7 @@ class UndeletePage(WidgyPage):
 # Remove built in Mezzanine models from the admin center
 from mezzanine.pages.models import RichTextPage
 
-# We can't do this because it doesn't work in all projects, see:
-# https://github.com/stephenmcd/mezzanine/issues/660
-#admin.site.unregister(RichTextPage)
+admin.site.unregister(RichTextPage)
 
 admin.site.register(WidgyPage, WidgyPageAdmin)
 admin.site.register(UndeletePage, UndeletePageAdmin)
