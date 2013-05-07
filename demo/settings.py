@@ -388,6 +388,10 @@ REPLACEMENTS_APP_BLACKLIST = ('admin',)
 
 WIDGY_MEZZANINE_SITE = 'demo.widgy.widgy_site'
 
+URLCONF_INCLUDE_CHOICES = (
+    ('demo.demo_url.urls', 'Demo url'),
+)
+
 DAISYDIFF_JAR_PATH = os.path.join(PROJECT_ROOT, '..', 'bin', 'daisydiff', 'daisydiff.jar')
 
 ###################
