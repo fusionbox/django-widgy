@@ -1,9 +1,9 @@
 from __future__ import absolute_import
 
-from widgy.site import WidgySite
+from widgy.site import ReviewedWidgySite
 
 
-class DemoWidgySite(WidgySite):
+class DemoWidgySite(ReviewedWidgySite):
     def valid_parent_of(self, parent, child_class, obj=None):
         if isinstance(parent, I18NLayout):
             return True
