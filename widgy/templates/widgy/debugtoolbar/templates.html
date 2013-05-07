@@ -1,0 +1,22 @@
+{% load fusionbox_tags %}
+<h4>get_templates_hierarchy</h4>
+<table>
+  <thead>
+    <tr>
+      <th>Class</th>
+      <th>Templates</th>
+      <th>Used</th>
+    </tr>
+  </thead>
+  {% for call in  calls %}
+  {% ifchanged call.templates %}
+  <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
+    <td>{{ call.cls_name }}
+    <td>{% for template in call.templates %}
+          <code style="display: inline">{{ template }}</code>{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    <td><code style="display: inline">{{ call.used }}</code>
+  </tr>
+  {% endifchanged %}
+  {% endfor %}
+</table>
