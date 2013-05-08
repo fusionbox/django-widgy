@@ -1,0 +1,5 @@
+@each $i in 'left' 'center' 'right' 'justify' {
+  .htmlOutput .align-#{$i} {
+    text-align: $i;
+  }
+}
