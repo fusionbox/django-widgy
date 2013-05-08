@@ -9,8 +9,8 @@ from widgy.contrib.page_builder.models import Layout, MainContent, Accordion
 
 class TwoContentLayout(Layout):
     default_children = [
-        (MainContent, (), {}),
-        (MainContent, (), {}),
+        ('main1', MainContent, (), {}),
+        ('main2', MainContent, (), {}),
     ]
 
     class Meta:
