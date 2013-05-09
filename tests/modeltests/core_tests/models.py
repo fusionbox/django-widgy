@@ -24,6 +24,7 @@ class Layout(Content):
     def render(self, context, template=None):
         return ''.join(i.render(context) for i in self.get_children())
 
+
 class Bucket(Content):
     accepting_children = True
 
@@ -56,6 +57,18 @@ class PickyBucket(Bucket):
             return (self.valid_parent_of(cls) and
                     obj.text == 'hello')
         return issubclass(cls, RawTextWidget)
+
+
+class WeirdPkBase(Content):
+    bubble = models.AutoField(primary_key=True)
+
+
+class WeirdPkBucketBase(WeirdPkBase):
+    pass
+
+
+class WeirdPkBucket(WeirdPkBucketBase):
+    pass
 
 
 class ImmovableBucket(Bucket):

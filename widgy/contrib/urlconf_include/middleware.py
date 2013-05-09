@@ -4,8 +4,10 @@ import re
 from django.utils.importlib import import_module
 from django.conf import settings
 from django.conf.urls.defaults import include, url, patterns
+from django.conf.urls.i18n import i18n_patterns
 
 from .models import UrlconfIncludePage
+
 
 class PatchUrlconfMiddleware(object):
     def process_request(self, request):
@@ -19,8 +21,7 @@ class PatchUrlconfMiddleware(object):
         new_urlconf = imp.new_module('urlconf')
         new_urlconf.urlpatterns = patterns('')
         for page in urlconf_pages:
-            new_urlconf.urlpatterns.extend(patterns('',
-                    url('^' + re.escape(page.slug) + '/', include(page.urlconf_name))))
+            new_urlconf.urlpatterns.extend(self.get_pattern_for_page(page))
         new_urlconf.urlpatterns.extend(root_urlconf.urlpatterns)
 
         if hasattr(root_urlconf, 'handler404'):
@@ -29,3 +30,11 @@ class PatchUrlconfMiddleware(object):
             new_urlconf.handler500 = root_urlconf.handler500
 
         request.urlconf = new_urlconf
+
+    def get_pattern_for_page(self, page):
+        return patterns('', url(r'^' + re.escape(page.slug) + '/', include(page.urlconf_name)))
+
+
+class I18nPatchUrlconfMiddleware(PatchUrlconfMiddleware):
+    def get_pattern_for_page(self, page):
+        return i18n_patterns('', url(r'^' + re.escape(page.slug) + '/', include(page.urlconf_name)))
