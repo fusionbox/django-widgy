@@ -4,7 +4,7 @@ from django.conf import settings
 from mezzanine.pages.models import Page
 
 from widgy.db.fields import VersionedWidgyField
-from widgy.contrib.widgy_mezzanine.models.mixins import WidgyPageMixin
+from widgy.contrib.widgy_mezzanine.mixins import WidgyPageMixin
 
 
 class WidgyPage(WidgyPageMixin, Page):
