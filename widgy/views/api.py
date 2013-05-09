@@ -199,7 +199,7 @@ class NodeSingleObjectMixin(SingleObjectMixin, AuthorizedMixin):
     pk_url_kwarg = 'node_pk'
 
 
-class NodeEditView(WidgyViewMixin, NodeSingleObjectMixin, DetailView):
+class NodeEditView(NodeSingleObjectMixin, DetailView):
     """
     The only TemplateView in widgy: The interface for popped out node editing.
     """
@@ -226,7 +226,7 @@ class NodeTemplatesView(NodeSingleObjectMixin, WidgyView):
         return self.render_to_response(node.content.get_templates(request))
 
 
-class NodeParentsView(NodeSingleObjectMixin, WidgyView):
+class NodeParentsView(NodeSingleObjectMixin):
     """
     Given a node, where in its tree can it be moved?
     """

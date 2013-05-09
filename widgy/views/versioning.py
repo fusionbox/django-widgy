@@ -12,7 +12,7 @@ from django.utils import timezone
 
 from BeautifulSoup import BeautifulSoup
 
-from widgy.views.base import WidgyViewMixin, AuthorizedMixin
+from widgy.views.base import AuthorizedMixin
 from widgy.models import Node
 
 DIFF_ENABLED = bool(getattr(settings, 'DAISYDIFF_JAR_PATH', False))
@@ -48,7 +48,7 @@ class VersionTrackerMixin(SingleObjectMixin):
             'working_copy')
 
 
-class CommitView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, FormView):
+class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
     template_name = 'widgy/commit.html'
     form_class = CommitForm
 
@@ -77,7 +77,7 @@ class CommitView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, FormView)
         )
 
 
-class ResetView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, TemplateView):
+class ResetView(AuthorizedMixin, VersionTrackerMixin, TemplateView):
     template_name = 'widgy/reset.html'
 
     def get_context_data(self, **kwargs):
@@ -99,7 +99,7 @@ class ResetView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, TemplateVi
         )
 
 
-class HistoryView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, DetailView):
+class HistoryView(AuthorizedMixin, VersionTrackerMixin, DetailView):
     template_name = 'widgy/history.html'
 
     def get_context_data(self, **kwargs):
@@ -117,7 +117,7 @@ class HistoryView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, DetailVi
         return kwargs
 
 
-class RevertView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, FormView):
+class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
     template_name = 'widgy/revert.html'
     pk_url_kwarg = 'commit_pk'
     form_class = RevertForm
@@ -158,7 +158,7 @@ class RevertView(WidgyViewMixin, AuthorizedMixin, VersionTrackerMixin, FormView)
         )
 
 
-class DiffView(WidgyViewMixin, AuthorizedMixin, TemplateView):
+class DiffView(AuthorizedMixin, TemplateView):
     template_name = 'widgy/diff.html'
 
     def get_context_data(self, **kwargs):
