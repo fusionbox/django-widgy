@@ -2,12 +2,16 @@ from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Q
 from django.http import Http404
 from django.views.generic import View
+from django.views.generic.detail import SingleObjectMixin
+from django.conf import settings
 
 from mezzanine.pages.views import page as page_view
 
 from widgy.contrib.form_builder.views import HandleFormMixin
 from widgy.contrib.widgy_mezzanine.models import WidgyPage
 from widgy.models import Node
+from widgy.views.base import AuthorizedMixin
+from widgy.utils import fancy_import
 
 
 def get_page_from_node(node):
@@ -48,15 +52,23 @@ class HandleFormView(HandleFormMixin, View):
 handle_form = HandleFormView.as_view()
 
 
-def preview(request, node_pk, node=None):
-    node = node or get_object_or_404(Node, pk=node_pk)
+class PreviewView(AuthorizedMixin, SingleObjectMixin, View):
+    model = Node
+    pk_url_kwarg = 'node_pk'
 
-    page = get_page_from_node(node)
+    def get(self, request, node_pk, node=None):
+        node = node or self.get_object()
 
-    context = {
-        'page': page,
-        'root_node_override': node,
-        '_current_page': page,
-    }
+        page = get_page_from_node(node)
 
-    return page_view(request, page.slug, extra_context=context)
+        context = {
+            'page': page,
+            'root_node_override': node,
+            '_current_page': page,
+        }
+
+        return page_view(request, page.slug, extra_context=context)
+
+preview = PreviewView.as_view(
+    site=fancy_import(settings.WIDGY_MEZZANINE_SITE),
+)
