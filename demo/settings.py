@@ -284,6 +284,7 @@ INSTALLED_APPS = (
     'fusionbox.core',
     'south',
     'django_extensions',
+    'backupdb',
 
     # widgy apps
     'filer',
