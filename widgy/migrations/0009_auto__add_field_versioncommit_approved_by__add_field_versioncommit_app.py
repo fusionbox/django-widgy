@@ -16,7 +16,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'VersionCommit.approved_by'
         db.add_column(u'widgy_versioncommit', 'approved_by',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', null=True, on_delete=models.SET_NULL, to=orm[user_orm_label]),
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', null=True, on_delete=models.PROTECT, to=orm[user_orm_label]),
                       keep_default=False)
 
         # Adding field 'VersionCommit.approved_at'
@@ -87,7 +87,7 @@ class Migration(SchemaMigration):
         'widgy.versioncommit': {
             'Meta': {'object_name': 'VersionCommit'},
             'approved_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'null': 'True'}),
-            'approved_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['%s']" % user_orm_label}),
+            'approved_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'null': 'True', 'on_delete': 'models.PROTECT', 'to': u"orm['%s']" % user_orm_label}),
             'author': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s']" % user_orm_label, 'null': 'True', 'on_delete': 'models.SET_NULL'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

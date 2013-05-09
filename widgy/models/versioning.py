@@ -166,7 +166,7 @@ class VersionCommit(QuerySetManagerModel, models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     message = models.TextField(blank=True, null=True)
     publish_at = models.DateTimeField(default=timezone.now)
-    approved_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL,
+    approved_by = models.ForeignKey(User, null=True, on_delete=models.PROTECT,
                                     related_name='+')
     approved_at = models.DateTimeField(default=None, null=True)
 
