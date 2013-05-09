@@ -1,7 +1,7 @@
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
 from django.contrib import messages
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied, ValidationError
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.conf import settings
 import django
@@ -67,6 +67,14 @@ class VersionCommitAdmin(AuthorizedAdminMixin, ModelAdmin):
         return qs.get_non_approved()
 
     queryset = get_queryset
+
+    def get_object(self, request, object_id):
+        model = self.model
+        try:
+            object_id = model._meta.pk.to_python(object_id)
+            return model.objects.get(pk=object_id)
+        except (model.DoesNotExist, ValidationError, ValueError):
+            return None
 
     def get_changelist(self, request, *args, **kwargs):
         return VersionCommitChangeList

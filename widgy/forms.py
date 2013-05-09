@@ -220,6 +220,11 @@ class ApproveForm(forms.ModelForm):
         model = VersionCommit
         fields = ('publish_at', )
 
+    def __init__(self, *args, **kwargs):
+        super(ApproveForm, self).__init__(*args, **kwargs)
+        if hasattr(self, 'instance'):
+            self.initial.update(approve=self.instance.is_approved)
+
     def save(self, request, commit=True):
         if self.cleaned_data['approve']:
             self.instance.approve(request.user, commit=commit)
