@@ -226,7 +226,7 @@ class NodeTemplatesView(NodeSingleObjectMixin, WidgyView):
         return self.render_to_response(node.content.get_templates(request))
 
 
-class NodeParentsView(NodeSingleObjectMixin):
+class NodeParentsView(NodeSingleObjectMixin, WidgyView):
     """
     Given a node, where in its tree can it be moved?
     """
