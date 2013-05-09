@@ -20,7 +20,8 @@ from modeltests.core_tests.models import (
     Layout, Bucket, RawTextWidget, CantGoAnywhereWidget, PickyBucket,
     ImmovableBucket, AnotherLayout, VowelBucket, VersionedPage, VersionedPage2,
     VersionedPage3, VersionedPage4, VersionPageThrough, Related,
-    ForeignKeyWidget)
+    ForeignKeyWidget, WeirdPkBucket
+)
 
 
 from modeltests.core_tests.tests.base import RootNodeTestCase, make_a_nice_tree
@@ -730,6 +731,16 @@ class TestVersioning(RootNodeTestCase):
         time.sleep(.1)
         commit.save()
         self.assertEqual(created_at, commit.created_at)
+
+    def test_cloning_multi_table_inheritance(self):
+        root = PickyBucket.add_root(widgy_site)
+        new_root = root.clone()
+        self.assertNotEqual(new_root.pk, root.pk)
+
+    def test_cloning_multi_table_inheritance_fancy(self):
+        root = WeirdPkBucket.add_root(widgy_site, bubble=2)
+        new_root = root.clone()
+        self.assertNotEqual(new_root.pk, root.pk)
 
 
 class TestPrefetchTree(RootNodeTestCase):

@@ -55,6 +55,7 @@ class Node(MP_Node):
 
     class Meta:
         app_label = 'widgy'
+        unique_together = [('content_type', 'content_id')]
 
     def __unicode__(self):
         return unicode(self.content)
@@ -734,11 +735,27 @@ class Content(models.Model):
         super(Content, self).delete()
 
     def clone(self):
-        # TODO: Make this work with inheritance. Maybe many-to-many
-        # relationships too, or document that you should provide your own clone()
+        """
+        **Note:** In order for clone to work, you need to have an
+        auto-incrementing primary key.
+
+        Also see https://docs.djangoproject.com/en/dev/topics/db/queries/#copying-model-instances
+        """
+        # TODO: Maybe provide support for many-to-many relationships too, or
+        # document that you should provide your own clone()
         # See https://code.djangoproject.com/ticket/4027
         new = copy.copy(self)
         new.pk = None
+        # This adds support for multi-table inheritance.  Normally we would say
+        #
+        #     new.pk = None
+        #     new.id = None
+        #
+        # but we can't know for sure what the name of the actually primary key
+        # field is called.  So we do this to set all the primary keys to None.
+        for field, _ in new._meta.get_fields_with_model():
+            if field.primary_key:
+                setattr(new, field.attname, None)
         new.save()
         return new
 
