@@ -18,6 +18,7 @@ from django.contrib import messages
 
 from BeautifulSoup import BeautifulSoup
 
+from widgy.utils import format_html
 from widgy.views.base import AuthorizedMixin
 from widgy.models import Node
 
@@ -158,6 +159,9 @@ class ApproveView(AuthorizedMixin, VersionTrackerMixin, RedirectView):
     http_method_names = ['post']
 
     def get_redirect_url(self, pk, commit_pk):
+        # XXX: Avoid circular import
+        from widgy.forms import UndoApprovalsForm
+
         vt = get_object_or_404(self.get_queryset(), pk=pk)
         commit = get_object_or_404(vt.commits.select_related('root_node'),
                                    pk=commit_pk)
@@ -165,12 +169,24 @@ class ApproveView(AuthorizedMixin, VersionTrackerMixin, RedirectView):
 
         commit.approve(self.request.user)
         commit.save()
-        messages.success(self.request, _('Commit has been approved'))
 
-        return self.site.reverse(self.site.history_view, kwargs={
+        history_url = self.site.reverse(self.site.history_view, kwargs={
             'pk': vt.pk
         })
 
+        message = format_html('{0} {1}',
+            _('Commit %s has been approved') % commit,
+            UndoApprovalsForm(
+                initial={
+                    'actions': [commit.pk],
+                    'referer': history_url,
+                }
+            ).render(self.request, self.site)
+        )
+
+        messages.success(self.request, message, extra_tags='safe')
+
+        return history_url
 
 
 class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
