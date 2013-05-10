@@ -25,6 +25,7 @@ install_requires = [
     'django-compressor',
     'django-extensions',
     'beautifulsoup4',
+    'sorl-thumbnail==11.12'
 ]
 
 version = (0, 0, 1, 'alpha')
