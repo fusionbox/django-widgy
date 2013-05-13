@@ -27,7 +27,7 @@ from widgy.exceptions import (
 )
 from widgy.signals import pre_delete_widget
 from widgy.generic import WidgyGenericForeignKey, ProxyGenericRelation
-from widgy.utils import exception_to_bool, update_context
+from widgy.utils import exception_to_bool, update_context, unique_everseen
 
 logger = logging.getLogger(__name__)
 
@@ -620,11 +620,13 @@ class Content(models.Model):
         for template in templates:
             for parent_cls in cls.__mro__:
                 try:
-                    ret.append(template.format(**parent_cls.get_template_kwargs(**kwargs)))
+                    ret.extend(
+                        template.format(**i) for i in parent_cls.get_template_kwargs(**kwargs)
+                    )
                 except AttributeError:
                     pass
 
-        return ret
+        return list(unique_everseen(ret))
 
     @classmethod
     def get_template_kwargs(cls, **kwargs):
@@ -634,7 +636,7 @@ class Content(models.Model):
         }
         defaults.update(**kwargs)
 
-        return defaults
+        return [defaults]
 
     @property
     def preview_templates(self):
