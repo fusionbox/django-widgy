@@ -717,7 +717,7 @@ li.node_drop_target {
         li.shelfItem {
           display: inline-block;
           padding: 1px 1px 1px 1px;
-          width: auto;
+          width: auto !important;
 
           span.title {
             background-position: 5px 5px;
