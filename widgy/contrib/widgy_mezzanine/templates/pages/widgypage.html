@@ -1,1 +1,2 @@
-{% extends "pages/widgypage_base.html" %}
+{% load widgy_tags %}
+{% render_root page.get_content_model 'root_node' %}
