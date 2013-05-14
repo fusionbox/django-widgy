@@ -21,7 +21,7 @@ def get_page_from_node(node):
         return get_object_or_404(
             WidgyPage.objects.distinct(),
             Q(root_node__commits__root_node=root_node) | Q(root_node__working_copy=root_node)
-        ).page_ptr
+        )
     except Http404:
         # otherwise, use a fake page
         return WidgyPage(
