@@ -485,6 +485,7 @@ class FormInput(FormField):
         'number': forms.IntegerField,
         'email': forms.EmailField,
         'tel': PhoneNumberField,
+        'checkbox': forms.BooleanField,
     }
 
     FORM_INPUT_TYPES = (
@@ -492,6 +493,7 @@ class FormInput(FormField):
         ('number', _('Number')),
         ('email', _('Email')),
         ('tel', _('Telephone')),
+        ('checkbox', _('Checkbox')),
     )
 
     formfield_class = forms.CharField
