@@ -609,7 +609,7 @@ class Content(models.Model):
 
     @classmethod
     def get_templates_hierarchy(cls, **kwargs):
-        templates = kwargs.get('heirarchy', (
+        templates = kwargs.get('hierarchy', (
             'widgy/{app_label}/{module_name}/{template_name}{extension}',
             'widgy/{app_label}/{template_name}{extension}',
             'widgy/{template_name}{extension}',

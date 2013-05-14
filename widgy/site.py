@@ -153,7 +153,7 @@ class WidgySite(object):
         files = set()
         for widget in self.get_all_content_classes():
             files.update(widget.get_templates_hierarchy(
-                heirarchy=['widgy/{app_label}/{module_name}{extension}'],
+                hierarchy=['widgy/{app_label}/{module_name}{extension}'],
                 extension=extension,
             ))
         return filter(self.filter_existing_staticfiles, files)
