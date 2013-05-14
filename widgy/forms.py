@@ -95,7 +95,6 @@ class WidgyFormField(forms.ModelChoiceField):
         the list of choices.  Otherwise, we set the ``WidgyWidget`` class as
         the widget we use for this field instance.
         """
-        choices = list(self.choices)
         if isinstance(value, Node):
             self.node = value
             try:
@@ -109,15 +108,17 @@ class WidgyFormField(forms.ModelChoiceField):
             except AttributeError:
                 pass
             self.queryset = None
-        elif len(choices) == 2:
-            self._value = choices[1][0]
-            self.widget = DisplayWidget(display_name=choices[1][1])
-            self.help_text = _('You must save before you can edit this.')
         else:
-            self.widget = ContentTypeRadioSelect(
-                # remove the empty choice
-                choices=[c for c in choices if c[0]]
-            )
+            # remove the empty choice
+            choices = [c for c in self.choices if c[0]]
+            if len(choices) == 1:
+                self._value = choices[0][0]
+                self.widget = DisplayWidget(display_name=choices[0][1])
+                self.help_text = _('You must save before you can edit this.')
+            else:
+                self.widget = ContentTypeRadioSelect(
+                    choices=choices,
+                )
 
         try:
             self.widget.widget.site = self.site
