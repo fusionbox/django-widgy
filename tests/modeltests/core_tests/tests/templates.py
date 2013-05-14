@@ -12,6 +12,7 @@ from modeltests.core_tests.models import (
 )
 
 from widgy.templatetags.widgy_tags import mdown
+from widgy.utils import unique_everseen
 
 
 TEMPLATE = """
@@ -110,7 +111,7 @@ class TestMarkdownXss(TestCase):
 
 class TestTemplateHierarchy(TestCase):
     def test_hierarchy_involving_non_model_mixins(self):
-        self.assertEqual(MyInvisibleBucket.get_templates_hierarchy(template_name='test'), [
+        self.assertEqual(list(unique_everseen(MyInvisibleBucket.get_templates_hierarchy(template_name='test'))), [
             'widgy/core_tests/myinvisiblebucket/test.html',
             'widgy/mixins/invisible/test.html',
             'widgy/models/content/test.html',
@@ -121,7 +122,7 @@ class TestTemplateHierarchy(TestCase):
         ])
 
     def test_hierarchy_with_inheritance(self):
-        self.assertEqual(WeirdPkBucket.get_templates_hierarchy(template_name='test'), [
+        self.assertEqual(list(unique_everseen(WeirdPkBucket.get_templates_hierarchy(template_name='test'))), [
             'widgy/core_tests/weirdpkbucket/test.html',
             'widgy/core_tests/weirdpkbucketbase/test.html',
             'widgy/core_tests/weirdpkbase/test.html',

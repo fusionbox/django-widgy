@@ -27,7 +27,7 @@ from widgy.exceptions import (
 )
 from widgy.signals import pre_delete_widget
 from widgy.generic import WidgyGenericForeignKey, ProxyGenericRelation
-from widgy.utils import exception_to_bool, update_context, unique_everseen
+from widgy.utils import exception_to_bool, update_context
 
 logger = logging.getLogger(__name__)
 
@@ -625,8 +625,9 @@ class Content(models.Model):
                     )
                 except AttributeError:
                     pass
-
-        return list(unique_everseen(ret))
+        # This must return a list or tuple because
+        # django.template.render_to_string does a typecheck.
+        return ret
 
     @classmethod
     def get_template_kwargs(cls, **kwargs):
