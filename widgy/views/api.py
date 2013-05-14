@@ -17,6 +17,7 @@ from widgy.models import Node
 from widgy.exceptions import InvalidTreeMovement
 from widgy.utils import extract_id
 from widgy.views.base import WidgyViewMixin, AuthorizedMixin
+from widgy.signals import tree_changed
 
 
 class WidgyView(WidgyViewMixin, RestView):
@@ -56,6 +57,9 @@ class ContentView(WidgyView):
         if not form.is_valid():
             raise ValidationError(form.errors)
         form.save()
+
+        tree_changed.send(sender=self, node=obj.node, content=obj)
+
         return self.render_to_response(form.instance.to_json(self.site),
                                        status=200)
 
@@ -105,8 +109,12 @@ class NodeView(WidgyView):
             parent = get_object_or_404(Node, pk=extract_id(data['parent_id']))
             content = parent.content.add_child(self.site, content_class)
 
-        return self.render_as_node(content.node.to_json(self.site),
-                                   status=201)
+        tree_changed.send(sender=self, node=content.node, content=content)
+
+        node_json = content.node.to_json(self.site)
+        resp = self.render_as_node(node_json, status=201)
+        resp['Location'] = node_json['url']
+        return resp
 
     def put(self, request, node_pk):
         """
@@ -135,6 +143,8 @@ class NodeView(WidgyView):
             except Node.DoesNotExist:
                 raise Http404
 
+        tree_changed.send(sender=self, node=node, content=node.content)
+
         return self.render_as_node(None, status=200)
 
     def delete(self, request, node_pk):
@@ -145,6 +155,7 @@ class NodeView(WidgyView):
 
         try:
             node.content.delete()
+            tree_changed.send(sender=self, node=node, content=node.content)
             return self.render_as_node(None)
         except ProtectedError as e:
             raise ValidationError({'message': e.args[0]})

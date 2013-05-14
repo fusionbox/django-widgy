@@ -1,9 +1,11 @@
 import json
+import mock
 
 from django.core import urlresolvers
 
 from widgy.views import extract_id
 from widgy.models import Node
+from widgy.signals import tree_changed
 
 from modeltests.core_tests.widgy_config import widgy_site
 from modeltests.core_tests.models import ImmovableBucket, UndeletableRawTextWidget, RawTextWidget
@@ -271,3 +273,75 @@ class TestApi(RootNodeTestCase, HttpTestCase):
 
         left = Node.objects.get(pk=left.pk)
         self.assertEqual(before_children + 1, len(left.get_children()))
+
+
+class TestTreeChangedSignal(RootNodeTestCase, HttpTestCase):
+    """
+    This tests that the tree_changed signal gets sent by all the views.
+    """
+
+    def setUp(self):
+        super(TestTreeChangedSignal, self).setUp()
+        self.node_url = widgy_site.reverse(widgy_site.node_view)
+        def handler_spec(*args, **kwargs):
+            pass
+        self.tree_changed_callback = mock.create_autospec(handler_spec)
+        tree_changed.connect(self.tree_changed_callback)
+
+    def test_change(self):
+        left, right = make_a_nice_tree(self.root_node)
+
+        bottom = left.content.get_children()[2].get_children()[0]
+
+        data = bottom.to_json(widgy_site)
+        self.put(data['url'], data)
+
+        self.tree_changed_callback.assert_called_once_with(
+            sender=mock.ANY,
+            node=bottom.node,
+            content=bottom,
+            signal=tree_changed)
+
+    def test_create(self):
+        bucket = list(self.root_node.get_children())[0].content
+
+        resp = self.post(self.node_url, {
+            '__class__': 'core_tests.rawtextwidget',
+            'parent_id': bucket.node.get_api_url(widgy_site),
+            'right_id': None,
+        })
+
+        new_node = Node.objects.get(pk=extract_id(resp['Location']))
+
+        self.tree_changed_callback.assert_called_once_with(
+            sender=mock.ANY,
+            node=new_node,
+            content=new_node.content,
+            signal=tree_changed)
+
+    def test_move(self):
+        left, right = make_a_nice_tree(self.root_node)
+
+        self.put(left.get_api_url(widgy_site), {
+            'parent_id': right.get_api_url(widgy_site),
+            'right_id': None,
+        })
+
+        self.tree_changed_callback.assert_called_once_with(
+            sender=mock.ANY,
+            node=left,
+            content=left.content,
+            signal=tree_changed)
+
+    def test_delete(self):
+        left, right = make_a_nice_tree(self.root_node)
+
+        node_to_delete = list(right.get_children())[0]
+
+        self.delete(node_to_delete.get_api_url(widgy_site))
+
+        self.tree_changed_callback.assert_called_once_with(
+            sender=mock.ANY,
+            node=node_to_delete,
+            content=mock.ANY,
+            signal=tree_changed)
