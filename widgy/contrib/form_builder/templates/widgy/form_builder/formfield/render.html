@@ -3,7 +3,7 @@
   {{field.label_tag}}
   {{field}}
   {% if field.help_text %}
-    <p class="help_text">{{field.help_text}}</p>
+    <div class="help_text">{{ field.help_text|safe }}</div>
   {% endif %}{{field.errors}}
 </div>
 {% endif %}

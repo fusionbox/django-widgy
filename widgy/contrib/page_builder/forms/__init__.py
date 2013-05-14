@@ -123,3 +123,20 @@ class CKEditorField(forms.CharField):
         return bleach.clean(value,
                             tags=self.ALLOWED_TAGS,
                             attributes=self.ALLOWED_ATTRIBUTES)
+
+
+class MiniCKEditorWidget(CKEditorWidget):
+    CONFIG = {
+        'toolbar': [
+            {'name': 'basicstyles', 'groups': ['basicstyles', 'cleanup'], 'items': ['Bold', 'Italic', 'Strike', 'Underline', '-', 'Subscript', 'Superscript', '-', 'RemoveFormat']},
+            {'name': 'undo', 'groups': ['undo'], 'items': ['Undo', 'Redo']},
+            {'name': 'links', 'items': ['Link', 'Unlink', 'Anchor']},
+            {'name': 'mode', 'groups': ['mode'], 'items': ['Source']},
+            {'name': 'editing', 'groups': ['find', 'selection', 'spellchecker'], 'items': ['Scayt']},
+        ],
+        'contentsCss': staticfiles_storage.url('widgy/css/html.css'),
+    }
+
+
+class MiniCKEditorField(forms.CharField):
+    widget = CKEditorWidget

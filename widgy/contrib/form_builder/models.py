@@ -21,6 +21,7 @@ from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin
 from widgy.utils import update_context, build_url
 from widgy.contrib.page_builder.db.fields import MarkdownField
 from widgy.contrib.page_builder.models import Bucket, Html
+from widgy.contrib.page_builder.forms import MiniCKEditorField
 import widgy
 
 
@@ -426,6 +427,10 @@ class BaseFormField(FormElement):
         return []
 
 
+class FormFieldForm(forms.ModelForm):
+    help_text = MiniCKEditorField(label=_('help text'), required=False)
+
+
 class FormField(DisplayNameMixin(lambda x: x.label), BaseFormField):
     widget = None
 
@@ -435,6 +440,8 @@ class FormField(DisplayNameMixin(lambda x: x.label), BaseFormField):
     help_text = models.TextField(blank=True, verbose_name=_('help text'))
     # associates instances of the same logical field across versions
     ident = UUIDField()
+
+    form = FormFieldForm
 
     class Meta:
         abstract = True
@@ -461,7 +468,7 @@ class FormField(DisplayNameMixin(lambda x: x.label), BaseFormField):
         return unicode(value)
 
 
-class FormInputForm(forms.ModelForm):
+class FormInputForm(FormFieldForm):
     class Meta:
         fields = (
             'type',
