@@ -6,9 +6,13 @@ from django.template import Template, Context
 from widgy.models import VersionTracker
 
 from modeltests.core_tests.widgy_config import widgy_site
-from modeltests.core_tests.models import RawTextWidget, HasAWidgy, VersionedPage
+from modeltests.core_tests.models import (
+    RawTextWidget, HasAWidgy, VersionedPage,
+    MyInvisibleBucket, WeirdPkBucket
+)
 
 from widgy.templatetags.widgy_tags import mdown
+from widgy.utils import unique_everseen
 
 
 TEMPLATE = """
@@ -103,3 +107,27 @@ class TestMarkdownXss(TestCase):
         for html, must_not_occur in test_cases:
             cleaned = mdown(html)
             self.assertNotIn(must_not_occur, cleaned)
+
+
+class TestTemplateHierarchy(TestCase):
+    def test_hierarchy_involving_non_model_mixins(self):
+        self.assertEqual(list(unique_everseen(MyInvisibleBucket.get_templates_hierarchy(template_name='test'))), [
+            'widgy/core_tests/myinvisiblebucket/test.html',
+            'widgy/mixins/invisible/test.html',
+            'widgy/models/content/test.html',
+            'widgy/core_tests/test.html',
+            'widgy/mixins/test.html',
+            'widgy/models/test.html',
+            'widgy/test.html',
+        ])
+
+    def test_hierarchy_with_inheritance(self):
+        self.assertEqual(list(unique_everseen(WeirdPkBucket.get_templates_hierarchy(template_name='test'))), [
+            'widgy/core_tests/weirdpkbucket/test.html',
+            'widgy/core_tests/weirdpkbucketbase/test.html',
+            'widgy/core_tests/weirdpkbase/test.html',
+            'widgy/models/content/test.html',
+            'widgy/core_tests/test.html',
+            'widgy/models/test.html',
+            'widgy/test.html',
+        ])

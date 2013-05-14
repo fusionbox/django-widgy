@@ -71,7 +71,7 @@ class InvisibleMixin(object):
         }
         defaults.update(**kwargs)
 
-        return defaults
+        return super(InvisibleMixin, cls).get_template_kwargs(**kwargs) + [defaults]
 
 
 class TabbedContainer(object):
@@ -86,7 +86,7 @@ class TabbedContainer(object):
         }
         defaults.update(**kwargs)
 
-        return defaults
+        return super(TabbedContainer, cls).get_template_kwargs(**kwargs) + [defaults]
 
 
 def DisplayNameMixin(fn):
