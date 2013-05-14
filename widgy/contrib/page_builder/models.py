@@ -20,7 +20,7 @@ from widgy.db.fields import WidgyField
 from widgy.contrib.page_builder.db.fields import MarkdownField, VideoField
 from widgy.contrib.page_builder.forms import CKEditorField
 from widgy.signals import pre_delete_widget
-from widgy.utils import build_url
+from widgy.utils import build_url, SelectRelatedManager
 import widgy
 
 
@@ -165,6 +165,8 @@ class CalloutWidget(Content):
 
     editable = True
 
+    objects = SelectRelatedManager(select_related=['callout__root_node'])
+
     @classmethod
     def valid_child_of(cls, parent, obj=None):
         return isinstance(parent, Sidebar)
@@ -258,6 +260,8 @@ class Image(Content):
     editable = True
 
     image = ImageField()
+
+    objects = SelectRelatedManager(select_related=['image'])
 
     class Meta:
         verbose_name = _('image')

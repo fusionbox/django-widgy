@@ -9,6 +9,7 @@ from contextlib import contextmanager
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 from django.template import Context
+from django.db import models
 
 try:
     from django.contrib.auth import get_user_model
@@ -129,3 +130,17 @@ def unique_everseen(iterable, key=None):
             if k not in seen:
                 seen_add(k)
                 yield element
+
+
+class SelectRelatedManager(models.Manager):
+    """
+    A Manager that always uses select_related.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.select_related = kwargs.pop('select_related', [])
+        super(SelectRelatedManager, self).__init__(*args, **kwargs)
+
+    def get_query_set(self, *args, **kwargs):
+        qs = super(SelectRelatedManager, self).get_query_set(*args, **kwargs)
+        return qs.select_related(*self.select_related)
