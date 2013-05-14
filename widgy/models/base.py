@@ -7,6 +7,8 @@ from functools import partial
 import logging
 import itertools
 import copy
+import hashlib
+import json
 
 from django.db import models
 from django.forms.models import modelform_factory, ModelForm
@@ -23,9 +25,10 @@ from widgy.exceptions import (
     InvalidOperation,
     InvalidTreeMovement,
     ParentChildRejection,
-    RootDisplacementError
+    RootDisplacementError,
+    CannotBeCached,
 )
-from widgy.signals import pre_delete_widget
+from widgy.signals import pre_delete_widget, tree_changed
 from widgy.generic import WidgyGenericForeignKey, ProxyGenericRelation
 from widgy.utils import exception_to_bool, update_context
 
@@ -52,6 +55,7 @@ class Node(MP_Node):
     content_id = models.PositiveIntegerField()
     content = WidgyGenericForeignKey('content_type', 'content_id')
     is_frozen = models.BooleanField(default=False)
+    _cache_key = models.CharField(max_length=64, null=True)
 
     class Meta:
         app_label = 'widgy'
@@ -294,6 +298,7 @@ class Node(MP_Node):
             content=self.content.clone(),
             numchild=self.numchild,
             is_frozen=freeze,
+            _cache_key=self._cache_key,
         )
         children_to_create = []
         for child in self.depth_first_order()[1:]:
@@ -303,6 +308,7 @@ class Node(MP_Node):
                 is_frozen=freeze,
                 depth=child.depth,
                 numchild=child.numchild,
+                _cache_key=self._cache_key,
             ))
         cls.objects.bulk_create(children_to_create)
         return new_root
@@ -365,11 +371,33 @@ class Node(MP_Node):
 
         return dangling, unknown
 
+    def update_cache_key(self):
+        try:
+            cache_keys = [node.content.get_cache_key()
+                          for node in self.depth_first_order()]
+            self._cache_key = hashlib.sha256(':'.join(cache_keys)).hexdigest()
+        except CannotBeCached:
+            self._cache_key = None
+        self.save()
+
+    @property
+    def cache_key(self):
+        if self._cache_key:
+            return self._cache_key
+        else:
+            raise CannotBeCached
+
 
 def check_frozen(sender, instance, **kwargs):
     instance.check_frozen()
 
 models.signals.pre_delete.connect(check_frozen, sender=Node)
+
+
+def update_cache_key(sender, node, content, **kwargs):
+    node.get_root().update_cache_key()
+
+tree_changed.connect(update_cache_key)
 
 
 class Content(models.Model):
@@ -777,6 +805,9 @@ class Content(models.Model):
 
     def equal(self, other):
         return self.get_attributes() == other.get_attributes()
+
+    def get_cache_key(self):
+        return hashlib.sha256(json.dumps(self.get_attributes())).digest()
 
 
 class UnknownWidget(Content):

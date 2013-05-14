@@ -47,3 +47,11 @@ class MutualRejection(ParentWasRejected, ChildWasRejected):
     For instances where both child and parent reject the movement request.
     """
     message = "Neither the parent or child accept this parent-child relationship."
+
+
+class CannotBeCached(Exception):
+    """
+    Any widget can prevent the entire tree from being cached by raising
+    this exception.
+    """
+    pass
