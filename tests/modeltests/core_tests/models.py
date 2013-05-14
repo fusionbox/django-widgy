@@ -5,6 +5,7 @@ from widgy.db.fields import WidgyField, VersionedWidgyField
 from widgy import registry
 
 from widgy.models.links import LinkableMixin, LinkField
+from widgy.models.mixins import InvisibleMixin
 
 
 class Layout(Content):
@@ -168,3 +169,10 @@ class AnotherLinkableThing(LinkableMixin, models.Model):
 
 class ThingWithLink(models.Model):
     link = LinkField('linkable_content_type', 'linkable_object_id')
+
+
+class MyInvisibleBucket(InvisibleMixin, Content):
+    """
+    This is for testing template hierarchy
+    """
+    pass

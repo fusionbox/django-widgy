@@ -609,7 +609,7 @@ class Content(models.Model):
 
     @classmethod
     def get_templates_hierarchy(cls, **kwargs):
-        templates = kwargs.get('heirarchy', (
+        templates = kwargs.get('hierarchy', (
             'widgy/{app_label}/{module_name}/{template_name}{extension}',
             'widgy/{app_label}/{template_name}{extension}',
             'widgy/{template_name}{extension}',
@@ -620,10 +620,13 @@ class Content(models.Model):
         for template in templates:
             for parent_cls in cls.__mro__:
                 try:
-                    ret.append(template.format(**parent_cls.get_template_kwargs(**kwargs)))
+                    ret.extend(
+                        template.format(**i) for i in parent_cls.get_template_kwargs(**kwargs)
+                    )
                 except AttributeError:
                     pass
-
+        # This must return a list or tuple because
+        # django.template.render_to_string does a typecheck.
         return ret
 
     @classmethod
@@ -634,7 +637,7 @@ class Content(models.Model):
         }
         defaults.update(**kwargs)
 
-        return defaults
+        return [defaults]
 
     @property
     def preview_templates(self):

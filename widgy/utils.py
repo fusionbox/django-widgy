@@ -2,6 +2,7 @@
 Some utility functions used throughout the project.
 """
 import urllib
+from itertools import ifilterfalse
 
 import bs4
 from contextlib import contextmanager
@@ -82,6 +83,7 @@ def update_context(context, dict):
     yield context
     context.pop()
 
+
 def build_url(path, **kwargs):
     if kwargs:
         path += '?' + urllib.urlencode(kwargs)
@@ -110,3 +112,20 @@ def html_to_plaintext(html):
     soup = bs4.BeautifulSoup(html)
     text = ' '.join(get_text(soup))
     return text
+
+
+def unique_everseen(iterable, key=None):
+    "List unique elements, preserving order. Remember all elements ever seen."
+    # http://docs.python.org/2/library/itertools.html
+    seen = set()
+    seen_add = seen.add
+    if key is None:
+        for element in ifilterfalse(seen.__contains__, iterable):
+            seen_add(element)
+            yield element
+    else:
+        for element in iterable:
+            k = key(element)
+            if k not in seen:
+                seen_add(k)
+                yield element

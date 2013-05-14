@@ -1,6 +1,8 @@
-{% extends "widgy/preview.html" %}
-{% block content %}
+{% extends "widgy/mixins/tabbed/preview.html" %}
+{% load i18n %}
+{% block title %}
+{{ block.super }}
 {% if self.submission_count %}
-  <a href="{{ self.submission_url }}">view submissions</a>
+  <a href="{{ self.submission_url }}">{% trans 'view submissions' %}</a>
 {% endif %}
 {% endblock %}
