@@ -1,6 +1,7 @@
 from django.core import urlresolvers
 
 from widgy.models.links import LinkableMixin
+from widgy.exceptions import CannotBeCached
 
 
 class WidgyPageMixin(LinkableMixin):
@@ -23,3 +24,14 @@ class WidgyPageMixin(LinkableMixin):
                 'form_node_pk': form.node.pk,
                 'root_node_pk': widgy['root_node'].pk,
             })
+
+    def get_cache_key(self, widgy_env, context):
+        request = context.get('request')
+
+        if request and request.method != 'GET':
+            raise CannotBeCached
+
+        return ':'.join([
+            self.title,
+            (request and request.get_full_path()) or self.get_absolute_url()
+        ])

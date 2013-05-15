@@ -1,12 +1,16 @@
+import hashlib
+
 from django.db import models
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from django.db.models.loading import get_app
 from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
 
 # WidgyContentType has a patched get_for_models that doesn't ignore proxy
 # models
 from widgy.generic.models import ContentType as WidgyContentType
 from widgy.utils import fancy_import, update_context
+from widgy.exceptions import CannotBeCached
 
 from south.modelsinspector import add_introspection_rules
 
@@ -135,7 +139,6 @@ class WidgyField(models.ForeignKey):
         if not root_node:
             return 'no content'
 
-        root_node.prefetch_tree()
         env = {
             'widgy': {
                 'site': self.site,
@@ -144,8 +147,22 @@ class WidgyField(models.ForeignKey):
                 'parent': context and context.get('widgy'),
             },
         }
+
+        try:
+            owner_cache_key = model_instance.get_cache_key(env['widgy'], context)
+            cache_key = hashlib.sha256(root_node.cache_key + owner_cache_key).hexdigest()
+            cached_content = cache.get(cache_key)
+            if cached_content:
+                return cached_content
+        except CannotBeCached:
+            cache_key = None
+
+        root_node.prefetch_tree()
         with update_context(context, env) as context:
-            return root_node.render(context)
+            rendered = root_node.render(context)
+            if cache_key:
+                cache.set(cache_key, rendered)
+            return rendered
 
 
 class VersionedWidgyField(WidgyField):

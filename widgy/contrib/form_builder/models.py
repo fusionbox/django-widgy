@@ -22,6 +22,7 @@ from widgy.utils import update_context, build_url
 from widgy.contrib.page_builder.db.fields import MarkdownField
 from widgy.contrib.page_builder.models import Bucket, Html
 from widgy.contrib.page_builder.forms import MiniCKEditorField
+from widgy.exceptions import CannotBeCached
 import widgy
 
 

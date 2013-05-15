@@ -158,6 +158,9 @@ class Callout(models.Model):
         verbose_name = _('callout')
         verbose_name_plural = _('callouts')
 
+    def get_cache_key(self, widgy_env, context):
+        return widgy_env['parent']['owner'].get_cache_key(widgy_env, context)
+
 
 @widgy.register
 class CalloutWidget(Content):
