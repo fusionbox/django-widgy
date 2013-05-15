@@ -1,6 +1,7 @@
 <!doctype HTML>
 {% load compress %}
 {% load pages_tags %}
+{% load widgy_tags %}
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -16,12 +17,18 @@
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
     </style>
+    {% for scss_file in 'WIDGY_MEZZANINE_SITE'|scss_files %}
+    <link rel="stylesheet" href="{% static scss_file %}" type="text/x-scss">
+    {% endfor %}
     {% endblock %}
   {% endcompress %}
   {% compress js %}
     {% block js %}
       <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
       <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+      {% for js_file in 'WIDGY_MEZZANINE_SITE'|js_files %}
+      <script src="{% static js_file %}"></script>
+      {% endfor %}
     {% endblock %}
   {% endcompress %}
 </head>

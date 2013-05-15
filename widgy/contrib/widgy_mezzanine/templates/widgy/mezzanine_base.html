@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load pages_tags %}
+
+{% block metadata %}
+<title>{{ page.meta_title }}</title>
+<meta name="description" content="{{ page.description }}" />
+<meta name="keywords" content="{{ page.get_content_model.seo_keywords }}" />
+{% endblock %}
+
+{% block leftnav %}
+  {% page_menu 'pages/menus/leftnav.html' %}
+{% endblock %}
+
+{% block breadcrumb %}
+{{ block.super }} {% page_menu 'pages/menus/breadcrumb.html' %}
+{% endblock %}
