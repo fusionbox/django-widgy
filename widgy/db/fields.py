@@ -1,11 +1,11 @@
-from operator import or_
-
 from django.db import models
-from django.db.models import Q
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from django.db.models.loading import get_app
 from django.contrib.contenttypes.models import ContentType
 
+# WidgyContentType has a patched get_for_models that doesn't ignore proxy
+# models
+from widgy.generic.models import ContentType as WidgyContentType
 from widgy.utils import fancy_import, update_context
 
 from south.modelsinspector import add_introspection_rules
@@ -111,13 +111,21 @@ class WidgyField(models.ForeignKey):
             return getattr(get_app(app_label), model_name)
 
         layouts = tuple(map(normalize, layouts))
-        classes = (cls for cls in self.site.get_all_content_classes() if issubclass(cls, layouts))
+        classes = (cls for cls in self.site.get_all_content_classes()
+                   if issubclass(cls, layouts))
 
-        qs = reduce(or_, (Q(app_label=cls._meta.app_label, model=cls._meta.module_name)
-                          for cls in classes))
-
-        # we need to return a queryset, not a list.
-        return ContentType.objects.filter(qs)
+        # This method must return a queryset, because it is used as
+        # choices for a ModelChoiceField.
+        #
+        # If you are having trouble running tests because of this line,
+        # do not create WidgyFormMixin subclasses at the root level, the
+        # test databases haven't been set up yet, but we try to query
+        # the ContentType table.
+        return ContentType.objects.filter(pk__in=[
+            ct.pk for ct in WidgyContentType.objects.get_for_models(
+                for_concrete_models=False,
+                *classes
+            ).values()])
 
     def get_render_node(self, model_instance, context):
         return getattr(model_instance, self.name)

@@ -53,17 +53,21 @@ class TestWidgyField(TestCase):
         self.assertEqual(len(layout_contenttypes), 1)
         self.assertIn(the_layout_contenttype, layout_contenttypes)
 
-
-class WidgiedForm(WidgyFormMixin, forms.Form):
-    text_field = forms.CharField()
-    widgy_field = WidgyFormField(
-        queryset=ContentType.objects.filter(model__in=['layout', 'anotherlayout']),
-        site=widgy_site,
-    )
-
 class TestPlainForm(TestCase):
+    def setUp(self):
+        # WidgyForms cannot be at the root level of a test because they make
+        # database calls and the database isn't setup yet.
+        class WidgiedForm(WidgyFormMixin, forms.Form):
+            text_field = forms.CharField()
+            widgy_field = WidgyFormField(
+                queryset=ContentType.objects.filter(model__in=['layout', 'anotherlayout']),
+                site=widgy_site,
+            )
+
+        self.form = WidgiedForm
+
     def test_render_initial(self):
-        x = WidgiedForm()
+        x = self.form()
         rendered = x.as_p()
         self.assertIn('value="%s"' % ContentType.objects.get_for_model(Layout).id,
                       rendered)
@@ -80,13 +84,13 @@ class TestPlainForm(TestCase):
                       rendered)
 
     def test_initial_save(self):
-        x = WidgiedForm({
+        x = self.form({
             'text_field': 'foo',
             'widgy_field': str(ContentType.objects.get_for_model(AnotherLayout).id),
         })
         self.assertTrue(x.is_valid())
 
-        x = WidgiedForm({
+        x = self.form({
             'text_field': 'foo',
             'widgy_field': str(ContentType.objects.get_for_model(HasAWidgy).id),
         })
@@ -95,18 +99,20 @@ class TestPlainForm(TestCase):
     def test_second_save(self):
         # todo...I don't even know what the api for a non-modelform widgy field is
         root_node = Layout.add_root(widgy_site)
-        x = WidgiedForm(initial={'widgy_field': root_node})
-
-
-class WidgiedModelForm(WidgyFormMixin, forms.ModelForm):
-    text_field = forms.CharField()
-
-    class Meta:
-        model = HasAWidgy
+        x = self.form(initial={'widgy_field': root_node})
 
 class TestModelForm(TestCase):
+    def setUp(self):
+        class WidgiedModelForm(WidgyFormMixin, forms.ModelForm):
+            text_field = forms.CharField()
+
+            class Meta:
+                model = HasAWidgy
+
+        self.form = WidgiedModelForm
+
     def test_render_initial(self):
-        x = WidgiedModelForm()
+        x = self.form()
         rendered = x.as_p()
         self.assertIn('value="%s"' % ContentType.objects.get_for_model(Layout).id,
                       rendered)
@@ -123,7 +129,7 @@ class TestModelForm(TestCase):
                       rendered)
 
     def test_initial_save(self):
-        x = WidgiedModelForm({
+        x = self.form({
             'text_field': 'asdf',
             'widgy': ContentType.objects.get_for_model(AnotherLayout).id,
         })
@@ -133,7 +139,7 @@ class TestModelForm(TestCase):
         self.assertIsInstance(instance.widgy.content, AnotherLayout)
 
     def test_initial_save_invalid(self):
-        x = WidgiedModelForm({
+        x = self.form({
             'text_field': 'asdf',
             'widgy': ContentType.objects.get_for_model(HasAWidgy).id,
         })
@@ -144,7 +150,7 @@ class TestModelForm(TestCase):
         instance = HasAWidgy.objects.create(
             widgy=Layout.add_root(widgy_site).node
         )
-        x = WidgiedModelForm(instance=instance)
+        x = self.form(instance=instance)
         rendered = x.as_p()
 
         self.assertIn('input type="hidden" name="widgy" value="%s"' % instance.widgy.pk,
@@ -158,7 +164,7 @@ class TestModelForm(TestCase):
         instance = HasAWidgy.objects.create(
             widgy=Layout.add_root(widgy_site).node
         )
-        x = WidgiedModelForm(instance=instance, data={
+        x = self.form(instance=instance, data={
             'widgy': '1',
             'text_field': 'asdf',
         })
@@ -180,13 +186,16 @@ class TestModelForm(TestCase):
         instance = x.save()
         self.assertIsInstance(instance.widgy.content, AnotherLayout)
 
-class VersionedWidgiedForm(WidgyFormMixin, forms.ModelForm):
-    class Meta:
-        model = VersionedPage
 
 class TestVersionedModelForm(TestCase):
+    def setUp(self):
+        class VersionedWidgiedForm(WidgyFormMixin, forms.ModelForm):
+            class Meta:
+                model = VersionedPage
+        self.form = VersionedWidgiedForm
+
     def test_render(self):
-        x = VersionedWidgiedForm()
+        x = self.form()
         rendered = x.as_p()
         self.assertIn('value="%s"' % ContentType.objects.get_for_model(Layout).id,
                       rendered)
@@ -200,14 +209,14 @@ class TestVersionedModelForm(TestCase):
                       rendered)
 
     def test_first_save_noroot(self):
-        x = VersionedWidgiedForm({})
+        x = self.form({})
 
         self.assertTrue(x.is_valid())
         instance = x.save()
         self.assertEqual(instance.version_tracker, None)
 
     def test_first_save(self):
-        x = VersionedWidgiedForm({
+        x = self.form({
             'version_tracker': ContentType.objects.get_for_model(Layout).id,
         })
 
@@ -217,11 +226,11 @@ class TestVersionedModelForm(TestCase):
         self.assertIsInstance(instance.version_tracker.working_copy.content, Layout)
 
     def test_second_render(self):
-        x = VersionedWidgiedForm({
+        x = self.form({
             'version_tracker': ContentType.objects.get_for_model(Layout).id,
         })
         instance = x.save()
-        x = VersionedWidgiedForm(instance=instance)
+        x = self.form(instance=instance)
         url = widgy_site.reverse(widgy_site.commit_view, kwargs={'pk': instance.pk})
         self.assertIn(url, x.as_p())
 
