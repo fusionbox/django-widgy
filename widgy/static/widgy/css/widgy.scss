@@ -542,17 +542,32 @@ li.node_drop_target {
                           p.drag-row {
                             span.dragHandle {
                               font-size: 13px;
+                               left: 5px;
+                               position: absolute;
+                               top: 10px;
                             }
                             
                             span.title {
                               font-size: 12px;
+                              display: block;
+                              margin: 0 0 5px;
+                              padding: 0 0 0 10px;
                             }
                             
                             button {
                               font-size: 10px;
                               line-height: 1em;
-                              margin-left: 0.5em;
+                              margin: 0;
                               padding: 1px;
+                              position: static;
+                              
+                              &.delete {
+                                float: right;
+                              }
+                              
+                              &.edit {
+                                float: left;
+                              }
                               
                               span {
                                 display: none;
