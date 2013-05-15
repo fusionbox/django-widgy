@@ -723,6 +723,7 @@ li.node_drop_target {
             background-position: 5px 5px;
             font-size: 11px;
             padding: 2px 0px 2px 26px;
+            text-transform: capitalize;
           }
 
           span.icon-move {
@@ -849,6 +850,7 @@ div.widgy {
                 font-size: 1.2em;
                 line-height: 1.8em;
                 padding: 5px 0 5px 30px;
+                text-transform: capitalize;
               }
               
               &.being_dragged {
@@ -902,6 +904,7 @@ li.shelfItem {
   border: 1px solid #E0E0E0;
      
   @include node-icon("accordion", "../image/widget-accordion.png");
+  @include node-icon("brandlist", "../image/widget-brand-list.png");
   @include node-icon("button", "../image/widget-button.png");
   @include node-icon("calloutwidget", "../image/widget-callout.png");
   @include node-icon("choicefield", "../image/widget-radio.png");
@@ -911,15 +914,20 @@ li.shelfItem {
   @include node-icon("figure", "../image/widget-figure.png");
   @include node-icon("form", "../image/widget-form.gif");
   @include node-icon("forminput", "../image/widget-form.gif");
+  @include node-icon("googlemap", "../image/widget-google-map.png");
   @include node-icon("homebucket", "../image/widget-bucket.png");
   @include node-icon("html", "../image/widget-html.png");
   @include node-icon("image", "../image/widget-image.gif");
+  @include node-icon("imagecallout", "../image/widget-image-bucket.png");
   @include node-icon("markdown", "../image/widget-code.gif");
   @include node-icon("miniboxes", "../image/widget-miniboxes.gif");
   @include node-icon("multiplechoicefield", "../image/widget-checkbox.png");
+  @include node-icon("productbucket", "../image/widget-product-bucket.png");
+  @include node-icon("productlist", "../image/widget-product-list.png");
   @include node-icon("savedatahandler", "../image/widget-save-data.png");
   @include node-icon("section", "../image/widget-section.png");
   @include node-icon("slide", "../image/widget-slide.png");
+  @include node-icon("slideshow", "../image/widget-slide.png");
   @include node-icon("submitbutton", "../image/widget-button.png");
   @include node-icon("table", "../image/widget-table.gif");
   @include node-icon("tableheaderdata", "../image/widget-tablecolumn.png");
