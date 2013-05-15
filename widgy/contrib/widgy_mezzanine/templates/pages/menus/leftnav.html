@@ -1,0 +1,29 @@
+{% load i18n future pages_tags %}
+
+{% if page_branch_in_menu %}
+  {% for page in page_branch %}
+    {% if page.branch_level == 0 %}
+      {% if page.is_current_or_ascendant %}
+        <p class="title{% if page.is_current %} here{% endif %}">{{ page.title }}</p>
+        {% if page.has_children_in_menu and page.is_current_or_ascendant %}
+        <nav>
+        <ul>
+          {% page_menu page %}
+        </ul>
+        </nav>
+        {% endif %}
+      {% endif %}
+    {% else %}
+      {% if page.in_menu %}
+        <li{% if page.is_current_or_ascendant %} class="here"{% endif %}>
+          <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+          {% if page.has_children_in_menu and page.is_current_or_ascendant %}
+          <ul>
+            {% page_menu page %}
+          </ul>
+          {% endif %}
+        </li>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
