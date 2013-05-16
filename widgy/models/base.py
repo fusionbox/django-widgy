@@ -710,6 +710,11 @@ class Content(models.Model):
             formfield.widget = widgets.RelatedFieldWidgetWrapper(
                 formfield.widget, db_field.rel, admin_site,
                 can_add_related=can_add_related)
+        else:
+            for klass in db_field.__class__.mro():
+                if klass in self.formfield_overrides:
+                    kwargs = dict(copy.deepcopy(self.formfield_overrides[klass]), **kwargs)
+                    return db_field.formfield(**kwargs)
         return formfield
 
     def get_templates(self, request):
