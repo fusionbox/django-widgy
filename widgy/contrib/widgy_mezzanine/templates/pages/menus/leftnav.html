@@ -4,14 +4,14 @@
   {% for page in page_branch %}
     {% if page.branch_level == 0 %}
       {% if page.is_current_or_ascendant %}
-        <p class="title{% if page.is_current %} here{% endif %}">{{ page.title }}</p>
-        {% if page.has_children_in_menu and page.is_current_or_ascendant %}
-        <nav>
-        <ul>
-          {% page_menu page %}
-        </ul>
+        <nav class="left">
+          <p class="title{% if page.is_current %} here{% endif %}">{{ page.title }}</p>
+          {% if page.has_children_in_menu and page.is_current_or_ascendant %}
+          <ul>
+            {% page_menu page %}
+          </ul>
+          {% endif %}
         </nav>
-        {% endif %}
       {% endif %}
     {% else %}
       {% if page.in_menu %}
