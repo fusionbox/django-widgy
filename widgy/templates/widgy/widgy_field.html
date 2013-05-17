@@ -1,4 +1,16 @@
 {% load compress %}{% load fusionbox_tags %}{% load static %}
+{% comment %}
+Hitting return in a form clicks its first button. Without this dummy
+button, the first button in the form would be a widget's delete button.
+So instead of submitting the form as expected, <RET> would delete a
+widget! The button can't be `display: none` because then it won't be
+used.
+
+name=_continue makes 'Save and continue editing' the default behavior in
+the admin center.
+{% endcomment %}
+<input type="submit" name="_continue" style="position: absolute; left: -10000px;">
+
 <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
 {% compress css %}
 <link type="text/css" rel="stylesheet" href="{% static 'widgy/css/font-awesome.css' %}">

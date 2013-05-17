@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
+from django.db.models.deletion import ProtectedError
 
 from fusionbox.db.models import QuerySetManager
 
@@ -71,7 +72,11 @@ class VersionTracker(models.Model):
         old_working_copy = self.working_copy
         self.working_copy = self.head.root_node.clone_tree(freeze=False)
         self.save()
-        old_working_copy.delete()
+        try:
+            old_working_copy.content.delete()
+        except ProtectedError:
+            # The tree couldn't be deleted, so just let it float away...
+            pass
 
     def get_published_node(self, request):
         for commit in self.get_history():

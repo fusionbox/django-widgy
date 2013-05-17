@@ -1,6 +1,7 @@
 from pprint import pprint
 import datetime
 import time
+import mock
 
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -687,6 +688,8 @@ class TestVersioning(RootNodeTestCase):
         textwidget_content.save()
 
         tracker.reset()
+        # the content should get deleted
+        self.assertFalse(RawTextWidget.objects.filter(pk=textwidget_content.pk).exists())
         textwidget_content = tracker.working_copy.content
         self.assertEqual(textwidget_content.text, 'first')
 
@@ -741,6 +744,19 @@ class TestVersioning(RootNodeTestCase):
         root = WeirdPkBucket.add_root(widgy_site, bubble=2)
         new_root = root.clone()
         self.assertNotEqual(new_root.pk, root.pk)
+
+    def test_reset_exception(self):
+        """
+        Some widgets can't be deleted. We should still be able to reset.
+        """
+
+        tracker, commit1 = self.make_commit(datetime.timedelta(days=-1))
+
+        with mock.patch.object(tracker.working_copy.content, 'delete') as delete:
+            delete.side_effect = ProtectedError("can't delete", [])
+            tracker.reset()
+        # passes if there was no exception
+
 
 
 class TestPrefetchTree(RootNodeTestCase):
