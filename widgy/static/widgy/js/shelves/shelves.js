@@ -143,8 +143,7 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
         return;
 
       var placeholder = this.placeholder = $('<li class="drag_placeholder">&nbsp;</li>').css({
-        width: this.$el.width(),
-        padding: this.$el.css('padding')
+        width: this.$el.width()
       });
 
       this.$el.after(placeholder);
