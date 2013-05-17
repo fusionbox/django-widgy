@@ -67,8 +67,8 @@ $table-cell-min-width: 250px;
 /* Placeholder selectors
 -----------------------------------------*/
 %loading {
-  background: url('../image/loading.gif') center no-repeat;
-  color: transparent;
+  background: url('../image/loading.gif') center no-repeat !important;
+  color: transparent !important;
 }
 
 
