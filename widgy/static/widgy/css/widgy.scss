@@ -14,7 +14,8 @@ $table-cell-min-width: 250px;
   cursor: pointer;
   display: inline-block;
   height: auto;
-  font-weight: normal;
+  font-weight: bold;
+  line-height: 12px;
   padding: 2px 4px;
   width: auto;
 
@@ -316,7 +317,7 @@ li.node_drop_target {
           z-index: 100;
           
           &.edit {
-            right: 68px;
+            right: 74px;
           }
         }
 
@@ -487,7 +488,7 @@ li.node_drop_target {
                 }
           
                 button.delete {
-                  font-size: 8px;
+                  font-size: 9px;
                   line-height: 1em;
                   padding: 1px;
                   position: absolute;
