@@ -224,7 +224,7 @@ li.node_drop_target {
     &.being_dragged {
       @include shadow(#999999, 2px, 2px, 5px);
       background-color: blue;
-      margin: 0;
+      margin: 0 !important;
       position: fixed;
     }
 
