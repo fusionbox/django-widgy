@@ -51,8 +51,9 @@ $table-cell-min-width: 250px;
     background: $green;
     color: white;
     height: auto;
+    line-height: 15px;
     font-weight: bold;
-    padding: 1px 4px !important;
+    padding: 0px 4px 1px !important;
     
     &:hover {
       background: lighten($green,10%);
@@ -189,7 +190,6 @@ li.node_drop_target {
     @include inset-shadow(transparent,0px,0px,0px);
     background: white;
     list-style: none;
-    overflow: hidden;
     padding: 0px;
     margin: 0 0 1em 0;
 
