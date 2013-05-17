@@ -1,10 +1,4 @@
-@mixin rounded($radius) {
-  border-radius: $radius !important;
-    -o-border-radius: $radius !important;
-    -ms-border-radius: $radius !important;
-    -moz-border-radius: $radius !important;
-    -webkit-border-radius: $radius !important;
-}
+@import "widgy_common";
 
 /*
 div.widgy div.editor section.node div.widget > ul.nodeChildren {
@@ -12,60 +6,93 @@ div.widgy div.editor section.node div.widget > ul.nodeChildren {
 }
 */
 
-div.widgy div.editor section.tabbed > div.widget > ul.nodeChildren {
-  float: left !important;
-  width: 63% !important;
+div.widgy div.editor .tabbed {
+  > .widget {
+    @include clearfix;
+  }
+}
+
+div.widgy div.editor .tabbed > div.widget > ul.nodeChildren {
+  @include box-sizing(border-box);
 
   > li {
     @include rounded(4px 4px 0px 0px);
-    background: #eeeeee !important;
-    border-color: #cccccc;
-    border-width: 1px 1px 0px 1px;
-    color: #999999;
     display: inline-block;
     float: left;
     margin: 0 0 0 .5em !important;
     padding: 0px 5px !important;
     position: relative;
     top: 2px;
-    z-index: 10;
 
-    .widget {
-      background: transparent !important;
+    &.node {
+      background: #eeeeee !important;
+      border-color: #cccccc;
+      border-width: 1px 1px 0px 1px;
+      color: #999999;
 
-      .drag-row {
-        @include rounded(0px);
-        background: transparent !important;
+      &.active {
+        background-color: #fafafa !important;
+        border-bottom: 2px solid #fafafa;
+        color: #555555;
 
-        span.title {
-          color: inherit;
-        }
-
-        .edit, // functionality for editing the tab doesn't exist yet.
-        .delete span {
-          display: none;
-        }
-
-        .preview {
-          background: transparent;
+        .edit, .delete {
           display: inline;
         }
       }
+
+      .widget {
+        background: transparent !important;
+
+        .drag-row {
+          @include rounded(0px);
+          background: transparent !important;
+
+          span.title {
+            color: inherit;
+          }
+
+          .edit span, // functionality for editing the tab doesn't exist yet.
+          .delete span {
+            display: none;
+          }
+
+          button.edit,
+          button.delete {
+            position: static !important;
+          }
+
+          .preview {
+            background: transparent;
+            display: inline;
+          }
+        }
+      }
+
+      .preview,
+      .nodeChildren {
+        display: none;
+      }
+
+      &:hover {
+        background-color: white !important;
+      }
+
+      .edit, .delete {
+        display: none;
+      }
     }
 
-    .preview,
-    .nodeChildren {
-      display: none;
-    }
+    &.node_drop_target {
+      height: 24px !important;
+      width: 50px;
 
-    &:hover {
-      background-color: white !important;
-    }
+      &.active {
+        width: 100px;
 
-    &.active {
-      background-color: #fafafa !important;
-      border-bottom: 2px solid #fafafa;
-      color: #555555;
+        span {
+          display: none;
+        }
+      }
     }
   }
 }
