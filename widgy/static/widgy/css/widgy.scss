@@ -4,6 +4,7 @@
 /* Mixins
 -----------------------------------------*/
 
+$table-cell-min-width: 250px;
 
 @mixin button {
   @include rounded(3px);
@@ -455,10 +456,22 @@ li.node_drop_target {
       ul.nodeChildren {
         li.node, li.node_drop_target  {
           margin: 1em;
+          
+          &.table {
+            > div.widget {
+              > ul.nodeChildren {
+                // table container
+                overflow: auto;
+                overflow-y: hidden;
+              }
+            }
+          }
                   
           &.tableheader {
             border: 0px;
-            padding: 0px 30px;
+            margin: 0 1em;
+            overflow: visible;
+            padding: 0px 0px 0px 40px;
           
             > div.widget {
               > p.drag-row {
@@ -497,6 +510,7 @@ li.node_drop_target {
               ul.nodeChildren {
                 li.tableheaderdata {
                   @include rounded(0px);
+                  min-width: $table-cell-min-width;
           
                   > div.widget {
                     > p.drag-row {
@@ -559,14 +573,9 @@ li.node_drop_target {
                               line-height: 1em;
                               margin: 0;
                               padding: 1px;
-                              position: static;
-                              
-                              &.delete {
-                                float: right;
-                              }
                               
                               &.edit {
-                                float: left;
+                                right: 35px;
                               }
                               
                               span {
@@ -586,26 +595,28 @@ li.node_drop_target {
           &.invisible {
             background: transparent;
             border: 0px;
-            margin: 0px;
+            margin: 0 1em;
             overflow: visible;
-            padding: 0px 30px;
+            padding: 0px 0px 0px 40px;
             
             div.widget {
               ul.nodeChildren {
                 
                 li.node.tablerow {
                   border: 0px;
+                  margin: 0px;
                   overflow: visible;
                   
                   > div.widget {
                     
                     > p.drag-row {
                       height: 0px;
+                      min-height: 0px;
                       padding: 0px;
                       
                       span.dragHandle {
                         font-size: 14px;
-                        left: -30px;
+                        left: -20px;
                         position: absolute;
                         top: 3px;
                       }
@@ -616,7 +627,7 @@ li.node_drop_target {
                         padding: 3px 0px 1px 1px;
                         position: absolute;
                         top: 3px;
-                        right: -30px;
+                        left: -40px;
                         z-index: 1000;
                   
                         i {
@@ -634,6 +645,7 @@ li.node_drop_target {
                       
                       > li.node.tabledata {
                         @include rounded(0px);
+                        min-width: $table-cell-min-width;
                   
                         > div.widget {
                           min-height: 20px;
@@ -669,14 +681,9 @@ li.node_drop_target {
                               line-height: 1em;
                               margin: 0;
                               padding: 1px;
-                              position: static;
-                              
-                              &.delete {
-                                float: right;
-                              }
                               
                               &.edit {
-                                float: left;
+                                right: 35px;
                               }
                               
                               span {
