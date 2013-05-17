@@ -8,46 +8,36 @@ $table-cell-min-width: 250px;
 
 @mixin button {
   @include rounded(3px);
-  background: transparent;
-  border: 1px solid $blue;
-  color: $blue;
+  background: $blue;
+  border: 0px;
+  color: white;
   cursor: pointer;
   display: inline-block;
   height: auto;
-  font-weight: bold;
-  padding: 2px;
+  font-weight: normal;
+  padding: 2px 4px;
   width: auto;
 
   &:hover {
-    background: lighten($blue,35%);
-    color: $blue;
+    background: lighten($blue,10%);
+    color: white;
   }
 
   &.cancel {
-    border-color: $grey;
-    color: $grey;
+    background: $grey;
+    color: white;
     
     &:hover {
-      background: lighten($lightgrey,15%);
-    }
-  }
-  
-  &.edit {
-    background: #f4f4f4;
-
-    &:hover {
-      background: lighten($blue,35%);
-      color: $blue;
+      background: lighten($grey,10%);
     }
   }
   
   &.delete {
-    background: #f4f4f4;
-    border-color: $red;
-    color: $red;
+    background: $red;
+    color: white;
     
     &:hover {
-      background: lighten($red,35%);
+      background: lighten($red,10%);
     }
   }
   
@@ -57,14 +47,14 @@ $table-cell-min-width: 250px;
   
   &[type='submit'] {
     @include rounded(3px);
-    border-color: $green;
-    color: $green;
+    background: $green;
+    color: white;
     height: auto;
     font-weight: bold;
-    padding: 2px !important;
+    padding: 2px 4px !important;
     
     &:hover {
-      background: lighten($green,50%);
+      background: lighten($green,10%);
     }
   }
   
@@ -303,15 +293,17 @@ li.node_drop_target {
         display: block;
         float: none;
         height: auto;
-        min-height: 22px;
+        min-height: 20px;
         margin: 0px;
-        padding: 10px;
+        padding: 2px;
         position: relative;
         width: auto;
         
         span.title {
-          font-size: 15px;
+          color: #666;
+          font-size: 13px;
           font-weight: normal;
+          line-height: 20px;
         }
 
         button.edit,
@@ -319,20 +311,21 @@ li.node_drop_target {
           float: none;
           margin-left: 0;
           position: absolute;
-          top: 9px;
-          right: 9px;
+          top: 3px;
+          right: 3px;
           z-index: 100;
           
           &.edit {
-            right: 80px;
+            right: 68px;
           }
         }
 
         .dragHandle {
-          left: -5px;
+          left: 0px;
           float: left;
-          font-size: 20px;
+          font-size: 14px;
           position: relative;
+          top: 3px;
           cursor: pointer;
         }                      
       }
@@ -416,7 +409,7 @@ li.node_drop_target {
           
           .cancel {
             position: absolute;
-            right: 65px;
+            right: 55px;
             top: 0px;
           }
         }
@@ -463,6 +456,7 @@ li.node_drop_target {
                 // table container
                 overflow: auto;
                 overflow-y: hidden;
+                padding-bottom: 20px !important;
               }
             }
           }
@@ -499,6 +493,7 @@ li.node_drop_target {
                   position: absolute;
                   top: 4px;
                   right: 4px;
+                  width: 15px;
                   z-index: 1000;
             
                   i {
@@ -539,6 +534,7 @@ li.node_drop_target {
                         position: absolute;
                         top: 3px;
                         right: 3px;
+                        width: 15px;
                         z-index: 1000;
                   
                         i {
@@ -556,16 +552,15 @@ li.node_drop_target {
                           p.drag-row {
                             span.dragHandle {
                               font-size: 13px;
-                               left: 5px;
+                               left: 0px;
                                position: absolute;
-                               top: 10px;
+                               top: 5px;
                             }
                             
                             span.title {
                               font-size: 12px;
                               display: block;
-                              margin: 0 0 5px;
-                              padding: 0 0 0 10px;
+                              padding: 0 0 0 15px;
                             }
                             
                             button {
@@ -628,6 +623,7 @@ li.node_drop_target {
                         position: absolute;
                         top: 3px;
                         left: -40px;
+                        width: 15px;
                         z-index: 1000;
                   
                         i {
@@ -664,16 +660,15 @@ li.node_drop_target {
                           p.drag-row {
                             span.dragHandle {
                               font-size: 13px;
-                               left: 5px;
+                               left: 0px;
                                position: absolute;
-                               top: 10px;
+                               top: 5px;
                             }
                             
                             span.title {
                               font-size: 12px;
                               display: block;
-                              margin: 0 0 5px;
-                              padding: 0 0 0 10px;
+                              padding: 0 0 0 15px;
                             }
                             
                             button {
