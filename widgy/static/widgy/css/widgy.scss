@@ -746,6 +746,7 @@ li.node_drop_target {
       margin: 10px;
       padding: 0px 0px 10px 0px;
       width: auto;
+      overflow-y: hidden;
 
       p.title {
         display: none; // hide the form widgets label
@@ -853,6 +854,7 @@ div.widgy {
           float: right;
           position: relative;
           width: 35%;
+          overflow-y: auto;
 
           p.title {}
           

@@ -84,6 +84,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       DraggableView.prototype.onClose.apply(this, arguments);
 
       this.list.closeAll();
+      if ( this.hasShelf() )
+        this.shelf.close();
     },
 
     dontShowChildren: function() {

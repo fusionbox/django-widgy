@@ -28,7 +28,8 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
         'resort',
         'refresh',
         'addOptions',
-        'filterDuplicates'
+        'filterDuplicates',
+        'resizeShelf'
       );
 
       this.collection.on('add', this.addOne)
@@ -37,6 +38,8 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
       this.app = options.app;
 
       this.list = new Backbone.ViewList();
+
+      $(window).resize(this.resizeShelf);
     },
 
     addOne: function(model) {
@@ -67,8 +70,13 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
     render: function() {
       Backbone.View.prototype.render.apply(this, arguments);
       this.$list = this.$el.children('.list');
-
+      this.resizeShelf();
       return this;
+    },
+
+    resizeShelf: function() {
+      var mezzanine_correction = 125;
+      this.el.style.maxHeight = (document.documentElement.clientHeight - mezzanine_correction) + 'px';
     },
 
     refresh: function() {
@@ -116,6 +124,11 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
       this.collection.update(instances);
       this.collection.sort();
       this.content_classes = null;
+    },
+
+    onClose: function() {
+      Backbone.View.prototype.onClose.apply(this, arguments);
+      $(window).off('resize', this.resizeShelf);
     }
   });
 
@@ -143,8 +156,7 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
         return;
 
       var placeholder = this.placeholder = $('<li class="drag_placeholder">&nbsp;</li>').css({
-        width: this.$el.width(),
-        padding: this.$el.css('padding')
+        width: this.$el.width()
       });
 
       this.$el.after(placeholder);
