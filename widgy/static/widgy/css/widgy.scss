@@ -529,12 +529,13 @@ li.node_drop_target {
                       }
                 
                       button.delete {
-                        font-size: 8px;
-                        line-height: 8px;
-                        padding: 3px 0px 1px 1px;
+                        font-size: 9px;
+                        line-height: 9px;
+                        padding: 0px;
                         position: absolute;
                         top: 3px;
                         right: 3px;
+                        height: 15px;
                         width: 15px;
                         z-index: 1000;
                   
@@ -565,10 +566,16 @@ li.node_drop_target {
                             }
                             
                             button {
-                              font-size: 10px;
-                              line-height: 1em;
+                              font-size: 9px;
+                              line-height: 9px;
+                              height: 15px;
                               margin: 0;
-                              padding: 1px;
+                              padding: 0px;
+                              width: 15px;
+            
+                              i {
+                                width: 1em;
+                              }
                               
                               &.edit {
                                 right: 35px;
@@ -618,9 +625,10 @@ li.node_drop_target {
                       }
                 
                       button.delete {
-                        font-size: 8px;
-                        line-height: 8px;
-                        padding: 3px 0px 1px 1px;
+                        font-size: 9px;
+                        line-height: 9px;
+                        height: 15px;
+                        padding: 0px;
                         position: absolute;
                         top: 3px;
                         left: -40px;
@@ -673,10 +681,16 @@ li.node_drop_target {
                             }
                             
                             button {
-                              font-size: 10px;
-                              line-height: 1em;
+                              font-size: 9px;
+                              line-height: 9px;
+                              height: 15px;
                               margin: 0;
-                              padding: 1px;
+                              padding: 0px;
+                              width: 15px;
+            
+                              i {
+                                width: 1em;
+                              }
                               
                               &.edit {
                                 right: 35px;
