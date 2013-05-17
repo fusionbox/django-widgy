@@ -55,6 +55,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         'rerender',
         'popOut',
         'popIn',
+        'listenToChildEvents',
         'closeSubwindow'
         );
 
@@ -112,6 +113,14 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       });
     },
 
+    listenToChildEvents: function(child_view) {
+      this
+        .listenTo(child_view, 'startDrag', this.startDrag)
+        .listenTo(child_view, 'stopDrag', this.stopDrag);
+
+      return child_view;
+    },
+
     addChildPromise: function(node, collection, options) {
       var parent = this;
 
@@ -121,16 +130,14 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       });
 
       return node.ready(function(model) {
-        var node_view = new model.component.View({
+        return new model.component.View({
           model: node,
           parent: parent,
           app: parent.app
         });
-
-        parent
-          .listenTo(node_view, 'startDrag', parent.startDrag)
-          .listenTo(node_view, 'stopDrag', parent.stopDrag);
-
+      })
+      .then(this.listenToChildEvents)
+      .then(function(node_view) {
         parent.app.node_view_list.push(node_view);
         if ( options && options.index ) {
           parent.list.list.splice(options.index, 0, node_view);
@@ -388,7 +395,15 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     rerender: function() {
+      this.cleanUp();
       this.renderPromise().done();
+    },
+
+    cleanUp: function() {
+      this.$children.remove();
+      this.$preview.remove();
+      if (this.shelf)
+        this.shelf.close();
     },
 
     renderNode: function() {
@@ -409,6 +424,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         return Q.all(view.getRenderPromises()).then(function() {
           if ( view.app.compatibility_data )
             view.app.updateCompatibility(view.app.compatibility_data);
+
+          view.trigger('rendered', view);
 
           return view;
         });
@@ -433,8 +450,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
     renderShelf: function() {
       console.log('renderShelf');
-      if (this.shelf)
-        this.shelf.remove();
 
       var shelf = this.shelf = new shelves.ShelfView({
         collection: new shelves.ShelfCollection({

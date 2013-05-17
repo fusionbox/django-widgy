@@ -13,7 +13,7 @@ from filer.models.filemodels import File
 from widgy.models import Content
 from widgy.models.mixins import (
     StrictDefaultChildrenMixin, InvisibleMixin, TitleDisplayNameMixin,
-    DisplayNameMixin,
+    DisplayNameMixin, TabbedContainer
 )
 from widgy.models.links import LinkField, LinkFormField, LinkFormMixin
 from widgy.db.fields import WidgyField
@@ -190,7 +190,8 @@ class Accordion(Bucket):
 
 
 @widgy.register
-class Tabs(Accordion):
+class Tabs(TabbedContainer, Accordion):
+
     class Meta:
         proxy = True
         verbose_name = _('tabs')

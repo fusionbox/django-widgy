@@ -341,10 +341,11 @@ li.node_drop_target {
           top: 3px;
           right: 3px;
           z-index: 10;
-          
-          &.edit {
-            right: 74px;
-          }
+        }
+
+        // If you nest this in the previous statement the selector becomes .edit.edit, which is too specific.
+        button.edit {
+          right: 74px;
         }
 
         .dragHandle {

@@ -5,6 +5,14 @@ define([ 'underscore', 'widgy.backbone', 'components/widget/component' ], functi
       'click .tabbed > .widget > .node_children .drag-row': 'showTabClick'
     }),
 
+    initialize: function() {
+      widget.View.prototype.initialize.apply(this, arguments);
+
+      _.bindAll(this,
+        'stealThingsFromChild'
+      );
+    },
+
     showTabClick: function(event) {
       if ( $(event.target).is('.preview') )
         return;
@@ -42,28 +50,40 @@ define([ 'underscore', 'widgy.backbone', 'components/widget/component' ], functi
       });
     },
 
-    renderPromise: function() {
-      return widget.View.prototype.renderPromise.apply(this, arguments).then(function(view) {
+    renderChildren: function() {
+      var parent = this;
+      return widget.View.prototype.renderChildren.apply(this, arguments).then(function() {
         // Show the first tab on first render.
         // Does this always work?
-        view.showTab(view.list.list[0]);
+        if ( parent.list.list.length )
+          parent.showTab(parent.list.list[0]);
 
-        return view;
+        return parent;
       });
     },
 
-    addChildPromise: function() {
-      var parent = this;
-      return widget.View.prototype.addChildPromise.apply(this, arguments).then(function(child_view) {
-        if ( child_view.hasShelf() ) {
-          console.log('addChildPromise');
-          child_view.shelf.$el.hide().appendTo(parent.$current);
-        }
-        child_view.$preview.hide().appendTo(parent.$current);
-        child_view.$children.hide().appendTo(parent.$current);
+    stealThingsFromChild: function(child_view) {
+      if ( child_view.hasShelf() ) {
+        child_view.shelf.$el.hide().appendTo(this.$current);
+      }
+      child_view.$preview.hide().appendTo(this.$current);
+      child_view.$children.hide().appendTo(this.$current);
 
-        return child_view;
-      });
+      this.showTab(child_view);
+
+      return child_view;
+    },
+
+    listenToChildEvents: function(child_view) {
+      widget.View.prototype.listenToChildEvents.apply(this, arguments);
+      this.listenTo(child_view, 'rendered', this.stealThingsFromChild);
+      return child_view;
+    },
+
+    createDropTarget: function(view) {
+      var drop_target = widget.View.prototype.createDropTarget.apply(this, arguments);
+      drop_target.$el.css('height', '');
+      return drop_target;
     }
   });
 
