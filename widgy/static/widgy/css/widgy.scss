@@ -314,7 +314,7 @@ li.node_drop_target {
           position: absolute;
           top: 3px;
           right: 3px;
-          z-index: 100;
+          z-index: 10;
           
           &.edit {
             right: 74px;
@@ -495,7 +495,7 @@ li.node_drop_target {
                   top: 4px;
                   right: 4px;
                   width: 15px;
-                  z-index: 1000;
+                  z-index: 10;
             
                   i {
                     width: 1em;
@@ -537,7 +537,7 @@ li.node_drop_target {
                         right: 3px;
                         height: 15px;
                         width: 15px;
-                        z-index: 1000;
+                        z-index: 10;
                   
                         i {
                           width: 1em;
@@ -633,7 +633,7 @@ li.node_drop_target {
                         top: 3px;
                         left: -40px;
                         width: 15px;
-                        z-index: 1000;
+                        z-index: 10;
                   
                         i {
                           width: 1em;
