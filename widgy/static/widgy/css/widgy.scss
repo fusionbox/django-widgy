@@ -164,18 +164,29 @@ textarea {
     
 li.node_drop_target {
   @include rounded(3px);
-  border: 2px dashed $green !important;
-  background: white !important;
-  font-size: 1.4em !important;
+  @include transition;
+  border: 1px dashed lighten($green,10%) !important;
+  background: lighten($green,25%) !important;
+  font-size: 1.0em !important;
   font-style: italic !important;
   height: auto !important;
-  margin-bottom: 1em !important;
-  padding: 1em !important;
+  margin: 0.25em 1em !important;
+  padding: 0.25em !important;
+  text-align: center;
+  
+  span {
+    height: 0;
+    overflow: hidden;
+  }
 
   &.active {
-    border: 2px dashed darken($green,10%) !important;
+    border: 1px dashed $green !important;
     background: lighten($green,40%) !important;
     color: $darken($green,10%) !important;
+    
+    span {
+      height: auto;
+    }
   }
 }
 
@@ -443,6 +454,12 @@ li.node_drop_target {
   
         &:not(:empty) {
           padding: 1em;
+        }
+        
+        div.htmlOutput {
+          display: block !important;
+          float: none !important;
+          width: auto !important;
         }
       }
       
@@ -956,6 +973,7 @@ li.shelfItem {
   @include node-icon("accordion", "../image/widget-accordion.png");
   @include node-icon("brandlist", "../image/widget-brand-list.png");
   @include node-icon("button", "../image/widget-button.png");
+  @include node-icon("buttonsetcallout", "../image/widget-button.png");
   @include node-icon("calloutwidget", "../image/widget-callout.png");
   @include node-icon("choicefield", "../image/widget-radio.png");
   @include node-icon("demoaccordion", "../image/widget-accordion.png");
@@ -969,9 +987,11 @@ li.shelfItem {
   @include node-icon("html", "../image/widget-html.png");
   @include node-icon("image", "../image/widget-image.gif");
   @include node-icon("imagecallout", "../image/widget-image-bucket.png");
+  @include node-icon("insightcallout", "../image/widget-chart.png");
   @include node-icon("markdown", "../image/widget-code.gif");
   @include node-icon("miniboxes", "../image/widget-miniboxes.gif");
   @include node-icon("multiplechoicefield", "../image/widget-checkbox.png");
+  @include node-icon("newsbucket", "../image/widget-news.png");
   @include node-icon("productbucket", "../image/widget-product-bucket.png");
   @include node-icon("productlist", "../image/widget-product-list.png");
   @include node-icon("savedatahandler", "../image/widget-save-data.png");
@@ -987,6 +1007,7 @@ li.shelfItem {
   @include node-icon("uncaptcha", "../image/widget-hidden-field.png");
   @include node-icon("upcomingevents", "../image/widget-calendar.png");
   @include node-icon("video", "../image/widget-video.gif");
+  @include node-icon("videobucket", "../image/widget-video.gif");
 }
 
 

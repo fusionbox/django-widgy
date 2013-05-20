@@ -72,6 +72,14 @@
     background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, $bottom), color-stop(1.00, $top)) !important;
 }
 
+@mixin transition($basic: all 0.25s ease 0s) {
+  transition: $basic;
+    -o-transition: $basic;
+    -ms-transition: $basic;
+    -moz-transition: $basic;
+    -webkit-transition: $basic;
+}
+
 
 @mixin inner {
   display: block;
