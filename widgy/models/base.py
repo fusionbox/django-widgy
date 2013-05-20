@@ -13,7 +13,7 @@ from django.forms.models import modelform_factory, ModelForm
 from django.contrib.contenttypes.models import ContentType
 from django.template.loader import render_to_string
 from django.template import RequestContext
-from django.contrib.admin.options import FORMFIELD_FOR_DBFIELD_DEFAULTS
+from django.contrib.admin.options import FORMFIELD_FOR_DBFIELD_DEFAULTS as FORMFIELD_FOR_DBFIELD_DEFAULTS_ORIG
 from django.contrib.admin import widgets
 from django.template.defaultfilters import capfirst
 
@@ -28,8 +28,13 @@ from widgy.exceptions import (
 from widgy.signals import pre_delete_widget
 from widgy.generic import WidgyGenericForeignKey, ProxyGenericRelation
 from widgy.utils import exception_to_bool, update_context
+from widgy.widgets import DateTimeWidget
 
 logger = logging.getLogger(__name__)
+
+# Patch DateTime fields in order to be initialized
+FORMFIELD_FOR_DBFIELD_DEFAULTS = copy.deepcopy(FORMFIELD_FOR_DBFIELD_DEFAULTS_ORIG)
+FORMFIELD_FOR_DBFIELD_DEFAULTS[models.DateTimeField]['widget'] = DateTimeWidget
 
 
 class Node(MP_Node):

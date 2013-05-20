@@ -34,6 +34,13 @@ except ImportError:
         kwargs_safe = dict([(k, conditional_escape(v)) for (k, v) in kwargs.iteritems()])
         return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
+try:
+    from django.utils.encoding import force_text
+except ImportError:
+    # Django 1.4
+    from django.utils.encoding import force_unicode
+    force_text = force_unicode
+
 
 def extract_id(url):
     """

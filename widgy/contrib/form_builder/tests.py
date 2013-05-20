@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
 
 import contextlib
-import unittest
 
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django import forms
 from django.utils import timezone
 from django.core import mail
+from django.utils import unittest
 
 import mock
 
