@@ -35,7 +35,7 @@ class FormAdmin(admin.ModelAdmin):
         obj = self.get_object(request, unquote(object_id))
         opts = self.model._meta
 
-        headers = obj.submissions.field_names()
+        headers = obj.submissions.get_formfield_labels()
         rows = obj.submissions.as_ordered_dictionaries(headers.keys())
         return render(request, 'admin/form_builder/form/change_form.html', {
             'title': _('View %s submissions') % force_text(opts.verbose_name),
@@ -58,7 +58,7 @@ class FormAdmin(admin.ModelAdmin):
         resp['Content-Disposition'] = 'attachment; filename="%s"' % self.csv_file_name(obj)
 
         values = obj.submissions.as_dictionaries()
-        headers = obj.submissions.field_names()
+        headers = obj.submissions.get_formfield_labels()
 
         writer = csv.DictWriter(resp, list(headers))
         writer.writerow(headers)

@@ -127,7 +127,7 @@ class TestForm(TestCase):
 
     def test_field_names(self):
         self.submit('a', 'b', 'c')
-        field_names = FormSubmission.objects.field_names()
+        field_names = FormSubmission.objects.get_formfield_labels()
         field_names.pop('created_at')
         self.assertEqual(field_names, {
             self.fields[0].ident: 'field 1',
@@ -140,7 +140,7 @@ class TestForm(TestCase):
 
         self.submit('a', 'b', 'c')
 
-        field_names = FormSubmission.objects.field_names()
+        field_names = FormSubmission.objects.get_formfield_labels()
         field_names.pop('created_at')
         self.assertEqual(field_names, {
             self.fields[0].ident: 'field 1 edited',
@@ -179,7 +179,7 @@ class TestForm(TestCase):
         ident = self.fields[0].ident
         self.fields[0].delete()
 
-        field_names = FormSubmission.objects.field_names()
+        field_names = FormSubmission.objects.get_formfield_labels()
         field_names.pop('created_at')
         self.assertEqual(field_names, {
             ident: 'field 1',
@@ -239,7 +239,7 @@ class TestForm(TestCase):
         self.submit('1', '2', '3', form=new_form)
 
         self.assertEqual(new_form.submission_count, 2)
-        field_names = new_form.submissions.field_names()
+        field_names = new_form.submissions.get_formfield_labels()
         field_names.pop('created_at')
         self.assertEqual(field_names, {
             self.fields[0].ident: 'updated',
