@@ -170,22 +170,22 @@ li.node_drop_target {
   font-size: 1.0em !important;
   font-style: italic !important;
   height: auto !important;
-  margin: 0.25em 1em !important;
+  margin: 0.75em 1em !important;
   padding: 0.25em !important;
   text-align: center;
   
   span {
-    height: 0;
-    overflow: hidden;
+    display: none;
   }
 
   &.active {
     border: 1px dashed $green !important;
     background: lighten($green,40%) !important;
     color: $darken($green,10%) !important;
+    margin: 0.25em 1em !important;
     
     span {
-      height: auto;
+      display: block;
     }
   }
 }
