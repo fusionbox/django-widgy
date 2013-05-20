@@ -1,0 +1,18 @@
+{{ widget }}
+<script>
+  require(['underscore', 'jquery'], function (_, $) {
+    _.defer(function () {
+      _.defer(function () {
+      // Idempotent DateTimeShortcuts.init
+      $(".vDateField").each(function () {
+        if (!/datetimeshortcuts/.test($(this).next().attr('class')))
+          DateTimeShortcuts.addCalendar(this);
+      });
+      $(".vTimeField").each(function () {
+        if (!/datetimeshortcuts/.test($(this).next().attr('class')))
+          DateTimeShortcuts.addClock(this);
+      });
+     })
+    })
+  });
+</script>
