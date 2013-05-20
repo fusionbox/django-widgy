@@ -178,14 +178,17 @@ class Node(MP_Node):
         for content_type_id, content_ids in contents.iteritems():
             try:
                 ct = ContentType.objects.get_for_id(content_type_id)
+                model_class = ct.model_class()
             except AttributeError:
-                # get_for_id raises AttributeError when there's no model_class.
+                # get_for_id raises AttributeError when there's no model_class in django < 1.6.
+                model_class = None
+            if model_class:
+                contents[content_type_id] = ct.model_class().objects.in_bulk(content_ids)
+            else:
                 ct = ContentType.objects.get(id=content_type_id)
                 contents[content_type_id] = dict((id, UnknownWidget(ct, id)) for id in content_ids)
                 # Warn about using an UnknownWidget. It doesn't matter which instance we use.
                 next(contents[content_type_id].itervalues(), UnknownWidget(ct, None)).warn()
-            else:
-                contents[content_type_id] = ct.model_class().objects.in_bulk(content_ids)
         return contents
 
     @classmethod
