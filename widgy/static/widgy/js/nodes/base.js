@@ -15,9 +15,10 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
   var DraggablewView = Backbone.View.extend({
     tagName: 'li',
     className: 'node',
+    dragTimeout: 0,
 
     events: Backbone.extendEvents(Backbone.View, {
-      'mousedown .drag-row': 'startBeingDragged'
+      'mousedown .drag-row': 'onMouseDown'
     }),
 
     initialize: function(options) {
@@ -53,7 +54,7 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
         });
     },
 
-    startBeingDragged: function(event) {
+    onMouseDown: function(event) {
       event.preventDefault();
       event.stopPropagation();
 
@@ -64,6 +65,20 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
       if ( ! this.app.ready() )
         return;
 
+      var _continue = true;
+
+      this.$el.on('mouseup.draggable-timeout', function() {
+        _continue = false;
+      });
+
+      setTimeout(_.bind(function() {
+        this.$el.off('.draggable-timeout');
+        if ( _continue )
+          this.startBeingDragged(event);
+      }, this), this.dragTimeout);
+    },
+
+    startBeingDragged: function(event) {
       // Store the mouse offset in this container for followMouse to use.  We
       // need to get this before `this.app.startDrag`, otherwise the drop
       // targets screw everything up.

@@ -141,7 +141,7 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
     // Override the DraggableView events, I want the whole thing draggable, not
     // just the drag handle.
     events: Backbone.extendEvents(DraggableView, {
-      'mousedown': 'startBeingDragged'
+      'mousedown': 'onMouseDown'
     }),
 
     canAcceptParent: function(parent) {
@@ -150,10 +150,6 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
 
     startBeingDragged: function(event) {
       DraggableView.prototype.startBeingDragged.apply(this, arguments);
-
-      // only on a left click.
-      if ( event.which !== 1 )
-        return;
 
       var placeholder = this.placeholder = $('<li class="drag_placeholder">&nbsp;</li>').css({
         width: this.$el.width()
