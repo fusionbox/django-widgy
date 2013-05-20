@@ -55,7 +55,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         'rerender',
         'popOut',
         'popIn',
-        'listenToChildEvents',
+        'prepareChild',
         'closeSubwindow'
         );
 
@@ -113,7 +113,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       });
     },
 
-    listenToChildEvents: function(child_view) {
+    prepareChild: function(child_view) {
       this
         .listenTo(child_view, 'startDrag', this.startDrag)
         .listenTo(child_view, 'stopDrag', this.stopDrag);
@@ -136,7 +136,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
           app: parent.app
         });
       })
-      .then(this.listenToChildEvents)
+      .then(this.prepareChild)
       .then(function(node_view) {
         parent.app.node_view_list.push(node_view);
         if ( options && options.index ) {

@@ -74,9 +74,10 @@ define([ 'underscore', 'widgy.backbone', 'components/widget/component' ], functi
       return child_view;
     },
 
-    listenToChildEvents: function(child_view) {
-      widget.View.prototype.listenToChildEvents.apply(this, arguments);
+    prepareChild: function(child_view) {
+      widget.View.prototype.prepareChild.apply(this, arguments);
       this.listenTo(child_view, 'rendered', this.stealThingsFromChild);
+      child_view.dragTimeout = 100;
       return child_view;
     },
 
