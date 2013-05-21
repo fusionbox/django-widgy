@@ -1,4 +1,7 @@
 # Widgy Editor for Django
+
+[![Build Status](https://travis-ci.org/fusionbox/django-widgy.png)](https://travis-ci.org/fusionbox/django-widgy)
+
 Widgy is a content editor somewhat in the line of CKEditor.  It is not a WYSIWYG
 editor though.  Widgy is more suited than CKEditor for editing pages, as in a
 CMS because it allows you to edit specific parts of the page and those parts
