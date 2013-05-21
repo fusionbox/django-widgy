@@ -231,7 +231,7 @@ class TestVersionedModelForm(TestCase):
         })
         instance = x.save()
         x = self.form(instance=instance)
-        url = widgy_site.reverse(widgy_site.commit_view, kwargs={'pk': instance.pk})
+        url = widgy_site.reverse(widgy_site.commit_view, kwargs={'pk': instance.version_tracker.pk})
         self.assertIn(url, x.as_p())
 
 
