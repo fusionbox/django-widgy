@@ -16,8 +16,10 @@ from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
 
 from widgy.forms import WidgyFormMixin
-from widgy.contrib.widgy_mezzanine.models import WidgyPage
+from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.utils import fancy_import, format_html
+
+WidgyPage = get_widgypage_model()
 
 
 class WidgyPageAdminForm(WidgyFormMixin, PageAdminForm):

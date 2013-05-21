@@ -1,8 +1,11 @@
 from haystack import indexes
 
-from widgy.contrib.widgy_mezzanine.models import WidgyPage
+from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.templatetags.widgy_tags import render_root
 from widgy.utils import html_to_plaintext
+
+WidgyPage = get_widgypage_model()
+
 
 class PageIndex(indexes.SearchIndex, indexes.Indexable):
     title = indexes.CharField(model_attr='title')
