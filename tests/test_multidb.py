@@ -18,9 +18,10 @@ elif engine == 'postgres':
         "default": {
             "ENGINE": "django.db.backends.postgresql_psycopg2",
             "NAME": "widgy",
-            "USER": "widgy",
-            "PASSWORD": "",
+            "USER": "postgres",
         }
     }
+elif engine == 'sqlite':
+    pass
 elif engine:
     assert False, "%r is not a valid DATABASE_ENGINE" % engine
