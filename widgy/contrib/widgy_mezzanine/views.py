@@ -8,10 +8,12 @@ from django.conf import settings
 from mezzanine.pages.views import page as page_view
 
 from widgy.contrib.form_builder.views import HandleFormMixin
-from widgy.contrib.widgy_mezzanine.models import WidgyPage
+from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.models import Node
 from widgy.views.base import AuthorizedMixin
 from widgy.utils import fancy_import
+
+WidgyPage = get_widgypage_model()
 
 
 def get_page_from_node(node):
