@@ -139,4 +139,4 @@ class MiniCKEditorWidget(CKEditorWidget):
 
 
 class MiniCKEditorField(forms.CharField):
-    widget = CKEditorWidget
+    widget = MiniCKEditorWidget
