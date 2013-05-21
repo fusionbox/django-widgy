@@ -166,28 +166,43 @@ textarea {
 li.node_drop_target {
   @include rounded(3px);
   @include transition;
-  border: 1px dashed lighten($green,10%) !important;
+
+  border: none !important;
   background: lighten($green,25%) !important;
   font-size: 1.0em !important;
   font-style: italic !important;
-  height: auto !important;
-  margin: 0.75em 1em !important;
-  padding: 0.25em !important;
+  height: 1em !important;
+  margin: -1em 1em !important;
+  padding: 0em !important;
   text-align: center;
-  
+
   span {
     display: none;
+  }
+
+  &:first-child {
+    margin-top: 0 !important;
+  }
+
+  &:last-child,
+  &.previous.nm {
+    margin-bottom: 0 !important;
   }
 
   &.active {
     border: 1px dashed $green !important;
     background: lighten($green,40%) !important;
     color: darken($green,10%) !important;
-    margin: 0.25em 1em !important;
-    
+    height: 3em !important;
+    padding: 1em !important;
+
     span {
       display: block;
     }
+  }
+
+  &.previous {
+    background: #FF9900 !important;
   }
 }
 
@@ -235,7 +250,6 @@ li.node_drop_target {
     // drag & drop styles
     &.being_dragged {
       @include shadow(#999999, 2px, 2px, 5px);
-      background-color: blue;
       margin: 0 !important;
       position: fixed;
     }
