@@ -1,11 +1,12 @@
 figure {
-  border: 1px solid black;
-  display: inline-block;
+  display: block;
 
   &.left {
+    display: inline;
     float: left;
   }
   &.right {
+    display: inline;
     float: right;
   }
   &.center {
