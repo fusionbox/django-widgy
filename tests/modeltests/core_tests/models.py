@@ -176,3 +176,16 @@ class MyInvisibleBucket(InvisibleMixin, Content):
     This is for testing template hierarchy
     """
     pass
+
+
+class VariegatedFieldsWidget(Content):
+    required_name = models.CharField(max_length=255)
+    optional_name = models.CharField(max_length=255, blank=True)
+    color = models.CharField(max_length=255, choices=(
+        ('r', 'Red'),
+        ('g', 'Green'),
+        ('b', 'Blue'),
+    ))
+    date = models.DateField(null=True)
+    time = models.TimeField(null=True)
+    datetime = models.DateTimeField(null=True)
