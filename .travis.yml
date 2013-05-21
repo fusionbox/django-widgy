@@ -9,6 +9,9 @@ env:
   - DJANGO_PACKAGE=Django==1.5.1 DATABASE_ENGINE=sqlite
   - DJANGO_PACKAGE=Django==1.5.1 DATABASE_ENGINE=postgres
   - DJANGO_PACKAGE=Django==1.5.1 DATABASE_ENGINE=mysql
+  - DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip DATABASE_ENGINE=sqlite
+  - DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip DATABASE_ENGINE=postgres
+  - DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip DATABASE_ENGINE=mysql
 install:
   - pip install -q $DJANGO_PACKAGE --use-mirrors
   - pip install -q --use-mirrors mock MySQL-python psycopg2
