@@ -1,9 +1,19 @@
 language: python
 python:
   - "2.7"
+  - "2.6"
 env:
-  - DJANGO_VERSION=1.4
+  - DJANGO_PACKAGE=Django==1.4.5 DATABASE_ENGINE=sqlite
+  - DJANGO_PACKAGE=Django==1.4.5 DATABASE_ENGINE=mysql
+  - DJANGO_PACKAGE=Django==1.4.5 DATABASE_ENGINE=postgres
+  - DJANGO_PACKAGE=Django==1.5.1 DATABASE_ENGINE=sqlite
+  - DJANGO_PACKAGE=Django==1.5.1 DATABASE_ENGINE=postgres
+  - DJANGO_PACKAGE=Django==1.5.1 DATABASE_ENGINE=mysql
 install:
-  - pip install -q Django==$DJANGO_VERSION
-  - python setup.py -q install
-script: make test
+  - pip install -q $DJANGO_PACKAGE --use-mirrors
+  - pip install -q --use-mirrors mock MySQL-python psycopg2
+  - python setup.py install
+before_script:
+  - psql -c 'create database widgy;' -U postgres
+  - mysql -e 'create database widgy;'
+script: make test-py

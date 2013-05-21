@@ -8,6 +8,7 @@ from django import forms
 from django.utils import timezone
 from django.core import mail
 from django.utils import unittest
+from django.db import connection
 
 import mock
 
@@ -192,9 +193,16 @@ class TestForm(TestCase):
 
         letters_dict, numbers_dict = FormSubmission.objects.as_dictionaries()
 
+        # Mysql doesn't have millisecond precision for DateTimes, so refetch
+        # these objects to portably do it.
+        letters = FormSubmission.objects.get(pk=letters.pk)
+        numbers = FormSubmission.objects.get(pk=numbers.pk)
+
         self.assertEqual(letters.as_dict(), letters_dict)
         self.assertEqual(numbers.as_dict(), numbers_dict)
 
+    @unittest.skipIf(connection.vendor == 'mysql',
+                     "must have millisecond DateTime precision to order form submissions")
     def test_as_ordered_dictionaries(self):
         with mock_now() as first:
             self.submit('a', 'b', 'c')
