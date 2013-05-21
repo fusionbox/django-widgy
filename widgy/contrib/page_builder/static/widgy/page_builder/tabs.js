@@ -4,6 +4,7 @@ jQuery(function($) {
     $('.tabify .tabs a[href=' + $(this).attr('href') + ']').addClass('active'); // activate the clicked tab
     $('.tabify .tabContent').removeClass('active'); // clear the active content
     $($(this).attr('href')).addClass('active'); // show the clicked content
+    return false;
   });
 
   //|
