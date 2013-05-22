@@ -568,10 +568,6 @@ class BaseChoiceField(FormField):
             'required': self.required,
         }
 
-    @property
-    def widget_class(self):
-        return self.WIDGET_CLASSES[self.type]
-
 
 @widgy.register
 class ChoiceField(BaseChoiceField):
@@ -594,6 +590,10 @@ class ChoiceField(BaseChoiceField):
         if self.type == 'select':
             choices.insert(0, ('', self.EMPTY_LABEL))
         return choices
+
+    @property
+    def widget_class(self):
+        return self.WIDGET_CLASSES.get(self.type, forms.Select)
 
 
 @widgy.register
@@ -627,6 +627,10 @@ class MultipleChoiceField(BaseChoiceField):
         choices contain commas.
         """
         return ','.join(i.replace('\\', '\\\\').replace(',', '\\,') for i in value)
+
+    @property
+    def widget_class(self):
+        return self.WIDGET_CLASSES.get(self.type, forms.CheckboxSelectMultiple)
 
 
 @widgy.register
