@@ -26,3 +26,12 @@ p.file-upload {
   top: 0;
   width: 18em;
 }
+
+#changelist-search input[type="submit"] {
+  background-image: none;
+  background: #309BBF;
+  
+  &:hover {
+    background: #38B9E6;
+  }
+}
