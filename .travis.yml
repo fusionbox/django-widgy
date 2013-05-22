@@ -14,8 +14,24 @@ env:
   - DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip DATABASE_ENGINE=mysql
 install:
   - pip install -q $DJANGO_PACKAGE --use-mirrors
-  - pip install -q --use-mirrors mock MySQL-python psycopg2
+  - pip install -q --use-mirrors mock
+  - |
+    if [ "$DATABASE_ENGINE" = "mysql" ]
+    then
+      pip install -q --use-mirrors MySQL-python
+    fi
+  - |
+    if [ "$DATABASE_ENGINE" = "postgres" ]
+    then
+      pip install -q --use-mirrors psycopg2
+    fi
   - python setup.py install
+  # mezzanine tries to override our django version sometimes
+  - |
+    if [ "`pip freeze|grep '^Django=='`" != "$DJANGO_PACKAGE" ]
+    then
+      pip install -q --use-mirrors $DJANGO_PACKAGE
+    fi
 before_script:
   - psql -c 'create database widgy;' -U postgres
   - mysql -e 'create database widgy;'
