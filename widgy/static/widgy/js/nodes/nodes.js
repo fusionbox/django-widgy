@@ -175,9 +175,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     'delete': function(event) {
-      event.preventDefault();
       // TODO: A better UI experience would be undo, but this is a stop gap.
       modal.confirm('Are you sure?', this.deleteSelf);
+      return false;
     },
 
     deleteSelf: function() {
