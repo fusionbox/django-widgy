@@ -25,7 +25,7 @@ install:
     then
       pip install -q --use-mirrors psycopg2
     fi
-  - python setup.py install
+  - pip install --use-mirrors .
   # mezzanine tries to override our django version sometimes
   - |
     if [ "`pip freeze|grep '^Django=='`" != "$DJANGO_PACKAGE" ]
