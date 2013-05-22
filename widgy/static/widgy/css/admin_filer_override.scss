@@ -30,8 +30,15 @@ p.file-upload {
 #changelist-search input[type="submit"] {
   background-image: none;
   background: #309BBF;
+  height: 20px;
+  padding: 0px 2px;
   
   &:hover {
     background: #38B9E6;
   }
+}
+
+#changelist-search input[type='checkbox'] {
+  margin: 0px 0px 0px 10px;
+  top: 2px;
 }
