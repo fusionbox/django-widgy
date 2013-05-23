@@ -476,6 +476,9 @@ class FormInputForm(FormFieldForm):
             'label',
             'help_text',
         )
+        widgets = {
+            'type': forms.Select,
+        }
 
 
 @widgy.register
