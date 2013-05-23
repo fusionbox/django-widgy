@@ -16,6 +16,7 @@ from widgy.views import (
     HistoryView,
     ReviewedHistoryView,
     ApproveView,
+    UnapproveView,
     RevertView,
     DiffView,
     ResetView,
@@ -192,6 +193,7 @@ class ReviewedWidgySite(WidgySite):
     def get_urls(self):
         return super(ReviewedWidgySite, self).get_urls() + patterns('',
             url('^approve/(?P<pk>[^/]+)/(?P<commit_pk>[^/]+)/$', self.approve_view),
+            url('^unapprove/(?P<pk>[^/]+)/(?P<commit_pk>[^/]+)/$', self.unapprove_view),
             url('^undo-approvals/$', self.undo_approvals_view),
         )
 
@@ -207,7 +209,8 @@ class ReviewedWidgySite(WidgySite):
 
         from widgy.admin import VersionCommitAdmin
 
-        approval_views = (VersionCommitAdmin, ApproveView, UndoApprovalsView)
+        approval_views = (VersionCommitAdmin, ApproveView, UndoApprovalsView,
+                          UnapproveView)
         if isinstance(view, approval_views):
             if not request.user.has_perm('widgy.change_versioncommit'):
                 raise PermissionDenied
@@ -215,6 +218,10 @@ class ReviewedWidgySite(WidgySite):
     @cached_property
     def approve_view(self):
         return ApproveView.as_view(site=self)
+
+    @cached_property
+    def unapprove_view(self):
+        return UnapproveView.as_view(site=self)
 
     @cached_property
     def undo_approvals_view(self):

@@ -155,26 +155,46 @@ class ReviewedHistoryView(HistoryView):
         return kwargs
 
 
-class ApproveView(AuthorizedMixin, VersionTrackerMixin, RedirectView):
+class ApprovalChangeBaseView(AuthorizedMixin, VersionTrackerMixin, RedirectView):
+    """
+    Abstract class for approving or unapproving commits
+    """
     http_method_names = ['post']
 
     def get_redirect_url(self, pk, commit_pk):
-        # XXX: Avoid circular import
-        from widgy.forms import UndoApprovalsForm
-
         vt = get_object_or_404(self.get_queryset(), pk=pk)
         commit = get_object_or_404(vt.commits.select_related('root_node'),
                                    pk=commit_pk)
         commit.tracker = vt
 
-        commit.approve(self.request.user)
-        commit.save()
+        self.action(commit)
 
         history_url = self.site.reverse(self.site.history_view, kwargs={
             'pk': vt.pk
         })
 
-        message = format_html('{0} {1}',
+        messages.success(self.request, self.get_message(commit, history_url))
+
+        return history_url
+
+    def action(self, commit):
+        raise NotImplementedError("action should be implemented in subclass")
+
+    def get_message(self, commit, history_url):
+        raise NotImplementedError("get_message should be implemented in subclass")
+
+
+class ApproveView(ApprovalChangeBaseView):
+
+    def action(self, commit):
+        commit.approve(self.request.user)
+        commit.save()
+
+    def get_message(self, commit, history_url):
+        # XXX: Avoid circular import
+        from widgy.forms import UndoApprovalsForm
+
+        return format_html('{0} {1}',
             _('Commit %s has been approved') % commit,
             UndoApprovalsForm(
                 initial={
@@ -184,9 +204,15 @@ class ApproveView(AuthorizedMixin, VersionTrackerMixin, RedirectView):
             ).render(self.request, self.site)
         )
 
-        messages.success(self.request, message, extra_tags='safe')
 
-        return history_url
+class UnapproveView(ApprovalChangeBaseView):
+
+    def action(self, commit):
+        commit.unapprove(self.request.user)
+        commit.save()
+
+    def get_message(self, commit, history_url):
+        return _('Commit %s has been unapproved') % commit
 
 
 class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):

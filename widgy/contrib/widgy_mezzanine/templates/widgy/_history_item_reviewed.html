@@ -30,10 +30,16 @@
   {% else %}
     {% trans "Can't revert; this is the same as the current version." %}
   {% endif %}
-  {% if not commit.is_approved and can_approve_commit %}
-    <form method="post" action="{% reverse_site_url site 'approve_view' pk=commit.tracker.pk commit_pk=commit.pk %}">
+  {% if can_approve_commit %}
+    {% if not commit.is_approved %}
+      <form method="post" action="{% reverse_site_url site 'approve_view' pk=commit.tracker.pk commit_pk=commit.pk %}">
+        <input class="button" type="submit" value="{% trans "Approve this commit" %}">
+    {% else %}
+      {# unapprove_view avoid generating a UndoApprovalsForm for each commit #}
+      <form method="post" action="{% reverse_site_url site 'unapprove_view' pk=commit.tracker.pk commit_pk=commit.pk %}">
+        <input class="button" type="submit" value="{% trans "Unapprove this commit" %}">
+    {% endif %}
       {% csrf_token %}
-      <input class="button" type="submit" class="widgy-fancybox" value="{% trans "Approve this commit" %}">
     </form>
   {% endif %}
   {% if commit.diff_url %}
