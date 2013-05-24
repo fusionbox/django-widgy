@@ -525,10 +525,6 @@ class Content(models.Model):
         parent = self.node.get_parent()
         return parent and parent.content
 
-
-    def meta(self):
-        return self._meta
-
     def get_form_class(self, request):
         defaults = {
             "form": self.form,
