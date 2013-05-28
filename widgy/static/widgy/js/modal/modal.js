@@ -63,10 +63,17 @@ define([ 'widgy.backbone',
     }
   }
 
+  function confirm(message, success) {
+    if ( window.confirm(message) ) {
+      success();
+    }
+  }
+
   return {
     ModalView: ModalView,
     ErrorView: ErrorView,
     raiseError: raiseError,
-    ajaxError: ajaxError
+    ajaxError: ajaxError,
+    confirm: confirm
   };
 });

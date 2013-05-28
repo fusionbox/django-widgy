@@ -42,6 +42,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         'addChild',
         'addChildPromise',
         'addDropTargets',
+        'deleteSelf',
         'createDropTarget',
         'clearDropTargets',
         'startDrag',
@@ -174,6 +175,12 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     'delete': function(event) {
+      // TODO: A better UI experience would be undo, but this is a stop gap.
+      modal.confirm('Are you sure?', this.deleteSelf);
+      return false;
+    },
+
+    deleteSelf: function() {
       var spinner = new Backbone.Spinner({el: this.$('.delete:first')}),
           model = this.node;
 
@@ -188,7 +195,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         error: error,
         app: this.app
       });
-      return false;
     },
 
     startDrag: function(dragged_view) {

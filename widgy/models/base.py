@@ -9,11 +9,11 @@ import itertools
 import copy
 
 from django.db import models
+from django import forms
 from django.forms.models import modelform_factory, ModelForm
 from django.contrib.contenttypes.models import ContentType
 from django.template.loader import render_to_string
 from django.template import RequestContext
-from django.contrib.admin.options import FORMFIELD_FOR_DBFIELD_DEFAULTS as FORMFIELD_FOR_DBFIELD_DEFAULTS_ORIG
 from django.contrib.admin import widgets
 from django.template.defaultfilters import capfirst
 
@@ -32,9 +32,15 @@ from widgy.widgets import DateTimeWidget
 
 logger = logging.getLogger(__name__)
 
-# Patch DateTime fields in order to be initialized
-FORMFIELD_FOR_DBFIELD_DEFAULTS = copy.deepcopy(FORMFIELD_FOR_DBFIELD_DEFAULTS_ORIG)
-FORMFIELD_FOR_DBFIELD_DEFAULTS[models.DateTimeField]['widget'] = DateTimeWidget
+# TODO: Don't use the Admin widgets.
+FORMFIELD_FOR_DBFIELD_DEFAULTS = {
+    models.DateTimeField: {
+        'form_class': forms.SplitDateTimeField,
+        'widget': DateTimeWidget
+    },
+    models.DateField: {'widget': widgets.AdminDateWidget},
+    models.TimeField: {'widget': widgets.AdminTimeWidget},
+}
 
 
 class Node(MP_Node):
@@ -518,10 +524,6 @@ class Content(models.Model):
     def get_parent(self):
         parent = self.node.get_parent()
         return parent and parent.content
-
-
-    def meta(self):
-        return self._meta
 
     def get_form_class(self, request):
         defaults = {

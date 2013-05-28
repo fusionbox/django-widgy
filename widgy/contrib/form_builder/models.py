@@ -486,6 +486,7 @@ class FormInput(FormField):
         'email': forms.EmailField,
         'tel': PhoneNumberField,
         'checkbox': forms.BooleanField,
+        'date': forms.DateField,
     }
 
     FORM_INPUT_TYPES = (
@@ -494,6 +495,7 @@ class FormInput(FormField):
         ('email', _('Email')),
         ('tel', _('Telephone')),
         ('checkbox', _('Checkbox')),
+        ('date', _('Date')),
     )
 
     formfield_class = forms.CharField
@@ -512,6 +514,11 @@ class FormInput(FormField):
         }
         if self.required:
             attrs['required'] = 'required'
+
+        if self.type == 'date':
+            # Use type text because Kalendae doesn't play well with type=date
+            attrs['type'] = 'text'
+            attrs['class'] = 'date auto-kal'
 
         return forms.TextInput(attrs=attrs)
 
@@ -561,10 +568,6 @@ class BaseChoiceField(FormField):
             'required': self.required,
         }
 
-    @property
-    def widget_class(self):
-        return self.WIDGET_CLASSES[self.type]
-
 
 @widgy.register
 class ChoiceField(BaseChoiceField):
@@ -587,6 +590,10 @@ class ChoiceField(BaseChoiceField):
         if self.type == 'select':
             choices.insert(0, ('', self.EMPTY_LABEL))
         return choices
+
+    @property
+    def widget_class(self):
+        return self.WIDGET_CLASSES.get(self.type, forms.Select)
 
 
 @widgy.register
@@ -620,6 +627,10 @@ class MultipleChoiceField(BaseChoiceField):
         choices contain commas.
         """
         return ','.join(i.replace('\\', '\\\\').replace(',', '\\,') for i in value)
+
+    @property
+    def widget_class(self):
+        return self.WIDGET_CLASSES.get(self.type, forms.CheckboxSelectMultiple)
 
 
 @widgy.register
