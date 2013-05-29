@@ -408,6 +408,21 @@ li.node_drop_target {
                 }
               }
             }
+            
+            p.datetime {
+              display: inline;
+              float: left;
+              width: 50%;
+              
+              br {
+                display: inline;
+              }
+              
+              input[type='text'] {
+                margin: 0px 5px;
+                width: 100px;
+              }
+            }
           }
 
           label {
