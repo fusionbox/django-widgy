@@ -184,16 +184,6 @@ class Accordion(Bucket):
     def valid_parent_of(self, cls, obj=None):
         return issubclass(cls, Section)
 
-    @classmethod
-    def valid_child_of(cls, parent, obj=None):
-        """
-        Accordions are not nestable.
-        """
-        for p in list(parent.get_ancestors()) + [parent]:
-            if isinstance(p, Accordion):
-                return False
-        return super(Accordion, cls).valid_child_of(parent, obj)
-
     class Meta:
         verbose_name = _('accordion')
         verbose_name_plural = _('accordions')
