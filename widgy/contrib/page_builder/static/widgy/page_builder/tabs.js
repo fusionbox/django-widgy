@@ -1,9 +1,15 @@
 jQuery(function($) {
   $('.tabify .tabs a').bind('click', function() {
+    var href = $(this).attr('href');
+    var tabContent = $(href);
     $('.tabify .tabs a').removeClass('active'); // clear the active tabs
-    $('.tabify .tabs a[href=' + $(this).attr('href') + ']').addClass('active'); // activate the clicked tab
+    $('.tabify .tabs a[href=' + href + ']').addClass('active'); // activate the clicked tab
     $('.tabify .tabContent').removeClass('active'); // clear the active content
-    $($(this).attr('href')).addClass('active'); // show the clicked content
+    tabContent.addClass('active'); // show the clicked content
+    // Change the hash without scrolling
+    tabContent.attr('id', '');
+    window.location.hash = href;
+    tabContent.attr('id', href.substr(1)); // remove the sharp
     return false;
   });
 

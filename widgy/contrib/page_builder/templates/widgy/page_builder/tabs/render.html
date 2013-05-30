@@ -3,7 +3,7 @@
 <div class="tabify">
   <ul class="tabs">
     {% for tab in self.get_children %}
-    <li><a href="#{{ tab|slugify }}">{{ tab }}</a></li>
+      <li><a href="#{{ tab|slugify }}"{% if forloop.first %} class="active"{% endif %}>{{ tab }}</a></li>
     {% endfor %}
   </ul>
 
