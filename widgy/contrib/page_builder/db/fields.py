@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import urlparse
 import re
 
 from django import forms
@@ -28,13 +27,15 @@ class MarkdownField(models.TextField):
 
 
 class VideoUrl(unicode):
+
+    def __new__(cls, regex):
+        self = super(VideoUrl, cls).__new__(cls, regex.string)
+        self.regex = regex
+        return self
+
     @property
     def video_id(self):
-        parsed_url = urlparse.urlparse(self)
-        if parsed_url.query == '':
-            return parsed_url.path[1:]
-        return urlparse.parse_qs(parsed_url.query)['v'][0]
-
+        return self.regex.group('id')
 
 class YoutubeUrl(VideoUrl):
     @property
@@ -48,10 +49,17 @@ class VimeoUrl(VideoUrl):
         return '//player.vimeo.com/video/{0}'.format(self.video_id)
 
 
+class CNBCUrl(VideoUrl):
+    @property
+    def embed_url(self):
+        return '//plus.cnbc.com/rssvideosearch/action/player/id/{0}/code/cnbcplayershare'.format(self.video_id)
+
+
 VIDEO_URL_CLASSES = {
-    r'^https?:\/\/(?:www\.)?youtube.com\/watch\?(?=.*v=\w+)(?:\S+)?$': YoutubeUrl,
-    r'^https?:\/\/youtu\.be\/(\w+)$': YoutubeUrl,
-    r'^https?:\/\/(?:www\.)?vimeo.com\/(\d+)$': VimeoUrl,
+    r'^https?:\/\/(?:www\.)?youtube.com\/watch\?(?=.*v=(?P<id>\w+))(?:\S+)?$': YoutubeUrl,
+    r'^https?:\/\/youtu\.be\/(?P<id>\w+)$': YoutubeUrl,
+    r'^https?:\/\/(?:www\.)?vimeo.com\/(?P<id>\d+)$': VimeoUrl,
+    r'^https?:\/\/video.cnbc.com/gallery/\?(?=.*video=(?P<id>\d+))(?:\S*)$': CNBCUrl,
 }
 
 
@@ -79,7 +87,8 @@ class VideoField(models.URLField):
 
     def get_url_instance(cls, value):
         for pattern in VIDEO_URL_CLASSES.keys():
-            if re.match(pattern, value):
+            match = re.match(pattern, value)
+            if match:
                 UrlClass = VIDEO_URL_CLASSES[pattern]
-                return UrlClass(value)
+                return UrlClass(match)
         return value
