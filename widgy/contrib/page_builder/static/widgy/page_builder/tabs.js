@@ -2,10 +2,10 @@ jQuery(function($) {
   $('.tabify .tabs a').bind('click', function() {
     var href = $(this).attr('href'),
         tabify = $(this).closest('.tabify'),
-        tabContent = tabify.find(href);
-    tabify.find('.tabs a').removeClass('active'); // clear the active tabs
-    tabify.find('.tabs a[href=' + href + ']').addClass('active'); // activate the clicked tab
-    tabify.find('.tabContent').removeClass('active'); // clear the active content
+        tabContent = tabify.find(href).first();
+    tabify.children('.tabs').find('a').removeClass('active'); // clear the active tabs
+    tabify.children('.tabs').find('a[href=' + href + ']').addClass('active'); // activate the clicked tab
+    tabify.children('.tabContent').removeClass('active'); // clear the active content
     tabContent.addClass('active'); // show the clicked content
     // Change the hash without scrolling
     tabContent.attr('id', '');
