@@ -976,56 +976,9 @@ div.widgy {
   }
 }   
 
-@mixin node-icon ($class, $img) {
-  &.#{$class} > span.title {
-    background: url($img) no-repeat;
-  }
-}
-
 li.node,
 li.shelfItem {   
   border: 1px solid #E0E0E0;
-     
-  @include node-icon("accordion", "../image/widget-accordion.png");
-  @include node-icon("brandlist", "../image/widget-brand-list.png");
-  @include node-icon("button", "../image/widget-button.png");
-  @include node-icon("buttonsetcallout", "../image/widget-button.png");
-  @include node-icon("calloutwidget", "../image/widget-callout.png");
-  @include node-icon("choicefield", "../image/widget-radio.png");
-  @include node-icon("demoaccordion", "../image/widget-accordion.png");
-  @include node-icon("emailsuccesshandler", "../image/widget-email.gif");
-  @include node-icon("emailuserhandler", "../image/widget-email.gif");
-  @include node-icon("expandableimage", "../image/widget-image.gif");
-  @include node-icon("figure", "../image/widget-figure.png");
-  @include node-icon("form", "../image/widget-form.gif");
-  @include node-icon("forminput", "../image/widget-form.gif");
-  @include node-icon("googlemap", "../image/widget-google-map.png");
-  @include node-icon("homebucket", "../image/widget-bucket.png");
-  @include node-icon("html", "../image/widget-html.png");
-  @include node-icon("image", "../image/widget-image.gif");
-  @include node-icon("imagecallout", "../image/widget-image-bucket.png");
-  @include node-icon("insightcallout", "../image/widget-chart.png");
-  @include node-icon("markdown", "../image/widget-code.gif");
-  @include node-icon("miniboxes", "../image/widget-miniboxes.gif");
-  @include node-icon("multiplechoicefield", "../image/widget-checkbox.png");
-  @include node-icon("newsbucket", "../image/widget-news.png");
-  @include node-icon("productwidget", "../image/widget-product-bucket.png");
-  @include node-icon("productbucket", "../image/widget-product-bucket.png");
-  @include node-icon("productlist", "../image/widget-product-list.png");
-  @include node-icon("savedatahandler", "../image/widget-save-data.png");
-  @include node-icon("section", "../image/widget-section.png");
-  @include node-icon("slide", "../image/widget-slide.png");
-  @include node-icon("slideshow", "../image/widget-slide.png");
-  @include node-icon("submitbutton", "../image/widget-button.png");
-  @include node-icon("table", "../image/widget-table.gif");
-  @include node-icon("tableheaderdata", "../image/widget-tablecolumn.png");
-  @include node-icon("tablerow", "../image/widget-tablerow.png");
-  @include node-icon("tabs", "../image/widget-tab.png");
-  @include node-icon("textarea", "../image/widget-textarea.gif");
-  @include node-icon("uncaptcha", "../image/widget-hidden-field.png");
-  @include node-icon("upcomingevents", "../image/widget-calendar.png");
-  @include node-icon("video", "../image/widget-video.gif");
-  @include node-icon("videobucket", "../image/widget-video.gif");
 }
 
 

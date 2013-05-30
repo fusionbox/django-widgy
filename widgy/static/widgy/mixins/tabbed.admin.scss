@@ -29,18 +29,18 @@ div.widgy div.editor section.tabbed > div.widget > ul.nodeChildren {
     position: relative;
     top: 2px;
     z-index: 10;
-    
+
     .widget {
       background: transparent !important;
 
       .drag-row {
         @include rounded(0px);
         background: transparent !important;
-        
+
         span.title {
           color: inherit;
         }
-        
+
         .edit, // functionality for editing the tab doesn't exist yet.
         .delete span {
           display: none;
@@ -57,7 +57,7 @@ div.widgy div.editor section.tabbed > div.widget > ul.nodeChildren {
     .nodeChildren {
       display: none;
     }
-    
+
     &:hover {
       background-color: white !important;
     }

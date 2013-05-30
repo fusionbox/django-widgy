@@ -1,0 +1,19 @@
+@import "widgy_common.scss";
+
+li.node,
+li.shelfItem {
+  @include node-icon("page_builder.accordion", "../image/widget-accordion.png");
+  @include node-icon("page_builder.button", "../image/widget-button.png");
+  @include node-icon("page_builder.calloutwidget", "../image/widget-callout.png");
+  @include node-icon("page_builder.figure", "../image/widget-figure.png");
+  @include node-icon("page_builder.googlemap", "../image/widget-google-map.png");
+  @include node-icon("page_builder.html", "../image/widget-html.png");
+  @include node-icon("page_builder.image", "../image/widget-image.gif");
+  @include node-icon("page_builder.markdown", "../image/widget-code.gif");
+  @include node-icon("page_builder.section", "../image/widget-section.png");
+  @include node-icon("page_builder.tableheaderdata", "../image/widget-tablecolumn.png");
+  @include node-icon("page_builder.table", "../image/widget-table.gif");
+  @include node-icon("page_builder.tablerow", "../image/widget-tablerow.png");
+  @include node-icon("page_builder.tabs", "../image/widget-tab.png");
+  @include node-icon("page_builder.video", "../image/widget-video.gif");
+}

@@ -3,9 +3,6 @@
 
 {% block children %}
 {{ block.super }}
-{% compress css %}
-  <link type="text/x-scss" href="{% static 'widgy/css/tabbed.scss' %}" rel="stylesheet">
-{% endcompress %}
 <div class="current">
 </div>
 {% endblock %}
