@@ -4,6 +4,8 @@ from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.templatetags.widgy_tags import render_root
 from widgy.utils import html_to_plaintext
 
+from .signals import widgypage_pre_index
+
 WidgyPage = get_widgypage_model()
 
 
@@ -13,6 +15,10 @@ class PageIndex(indexes.SearchIndex, indexes.Indexable):
     description = indexes.CharField(model_attr='description')
     keywords = indexes.MultiValueField()
     text = indexes.CharField(document=True)
+
+    def full_prepare(self, *args, **kwargs):
+        widgypage_pre_index.send(sender=self)
+        return super(PageIndex, self).full_prepare(*args, **kwargs)
 
     def get_model(self):
         return WidgyPage
