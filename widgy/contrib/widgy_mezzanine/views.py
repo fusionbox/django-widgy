@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Q
-from django.http import Http404
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
 from django.conf import settings
@@ -20,11 +19,10 @@ def get_page_from_node(node):
     root_node = node.get_root()
     try:
         # try to find a page that uses this root node
-        return get_object_or_404(
-            WidgyPage.objects.distinct(),
+        return WidgyPage.objects.distinct().get(
             Q(root_node__commits__root_node=root_node) | Q(root_node__working_copy=root_node)
         )
-    except Http404:
+    except WidgyPage.DoesNotExist:
         # otherwise, use a fake page
         return WidgyPage(
             titles='restoring page',
