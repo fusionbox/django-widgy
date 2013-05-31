@@ -24,7 +24,6 @@ class WidgyWidget(forms.HiddenInput):
     Django form widget that is used to load the backbone.js application code
     for a Widgy field.
     """
-    stylesheets = None
     template_name = 'widgy/widgy_field.html'
 
     def render(self, name, value, attrs=None, context={}):
@@ -37,11 +36,11 @@ class WidgyWidget(forms.HiddenInput):
         defaults = {
             'html_name': name,
             'value': value,
-            'stylesheets': self.stylesheets,
             'html_id': attrs['id'],
             'node_dict': self.node.to_json(self.site),
             'node': self.node,
             'api_url': reverse(self.site.node_view),
+            'site': self.site,
         }
         defaults.update(context)
         return render_to_string(self.template_name, defaults)
@@ -103,10 +102,6 @@ class WidgyFormField(forms.ModelChoiceField):
                 self.widget.widget.node = value
             except AttributeError:
                 self.widget.node = value
-            try:
-                self.widget.stylesheets = self.node.content.editor_stylesheets
-            except AttributeError:
-                pass
             self.queryset = None
         else:
             # remove the empty choice

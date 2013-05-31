@@ -149,11 +149,11 @@ class WidgySite(object):
         path = finders.find(filename)
         return bool(path)
 
-    def find_media_files(self, extension):
+    def find_media_files(self, extension, hierarchy=['widgy/{app_label}/{module_name}{extension}']):
         files = set()
         for widget in self.get_all_content_classes():
             files.update(widget.get_templates_hierarchy(
-                hierarchy=['widgy/{app_label}/{module_name}{extension}'],
+                hierarchy=hierarchy,
                 extension=extension,
             ))
         return filter(self.filter_existing_staticfiles, files)
@@ -165,3 +165,12 @@ class WidgySite(object):
     @cached_property
     def js_files(self):
         return self.find_media_files('.js')
+
+    @cached_property
+    def admin_scss_files(self):
+        return self.find_media_files(
+            extension='.scss',
+            hierarchy=[
+                'widgy/{app_label}/{module_name}.admin{extension}',
+                'widgy/{app_label}/admin{extension}',
+            ])
