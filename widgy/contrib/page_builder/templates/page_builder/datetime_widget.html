@@ -1,8 +1,6 @@
 {{ widget }}
 <script>
-  require(['underscore', 'jquery'], function (_, $) {
-    _.defer(function () {
-      _.defer(function () {
+  require(['jquery'], function ($) {
       // Idempotent DateTimeShortcuts.init
       $(".vDateField").each(function () {
         if (!/datetimeshortcuts/.test($(this).next().attr('class')))
@@ -12,7 +10,5 @@
         if (!/datetimeshortcuts/.test($(this).next().attr('class')))
           DateTimeShortcuts.addClock(this);
       });
-     })
-    })
   });
 </script>

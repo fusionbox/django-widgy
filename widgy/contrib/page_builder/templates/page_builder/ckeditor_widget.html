@@ -6,11 +6,7 @@
   {# this tells CKEditor where to find its static assets #}
   CKEDITOR_BASEPATH = {{ ckeditor_path|json }};
   {# we need to ensure that the ckeditor library is loaded before we try to use it #}
-  require(['underscore', 'lib/ckeditor/ckeditor'], function(_) {
-    {% comment  %}
-    The defer is required only if ckeditor has already been loaded and
-    requirejs is calling us synchronously.
-    {% endcomment %}
-    _.defer(CKEDITOR.replace, {{ html_id|json }}, {{ config|json }});
+  require(['lib/ckeditor/ckeditor'], function() {
+    CKEDITOR.replace({{ html_id|json }}, {{ config|json }});
   });
 </script>
