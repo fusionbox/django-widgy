@@ -170,9 +170,9 @@ define([
 
       this.listenTo(edit_view, 'close', this.rerender);
 
+      widget.$preview.html(edit_view.el);
       edit_view.renderPromise()
         .then(function(edit_view) {
-          widget.$preview.html(edit_view.el);
           widget.$('.edit:first').remove();
 
           // TODO: use HTML autofocus property??
