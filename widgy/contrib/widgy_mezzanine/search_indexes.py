@@ -9,6 +9,7 @@ from .signals import widgypage_pre_index
 WidgyPage = get_widgypage_model()
 
 
+
 class PageIndex(indexes.SearchIndex, indexes.Indexable):
     title = indexes.CharField(model_attr='title')
     date = indexes.DateTimeField(model_attr='publish_date')
