@@ -31,3 +31,4 @@ PASSWORD_HASHERS = (
 SOUTH_TESTS_MIGRATE = False
 
 URLCONF_INCLUDE_CHOICES = tuple()
+TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'

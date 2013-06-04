@@ -679,7 +679,7 @@ class FormSubmission(behaviors.Timestampable, models.Model):
     objects = QuerySetManager()
 
     class QuerySet(QuerySet):
-        def field_names(self):
+        def get_formfield_labels(self):
             """
             A dictionary of field uuid to field label. We use the label of the
             field that was used by the most recent submission. Note that this

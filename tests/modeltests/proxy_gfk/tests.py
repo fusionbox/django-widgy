@@ -1,9 +1,10 @@
+import django
 from django.test import TestCase
 from django.utils import unittest
 
 from widgy.generic.models import ContentType
 
-from .models import Base, Related, Proxy
+from .models import Base, Related, Proxy, ConcreteModel
 
 
 class TestPGFK(TestCase):
@@ -50,7 +51,7 @@ class TestPGFK(TestCase):
 
         self.assertEqual([rel], list(Related.objects.filter(bases__id=base.id)))
 
-    @unittest.expectedFailure
+    @unittest.skipIf(django.VERSION < (1, 6, 0), 'only works on 1.6')
     def test_query_proxy(self):
         """
         I don't know how to make this pass. There's only a single instance
@@ -77,3 +78,22 @@ class TestPGFK(TestCase):
     def test_proxy_contenttype(self):
         self.assertEqual(Proxy, ContentType.objects.get_for_model(Proxy, for_concrete_model=False).model_class())
         self.assertEqual(Proxy, ContentType.objects.get_for_models(Proxy, for_concrete_models=False).values()[0].model_class())
+
+    @unittest.skipIf(django.VERSION < (1, 6, 0), 'only works on 1.6')
+    def test_abstract_reverse_join(self):
+        base = Base()
+        cm = ConcreteModel.objects.create()
+        base.obj = cm
+        base.save()
+
+        concrete_models = ConcreteModel.objects.filter(
+            bases__isnull=True
+        )
+
+        self.assertEqual(list(concrete_models), [])
+        base.delete()
+
+        concrete_models = ConcreteModel.objects.filter(
+            bases__isnull=True
+        )
+        self.assertEqual(list(concrete_models), [cm])
