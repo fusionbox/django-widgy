@@ -13,8 +13,8 @@ User = get_user_model()
 
 
 class VersionTracker(models.Model):
-    head = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT)
-    working_copy = models.ForeignKey(Node, on_delete=models.PROTECT)
+    head = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT, unique=True)
+    working_copy = models.ForeignKey(Node, on_delete=models.PROTECT, unique=True)
 
     class Meta:
         app_label = 'widgy'
@@ -117,6 +117,25 @@ class VersionTracker(models.Model):
             newest_tree = self.head.root_node
             Node.prefetch_trees(self.working_copy, newest_tree)
             return not self.working_copy.trees_equal(newest_tree)
+
+    def delete(self):
+        commits = self.get_history_list()
+        # break the circular reference
+        self.head = None
+        self.save()
+
+        # Commits can share trees (it happens when reverting), so collect them
+        # in a set in order to only delete them once.
+        trees_to_delete = set([self.working_copy])
+        for commit in commits:
+            trees_to_delete.add(commit.root_node)
+            commit.delete()
+
+        super(VersionTracker, self).delete()
+
+        for root_node in trees_to_delete:
+            Node.get_tree(root_node).update(is_frozen=False)
+            root_node.content.delete()
 
 
 class VersionCommit(models.Model):

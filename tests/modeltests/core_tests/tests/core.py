@@ -515,7 +515,7 @@ class TestVersioning(RootNodeTestCase):
 
             self.assertEqual(list(commits), history)
 
-        tracker = VersionTracker.objects.create(working_copy=root_node)
+        tracker = VersionTracker.objects.create(working_copy=RawTextWidget.add_root(widgy_site).node)
         self.assertEqual(tracker.get_history_list(), [])
 
     def orphan_helper(self):
@@ -757,6 +757,28 @@ class TestVersioning(RootNodeTestCase):
             tracker.reset()
         # passes if there was no exception
 
+    def test_delete(self):
+        self.assertEqual(RawTextWidget.objects.count(), 0)
+        tracker, commit = self.make_commit()
+        self.assertNotEqual(RawTextWidget.objects.count(), 0)
+        tracker.delete()
+        self.assertEqual(RawTextWidget.objects.count(), 0)
+        self.assertEqual(VersionTracker.objects.filter(pk=tracker.pk).count(), 0)
+
+    def test_delete_deep_tree_and_multiple_commits(self):
+        make_a_nice_tree(self.root_node)
+        tracker = VersionTracker.objects.create(working_copy=self.root_node)
+        tracker.commit()
+        tracker.commit()
+        tracker.delete()
+        self.assertEqual(RawTextWidget.objects.count(), 0)
+        self.assertEqual(VersionTracker.objects.filter(pk=tracker.pk).count(), 0)
+
+    def test_delete_after_revert(self):
+        tracker, commit = self.make_commit()
+        tracker.commit()
+        tracker.revert_to(commit)
+        tracker.delete()
 
 
 class TestPrefetchTree(RootNodeTestCase):
