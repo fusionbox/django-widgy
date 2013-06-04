@@ -64,15 +64,15 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         left, right = make_a_nice_tree(self.root_node)
         number_of_nodes = Node.objects.count()
         number_of_right_nodes = len(right.get_descendants()) + 1
-        content = right.content
+        right_children = right.content.depth_first_order()
         r = self.delete(right.get_api_url(widgy_site))
         self.assertEqual(r.status_code, 200)
 
         with self.assertRaises(Node.DoesNotExist):
             Node.objects.get(pk=right.pk)
 
-        with self.assertRaises(type(content).DoesNotExist):
-            type(content).objects.get(pk=content.pk)
+        for should_be_deleted in right_children:
+            self.assertFalse(type(should_be_deleted).objects.filter(pk=should_be_deleted.pk).exists())
 
         self.assertEqual(Node.objects.count(), number_of_nodes - number_of_right_nodes)
 

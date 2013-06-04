@@ -749,6 +749,8 @@ class Content(models.Model):
     def delete(self, raw=False):
         self.check_frozen()
         pre_delete_widget.send(self.__class__, instance=self, raw=raw)
+        for child in self.get_children():
+            child.delete(raw)
         self.node.delete()
         super(Content, self).delete()
 

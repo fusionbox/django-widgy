@@ -356,7 +356,7 @@ class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChi
         self.node.move(Node.get_last_root_node(),
                        'last-sibling')
 
-    def delete(self):
+    def delete(self, raw=False):
         self.check_frozen()
         # don't delete, just take us out of the tree
         self.make_root()
