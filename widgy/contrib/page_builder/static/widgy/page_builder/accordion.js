@@ -8,10 +8,10 @@ jQuery(function($) {
     $(document.body).addClass('no-details');
     $('summary').on('click', function(event) {
       var $details = $(this).parents('details');
-      if ( $details.attr('open') )
-        $details.removeAttr('open');
+      if ( $details.attr('open') || $details.hasClass('open') )
+        $details.removeAttr('open').removeClass('open');
       else
-        $details.attr('open', true);
+        $details.attr('open', true).addClass('open');
     });
   }
 });
