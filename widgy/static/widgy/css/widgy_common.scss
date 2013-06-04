@@ -137,3 +137,9 @@ $blue:        #309BBF;
 $green:       #559911;
 $purple:      #A56ED3;
 
+
+@mixin node-icon ($class, $img) {
+  &.#{$class} > span.title {
+    background: url($img) no-repeat;
+  }
+}

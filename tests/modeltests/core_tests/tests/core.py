@@ -921,6 +921,13 @@ class TestSite(TestCase):
         self.assertIn('widgy/core_tests/rawtextwidget.js', js_files)
         self.assertNotIn('widgy/models/content.js', js_files)
 
+    def test_admin_scss_files(self):
+        files = widgy_site.admin_scss_files
+        self.assertIn('widgy/core_tests/rawtextwidget.admin.scss', files)
+        self.assertIn('widgy/core_tests/admin.scss', files)
+
+        self.assertNotIn('widgy/models/content.scss', files)
+
 
 class TestFindProblems(RootNodeTestCase):
     def setUp(self):

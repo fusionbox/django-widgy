@@ -135,7 +135,7 @@ class CalloutBucket(Bucket):
         return False
 
     def valid_parent_of(self, cls, obj=None):
-        return issubclass(cls, (Markdown, Button))
+        return issubclass(cls, (Markdown, Button, Html))
 
     class Meta:
         verbose_name = _('callout bucket')

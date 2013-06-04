@@ -15,8 +15,8 @@ the admin center.
 {% compress css %}
 <link type="text/css" rel="stylesheet" href="{% static 'widgy/css/font-awesome.css' %}">
 <link type="text/x-scss" rel="stylesheet" href="{% static 'widgy/css/widgy.scss' %}">
-{% for sheet in stylesheets %}
-<link type="{{ sheet.type }}" href="{% static sheet.filename %}" rel="stylesheet">
+{% for scss_file in site.admin_scss_files %}
+<link type="text/x-scss" href="{% static scss_file %}" rel="stylesheet">
 {% endfor %}
 {% endcompress %}
 {% if html_name %}

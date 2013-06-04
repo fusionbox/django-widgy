@@ -26,6 +26,17 @@ class WidgyPageMixin(LinkableMixin):
                 'root_node_pk': widgy['root_node'].pk,
             })
 
+    def get_content_model(self):
+        """
+        This is needed to render an unsaved WidgyPage. The template
+        calls get_content_model, which should work because we inherit it
+        from Page. However, the default implementation does a database
+        query, which of course can't find anything because we are trying
+        to render an unsaved object. This functionality is used on the
+        fake WidgyPage used to preview while undeleting.
+        """
+        return self
+
 
 # In Django 1.5+, we could use swappable = True
 if getattr(settings, 'WIDGY_MEZZANINE_PAGE_MODEL', None) is None:
