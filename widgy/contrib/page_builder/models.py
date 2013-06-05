@@ -161,7 +161,8 @@ class Callout(models.Model):
 
 @widgy.register
 class CalloutWidget(Content):
-    callout = models.ForeignKey(Callout, null=True, blank=True)
+    callout = models.ForeignKey(Callout, null=True, blank=True,
+                                on_delete=models.PROTECT)
 
     editable = True
 
