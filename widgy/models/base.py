@@ -28,7 +28,7 @@ from widgy.exceptions import (
 from widgy.signals import pre_delete_widget
 from widgy.generic import WidgyGenericForeignKey, ProxyGenericRelation
 from widgy.utils import exception_to_bool, update_context
-from widgy.widgets import DateTimeWidget
+from widgy.widgets import DateTimeWidget, DateWidget, TimeWidget
 
 logger = logging.getLogger(__name__)
 
@@ -38,8 +38,8 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
         'form_class': forms.SplitDateTimeField,
         'widget': DateTimeWidget
     },
-    models.DateField: {'widget': widgets.AdminDateWidget},
-    models.TimeField: {'widget': widgets.AdminTimeWidget},
+    models.DateField: {'widget': DateWidget},
+    models.TimeField: {'widget': TimeWidget},
 }
 
 

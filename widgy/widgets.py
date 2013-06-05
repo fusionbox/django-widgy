@@ -16,3 +16,11 @@ class DateTimeMixin(object):
 
 class DateTimeWidget(DateTimeMixin, widgets.AdminSplitDateTime):
     pass
+
+
+class DateWidget(DateTimeMixin, widgets.AdminDateWidget):
+    pass
+
+
+class TimeWidget(DateTimeMixin, widgets.AdminTimeWidget):
+    pass
