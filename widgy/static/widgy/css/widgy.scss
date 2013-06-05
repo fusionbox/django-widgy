@@ -220,10 +220,6 @@ li.node_drop_target {
     padding: 0px;
     margin: 0 0 1em 0;
 
-    &:hover {
-      cursor: pointer;
-    }
-
     // specific node styles
     &.invisible {
       background-color: inherit;
@@ -325,6 +321,10 @@ li.node_drop_target {
         padding: 2px;
         position: relative;
         width: auto;
+
+        &.draggable {
+          cursor: pointer;
+        }
         
         span.title {
           color: #666;
@@ -354,7 +354,6 @@ li.node_drop_target {
           font-size: 14px;
           position: relative;
           top: 3px;
-          cursor: pointer;
         }                      
       }
 

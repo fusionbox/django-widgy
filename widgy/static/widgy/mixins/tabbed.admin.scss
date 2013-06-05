@@ -46,6 +46,7 @@ div.widgy div.editor .tabbed > div.widget > ul.nodeChildren {
         .drag-row {
           @include rounded(0px);
           background: transparent !important;
+          cursor: pointer;
 
           span.title {
             color: inherit;

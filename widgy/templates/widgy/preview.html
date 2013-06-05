@@ -1,7 +1,7 @@
 {% load i18n %}
 <div class="widget">
   {% block drag-row %}
-  <p class="drag-row">
+  <p class="drag-row{% if self.draggable %} draggable{% endif %}">
     {% if self.draggable %}
     <span class="drag_handle dragHandle icon-move"></span>
     {% endif %}
