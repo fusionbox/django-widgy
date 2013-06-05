@@ -491,6 +491,8 @@ li.node_drop_target {
           float: none !important;
           width: auto !important;
         }
+        -webkit-user-select: auto;
+        -moz-user-select: text;
       }
       
       // nested editors within editors
