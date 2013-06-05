@@ -86,9 +86,9 @@ class UndeleteField(forms.ModelChoiceField):
         return format_html('<a href="{url}">{preview}</a>', url=url, preview=ugettext('preview'))
 
 
-class UndeletePageAdmin(WidgyPageAdmin):
+class UndeletePageAdminMixin(object):
     def get_form(self, request, obj=None, **kwargs):
-        base = super(UndeletePageAdmin, self).get_form(request, obj, **kwargs)
+        base = super(UndeletePageAdminMixin, self).get_form(request, obj, **kwargs)
         base_field = base.base_fields['root_node']
         # create a new form using an UndeleteField instead of the
         # original VersionedWidgyField
@@ -100,13 +100,17 @@ class UndeletePageAdmin(WidgyPageAdmin):
         })
 
     def response_add(self, request, obj, *args, **kwargs):
-        resp = super(UndeletePageAdmin, self).response_add(request, obj, *args, **kwargs)
+        resp = super(UndeletePageAdminMixin, self).response_add(request, obj, *args, **kwargs)
         if resp.status_code == 302 and resp['Location'].startswith('../'):
             viewname = 'admin:%s_%s_change' % (
                 obj._meta.app_label,
                 obj._meta.module_name)
             resp['Location'] = reverse(viewname, args=(quote(obj.pk),))
         return resp
+
+
+class UndeletePageAdmin(UndeletePageAdminMixin, WidgyPageAdmin):
+    pass
 
 
 class UndeletePage(WidgyPage):
