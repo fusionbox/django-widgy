@@ -182,7 +182,7 @@ li.node_drop_target {
   &.active {
     border: 1px dashed $green !important;
     background: lighten($green,40%) !important;
-    color: $darken($green,10%) !important;
+    color: darken($green,10%) !important;
     margin: 0.25em 1em !important;
     
     span {
