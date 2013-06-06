@@ -148,7 +148,7 @@ class ReviewedHistoryView(HistoryView):
     def get_context_data(self, **kwargs):
         kwargs = super(ReviewedHistoryView, self).get_context_data(**kwargs)
         try:
-            self.site.authorize(self.request, self.site.approve_view.view_instance)
+            self.site.authorize(self.request, self.site.get_view_instance(self.site.approve_view))
             kwargs['can_approve_commit'] = True
         except PermissionDenied:
             kwargs['can_approve_commit'] = False
