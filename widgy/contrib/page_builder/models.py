@@ -294,8 +294,8 @@ class TableRow(TableElement):
             self.add_child(site, TableData)
 
     class Meta:
-        verbose_name = _('tablerow')
-        verbose_name_plural = _('tablerows')
+        verbose_name = _('row')
+        verbose_name_plural = _('rows')
 
 
 @widgy.register
@@ -348,14 +348,15 @@ class TableHeaderData(TableElement):
             i.reposition(site, new_right, i.get_parent())
 
     class Meta:
-        verbose_name = _('table header data')
-        verbose_name_plural = _('table header datas')
+        verbose_name = _('column')
+        verbose_name_plural = _('columns')
 
 
 @receiver(pre_delete_widget, sender=TableHeaderData)
 def delete_column(sender, instance, raw, **kwargs):
     if not raw:
         instance.delete_column()
+
 
 @widgy.register
 class TableData(TableElement):
@@ -373,6 +374,10 @@ class TableData(TableElement):
             return isinstance(parent, TableRow)
         else:
             return False
+
+    class Meta:
+        verbose_name = _('cell')
+        verbose_name_plural = _('cells')
 
 
 @widgy.register
