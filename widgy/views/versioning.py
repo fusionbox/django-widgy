@@ -193,16 +193,20 @@ class ApproveView(ApprovalChangeBaseView):
     def get_message(self, commit, history_url):
         # XXX: Avoid circular import
         from widgy.forms import UndoApprovalsForm
+        from widgy.admin import HTML_IN_MESSAGES
 
-        return format_html('{0} {1}',
-            _('Commit %s has been approved') % commit,
-            UndoApprovalsForm(
-                initial={
-                    'actions': [commit.pk],
-                    'referer': history_url,
-                }
-            ).render(self.request, self.site)
-        )
+        message = _('Commit %s has been approved') % commit
+        if HTML_IN_MESSAGES:
+            message = format_html('{0} {1}',
+                message,
+                UndoApprovalsForm(
+                    initial={
+                        'actions': [commit.pk],
+                        'referer': history_url,
+                    }
+                ).render(self.request, self.site)
+            )
+        return message
 
 
 class UnapproveView(ApprovalChangeBaseView):

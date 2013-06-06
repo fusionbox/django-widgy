@@ -1,7 +1,7 @@
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
 from django.contrib import messages
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied, ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.conf import settings
 import django
@@ -11,10 +11,8 @@ from widgy.utils import format_html
 
 # BBB: Before django 1.5, only session storage supported safe string in
 # messages. This is needed in order to put the undo form in messages.
-if django.VERSION < (1, 5) and \
-   settings.MESSAGE_STORAGE != 'django.contrib.messages.storage.session.SessionStorage':
-    raise ImproperlyConfigured("Django version prior to 1.5 should to use SessionStorage "
-                               "as MESSAGE_STORAGE")
+HTML_IN_MESSAGES = django.VERSION >= (1, 5) or \
+        settings.MESSAGE_STORAGE == 'django.contrib.messages.storage.session.SessionStorage'
 
 
 class AuthorizedAdminMixin(object):
@@ -103,16 +101,18 @@ class VersionCommitAdmin(AuthorizedAdminMixin, ModelAdmin):
             approved = _('%d commit has been approved')
 
         from widgy.forms import UndoApprovalsForm
-        message = format_html(
-            '{0} {1}',
-            approved % queryset.count(),
-            UndoApprovalsForm(
-                initial={
-                    'actions': [c.pk for c in queryset],
-                    'referer': request.path,
-                }
-            ).render(request, self.get_site())
-        )
+        message = approved % queryset.count()
+        if HTML_IN_MESSAGES:
+            message = format_html(
+                '{0} {1}',
+                message,
+                UndoApprovalsForm(
+                    initial={
+                        'actions': [c.pk for c in queryset],
+                        'referer': request.path,
+                    }
+                ).render(request, self.get_site())
+            )
 
         messages.info(request, message, extra_tags='safe')
 
