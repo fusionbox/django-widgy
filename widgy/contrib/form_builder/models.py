@@ -19,8 +19,10 @@ from fusionbox.forms.fields import PhoneNumberField
 
 from widgy.models import Content, Node
 from widgy.signals import pre_delete_widget
-from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, DisplayNameMixin
 from widgy.utils import update_context, build_url, force_bytes
+from widgy.models.mixins import (StrictDefaultChildrenMixin,
+                                 DefaultChildrenMixin, TabbedContainer,
+                                 DisplayNameMixin)
 from widgy.contrib.page_builder.db.fields import MarkdownField
 from widgy.contrib.page_builder.models import Bucket, Html
 from widgy.contrib.page_builder.forms import MiniCKEditorField
@@ -43,8 +45,8 @@ class FormElement(Content):
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
-        for p in list(parent.get_ancestors()) + [parent]:
-            if isinstance(p, FormBody):
+        for p in parent.get_ancestors().content_classes + [type(parent)]:
+            if issubclass(p, FormBody):
                 return super(FormElement, cls).valid_child_of(parent, obj)
         return False
 
@@ -160,7 +162,10 @@ class SubmitButton(FormElement):
 
     @property
     def deletable(self):
-        return len([i for i in self.parent_form.depth_first_order() if isinstance(i, SubmitButton)]) > 1
+        # only deletable if there's more than one one submit button
+        # (there must always be at least 1 submit button)
+        return sum(issubclass(i, SubmitButton) for
+                   i in self.parent_form.depth_first_order().content_classes) > 1
 
     class Meta:
         verbose_name = _('submit button')
@@ -281,8 +286,8 @@ class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChi
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
-        for p in list(parent.get_ancestors()) + [parent]:
-            if isinstance(p, Form):
+        for p in parent.get_ancestors().content_classes + [type(parent)]:
+            if issubclass(p, Form):
                 return False
         return super(Form, cls).valid_child_of(parent, obj)
 
@@ -661,7 +666,7 @@ class Uncaptcha(BaseFormField):
             return False
         if obj in parent.depth_first_order():
             return True
-        if [i for i in parent.depth_first_order() if isinstance(i, cls)]:
+        if any(issubclass(i, cls) for i in parent.depth_first_order().content_classes):
             return False
         else:
             return super(Uncaptcha, cls).valid_child_of(parent, obj)
@@ -789,4 +794,6 @@ def protect_emailuserhandler_to_ident_field(sender, instance, raw, **kwargs):
 
     for child in instance.parent_form.depth_first_order():
         if isinstance(child, EmailUserHandler) and child.to_ident == instance.ident:
-            raise ProtectedError("This cannot be deleted because it is being referenced by a %s." % (child.display_name,), [child])
+            raise ProtectedError(
+                "This cannot be deleted because it is being referenced by a %s." % (child.display_name,),
+                [child])

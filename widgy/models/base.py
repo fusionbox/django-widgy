@@ -16,6 +16,7 @@ from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.contrib.admin import widgets
 from django.template.defaultfilters import capfirst
+from django.utils.functional import cached_property
 
 from treebeard.mp_tree import MP_Node
 
@@ -386,6 +387,73 @@ def check_frozen(sender, instance, **kwargs):
 models.signals.pre_delete.connect(check_frozen, sender=Node)
 
 
+class ContentList(object):
+    """
+    An efficient wrapper around a list of Contents, generated from a
+    queryset of Nodes.
+
+    Behaviorally, it could be replaced with::
+
+        [node.content for node in node_qs]
+
+    Except it optimizes certain optimizations:
+
+      - Prefetches the Content instances in bulk
+      - Implements ``__contains__`` without fetching Contents at all
+      - Implements ``__len__`` without fetching Contents at all
+      - Can calculate Content _classes_ with fetching the Content instances
+
+    """
+
+    def __init__(self, node_qs):
+        self.node_qs = node_qs
+
+    @cached_property
+    def nodes(self):
+        nodes = list(self.node_qs)
+        # no need to keep a reference to the queryset around, we're not going
+        # to use it again.
+        del self.node_qs
+        return nodes
+
+    @cached_property
+    def contents(self):
+        Node.attach_content_instances(self.nodes)
+        return [node.content for node in self.nodes]
+
+    @cached_property
+    def content_classes(self):
+        """
+        This is like ``map(type, self.contents)``, but more efficient because
+        it doesn't fetch the Content instances.
+        """
+        # node.content_type doesn't use the ContentType cache, so we have to
+        # call get_for_id ourself, which does use the cache.
+        return [ContentType.objects.get_for_id(node.content_type_id).model_class() for node in self.nodes]
+
+    def __getitem__(self, index):
+        return self.contents[index]
+
+    def __len__(self):
+        # use .count() if nodes haven't been fetched already?
+        return len(self.nodes)
+
+    def __eq__(self, other):
+        if isinstance(other, ContentList):
+            other = other.contents
+        return self.contents == other
+
+    def __contains__(self, content):
+        if content is None:
+            return False
+        child_idents = ((i.content_id, i.content_type_id) for i in self.nodes)
+        ct = ContentType.objects.get_for_model(content, for_concrete_model=False)
+        return (content.pk, ct.pk) in child_idents
+
+    def __repr__(self):
+        return repr(self.contents)
+
+
 class Content(models.Model):
     """
     Abstract base class for all models that are intended to a part of a Widgy
@@ -513,16 +581,13 @@ class Content(models.Model):
         return self.node.get_root().content
 
     def get_ancestors(self):
-        ancestors = Node.attach_content_instances(self.node.get_ancestors())
-        return [node.content for node in ancestors]
+        return ContentList(self.node.get_ancestors())
 
     def depth_first_order(self):
-        nodes = Node.attach_content_instances(self.node.depth_first_order())
-        return [node.content for node in nodes]
+        return ContentList(self.node.depth_first_order())
 
     def get_children(self):
-        node_children = Node.attach_content_instances(self.node.get_children())
-        return [node.content for node in node_children]
+        return ContentList(self.node.get_children())
 
     def get_next_sibling(self):
         sib = self.node.get_next_sibling()

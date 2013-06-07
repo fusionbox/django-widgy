@@ -79,7 +79,7 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         left, right = make_a_nice_tree(self.root_node, self.widgy_site)
         number_of_nodes = Node.objects.count()
         number_of_right_nodes = len(right.get_descendants()) + 1
-        right_children = right.content.depth_first_order()
+        right_children = list(right.content.depth_first_order())
         r = self.delete(right.get_api_url(self.widgy_site))
         self.assertEqual(r.status_code, 200)
 
