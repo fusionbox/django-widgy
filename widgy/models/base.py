@@ -72,6 +72,11 @@ class Node(MP_Node):
     def __unicode__(self):
         return unicode(self.content)
 
+    def is_root(self):
+        # treebeard's implementation of is_root does a query, even though we
+        # already have all the information we need.
+        return self.depth == 1
+
     def to_json(self, site):
         children = [c.to_json(site) for c in self.get_children()]
         json = {
@@ -211,9 +216,7 @@ class Node(MP_Node):
         cls.attach_content_instances(list(itertools.chain(*trees)))
         for tree in trees:
             root_node = tree.pop(0)
-            # This should get_depth() or is_root(), but both of those do
-            # another query
-            if root_node.depth == 1:
+            if root_node.is_root():
                 root_node._parent = None
             root_node.consume_children(tree)
             assert not tree, "all of the nodes should be consumed"
