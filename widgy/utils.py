@@ -118,6 +118,11 @@ def html_to_plaintext(html):
                         yield t
 
     soup = bs4.BeautifulSoup(html)
+    # This only get the element having <elem role="main">, allowing
+    # to index only the main text of the page.
+    main = soup.find(role='main')
+    if main:
+        soup = main
     text = ' '.join(get_text(soup))
     return text
 
