@@ -33,11 +33,11 @@
   {% if can_approve_commit %}
     {% if not commit.is_approved %}
       <form method="post" action="{% reverse_site_url site 'approve_view' pk=commit.tracker.pk commit_pk=commit.pk %}">
-        <input class="button" type="submit" value="{% trans "Approve this Commit" %}">
+        <input class="button approve" type="submit" value="{% trans "Approve this Commit" %}">
     {% else %}
       {# unapprove_view avoid generating a UndoApprovalsForm for each commit #}
       <form method="post" action="{% reverse_site_url site 'unapprove_view' pk=commit.tracker.pk commit_pk=commit.pk %}">
-        <input class="button" type="submit" value="{% trans "Unapprove this Commit" %}">
+        <input class="button unapprove" type="submit" value="{% trans "Unapprove this Commit" %}">
     {% endif %}
       {% csrf_token %}
     </form>
