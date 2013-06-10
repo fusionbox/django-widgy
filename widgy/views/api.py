@@ -99,20 +99,43 @@ class NodeView(WidgyView):
         node.prefetch_tree()
         return self.render_as_node(node.to_json(self.site))
 
-    def post(self, request, node_pk=None):
+    def get_nodes(self):
         data = self.data()
-        app_label, model = data['__class__'].split('.')
+
+        right = None
+        parent = None
+        try:
+            right_id = data.get('right_id')
+            if right_id:
+                right = Node.objects.get(pk=extract_id(right_id))
+        except Node.DoesNotExist:
+            pass
+
+        try:
+            parent_id = data.get('parent_id')
+            if parent_id:
+                parent = Node.objects.get(pk=extract_id(parent_id))
+        except Node.DoesNotExist:
+            pass
+
+        if not (right or parent):
+            raise Http404
+
+        return (right, parent)
+
+    def post(self, request, node_pk=None):
+        app_label, model = self.data()['__class__'].split('.')
         content_class = get_model(app_label, model)
         if not content_class:
             raise Http404
         if not self.site.has_add_permission(request, content_class):
             raise PermissionDenied(_("You don't have permission to add this widget."))
 
-        try:
-            right = get_object_or_404(Node, pk=extract_id(data['right_id']))
+        right, parent = self.get_nodes()
+
+        if right:
             content = right.content.add_sibling(self.site, content_class)
-        except Http404:
-            parent = get_object_or_404(Node, pk=extract_id(data['parent_id']))
+        else:
             content = parent.content.add_child(self.site, content_class)
 
         return self.render_as_node(content.node.to_json(self.site),
@@ -130,22 +153,18 @@ class NodeView(WidgyView):
             put this in the model
         """
         node = get_object_or_404(Node, pk=node_pk)
-        data = self.data()
 
         if not self.site.has_change_permission(request, node.content):
             raise PermissionDenied(_("You don't have permission to move this widget."))
         if not node.content.draggable:
             raise InvalidTreeMovement({'message': "You can't move me"})
 
-        try:
-            right = Node.objects.get(pk=extract_id(data['right_id']))
+        right, parent = self.get_nodes()
+
+        if right:
             node.content.reposition(self.site, right=right.content)
-        except Node.DoesNotExist:
-            try:
-                parent = Node.objects.get(pk=extract_id(data['parent_id']))
-                node.content.reposition(self.site, parent=parent.content)
-            except Node.DoesNotExist:
-                raise Http404
+        else:
+            node.content.reposition(self.site, parent=parent.content)
 
         return self.render_as_node(None, status=200)
 
