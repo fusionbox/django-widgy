@@ -80,7 +80,7 @@ class WidgySite(object):
         try:
             return view.view_instance
         except AttributeError:
-            raise ValueError("View does not inherit from AuthorizedMixin")
+            raise ValueError("View does not inherit from WidgyViewMixin")
 
     # These must return the same instance throughout the whole lifetime
     # of the widgy site for reverse to work.
