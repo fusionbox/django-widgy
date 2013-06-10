@@ -1,4 +1,4 @@
-{% load i18n admin_static %}
+{% load i18n admin_static static compress %}
 {% if result_hidden_fields %}
   <div class="hiddenfields">{# DIV for HTML validation #}
   {% for item in result_hidden_fields %}{{ item }}{% endfor %}
@@ -39,4 +39,7 @@
   </tbody>
   </table>
   </div>
+  {% compress css %}
+  <link type="text/x-scss" rel="stylesheet" href="{% static 'widgy/css/unapproved_commits.scss' %}">
+  {% endcompress %}
 {% endif %}
