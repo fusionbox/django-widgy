@@ -1,7 +1,6 @@
 """
 Some utility functions used throughout the project.
 """
-import urllib
 from itertools import ifilterfalse
 
 import bs4
@@ -10,6 +9,7 @@ from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 from django.template import Context
 from django.db import models
+from django.utils.http import urlencode
 
 try:
     from django.contrib.auth import get_user_model
@@ -94,7 +94,7 @@ def update_context(context, dict):
 
 def build_url(path, **kwargs):
     if kwargs:
-        path += '?' + urllib.urlencode(kwargs)
+        path += '?' + urlencode(kwargs)
     return path
 
 
