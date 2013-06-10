@@ -121,7 +121,7 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
         else
           return this.collection._prepareModel(value);
       }, this);
-      this.collection.update(instances);
+      this.collection.set(instances);
       this.collection.sort();
       this.content_classes = null;
     },

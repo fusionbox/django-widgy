@@ -177,7 +177,7 @@ describe('NodeCollection', function() {
     assert.equal(node1.children.length, 1);
 
     return Q.all([node1.ready(), node2.ready()]).then(function() {
-      x.update2([
+      x.set2([
         {
           url: 1,
           children: [

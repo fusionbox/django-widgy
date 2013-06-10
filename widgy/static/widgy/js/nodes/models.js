@@ -105,7 +105,7 @@ define([ 'underscore', 'widgy.backbone', 'lib/q'
 
       if (ret) {
         if (children) {
-          this.children.update2(children, options);
+          this.children.set2(children, options);
           if ( options && (options.resort || options.sort_silently) ) {
             this.children.sortByRight(options);
           }
@@ -185,7 +185,7 @@ define([ 'underscore', 'widgy.backbone', 'lib/q'
      *      collection.
      *    - else, remove the old model from the collection.
      */
-    update2: function(data, options) {
+    set2: function(data, options) {
       var models = [];
 
       _.each(data, function(child) {
@@ -199,7 +199,7 @@ define([ 'underscore', 'widgy.backbone', 'lib/q'
         }
       }, this);
 
-      this.update(models, options);
+      this.set(models, options);
     },
 
     /**

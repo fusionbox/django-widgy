@@ -1,4 +1,4 @@
-define([ 'jquery', 'underscore', 'backbone', 'mustache', 'lib/q' ], function($, _, Backbone, Mustache, Q) {
+define([ 'jquery', 'underscore', 'backbone', 'lib/mustache', 'lib/q' ], function($, _, Backbone, Mustache, Q) {
 
   Mustache.tags = ['<%', '%>'];
 
