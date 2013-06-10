@@ -244,6 +244,15 @@ section.main {
 
         input.button[type='submit'] {
           @include button;
+          
+          &.unapprove {
+            border-color: $red;
+            color: $red;
+    
+            &:hover {
+              background: lighten($red,35%);
+            }
+          }
         }
       }
       
