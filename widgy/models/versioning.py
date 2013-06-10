@@ -18,7 +18,8 @@ class VersionTracker(models.Model):
     head = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT, unique=True)
     working_copy = models.ForeignKey(Node, on_delete=models.PROTECT, unique=True)
 
-    item_partial_template = 'widgy/_history_item_versioned.html'
+    history_item_partial_template = 'widgy/_history_item_versioned.html'
+    commit_submitrow = 'widgy/_commit_submitrow_versioned.html'
 
     class Meta:
         app_label = 'widgy'
@@ -144,7 +145,8 @@ class VersionTracker(models.Model):
 
 class ReviewedVersionTracker(VersionTracker):
 
-    item_partial_template = 'widgy/_history_item_reviewed.html'
+    history_item_partial_template = 'widgy/_history_item_reviewed.html'
+    commit_submitrow = 'widgy/_commit_submitrow_reviewed.html'
 
     class Meta:
         app_label = 'widgy'

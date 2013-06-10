@@ -47,21 +47,15 @@ class CommitForm(forms.Form):
 
 
 class ReviewedCommitForm(CommitForm):
-    approve_it = forms.BooleanField(label=_('Approve the commit'),
-                                     required=False)
 
     def commit(self, obj, user):
         cleaned_data = self.cleaned_data.copy()
-        approve_it = cleaned_data.pop('approve_it')
+        approve_it = 'approve_it' in self.data
 
         commit = obj.commit(user, **cleaned_data)
 
         if approve_it:
             commit.approve(user)
-
-
-class RevertForm(CommitForm):
-    pass
 
 
 class VersionTrackerMixin(SingleObjectMixin):
@@ -74,7 +68,6 @@ class VersionTrackerMixin(SingleObjectMixin):
 
 class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
     template_name = 'widgy/commit.html'
-    form_class = CommitForm
 
     def get_context_data(self, **kwargs):
         self.object = self.get_object()
@@ -89,6 +82,7 @@ class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
 
         # lazy because the template doesn't always use it
         kwargs['changed_anything'] = lambda: self.object.has_changes()
+        kwargs['submitrow_template'] = self.site.get_version_tracker_model().commit_submitrow
 
         return kwargs
 
@@ -134,7 +128,7 @@ class HistoryView(AuthorizedMixin, VersionTrackerMixin, DetailView):
         kwargs = super(HistoryView, self).get_context_data(**kwargs)
         kwargs['site'] = self.site
         kwargs['commits'] = self.object.get_history_list()
-        kwargs['history_item_template'] = self.site.get_version_tracker_model().item_partial_template
+        kwargs['history_item_template'] = self.site.get_version_tracker_model().history_item_partial_template
         for commit in kwargs['commits']:
             if commit.parent_id:
                 commit.diff_url = diff_url(self.site,
@@ -222,7 +216,6 @@ class UnapproveView(ApprovalChangeBaseView):
 class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
     template_name = 'widgy/revert.html'
     pk_url_kwarg = 'commit_pk'
-    form_class = RevertForm
 
     def get_context_data(self, **kwargs):
         kwargs['object'] = self.object
@@ -230,6 +223,7 @@ class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
         kwargs['revert_url'] = self.site.reverse(
             self.site.revert_view,
             kwargs={'pk': self.object.tracker.pk, 'commit_pk': self.object.pk})
+        kwargs['submitrow_template'] = self.site.get_version_tracker_model().commit_submitrow
         return kwargs
 
     def get_object(self, queryset=None):
@@ -258,6 +252,9 @@ class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
             template='widgy/commit_success.html',
             context=self.get_context_data(),
         )
+
+    def get_form_class(self):
+        return self.site.get_commit_form(self.request.user)
 
 
 class DiffView(AuthorizedMixin, TemplateView):
