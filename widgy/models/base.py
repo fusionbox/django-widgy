@@ -579,10 +579,7 @@ class Content(models.Model):
         """
         if hasattr(self, '_node'):
             return self._node
-        try:
-            return self._nodes.all()[0]
-        except IndexError:
-            raise Node.DoesNotExist
+        return self._nodes.get()
 
     @node.setter
     def node(self, value):
@@ -660,7 +657,12 @@ class Content(models.Model):
     def add_child(self, site, cls, **kwargs):
         self.check_frozen()
         obj = cls.objects.create(**kwargs)
-        self.node.add_child(content=obj)
+        node = self.node.add_child(content=obj)
+        # We have the Node object already, so it'd be silly for the
+        # compatibility checking to fetch it. We do have to clear the cache
+        # before returning from this method, to prevent a possibly stale and
+        # incorrect Node instance.
+        obj._node = node
 
         try:
             site.validate_relationship(self, obj)
@@ -669,16 +671,18 @@ class Content(models.Model):
             raise
 
         obj.post_create(site)
+        del obj._node
         return obj
 
     def add_sibling(self, site, cls, **kwargs):
-        self.check_frozen()
-        if self.node.is_root():
+        node = self.node
+        node.check_frozen()
+        if node.is_root():
             raise RootDisplacementError({'message': 'You can\'t put things next to me'})
 
         obj = cls.objects.create(**kwargs)
-        self.node.add_sibling(content=obj, pos='left')
-        parent = self.node.get_parent().content
+        obj._node = node.add_sibling(content=obj, pos='left')
+        parent = self.get_parent()
 
         try:
             site.validate_relationship(parent, obj)

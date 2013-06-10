@@ -65,6 +65,7 @@ class TestCore(RootNodeTestCase):
             picky_bucket.add_child(widgy_site,
                                    RawTextWidget,
                                    text='aasdf')
+        self.assertEqual(picky_bucket.node.numchild, 0)
 
         picky_bucket.add_child(widgy_site,
                                RawTextWidget,
@@ -73,6 +74,19 @@ class TestCore(RootNodeTestCase):
         with self.assertRaises(ChildWasRejected):
             picky_bucket.add_child(widgy_site,
                                    Layout)
+
+    def test_node_cache(self):
+        picky_bucket = self.root_node.content.add_child(widgy_site, PickyBucket)
+
+        x = picky_bucket.add_child(widgy_site, RawTextWidget, text='hello')
+
+        self.assertEqual(picky_bucket.node.numchild, 1)
+
+        x.add_sibling(widgy_site,
+                      RawTextWidget,
+                      text='hello')
+
+        self.assertEqual(picky_bucket.node.numchild, 2)
 
     def test_to_json_works_for_multi_table_inheritance(self):
         picky_bucket = self.root_node.content.add_child(widgy_site,

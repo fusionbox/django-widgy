@@ -45,10 +45,14 @@ class ContentView(WidgyView):
         Resolves ``app_label``, ``object_name``, and ``object_pk`` to a
         :class:`widgy.models.Content` instance.
         """
-        return (
+        obj = (
             ContentType.objects.get(model=object_name, app_label=app_label)
             .get_object_for_this_type(pk=object_pk)
         )
+        # We can't select_related this because there's no
+        # OneToOneGenericRelation.
+        obj._node = obj.node
+        return obj
 
     def get(self, request, app_label, object_name, object_pk):
         obj = self.get_object(app_label, object_name, object_pk)
@@ -108,6 +112,7 @@ class NodeView(WidgyView):
             right_id = data.get('right_id')
             if right_id:
                 right = Node.objects.get(pk=extract_id(right_id))
+                right.content.node = right
         except Node.DoesNotExist:
             pass
 
@@ -115,6 +120,7 @@ class NodeView(WidgyView):
             parent_id = data.get('parent_id')
             if parent_id:
                 parent = Node.objects.get(pk=extract_id(parent_id))
+                parent.content.node = parent
         except Node.DoesNotExist:
             pass
 
@@ -138,8 +144,10 @@ class NodeView(WidgyView):
         else:
             content = parent.content.add_child(self.site, content_class)
 
-        return self.render_as_node(content.node.to_json(self.site),
-                                   status=201)
+        node = content.node
+        node.content = content
+        node.prefetch_tree()
+        return self.render_as_node(node.to_json(self.site), status=201)
 
     def put(self, request, node_pk):
         """
@@ -170,6 +178,7 @@ class NodeView(WidgyView):
 
     def delete(self, request, node_pk):
         node = get_object_or_404(Node, pk=node_pk)
+        node.prefetch_tree()
 
         if not self.site.has_delete_permission(request, node.content):
             raise PermissionDenied(_("You don't have permission to delete this widget."))
@@ -243,6 +252,8 @@ class NodeEditView(NodeSingleObjectMixin, AuthorizedMixin, DetailView):
     def get_context_data(self, **kwargs):
         if not self.site.has_change_permission(self.request, self.object):
             raise PermissionDenied(_("You don't have permission to edit this widget."))
+
+        self.object.prefetch_tree()
         kwargs = super(NodeEditView, self).get_context_data(**kwargs)
         kwargs.update(
             html_id='node_%s' % (self.object.pk),

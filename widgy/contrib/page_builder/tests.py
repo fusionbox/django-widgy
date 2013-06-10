@@ -36,7 +36,12 @@ class TestTableWidget(TestCase):
         row_1 = self.table.body.add_child(widgy_site, TableRow)
         row_2 = self.table.body.add_child(widgy_site, TableRow)
 
+        self.assertTrue(row_1.node.is_leaf())
+
         th1 = self.table.header.add_child(widgy_site, TableHeaderData)
+
+        # adding a column to the header needs to add a cell to each row
+        self.assertFalse(row_1.node.is_leaf())
 
         cell_1 = row_1.get_children()[0]
         cell_2 = row_2.get_children()[0]
