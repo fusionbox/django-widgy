@@ -997,6 +997,14 @@ class TestPrefetchTree(RootNodeTestCase):
             # node.content.node must get set even if node.content has already been accessed
             self.assertEqual(self.root_node.content.node, self.root_node)
 
+    def test_prefetch_tree_on_leaf_node(self):
+        root_node = RawTextWidget.add_root(widgy_site).node
+
+        # A single query to fetch the Content -- don't try to fetch nodes
+        # because we already know we're a leaf.
+        with self.assertNumQueries(1):
+            root_node.prefetch_tree()
+
 
 class TestSite(TestCase):
     def test_scss_location(self):

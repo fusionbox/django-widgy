@@ -139,6 +139,14 @@ class Node(MP_Node):
                 return self
         return super(Node, self).get_root()
 
+    def get_descendants(self):
+        if self.is_leaf():
+            # treebeard does a weird useless query:
+            # SELECT * FROM node WHERE id = 12 AND id != 12
+            return self.__class__.objects.none()
+        else:
+            return super(Node, self).get_descendants()
+
     def maybe_prefetch_tree(self):
         """
         Prefetch the tree unless it has already been prefetched
