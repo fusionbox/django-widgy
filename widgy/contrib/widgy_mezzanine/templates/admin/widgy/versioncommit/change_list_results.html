@@ -28,13 +28,13 @@
   </thead>
   <tbody>
   {% for result in results %}
-    {% if not forloop.first %}
-      {% ifchanged result.tracker %}</tbody><tbody>{% endifchanged %}
-    {% endif %}
     {% if result.form.non_field_errors %}
       <tr><td colspan="{{ result|length }}">{{ result.form.non_field_errors }}</td></tr>
     {% endif %}
     <tr class="{% cycle 'row1' 'row2' %}">{% for item in result %}{{ item }}{% endfor %}</tr>
+    {% if not forloop.first %}
+      {% ifchanged result.tracker %}</tbody><tbody>{% endifchanged %}
+    {% endif %}
   {% endfor %}
   </tbody>
   </table>
