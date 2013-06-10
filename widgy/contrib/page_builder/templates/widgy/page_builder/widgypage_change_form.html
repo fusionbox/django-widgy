@@ -2,9 +2,6 @@
 {% load i18n %}
 {% block object-tools %}
     <ul class="object-tools">
-    {% if history_url %}
-      <li><a href="{{ history_url }}" class="historylink">{% trans "History" %}</a></li>
-    {% endif %}
     {% if has_absolute_url %}
         <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>
     {% endif%}

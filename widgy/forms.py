@@ -142,6 +142,7 @@ class VersionedWidgyWidget(WidgyWidget):
         context = {
             'commit_url': self.site.reverse(self.site.commit_view, kwargs={'pk': value}),
             'reset_url': self.site.reverse(self.site.reset_view, kwargs={'pk': value}),
+            'history_url': self.site.reverse(self.site.history_view, kwargs={'pk': value}),
         }
 
         return super(VersionedWidgyWidget, self).render(name, value, attrs, context)

@@ -52,8 +52,6 @@ class WidgyPageAdmin(PageAdmin):
             # we are rendering a change form
             obj = context['original']
             site = self.get_site()
-            context['history_url'] = site.reverse(site.history_view,
-                                                  kwargs={'pk': obj.root_node.pk})
         return super(WidgyPageAdmin, self).render_change_form(request, context, *args, **kwargs)
 
 
