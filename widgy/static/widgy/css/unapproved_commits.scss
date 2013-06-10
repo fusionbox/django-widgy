@@ -1,0 +1,23 @@
+
+/* Commit Previews
+--------------------------------------------------*/
+
+.form-row.preview {
+  iframe {
+    height: 600px;
+    width: 980px;
+  }
+}
+
+/* Version Commit Page Groups
+--------------------------------------------------*/
+
+#changelist #result_list {
+  tbody {
+    > tr:first-child {
+      > td, th {
+        border-top: 2px solid #444444;
+      }
+    }
+  }
+}

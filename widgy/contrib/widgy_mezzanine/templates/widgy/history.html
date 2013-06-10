@@ -19,11 +19,11 @@
 <ol class="history">
     {% for commit in commits %}
     <li>
-      <p class="top">
+      <div class="top">
         <strong>{{ commit.created_at|date:"SHORT_DATETIME_FORMAT" }}</strong>
         {% if commit.author %}{% blocktrans with author=commit.author %} by <strong>{{ author }}</strong>{% endblocktrans %}{% endif %}
         {% include history_item_template %}
-      </p>
+      </div>
       {% if commit.message %}
         <blockquote>{{ commit.message|linebreaks }}</blockquote>
       {% endif %}
