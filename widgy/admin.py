@@ -4,6 +4,8 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.conf import settings
+from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 import django
 
 from widgy.forms import WidgyForm, ApproveForm
@@ -133,8 +135,11 @@ class VersionCommitAdmin(AuthorizedAdminMixin, ModelAdmin):
     commit_preview.allow_tags = True
 
     def preview(self, commit):
-        return format_html('<iframe src="{0}"></iframe>',
-                           self.get_commit_preview_url(commit))
+        context = {
+            'commit_url': self.get_commit_preview_url(commit)
+        }
+        return mark_safe(render_to_string('widgy/commit_preview.html',
+                                          context))
     preview.short_description = _('Preview')
 
     def commit_name(self, commit):
