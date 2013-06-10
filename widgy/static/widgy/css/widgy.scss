@@ -4,7 +4,7 @@
 /* Mixins
 -----------------------------------------*/
 
-$table-cell-min-width: 250px;
+$table-cell-min-width: 120px;
 
 @mixin button {
   @include rounded(3px);
@@ -593,9 +593,9 @@ li.node_drop_target {
                             }
                             
                             span.title {
-                              font-size: 12px;
-                              display: block;
-                              padding: 0 0 0 15px;
+//                              font-size: 12px;
+                              display: none;
+//                              padding: 0 0 0 15px;
                             }
                             
                             button {
@@ -689,9 +689,7 @@ li.node_drop_target {
                           min-height: 20px;
                           
                           > p.drag-row {
-                            background: white;
-                            height: 0px;
-                            padding: 0px;
+                            display: none;
                           }
                         }
                       }
@@ -702,15 +700,15 @@ li.node_drop_target {
                           p.drag-row {
                             span.dragHandle {
                               font-size: 13px;
-                               left: 0px;
+                               left: 2px;
                                position: absolute;
-                               top: 5px;
+                               top: 3px;
                             }
                             
                             span.title {
-                              font-size: 12px;
-                              display: block;
-                              padding: 0 0 0 15px;
+//                              font-size: 12px;
+                              display: none;
+//                              padding: 0 0 0 15px;
                             }
                             
                             button {
@@ -733,6 +731,10 @@ li.node_drop_target {
                                 display: none;
                               }
                             }
+                          }
+                            
+                          textarea {
+                            height: 40px;
                           }
                         }
                       }
