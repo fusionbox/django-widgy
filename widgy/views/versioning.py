@@ -62,7 +62,9 @@ class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
             kwargs['diff_url'] = diff_url(self.site,
                                           self.object.working_copy,
                                           self.object.head.root_node)
-        kwargs['changed_anything'] = self.object.has_changes()
+
+        # lazy because the template doesn't always use it
+        kwargs['changed_anything'] = lambda: self.object.has_changes()
 
         return kwargs
 
