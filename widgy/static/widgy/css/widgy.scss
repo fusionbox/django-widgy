@@ -296,6 +296,50 @@ li.node_drop_target {
       }
     }
     
+    &.image {
+      div.widget {
+        div {
+
+          div {
+
+            &.formField {
+              position: relative;
+
+              label {
+                display: none;
+              }
+            
+              a {
+                img {
+                  float: left;
+                  margin-right: 10px;
+                }
+              }
+              
+              span {
+                float: left;
+                
+              }
+            
+              a.related-lookup {
+                position: absolute;
+                height: 10px;
+                left: 53px;
+                top: 25px;
+              }
+            
+              input {
+                float: left;
+                margin-top: 6px;
+                width: 86%;
+              }
+            
+            }
+          }
+        }
+      }
+    }
+    
     div.widget {
       background: white;
       padding: 0px;
@@ -352,42 +396,9 @@ li.node_drop_target {
 
           &.formField {
             margin-bottom: 10px;
-            
-            &.image {
-              padding-left: 80px;
-              position: relative;
-              
-              label {
-                display: none;
-              }
-              
-              img {
-                left: 5px;
-                position: relative;
-                
-                &.quiet {
-                  left: 10px;
-                  position: absolute;
-                  top: 10px;
-                }
-              }
-              
-              a.related-lookup {
-                float: right;
-                height: 10px;
-                top: 21px;
-              }
-              
-              input {
-                float: left;
-                margin-top: 6px;
-                width: 86%;
-              }
-              
-            }
 
             .cke {
-              float: right;
+              float: left;
             }
             
             &.required {
@@ -422,6 +433,13 @@ li.node_drop_target {
                 margin: 0px 5px;
                 width: 100px;
               }
+            }
+          }
+          
+          input {
+            &[type='checkbox'],
+            &[type='radio'] {
+              margin-left: 0px;
             }
           }
 
@@ -983,20 +1001,6 @@ li.shelfItem {
   border: 1px solid #E0E0E0;
 }
 
-
-
-/* Mezzanine Override */ 
-
-input[type="text"], 
-input[type="password"], 
-input.vDateField, 
-input.vTimeField, 
-.change-list form table .vAutocompleteSearchField, 
-.change-list form table .vM2MAutocompleteSearchField, 
-.inline-tabular .vAutocompleteSearchField, 
-.inline-tabular .vM2MAutocompleteSearchField {
-  width: 200px;
-}
 
 
 /*| HTML and Markdown Preview Pane
