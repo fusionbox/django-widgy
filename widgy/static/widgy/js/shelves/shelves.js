@@ -151,6 +151,13 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/base',
       return this.app.validateRelationship(parent, this.model);
     },
 
+    onMouseDown: function(event) {
+      var ret = DraggableView.prototype.onMouseDown.apply(this, arguments);
+
+      if (ret)
+        this.startBeingDragged(event);
+    },
+
     startBeingDragged: function(event) {
       DraggableView.prototype.startBeingDragged.apply(this, arguments);
 
@@ -159,6 +166,11 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/base',
       });
 
       this.$el.after(placeholder);
+    },
+
+    stopBeingDragged: function() {
+      DraggableView.prototype.stopBeingDragged.apply(this, arguments);
+      this.placeholder.remove();
     },
 
     cssClasses: function() {
