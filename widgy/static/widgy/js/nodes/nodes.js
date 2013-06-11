@@ -298,22 +298,32 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         });
       }
 
-      if (this.canAcceptChild(view))
-      {
-        $children.prepend(this.createDropTarget().el);
+      if (this.canAcceptChild(view)) {
+        $children.prepend(this.createDropTarget(view).el);
         this.list.each(function(node_view) {
-          var drop_target = that.createDropTarget().$el.insertAfter(node_view.el);
-
-          if ( mine && view == node_view )
-            drop_target.hide();
-        });
+          var drop_target = that.createDropTarget(view).$el.insertAfter(node_view.el);
+        }, this);
       }
     },
 
-    createDropTarget: function() {
+    createDropTarget: function(view) {
       var drop_target = new DropTargetView();
       drop_target.on('dropped', this.dropChildView);
       this.drop_targets_list.push(drop_target);
+
+      if ( this.list.contains(view) ) {
+        var view_index = this.list.list.indexOf(view),
+            target_index = this.drop_targets_list.list.length - 1;
+        if ( view_index == target_index ) {
+          drop_target.activate().$el
+            .addClass('previous')
+            .attr('style', function(i, s) { return (s||'') + ' height: '+ view.$el.height() +'px !important;'; });
+          if ( view_index == this.list.list.length - 1 )
+            drop_target.$el.addClass('nm');
+        } else if ( view_index == target_index - 1 ) {
+          drop_target.$el.hide();
+        }
+      }
 
       return drop_target.render();
     },
@@ -549,9 +559,10 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
           'opacity': 0,
           'width': '100%',
           'height': '100%',
+          'padding': '20px 40px',
           'position': 'absolute',
-          'top': 0,
-          'left': 0
+          'top': '-20px',
+          'left': '-40px'
         });
       this.$el.prepend($pointerEventsCatcher);
 
@@ -560,10 +571,13 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
     activate: function(event) {
       this.$el.addClass('active');
+      return this;
     },
 
     deactivate: function(event) {
-      this.$el.removeClass('active');
+      this.$el.removeClass('active')
+              .css('height', '');
+      return this;
     }
   });
 
