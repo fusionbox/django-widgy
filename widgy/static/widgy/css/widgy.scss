@@ -1211,6 +1211,10 @@ span.title {
     font-size: 12px;
     padding: 4px;
   }
+
+  .loading {
+    @extend %loading;
+  }
 }
 
 .vForeignKeyRawIdAdminField {

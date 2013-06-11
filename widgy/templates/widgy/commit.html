@@ -1,8 +1,8 @@
+{% extends "widgy/popup_base.html" %}
 {% load url from future %}
 {% load i18n %}
-<script src="{% static 'widgy/js/lib/jquery.form.js' %}'"></script>
 
-<div class="commit popUp">
+{% block content %}
   <h2>{% trans "Commit Changes" %}</h2>
   {% if changed_anything %}
     <form method="post" class="commit_form" action="{{ commit_url }}">
@@ -20,11 +20,7 @@
       {% endif %}
       </p>
     </form>
-    <script>
-      $('.commit_form').ajaxForm({target: 'div.commit'});
-    </script>
   {% else %}
     <p>{% trans "Nothing has changed -- no need to commit." %}</p>
   {% endif %}
-</div>
-</body>
+{% endblock %}
