@@ -9,7 +9,8 @@
   "dependencies": {
     "jsdom": "~0.3.4",
     "requirejs": "~2.1.4",
-    "chai": "~1.4.2"
+    "chai": "~1.4.2",
+    "sinon": "~1.7.1"
   },
   "devDependencies": {
     "mocha": "~1.8.1",

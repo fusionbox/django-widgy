@@ -17,15 +17,6 @@ var assertListsEqual = function(a, b, message) {
   }
 };
 
-// define a TestComponent
-requirejs.define('components/testcomponent/component', ['widgy.contents'], function(contents) {
-  var TestContent = contents.Model.extend();
-
-  return _.extend({}, contents, {
-    Model: TestContent
-  });
-});
-
 var TestComponent = requirejs('components/testcomponent/component');
 
 

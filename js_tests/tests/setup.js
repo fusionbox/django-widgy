@@ -38,6 +38,20 @@ test = {
   }
 };
 
+requirejs.define('components/testcomponent/component', ['widgy.contents'], function(contents) {
+  var TestContent = contents.Model.extend();
+  var EditorView = contents.EditorView.extend();
+
+  var WidgetView = contents.View.extend({
+    editorClass: EditorView
+  });
+
+  return _.extend({}, contents, {
+    Model: TestContent,
+    View: WidgetView
+  });
+});
+
 module.exports = {
   test: test
 };

@@ -451,12 +451,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     renderShelf: function() {
       console.log('renderShelf');
 
-      var shelf = this.shelf = new shelves.ShelfView({
-        collection: new shelves.ShelfCollection({
-            node: this.node
-          }),
-        app: this.app
-      });
+      var shelf = this.shelf = this.makeShelf();
 
       this.listenTo(shelf, 'startDrag', this.startDrag)
           .listenTo(shelf, 'stopDrag', this.stopDrag);
@@ -479,6 +474,17 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
           shelf.el.style.marginTop = margin_top + 'px';
         });
       }
+
+      return shelf;
+    },
+
+    makeShelf: function() {
+      return new shelves.ShelfView({
+        collection: new shelves.ShelfCollection({
+            node: this.node
+          }),
+        app: this.app
+      });
     },
 
     toJSON: function() {
