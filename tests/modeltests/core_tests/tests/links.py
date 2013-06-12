@@ -2,8 +2,7 @@ from django import forms
 from django.test import TestCase
 
 from widgy.models.links import (
-    get_all_linkable_classes, get_all_linker_classes,
-    get_link_field_from_model, LinkFormMixin, LinkFormField,
+    link_registry, get_link_field_from_model, LinkFormMixin, LinkFormField,
     get_composite_key, convert_linkable_to_choice,
 )
 
@@ -15,24 +14,24 @@ from modeltests.core_tests.models import (
 
 class TestLinkRelations(TestCase):
     def test_get_all_linkable_classes(self):
-        self.assertIn(LinkableThing, get_all_linkable_classes())
-        self.assertIn(AnotherLinkableThing, get_all_linkable_classes())
+        self.assertIn(LinkableThing, link_registry)
+        self.assertIn(AnotherLinkableThing, link_registry)
 
     def test_get_all_linker_classes(self):
-        self.assertIn(ThingWithLink, get_all_linker_classes())
-        self.assertNotIn(Bucket, get_all_linker_classes())
-        self.assertNotIn(VersionPageThrough, get_all_linker_classes())
+        self.assertIn(ThingWithLink, link_registry.get_all_linker_classes())
+        self.assertNotIn(Bucket, link_registry.get_all_linker_classes())
+        self.assertNotIn(VersionPageThrough, link_registry.get_all_linker_classes())
 
     def test_get_all_links_for_obj(self):
         linkable = LinkableThing.objects.create()
 
-        self.assertEqual(len(list(linkable.get_links())), 0)
+        self.assertEqual(len(list(link_registry.get_links(linkable))), 0)
 
         thing = ThingWithLink.objects.create(
             link=linkable,
         )
 
-        self.assertEqual(list(linkable.get_links()), [thing])
+        self.assertEqual(list(link_registry.get_links(linkable)), [thing])
 
         linkable2 = AnotherLinkableThing.objects.create()
 
@@ -40,7 +39,7 @@ class TestLinkRelations(TestCase):
             link=linkable2,
         )
 
-        self.assertEqual(list(linkable2.get_links()), [thing2])
+        self.assertEqual(list(link_registry.get_links(linkable2)), [thing2])
 
     def test_get_all_possible_linkables(self):
         l1 = LinkableThing.objects.create()
@@ -87,11 +86,11 @@ class TestLinkForm(TestCase):
 
         # TODO: this has an implicit ordering check, that might be brittle.
         self.assertEqual(form.fields['link'].choices, [
+            (AnotherLinkableThing._meta.verbose_name_plural, [
+                convert_linkable_to_choice(page3),
+            ]),
             (LinkableThing._meta.verbose_name_plural, [
                 convert_linkable_to_choice(page2),
                 convert_linkable_to_choice(page1),
-            ]),
-            (AnotherLinkableThing._meta.verbose_name_plural, [
-                convert_linkable_to_choice(page3),
             ]),
         ])

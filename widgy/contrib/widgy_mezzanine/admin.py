@@ -14,10 +14,12 @@ except ImportError:
 
 from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
+from mezzanine.pages.models import Link
 
 from widgy.forms import WidgyFormMixin
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.utils import fancy_import, format_html
+from widgy.models import links
 
 WidgyPage = get_widgypage_model()
 
@@ -133,3 +135,5 @@ admin.site.unregister(RichTextPage)
 
 admin.site.register(WidgyPage, WidgyPageAdmin)
 admin.site.register(UndeletePage, UndeletePageAdmin)
+
+links.register(Link)

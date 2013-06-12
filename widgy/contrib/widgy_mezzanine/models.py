@@ -2,10 +2,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core import urlresolvers
 
-from widgy.models.links import LinkableMixin
 
-
-class WidgyPageMixin(LinkableMixin):
+class WidgyPageMixin(object):
     base_template = 'widgy/mezzanine_base.html'
 
     @property
@@ -42,7 +40,9 @@ class WidgyPageMixin(LinkableMixin):
 if getattr(settings, 'WIDGY_MEZZANINE_PAGE_MODEL', None) is None:
     from mezzanine.pages.models import Page
     from widgy.db.fields import VersionedWidgyField
+    from widgy.models import links
 
+    @links.register
     class WidgyPage(WidgyPageMixin, Page):
         root_node = VersionedWidgyField(
             site=settings.WIDGY_MEZZANINE_SITE,

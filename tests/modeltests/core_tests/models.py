@@ -4,7 +4,7 @@ from widgy.models import Content
 from widgy.db.fields import WidgyField, VersionedWidgyField
 from widgy import registry
 
-from widgy.models.links import LinkableMixin, LinkField
+from widgy.models import links
 from widgy.models.mixins import InvisibleMixin
 
 
@@ -156,19 +156,21 @@ class ForeignKeyWidget(Content):
 registry.register(ForeignKeyWidget)
 
 
-class LinkableThing(LinkableMixin, models.Model):
+@links.register
+class LinkableThing(models.Model):
     name = models.CharField(max_length=255, default='')
 
     def __unicode__(self):
         return self.name
 
 
-class AnotherLinkableThing(LinkableMixin, models.Model):
+@links.register
+class AnotherLinkableThing(models.Model):
     pass
 
 
 class ThingWithLink(models.Model):
-    link = LinkField('linkable_content_type', 'linkable_object_id')
+    link = links.LinkField('linkable_content_type', 'linkable_object_id')
 
 
 class MyInvisibleBucket(InvisibleMixin, Content):

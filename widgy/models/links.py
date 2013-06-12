@@ -3,26 +3,51 @@ import itertools
 
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ImproperlyConfigured
 from django import forms
 
 from widgy.generic import WidgyGenericForeignKey
 
 
-def is_linkable(model):
-    return issubclass(model, LinkableMixin) and not model._meta.proxy
+class LinkRegistry(set):
+
+    def register(self, model):
+        if model in self:
+            raise ImproperlyConfigured(("You cannot register the same "
+                                        "content ('{0}') twice.").format(model))
+        if not issubclass(model, models.Model):
+            raise ImproperlyConfigured(("{0} is not a subclass of django.db.models.Model, "
+                                        "so it cannot be registered").format(model))
+        self.add(model)
+
+        # This allow LinkRegistry.register to be used as a decorator
+        return model
+
+    def unregister(self, model):
+        self.remove(model)
+
+    def get_links(self, obj):
+        if not isinstance(obj, tuple(self)):
+            raise ValueError("The object class is not registered linkable")
+        all_qs = (linker._default_manager.filter(points_to_links(linker, obj))
+                  for linker in self.get_all_linker_classes())
+
+        return itertools.chain.from_iterable(all_qs)
+
+    @classmethod
+    def get_all_linker_classes(cls):
+        return filter(cls.has_link, models.get_models())
+
+    @classmethod
+    def has_link(cls, model):
+        return any(isinstance(field, LinkField)
+                   for field in model._meta.virtual_fields)
 
 
-def has_link(model):
-    return any(isinstance(field, LinkField)
-               for field in model._meta.virtual_fields)
 
-
-def get_all_linkable_classes():
-    return filter(is_linkable, models.get_models())
-
-
-def get_all_linker_classes():
-    return filter(has_link, models.get_models())
+link_registry = LinkRegistry()
+register = link_registry.register
+unregister = link_registry.register
 
 
 def points_to_links(linker, linkable):
@@ -37,18 +62,6 @@ def points_to_links(linker, linkable):
                         if isinstance(field, LinkField)))
 
 
-class LinkableMixin(object):
-    def get_links(self):
-        """
-        Returns a heterogenous list of all things that have a LinkField that
-        points to self.
-        """
-        all_qs = (linker._default_manager.filter(points_to_links(linker, self))
-                  for linker in get_all_linker_classes())
-
-        return itertools.chain.from_iterable(all_qs)
-
-
 class LinkField(WidgyGenericForeignKey):
     """
     TODO: Explore the consequences of using add_field in contribute_to_class to
@@ -56,6 +69,7 @@ class LinkField(WidgyGenericForeignKey):
     """
     def __init__(self, ct_field=None, fk_field=None, *args, **kwargs):
         self.null = kwargs.pop('null', False)
+        self._link_registry = kwargs.pop('link_registry', link_registry)
         super(LinkField, self).__init__(ct_field, fk_field, *args, **kwargs)
 
     def get_choices(self):
@@ -63,7 +77,7 @@ class LinkField(WidgyGenericForeignKey):
 
     def get_choices_by_class(self):
         return ((Model, Model._default_manager.all())
-                for Model in get_all_linkable_classes())
+                for Model in self._link_registry)
 
     def contribute_to_class(self, cls, name):
         if self.ct_field is None:
