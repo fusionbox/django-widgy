@@ -4,8 +4,9 @@
 <ul>
   {% for page in page_branch %}
   {% if page.in_menu %}
-  <li>
-    <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+  <li{% if page.is_current_or_ascendant %} class="here"{% endif %}>
+  <a{% if page.is_current_or_ascendant %} class="here"{% endif %}
+    href="{{ page.get_absolute_url }}">{{ page.title }}</a>
     {% if page.branch_level == 0 and page.has_children_in_menu %}
       {% page_menu page %}
     {% endif %}
