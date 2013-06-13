@@ -8,20 +8,6 @@ var _ = requirejs('underscore'),
     contents = requirejs('widgy.contents'),
     nodes = requirejs('nodes/nodes');
 
-// define a TestComponent
-requirejs.define('components/testcomponent/component', ['widgy.contents'], function(contents) {
-  var EditorView = contents.EditorView.extend({
-  });
-
-  var WidgetView = contents.View.extend({
-    editorClass: EditorView
-  });
-
-  return _.extend({}, contents, {
-    View: WidgetView
-  });
-});
-
 var TestComponent = requirejs('components/testcomponent/component');
 
 

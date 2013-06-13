@@ -10,13 +10,16 @@ global.window = global.window = global.document.createWindow();
 requirejs.config({
   baseUrl: path.join(__dirname, "../../widgy/static/widgy/js/"),
   paths: {
+    'jquery': './lib/jquery',
+    'underscore': './lib/underscore',
+    'backbone': './lib/backbone',
     'text': 'require/text'
   }
 });
 
 // Backbone expects window.jQuery to be set.
-var Backbone = requirejs('backbone'),
-    jQuery = requirejs('jquery');
+var Backbone = requirejs('lib/backbone'),
+    jQuery = requirejs('lib/jquery');
 
 Backbone.$ = jQuery;
 
@@ -34,6 +37,20 @@ test = {
     document.innerHTML = '';
   }
 };
+
+requirejs.define('components/testcomponent/component', ['widgy.contents'], function(contents) {
+  var TestContent = contents.Model.extend();
+  var EditorView = contents.EditorView.extend();
+
+  var WidgetView = contents.View.extend({
+    editorClass: EditorView
+  });
+
+  return _.extend({}, contents, {
+    Model: TestContent,
+    View: WidgetView
+  });
+});
 
 module.exports = {
   test: test
