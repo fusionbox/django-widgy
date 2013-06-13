@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from widgy.models import Content
 from widgy.db.fields import WidgyField, VersionedWidgyField
@@ -167,6 +168,12 @@ class LinkableThing(models.Model):
 @links.register
 class AnotherLinkableThing(models.Model):
     pass
+
+
+@links.register
+class LinkableThing3(models.Model):
+    class Meta:
+        verbose_name_plural = _('ZZZZZ should be last')
 
 
 class ThingWithLink(models.Model):

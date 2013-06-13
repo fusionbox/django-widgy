@@ -76,8 +76,10 @@ class LinkField(WidgyGenericForeignKey):
         return itertools.chain.from_iterable(choices for _, choices in self.get_choices_by_class())
 
     def get_choices_by_class(self):
+        def key(cls):
+            return cls._meta.verbose_name_plural.lower()
         return ((Model, Model._default_manager.all())
-                for Model in self._link_registry)
+                for Model in sorted(self._link_registry, key=key))
 
     def contribute_to_class(self, cls, name):
         if self.ct_field is None:
