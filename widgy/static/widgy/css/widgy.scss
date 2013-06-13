@@ -951,6 +951,7 @@ div.widgy {
               list-style: none;
               margin: 0 4px 4px 0;
               padding: 5px 10px 5px 5px;
+              vertical-align: top;
               width: 185px;
     
               span.icon-move {
@@ -966,9 +967,10 @@ div.widgy {
                 display: inline;
                 float: left;
                 font-size: 1.2em;
-                line-height: 1.8em;
+                line-height: 1.4em;
                 padding: 5px 0 5px 30px;
                 text-transform: capitalize;
+                max-width: 130px;
               }
               
               &.being_dragged {
