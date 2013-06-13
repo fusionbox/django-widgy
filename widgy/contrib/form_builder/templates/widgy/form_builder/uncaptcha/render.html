@@ -1,8 +1,8 @@
-{% load fusionbox_tags %}{{ field.errors }}
+{% load fusionbox_tags i18n %}{{ field.errors }}
 <div id="{{ field.html_name }}_container" class="{{field.name}} {{field.html_name}}{% if field.field.required %} required{% endif %}{% if field.errors %} error{% endif %} formField">
-  <label for="{{ field.id_for_label }}">Uncaptcha: </label>
+  <label for="{{ field.id_for_label }}">{% trans "Uncaptcha:" %}</label>
   <input type="text" id="{{ field.id_for_label }}" name="{{ field.html_name }}">
-  <p class="help_text">Please copy "{{ csrf_token }}" into the field labeled "Uncaptcha"</span>
+  <div class="help_text">{% blocktrans %}Please copy "{{ csrf_token }}" into the field labeled "Uncaptcha".{% endblocktrans %}</div>
 </div>
 <script type="text/javascript">
   (function() {
