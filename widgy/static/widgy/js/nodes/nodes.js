@@ -55,6 +55,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         'rerender',
         'popOut',
         'popIn',
+        'prepareChild',
         'closeSubwindow'
         );
 
@@ -93,9 +94,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       return this.content.get('pop_out') === 2 && ! this.isRootNode();
     },
 
-    startBeingDragged: function(event) {
+    onMouseDown: function(event) {
       if ( $(event.target).is('.title, .drag-row, .drag_handle') && this.content.get('draggable') ) {
-        return DraggableView.prototype.startBeingDragged.apply(this, arguments);
+        return DraggableView.prototype.onMouseDown.apply(this, arguments);
       } else {
         return false;
       }
@@ -112,6 +113,14 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       });
     },
 
+    prepareChild: function(child_view) {
+      this
+        .listenTo(child_view, 'startDrag', this.startDrag)
+        .listenTo(child_view, 'stopDrag', this.stopDrag);
+
+      return child_view;
+    },
+
     addChildPromise: function(node, collection, options) {
       var parent = this;
 
@@ -121,16 +130,14 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       });
 
       return node.ready(function(model) {
-        var node_view = new model.component.View({
+        return new model.component.View({
           model: node,
           parent: parent,
           app: parent.app
         });
-
-        parent
-          .listenTo(node_view, 'startDrag', parent.startDrag)
-          .listenTo(node_view, 'stopDrag', parent.stopDrag);
-
+      })
+      .then(this.prepareChild)
+      .then(function(node_view) {
         parent.app.node_view_list.push(node_view);
         if ( options && options.index ) {
           parent.list.list.splice(options.index, 0, node_view);
@@ -200,27 +207,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     startDrag: function(dragged_view) {
       if ( ( this.hasShelf() && ! dragged_view.model.id || this.isRootNode() )) {
         this.dragged_view = dragged_view;
-
-        var bindToDocument = _.bind(function() {
-          $(document)
-            .on('mouseup.' + dragged_view.cid, this.stopDragging)
-            .on('mousemove.' + dragged_view.cid, dragged_view.followMouse)
-            .on('selectstart.' + dragged_view.cid, function(){ return false; })
-            // debugging helper
-            .one('keypress.' + dragged_view.cid, function(event) {
-              if ( event.which === 96 ) {
-                $(document)
-                  .off('.' + dragged_view.cid)
-                  // resume dragging
-                  .one('keypress.' + dragged_view.cid, function(event) {
-                    if ( event.which === 96 ) bindToDocument();
-                  });
-              }
-            });
-        }, this);
-
-        bindToDocument();
-
         this.addDropTargets(dragged_view);
       } else {
         // propagate event
@@ -232,11 +218,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       var dragged_view = this.dragged_view;
       delete this.dragged_view;
 
-      $(document).off('.' + dragged_view.cid);
-
-      if ( dragged_view.placeholder )
-        dragged_view.placeholder.remove();
-
       this.clearDropTargets();
 
       dragged_view.stopBeingDragged();
@@ -246,7 +227,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
     stopDrag: function(callback) {
       if ( this.hasShelf() && this.dragged_view ) {
-        callback(this.stopDragging());
+        var dragged_view = this.stopDragging();
+        if ( callback )
+          callback(dragged_view);
       } else {
         // propagate event
         this.trigger('stopDrag', callback);
@@ -388,7 +371,15 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     rerender: function() {
+      this.cleanUp();
       this.renderPromise().done();
+    },
+
+    cleanUp: function() {
+      this.$children.remove();
+      this.$preview.remove();
+      if (this.shelf)
+        this.shelf.close();
     },
 
     renderNode: function() {
@@ -409,6 +400,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         return Q.all(view.getRenderPromises()).then(function() {
           if ( view.app.compatibility_data )
             view.app.updateCompatibility(view.app.compatibility_data);
+
+          view.trigger('rendered', view);
 
           return view;
         });
@@ -433,15 +426,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
     renderShelf: function() {
       console.log('renderShelf');
-      if (this.shelf)
-        this.shelf.remove();
 
-      var shelf = this.shelf = new shelves.ShelfView({
-        collection: new shelves.ShelfCollection({
-            node: this.node
-          }),
-        app: this.app
-      });
+      var shelf = this.shelf = this.makeShelf();
 
       this.listenTo(shelf, 'startDrag', this.startDrag)
           .listenTo(shelf, 'stopDrag', this.stopDrag);
@@ -464,6 +450,17 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
           shelf.el.style.marginTop = margin_top + 'px';
         });
       }
+
+      return shelf;
+    },
+
+    makeShelf: function() {
+      return new shelves.ShelfView({
+        collection: new shelves.ShelfCollection({
+            node: this.node
+          }),
+        app: this.app
+      });
     },
 
     toJSON: function() {

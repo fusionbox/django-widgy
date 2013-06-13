@@ -6,6 +6,8 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
     document.body.scrollTop += amount;
   }, 100);
 
+  var BACKTICK = 96;
+
 
   /**
    * Provides an interface for a draggable NodeView.  See NodeView for more
@@ -15,9 +17,10 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
   var DraggablewView = Backbone.View.extend({
     tagName: 'li',
     className: 'node',
+    distanceTrigger: 5,
 
     events: Backbone.extendEvents(Backbone.View, {
-      'mousedown .drag-row': 'startBeingDragged'
+      'mousedown .drag-row': 'onMouseDown'
     }),
 
     initialize: function(options) {
@@ -27,7 +30,11 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
         'startBeingDragged',
         'followMouse',
         'stopBeingDragged',
-        'canAcceptParent'
+        'canAcceptParent',
+        'bindDragEvents',
+        'unbindDocument',
+        'checkDistance',
+        'debugMode'
       );
 
       this
@@ -53,16 +60,17 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
         });
     },
 
-    startBeingDragged: function(event) {
+    onMouseDown: function(event) {
       event.preventDefault();
       event.stopPropagation();
 
       // only on a left click.
-      if ( event.which !== 1 )
-        return;
+      if ( event.which !== 1 || ! this.app.ready() )
+        return false;
 
-      if ( ! this.app.ready() )
-        return;
+      // this is for checkDistance
+      this.originalX = event.clientX;
+      this.originalY = event.clientY;
 
       // Store the mouse offset in this container for followMouse to use.  We
       // need to get this before `this.app.startDrag`, otherwise the drop
@@ -71,8 +79,39 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
       this.cursorOffsetX = event.clientX - offset.left + (event.pageX - event.clientX);
       this.cursorOffsetY = event.clientY - offset.top + (event.pageY - event.clientY);
 
-      // follow mouse really quick, just in case they haven't moved their mouse
-      // yet.
+      $(document)
+        .on('mouseup.' + this.cid, this.unbindDocument)
+        .on('mousemove.' + this.cid, this.checkDistance);
+
+      $(window).on('scroll.' + this.cid, _.bind(function() {
+        // pass in a fake mouse event.
+        this.startBeingDragged({
+          clientY: this.originalY,
+          clientX: this.originalX
+        });
+      }, this));
+
+      return true;
+    },
+
+    unbindDocument: function(event) {
+      $(document).off('.' + this.cid);
+      $(window).off('.' + this.cid);
+    },
+
+    checkDistance: function(event) {
+      var distance = Math.sqrt(Math.pow(event.clientY - this.originalY, 2) + Math.pow(event.clientX - this.originalX, 2));
+
+      if ( distance > this.distanceTrigger ) {
+        this.startBeingDragged(event);
+      }
+    },
+
+    startBeingDragged: function(event) {
+      this.unbindDocument();
+
+      // follow mouse really quick, just in case they haven't moved their
+      // mouse yet.
       this.followMouse(event);
 
       this.$el.css({
@@ -81,7 +120,34 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
       });
       this.$el.addClass('being_dragged');
 
+      this.bindDragEvents();
       this.trigger('startDrag', this);
+    },
+
+    bindDragEvents: function() {
+      var view = this;
+
+      $(document)
+        .on('mouseup.' + this.cid, this.stopBeingDragged)
+        .on('mousemove.' + this.cid, this.followMouse)
+        .on('selectstart.' + this.cid, function(){ return false; })
+        // debugging helper
+        .one('keypress.' + this.cid, function(event) {
+          if ( event.which === BACKTICK )
+            view.debugMode();
+        });
+    },
+
+    debugMode: function(event) {
+      var view = this;
+      view.unbindDocument();
+
+      $(document)
+        // resume dragging
+        .one('keypress.' + this.cid, function(event) {
+          if ( event.which === BACKTICK )
+            view.bindDragEvents();
+        });
     },
 
     stopBeingDragged: function() {
@@ -92,9 +158,11 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
         'z-index': ''
       });
 
+      this.unbindDocument();
       this.$el.removeClass('being_dragged');
-
       clearInterval(this.bumpInterval);
+
+      this.trigger('stopDrag');
     },
 
     bumpAmount: function(clientY) {

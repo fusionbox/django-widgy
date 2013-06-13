@@ -1,8 +1,8 @@
-define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
+define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/base',
     'nodes/models',
     'text!nodes/preview.html',
     'text!./shelf.html'
-    ], function(exports, _, Backbone, DraggableView,
+    ], function($, _, Backbone, DraggableView,
       node_models,
       shelf_item_view_template,
       shelf_view_template
@@ -32,14 +32,11 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
         'resizeShelf'
       );
 
-      this.collection.on('add', this.addOne)
-                     .on('sort', this.resort);
+      this.collection.on('add', this.addOne);
 
       this.app = options.app;
 
       this.list = new Backbone.ViewList();
-
-      $(window).resize(this.resizeShelf);
     },
 
     addOne: function(model) {
@@ -51,7 +48,6 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
       view.on('all', this.bubble);
 
       this.list.push(view);
-      this.$list.append(view.render().el);
     },
 
     resort: function(collection) {
@@ -69,8 +65,15 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
 
     render: function() {
       Backbone.View.prototype.render.apply(this, arguments);
-      this.$list = this.$el.children('.list');
+      var $list = this.$list = this.$el.children('.list');
+      this.collection.on('sort', this.resort);
+
+      this.list.on('push', function(view) {
+        $list.append(view.render().el);
+      });
+
       this.resizeShelf();
+      $(window).resize(this.resizeShelf);
       return this;
     },
 
@@ -121,7 +124,7 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
         else
           return this.collection._prepareModel(value);
       }, this);
-      this.collection.update(instances);
+      this.collection.set(instances);
       this.collection.sort();
       this.content_classes = null;
     },
@@ -141,25 +144,33 @@ define([ 'exports', 'underscore', 'widgy.backbone', 'nodes/base',
     // Override the DraggableView events, I want the whole thing draggable, not
     // just the drag handle.
     events: Backbone.extendEvents(DraggableView, {
-      'mousedown': 'startBeingDragged'
+      'mousedown': 'onMouseDown'
     }),
 
     canAcceptParent: function(parent) {
       return this.app.validateRelationship(parent, this.model);
     },
 
+    onMouseDown: function(event) {
+      var ret = DraggableView.prototype.onMouseDown.apply(this, arguments);
+
+      if (ret)
+        this.startBeingDragged(event);
+    },
+
     startBeingDragged: function(event) {
       DraggableView.prototype.startBeingDragged.apply(this, arguments);
-
-      // only on a left click.
-      if ( event.which !== 1 )
-        return;
 
       var placeholder = this.placeholder = $('<li class="drag_placeholder">&nbsp;</li>').css({
         width: this.$el.width()
       });
 
       this.$el.after(placeholder);
+    },
+
+    stopBeingDragged: function() {
+      DraggableView.prototype.stopBeingDragged.apply(this, arguments);
+      this.placeholder.remove();
     },
 
     cssClasses: function() {

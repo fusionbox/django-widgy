@@ -122,6 +122,11 @@
   table { display: table; width: 100% !important; }
 }
 
+@mixin box-sizing($box-sizing) {
+  box-sizing: $box-sizing;
+  -moz-box-sizing: $box-sizing;
+}
+
 
 /* Variables
 -----------------------------------------------*/

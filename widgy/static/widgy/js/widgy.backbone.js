@@ -1,4 +1,4 @@
-define([ 'jquery', 'underscore', 'backbone', 'mustache', 'lib/q' ], function($, _, Backbone, Mustache, Q) {
+define([ 'jquery', 'underscore', 'backbone', 'lib/mustache', 'lib/q' ], function($, _, Backbone, Mustache, Q) {
 
   Mustache.tags = ['<%', '%>'];
 
@@ -171,10 +171,11 @@ define([ 'jquery', 'underscore', 'backbone', 'mustache', 'lib/q' ], function($, 
     );
   }
 
-  _.extend(ViewList.prototype, {
+  _.extend(ViewList.prototype, Backbone.Events, {
     push: function(view) {
       view.on('close', this.remove);
       this.list.push(view);
+      this.trigger('push', view);
     },
 
     remove: function(view) {

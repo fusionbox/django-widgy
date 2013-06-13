@@ -10,21 +10,10 @@ if ( typeof window.console == 'undefined' )
 }
 
 require.config({
-  // ordered dependencies (example: jquery plugins)
-  shim: {
-    'underscore': {
-      exports: '_'
-    },
-    'backbone': {
-      deps: ['underscore', 'jquery'],
-      exports: 'Backbone'
-    }
-  },
   paths: {
-  'jquery': './lib/jquery',
-  'underscore': './lib/underscore',
-  'backbone': './lib/backbone',
-  'mustache': './lib/mustache',
-  'text': 'require/text'
+    'jquery': './lib/jquery',
+    'underscore': './lib/underscore',
+    'backbone': './lib/backbone',
+    'text': 'require/text'
   }
 });
