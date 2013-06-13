@@ -7,7 +7,7 @@ from widgy.models.links import (
 )
 
 from modeltests.core_tests.models import (
-    LinkableThing, ThingWithLink, AnotherLinkableThing,
+    LinkableThing, ThingWithLink, AnotherLinkableThing, LinkableThing3,
     Bucket, VersionPageThrough
 )
 
@@ -82,9 +82,9 @@ class TestLinkForm(TestCase):
         page1 = LinkableThing.objects.create(name='Z')
         page2 = LinkableThing.objects.create(name='a')
         page3 = AnotherLinkableThing.objects.create()
+        page4 = LinkableThing3.objects.create()
         form = LinkForm()
 
-        # TODO: this has an implicit ordering check, that might be brittle.
         self.assertEqual(form.fields['link'].choices, [
             (AnotherLinkableThing._meta.verbose_name_plural, [
                 convert_linkable_to_choice(page3),
@@ -92,5 +92,8 @@ class TestLinkForm(TestCase):
             (LinkableThing._meta.verbose_name_plural, [
                 convert_linkable_to_choice(page2),
                 convert_linkable_to_choice(page1),
+            ]),
+            (LinkableThing3._meta.verbose_name_plural, [
+                convert_linkable_to_choice(page4),
             ]),
         ])
