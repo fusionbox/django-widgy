@@ -1,7 +1,9 @@
 {% load widgy_tags %}
 
 <div class="accordion">
-  {% for child in self.get_children %}
-  {% render child %}
-  {% endfor %}
+  {% with section_behavior='accordion' %}
+    {% for child in self.get_children %}
+    {% render child %}
+    {% endfor %}
+  {% endwith %}
 </div>
