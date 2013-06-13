@@ -14,7 +14,6 @@ from django.forms.models import modelform_factory, ModelForm
 from django.contrib.contenttypes.models import ContentType
 from django.template.loader import render_to_string
 from django.template import RequestContext
-from django.contrib.admin import widgets
 from django.template.defaultfilters import capfirst
 
 from treebeard.mp_tree import MP_Node
@@ -28,7 +27,7 @@ from widgy.exceptions import (
 from widgy.signals import pre_delete_widget
 from widgy.generic import WidgyGenericForeignKey, ProxyGenericRelation
 from widgy.utils import exception_to_bool, update_context
-from widgy.widgets import DateTimeWidget, DateWidget, TimeWidget
+from widgy.widgets import DateTimeWidget, DateWidget, TimeWidget, RelatedFieldWidgetWrapper
 
 logger = logging.getLogger(__name__)
 
@@ -717,9 +716,13 @@ class Content(models.Model):
             related_modeladmin = admin_site._registry.get(db_field.rel.to)
             can_add_related = bool(related_modeladmin and
                                    related_modeladmin.has_add_permission(request))
-            formfield.widget = widgets.RelatedFieldWidgetWrapper(
+            can_change_related = bool(related_modeladmin and
+                                      related_modeladmin.has_change_permission(request))
+            formfield.widget = RelatedFieldWidgetWrapper(
                 formfield.widget, db_field.rel, admin_site,
-                can_add_related=can_add_related)
+                can_add_related=can_add_related,
+                can_change_related=can_change_related,
+            )
         else:
             for klass in db_field.__class__.mro():
                 if klass in self.formfield_overrides:
