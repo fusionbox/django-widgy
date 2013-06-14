@@ -18,7 +18,7 @@ if URLCONF_INCLUDE_CHOICES is None:
 
 
 class UrlconfIncludePage(Page):
-    urlconf_name = models.CharField(max_length=255, verbose_name=_('urlconf name'),
+    urlconf_name = models.CharField(max_length=255, verbose_name=_('plugin name'),
                                     choices=URLCONF_INCLUDE_CHOICES)
 
     def can_add(self, request):
@@ -31,5 +31,5 @@ class UrlconfIncludePage(Page):
         return False
 
     class Meta:
-        verbose_name = _('urlconf include page')
-        verbose_name_plural = _('urlconf include pages')
+        verbose_name = _('plugin')
+        verbose_name_plural = _('plugins')
