@@ -5,7 +5,13 @@
     {% if page.branch_level == 0 %}
       {% if page.is_current_or_ascendant %}
         <nav class="left">
-          <p class="title{% if page.is_current %} here{% endif %}">{{ page.title }}</p>
+        <p class="title{% if page.is_current %} here{% endif %}">
+        {% if not page.is_current %}
+          <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+        {% else %}
+          {{ page.title }}
+        {% endif %}
+        </p>
           {% if page.has_children_in_menu and page.is_current_or_ascendant %}
           <ul>
             {% page_menu page %}
