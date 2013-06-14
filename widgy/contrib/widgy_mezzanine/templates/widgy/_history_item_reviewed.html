@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load url from future %}
 {% load widgy_tags %}
+{% siteperms site as siteperms %}
 
 {% if commit.is_approved %}
   {% blocktrans with approved_by=commit.approved_by approved_at=commit.approved_at|date:"SHORT_DATETIME_FORMAT" %}
@@ -30,7 +31,7 @@
   {% else %}
     {% trans "Can't revert; this is the same as the current version." %}
   {% endif %}
-  {% if can_approve_commit %}
+  {% if siteperms.approve_view %}
     {% if not commit.is_approved %}
       <form method="post" action="{% reverse_site_url site 'approve_view' pk=commit.tracker.pk commit_pk=commit.pk %}">
         <input class="button approve" type="submit" value="{% trans "Approve this Commit" %}">

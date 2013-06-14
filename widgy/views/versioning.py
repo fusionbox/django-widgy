@@ -73,6 +73,7 @@ class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
         self.object = self.get_object()
         kwargs = super(CommitView, self).get_context_data(**kwargs)
         kwargs['object'] = self.object
+        kwargs['site'] = self.site
         kwargs['commit_url'] = self.site.reverse(self.site.commit_view,
                                                  kwargs={'pk': self.object.pk})
         if self.object.head:
@@ -134,18 +135,6 @@ class HistoryView(AuthorizedMixin, VersionTrackerMixin, DetailView):
                 commit.diff_url = diff_url(self.site,
                                            commit.parent.root_node,
                                            commit.root_node)
-        return kwargs
-
-
-class ReviewedHistoryView(HistoryView):
-
-    def get_context_data(self, **kwargs):
-        kwargs = super(ReviewedHistoryView, self).get_context_data(**kwargs)
-        try:
-            self.site.authorize(self.request, self.site.get_view_instance(self.site.approve_view))
-            kwargs['can_approve_commit'] = True
-        except PermissionDenied:
-            kwargs['can_approve_commit'] = False
         return kwargs
 
 
