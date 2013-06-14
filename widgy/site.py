@@ -14,7 +14,6 @@ from widgy.views import (
     NodeParentsView,
     CommitView,
     HistoryView,
-    ReviewedHistoryView,
     ApproveView,
     UnapproveView,
     RevertView,
@@ -232,7 +231,3 @@ class ReviewedWidgySite(WidgySite):
     @cached_property
     def undo_approvals_view(self):
         return UndoApprovalsView.as_view(site=self)
-
-    @cached_property
-    def history_view(self):
-        return ReviewedHistoryView.as_view(site=self)

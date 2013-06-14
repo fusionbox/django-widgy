@@ -1,4 +1,9 @@
 {% load i18n %}
+{% load widgy_tags %}
+{% siteperms site as siteperms %}
+
 <input type="submit" value="{% trans 'Commit' %}">
-<input type="submit" name="approve_it" value="{% trans 'Commit and approve' %}">
+{% if siteperms.approve_view %}
+  <input type="submit" name="approve_it" value="{% trans 'Commit and approve' %}">
+{% endif %}
 {% include 'widgy/_commit_submitrow_common.html' %}
