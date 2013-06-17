@@ -2,6 +2,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core import urlresolvers
 
+from mezzanine.pages.managers import PageManager
+
+from widgy.utils import SelectRelatedManager
+
 
 class WidgyPageMixin(object):
     base_template = 'widgy/mezzanine_base.html'
@@ -36,6 +40,13 @@ class WidgyPageMixin(object):
         return self
 
 
+class PageSelectRelatedManager(SelectRelatedManager, PageManager):
+    """
+    WidgyPage's manager must be a PageManager.
+    """
+    use_for_related_fields = True
+
+
 # In Django 1.5+, we could use swappable = True
 if getattr(settings, 'WIDGY_MEZZANINE_PAGE_MODEL', None) is None:
     from mezzanine.pages.models import Page
@@ -55,3 +66,11 @@ if getattr(settings, 'WIDGY_MEZZANINE_PAGE_MODEL', None) is None:
         class Meta:
             verbose_name = _('widgy page')
             verbose_name_plural = _('widgy pages')
+
+        objects = PageSelectRelatedManager(select_related=[
+            'root_node'
+            'root_node__head',
+            # we might not need this, if head isn't published, but we
+            # probably will.
+            'root_node__head__root_node',
+        ])
