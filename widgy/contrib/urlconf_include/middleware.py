@@ -3,7 +3,7 @@ import re
 
 from django.utils.importlib import import_module
 from django.conf import settings
-from django.conf.urls.defaults import include, url, patterns
+from django.conf.urls import include, url, patterns
 from django.conf.urls.i18n import i18n_patterns
 from django.core import urlresolvers
 
@@ -15,20 +15,22 @@ class PatchUrlconfMiddleware(object):
         root_urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
         if isinstance(root_urlconf, basestring):
             root_urlconf = import_module(root_urlconf)
-        request.urlconf = self.get_urlconf(root_urlconf, logged_in=request.user.is_authenticated())
+        request.urlconf = self.get_urlconf(root_urlconf, self.get_pages(logged_in=request.user.is_authenticated()))
 
     @classmethod
     def get_pattern_for_page(cls, page):
         return patterns('', url(r'^' + re.escape(page.slug) + '/', include(page.urlconf_name)))
 
     @classmethod
-    def get_urlconf(cls, root_urlconf, logged_in=True):
+    def get_pages(cls, logged_in):
         qs = UrlconfIncludePage.objects.published()
         if not logged_in:
             qs = qs.exclude(login_required=True)
+        return qs
 
-        urlconf_pages = list(qs)
-        urlconf_pages.sort(key=lambda p: len(p.slug))
+    @classmethod
+    def get_urlconf(cls, root_urlconf, qs):
+        urlconf_pages = sorted(qs, key=lambda p: len(p.slug))
 
         new_urlconf = imp.new_module('urlconf')
         new_urlconf.urlpatterns = patterns('')
@@ -52,7 +54,7 @@ class PatchUrlconfMiddleware(object):
             # 404ing.
             empty_urlconf = imp.new_module('urlconf')
             empty_urlconf.urlpatterns = patterns('')
-            urlconf = self.get_urlconf(empty_urlconf, logged_in=True)
+            urlconf = self.get_urlconf(empty_urlconf, self.get_pages(logged_in=True))
             try:
                 urlresolvers.resolve(request.get_full_path(), urlconf)
             except urlresolvers.Resolver404:
