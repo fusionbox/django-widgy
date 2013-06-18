@@ -1,6 +1,0 @@
-{% load i18n %}
-{# TODO: this is dependent on widgy_mezzanine #}
-  <a class="button" target="_blank" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=commit.pk %}">{% trans "Preview" %}</a>
-{% if diff_url %}
-  <a class="button" target="_blank" href="{{ diff_url }}">{% trans "Diff" %}</a>
-{% endif %}

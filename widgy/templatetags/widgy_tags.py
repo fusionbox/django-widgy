@@ -79,7 +79,6 @@ def reverse_site_url(site, view_string, *args, **kwargs):
 
 
 class SitepermsWrapper(object):
-
     def __init__(self, request, site):
         self._request = request
         self._site = site
@@ -99,20 +98,17 @@ class SitepermsWrapper(object):
 
 
 class SitepermsNode(Node):
-
     def __init__(self, site, siteperms):
-        self.site = site
+        self.site = template.Variable(site)
         self.siteperms = siteperms
 
     def render(self, context):
-        if self.site not in context:
+        try:
+            site = self.site.resolve(context)
+        except template.VariableDoesNotExist:
             raise TemplateSyntaxError(("'siteperms' variable %s "
                                        "not in context") % self.site)
-        if self.siteperms in context:
-            raise TemplateSyntaxError(("'siteperms' overriding variable "
-                                       "%s") % self.site)
-        context[self.siteperms] = SitepermsWrapper(context['request'],
-                                                   context[self.site])
+        context[self.siteperms] = SitepermsWrapper(context['request'], site)
         return ''
 
 

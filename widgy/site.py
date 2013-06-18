@@ -14,12 +14,9 @@ from widgy.views import (
     NodeParentsView,
     CommitView,
     HistoryView,
-    ApproveView,
-    UnapproveView,
     RevertView,
     DiffView,
     ResetView,
-    UndoApprovalsView,
 )
 from widgy.exceptions import (
     MutualRejection,
@@ -183,51 +180,3 @@ class WidgySite(object):
                 'widgy/{app_label}/{module_name}.admin{extension}',
                 'widgy/{app_label}/admin{extension}',
             ])
-
-    def get_commit_form(self, user):
-        from widgy.views.versioning import CommitForm
-        return CommitForm
-
-
-class ReviewedWidgySite(WidgySite):
-
-    def get_version_tracker_model(self):
-        from widgy.models import ReviewedVersionTracker
-        return ReviewedVersionTracker
-
-    def get_urls(self):
-        return super(ReviewedWidgySite, self).get_urls() + patterns('',
-            url('^approve/(?P<pk>[^/]+)/(?P<commit_pk>[^/]+)/$', self.approve_view),
-            url('^unapprove/(?P<pk>[^/]+)/(?P<commit_pk>[^/]+)/$', self.unapprove_view),
-            url('^undo-approvals/$', self.undo_approvals_view),
-        )
-
-    def get_commit_form(self, user):
-        from widgy.views.versioning import CommitForm, ReviewedCommitForm
-        if user.has_perm('widgy.change_versioncommit'):
-            return ReviewedCommitForm
-        else:
-            return CommitForm
-
-    def authorize(self, request, view, obj=None):
-        super(ReviewedWidgySite, self).authorize(request, view, obj)
-
-        from widgy.admin import VersionCommitAdmin
-
-        approval_views = (VersionCommitAdmin, ApproveView, UndoApprovalsView,
-                          UnapproveView)
-        if isinstance(view, approval_views):
-            if not request.user.has_perm('widgy.change_versioncommit'):
-                raise PermissionDenied
-
-    @cached_property
-    def approve_view(self):
-        return ApproveView.as_view(site=self)
-
-    @cached_property
-    def unapprove_view(self):
-        return UnapproveView.as_view(site=self)
-
-    @cached_property
-    def undo_approvals_view(self):
-        return UndoApprovalsView.as_view(site=self)
