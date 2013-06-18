@@ -158,6 +158,7 @@ define([
 
     editWidget: function(event) {
       event.preventDefault();
+      event.stopPropagation();
 
       var editor_class = this.getEditorClass(),
           edit_view = new editor_class({
