@@ -20,9 +20,6 @@ class Migration(SchemaMigration):
         # Deleting model 'TextContent'
         db.delete_table('widgy_textcontent')
 
-        # Deleting model 'ContentPage'
-        db.delete_table('widgy_contentpage')
-
 
     def backwards(self, orm):
         # Adding model 'ImageContent'
@@ -53,13 +50,6 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
         ))
         db.send_create_signal('widgy', ['TextContent'])
-
-        # Adding model 'ContentPage'
-        db.create_table('widgy_contentpage', (
-            ('page_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['pages.Page'], unique=True, primary_key=True)),
-            ('root_node', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['widgy.Node'], null=True, on_delete=models.SET_NULL, blank=True)),
-        ))
-        db.send_create_signal('widgy', ['ContentPage'])
 
 
     models = {

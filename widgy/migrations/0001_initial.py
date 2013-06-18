@@ -8,13 +8,6 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'ContentPage'
-        db.create_table('widgy_contentpage', (
-            ('page_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['pages.Page'], unique=True, primary_key=True)),
-            ('root_node', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['widgy.Node'], null=True, on_delete=models.SET_NULL, blank=True)),
-        ))
-        db.send_create_signal('widgy', ['ContentPage'])
-
         # Adding model 'Node'
         db.create_table('widgy_node', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -57,9 +50,6 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        # Deleting model 'ContentPage'
-        db.delete_table('widgy_contentpage')
-
         # Deleting model 'Node'
         db.delete_table('widgy_node')
 
