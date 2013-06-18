@@ -274,6 +274,7 @@ INSTALLED_APPS = (
     'widgy.contrib.form_builder',
     'widgy.contrib.widgy_mezzanine',
     'widgy.contrib.widgy_i18n',
+    'widgy.contrib.review_queue',
     "django.contrib.admin",
     #"mezzanine.galleries",
     #"mezzanine.twitter",

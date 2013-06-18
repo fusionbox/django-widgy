@@ -4,14 +4,13 @@ from django.core import urlresolvers
 
 from widgy.views import extract_id
 from widgy.models import Node
-from widgy.site import ReviewedWidgySite
+from widgy.contrib.review_queue.site import ReviewedWidgySite
 
 from modeltests.core_tests.models import ImmovableBucket, UndeletableRawTextWidget, RawTextWidget
 from modeltests.core_tests.tests.base import RootNodeTestCase, HttpTestCase, make_a_nice_tree
 
 
 class TestApi(RootNodeTestCase, HttpTestCase):
-
     def setUp(self):
         super(TestApi, self).setUp()
         self.node_url = self.widgy_site.reverse(self.widgy_site.node_view)

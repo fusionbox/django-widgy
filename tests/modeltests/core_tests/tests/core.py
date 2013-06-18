@@ -1,3 +1,4 @@
+from pprint import pprint
 import datetime
 import time
 import mock
@@ -10,8 +11,8 @@ from django.utils import unittest, timezone
 from django.db.models.deletion import ProtectedError
 from django.contrib.auth.models import Permission
 
-from widgy.models import (Node, UnknownWidget, VersionTracker,
-                          ReviewedVersionTracker, Content)
+from widgy.models import (Node, UnknownWidget, VersionTracker, Content)
+from widgy.contrib.review_queue.models import ReviewedVersionTracker
 from widgy.exceptions import (
     ParentWasRejected, ChildWasRejected, MutualRejection, InvalidTreeMovement,
     InvalidOperation)
@@ -247,7 +248,6 @@ class TestTreesEqual(RootNodeTestCase):
 
 
 class TestVersioning(RootNodeTestCase):
-
     def make_commit(self, delta=datetime.timedelta(0), vt_class=VersionTracker):
         root_node = RawTextWidget.add_root(self.widgy_site, text='first').node
         tracker = vt_class.objects.create(working_copy=root_node)
@@ -737,6 +737,9 @@ class TestVersioning(RootNodeTestCase):
         commit.save()
         self.assertEqual(created_at, commit.created_at)
 
+    def refetch(self, obj):
+        return obj.__class__.objects.get(pk=obj.pk)
+
     def test_review_queue(self):
         tracker, commit1 = self.make_commit(vt_class=ReviewedVersionTracker)
 
@@ -747,16 +750,22 @@ class TestVersioning(RootNodeTestCase):
 
         request_factory = RequestFactory()
 
+        tracker = self.refetch(tracker)
         self.assertFalse(tracker.get_published_node(request_factory.get('/')))
+
         commit1.approve(user)
+
+        tracker = self.refetch(tracker)
         self.assertEqual(tracker.get_published_node(request_factory.get('/')),
                          commit1.root_node)
 
         commit2 = tracker.commit(publish_at=timezone.now())
+        tracker = self.refetch(tracker)
         self.assertEqual(tracker.get_published_node(request_factory.get('/')),
                          commit1.root_node)
 
         commit2.approve(user)
+        tracker = self.refetch(tracker)
         self.assertEqual(tracker.get_published_node(request_factory.get('/')),
                          commit2.root_node)
 

@@ -68,18 +68,18 @@ def render_root(context, owner, field_name):
 
 @register.simple_tag
 def reverse_site_url(site, view_string, *args, **kwargs):
-    """We would be tempted to put
+    """
+    We would be tempted to use
         {% url site.view kwarg=value kwarg2=value2 %}
-    but site.view actually return a callable (the view itself).
-    And Django template variable tries solver call it, fails
-    and resolve `site.view' as an empty string.
+    but site.view actually returns a callable (the view itself). The Django
+    template variable resolver tries to call it, which fails and resolves
+    `site.view' as an empty string.
     """
     view = getattr(site, view_string)
     return site.reverse(view, args=args, kwargs=kwargs)
 
 
 class SitepermsWrapper(object):
-
     def __init__(self, request, site):
         self._request = request
         self._site = site
@@ -99,20 +99,17 @@ class SitepermsWrapper(object):
 
 
 class SitepermsNode(Node):
-
     def __init__(self, site, siteperms):
-        self.site = site
+        self.site = template.Variable(site)
         self.siteperms = siteperms
 
     def render(self, context):
-        if self.site not in context:
+        try:
+            site = self.site.resolve(context)
+        except template.VariableDoesNotExist:
             raise TemplateSyntaxError(("'siteperms' variable %s "
                                        "not in context") % self.site)
-        if self.siteperms in context:
-            raise TemplateSyntaxError(("'siteperms' overriding variable "
-                                       "%s") % self.site)
-        context[self.siteperms] = SitepermsWrapper(context['request'],
-                                                   context[self.site])
+        context[self.siteperms] = SitepermsWrapper(context['request'], site)
         return ''
 
 

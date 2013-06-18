@@ -5,16 +5,9 @@
 <div class="commit popUp">
   <h2>{% trans "Commit Changes" %}</h2>
   {% if changed_anything %}
-    <form method="post" class="commit_form" action="{{ commit_url }}">
-      {% csrf_token %}
-      {% for field in form %}
-        {% include "widgy/field_as_div.html" %}
-      {% endfor %}
-      
-      <p class="submitRow">
-        {% include submitrow_template with commit=object.working_copy %}
-      </p>
-    </form>
+    {% block commit_form %}
+      {% include "widgy/_commit_form.html" with commit=object.working_copy action_url=commit_url %}
+    {% endblock %}
     <script>
       $('.commit_form').ajaxForm({target: 'div.commit'});
     </script>

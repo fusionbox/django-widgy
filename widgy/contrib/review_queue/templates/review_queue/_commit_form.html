@@ -1,0 +1,12 @@
+{% extends "widgy/_commit_form.html" %}
+{% load i18n %}
+{% load widgy_tags %}
+
+{% block submit_row %}
+  {% siteperms site as siteperms %}
+
+  {% if siteperms.approve_view %}
+    <input type="submit" name="approve_it" value="{% trans 'Commit and approve' %}">
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

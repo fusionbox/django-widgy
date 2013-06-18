@@ -2,24 +2,44 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.db.models.deletion import ProtectedError
-from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from fusionbox.db.models import QuerySetManager
-from fusionbox.behaviors import QuerySetManagerModel
 
-from widgy.utils import get_user_model
 from widgy.db.fields import WidgyField
 from widgy.models.base import Node
 
-User = get_user_model()
+
+class VersionCommit(models.Model):
+    tracker = models.ForeignKey('VersionTracker', related_name='commits')
+    parent = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT)
+    root_node = WidgyField(on_delete=models.PROTECT)
+    author = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
+                               null=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+    message = models.TextField(blank=True, null=True)
+    publish_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        app_label = 'widgy'
+
+    @property
+    def is_published(self):
+        return self.publish_at <= timezone.now()
+
+    def __unicode__(self):
+        if self.message:
+            subject = " - '%s'" % self.message.strip().split('\n')[0]
+        else:
+            subject = ''
+        return '%s %s%s' % (self.id, self.created_at, subject)
 
 
 class VersionTracker(models.Model):
+    commit_model = VersionCommit
+
     head = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT, unique=True)
     working_copy = models.ForeignKey(Node, on_delete=models.PROTECT, unique=True)
-
-    history_item_partial_template = 'widgy/_history_item_versioned.html'
-    commit_submitrow = 'widgy/_commit_submitrow_versioned.html'
 
     class Meta:
         app_label = 'widgy'
@@ -43,7 +63,7 @@ class VersionTracker(models.Model):
             return self.filter(**filters)
 
     def commit(self, user=None, **kwargs):
-        self.head = VersionCommit.objects.create(
+        self.head = self.commit_model.objects.create(
             parent=self.head,
             author=user,
             root_node=self.working_copy.clone_tree(),
@@ -56,7 +76,7 @@ class VersionTracker(models.Model):
         return self.head
 
     def revert_to(self, commit, user=None, **kwargs):
-        self.head = VersionCommit.objects.create(
+        self.head = self.commit_model.objects.create(
             parent=self.head,
             author=user,
             root_node=commit.root_node,
@@ -141,70 +161,3 @@ class VersionTracker(models.Model):
         for root_node in trees_to_delete:
             Node.get_tree(root_node).update(is_frozen=False)
             root_node.content.delete()
-
-
-class ReviewedVersionTracker(VersionTracker):
-
-    history_item_partial_template = 'widgy/_history_item_reviewed.html'
-    commit_submitrow = 'widgy/_commit_submitrow_reviewed.html'
-
-    class Meta:
-        app_label = 'widgy'
-        proxy = True
-
-    def get_published_node(self, request):
-        for commit in self.get_history():
-            if commit.is_published and commit.is_approved:
-                return commit.root_node
-        return None
-
-
-class VersionCommit(QuerySetManagerModel, models.Model):
-
-    tracker = models.ForeignKey(VersionTracker, related_name='commits')
-    parent = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT)
-    root_node = WidgyField(on_delete=models.PROTECT)
-    author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-    created_at = models.DateTimeField(auto_now_add=True)
-    message = models.TextField(blank=True, null=True)
-    publish_at = models.DateTimeField(default=timezone.now)
-    approved_by = models.ForeignKey(User, null=True, on_delete=models.PROTECT,
-                                    related_name='+')
-    approved_at = models.DateTimeField(default=None, null=True)
-
-    class Meta:
-        app_label = 'widgy'
-        verbose_name = _('unapproved commit')
-        verbose_name_plural = _('unapproved commits')
-
-    class QuerySet(QuerySet):
-        def get_non_approved(self):
-            return self.filter(approved_at__isnull=True,
-                               approved_by__isnull=True)
-
-    @property
-    def is_published(self):
-        return self.publish_at <= timezone.now()
-
-    @property
-    def is_approved(self):
-        return bool(self.approved_by and self.approved_at)
-
-    def approve(self, user, commit=True):
-        self.approved_at = timezone.now()
-        self.approved_by = user
-        if commit:
-            self.save()
-
-    def unapprove(self, user, commit=True):
-        self.approved_at = None
-        self.approved_by = None
-        if commit:
-            self.save()
-
-    def __unicode__(self):
-        if self.message:
-            subject = " - '%s'" % self.message.strip().split('\n')[0]
-        else:
-            subject = ''
-        return '%s %s%s' % (self.id, self.created_at, subject)

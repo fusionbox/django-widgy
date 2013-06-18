@@ -204,5 +204,5 @@ class ReviewedVersionedPage(models.Model):
     version_tracker = VersionedWidgyField(
         site='modeltests.core_tests.widgy_config.widgy_site',
         root_choices=[Layout, AnotherLayout],
-        to='widgy.ReviewedVersionTracker',
+        to='review_queue.ReviewedVersionTracker',
     )

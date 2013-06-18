@@ -21,7 +21,6 @@ class FakeUrlsModule(object):
 
 
 class WidgySiteTestMixin(object):
-
     widgy_site_class = WidgySite
     widgy_site_kwargs = {}
 
@@ -44,10 +43,8 @@ class WidgySiteTestMixin(object):
 
 
 class RootNodeTestCase(WidgySiteTestMixin, TestCase):
-
     def setUp(self):
         self.root_node = Layout.add_root(self.widgy_site).node
-
 
 
 class HttpTestCase(TestCase):
