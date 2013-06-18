@@ -8,11 +8,23 @@ from widgy.utils import fancy_import, update_context
 
 register = template.Library()
 
+class RenderNode(template.Node):
+    def __init__(self, arg):
+        self.arg = template.Variable(arg)
 
-@register.simple_tag(takes_context=True)
-def render(context, node):
-    return node.render(context)
+    def render(self, context):
+        try:
+            node = self.arg.resolve(context)
+        except template.VariableDoesNotExist as e:
+            raise Exception(e)
+        return node.render(context)
 
+@register.tag
+def render(parser, token):
+    bits = token.split_contents()
+    if len(bits) != 2:
+        raise template.TemplateSyntaxError("Usage: {% render node %}")
+    return RenderNode(bits[1])
 
 @register.filter
 def scss_files(site):
@@ -49,7 +61,19 @@ def mdown(value):
     return mark_safe(value)
 
 
-@register.simple_tag(takes_context=True)
+class RenderRootNode(template.Node):
+    def __init__(self, obj, field_name):
+        self.obj = template.Variable(obj)
+        self.field_name = template.Variable(field_name)
+
+    def render(self, context):
+        try:
+            owner = self.obj.resolve(context)
+            field_name = self.field_name.resolve(context)
+        except template.VariableDoesNotExist as e:
+            raise Exception(e)
+        return render_root(context, owner, field_name)
+
 def render_root(context, owner, field_name):
     """
     Renders `root_node` _unless_ `root_node_override` is in the context, in
@@ -62,3 +86,13 @@ def render_root(context, owner, field_name):
     field = owner._meta.get_field_by_name(field_name)[0]
     with update_context(context, {'root_node_override': None}):
         return field.render(owner, context=context, node=root_node)
+
+@register.tag(name='render_root')
+def render_root_tag(parser, token):
+    bits = token.split_contents()
+    if len(bits) != 3:
+        raise template.TemplateSyntaxError(
+            "Usage: {% render_root owner 'widgy_field_name' %}"
+        )
+
+    return RenderRootNode(bits[1], bits[2])
