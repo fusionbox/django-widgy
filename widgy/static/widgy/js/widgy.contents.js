@@ -29,6 +29,10 @@ define([
       // debugging: this will go away later probably.
       this.type = this.get('model');
       this.node = options.node;
+    },
+
+    isEditable: function() {
+      return !!this.get('edit_url');
     }
   });
 
@@ -159,6 +163,8 @@ define([
     editWidget: function(event) {
       event.preventDefault();
       event.stopPropagation();
+      if (! this.content.isEditable())
+        return;
 
       var editor_class = this.getEditorClass(),
           edit_view = new editor_class({
