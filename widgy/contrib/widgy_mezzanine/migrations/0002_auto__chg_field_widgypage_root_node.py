@@ -8,6 +8,7 @@ from django.db import models
 class Migration(SchemaMigration):
     depends_on = [
         ('widgy', '0003_auto__add_versiontracker__add_versioncommit'),
+        ('pages', '0013_auto__add_field_page_in_sitemap'),
     ]
 
     def forwards(self, orm):
