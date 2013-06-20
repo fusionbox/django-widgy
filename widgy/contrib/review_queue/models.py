@@ -2,18 +2,16 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from fusionbox.db.models import QuerySetManager
 
-from widgy.utils import get_user_model
 from widgy.models.versioning import VersionTracker, VersionCommit
-
-User = get_user_model()
 
 
 class ReviewedVersionCommit(VersionCommit):
-    approved_by = models.ForeignKey(User, null=True, on_delete=models.PROTECT,
-                                    related_name='+')
+    approved_by = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
+                                    null=True, on_delete=models.PROTECT, related_name='+')
     approved_at = models.DateTimeField(default=None, null=True)
 
     class Meta:

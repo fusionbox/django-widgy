@@ -2,21 +2,20 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.db.models.deletion import ProtectedError
+from django.conf import settings
 
 from fusionbox.db.models import QuerySetManager
 
-from widgy.utils import get_user_model
 from widgy.db.fields import WidgyField
 from widgy.models.base import Node
 
-User = get_user_model()
 
 class VersionCommit(models.Model):
-
     tracker = models.ForeignKey('VersionTracker', related_name='commits')
     parent = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT)
     root_node = WidgyField(on_delete=models.PROTECT)
-    author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    author = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
+                               null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     message = models.TextField(blank=True, null=True)
     publish_at = models.DateTimeField(default=timezone.now)
