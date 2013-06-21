@@ -1,7 +1,6 @@
 from django.conf.urls import patterns, url
 from django.core.exceptions import PermissionDenied
 from django.utils.functional import cached_property
-from django.contrib import admin
 
 from widgy.site import WidgySite
 from widgy.views import HistoryView
