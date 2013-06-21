@@ -133,9 +133,7 @@ class UndeletePage(WidgyPage):
         return super(UndeletePage, self).__init__(*args, **kwargs)
 
 
-# Registered in ReviewedWidgySite.__init__
 class VersionCommitAdmin(GetSiteMixin, VersionCommitAdminBase):
-
     def get_commit_name(self, commit):
         return get_page_from_node(commit.root_node).title
 

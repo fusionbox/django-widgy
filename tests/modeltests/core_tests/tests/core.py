@@ -247,7 +247,6 @@ class TestTreesEqual(RootNodeTestCase):
 
 
 class TestVersioning(RootNodeTestCase):
-
     def make_commit(self, delta=datetime.timedelta(0), vt_class=VersionTracker):
         root_node = RawTextWidget.add_root(self.widgy_site, text='first').node
         tracker = vt_class.objects.create(working_copy=root_node)

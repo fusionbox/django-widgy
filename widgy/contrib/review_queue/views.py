@@ -67,7 +67,6 @@ class ApprovalChangeBaseView(AuthorizedMixin, VersionTrackerMixin, RedirectView)
 
 
 class ApproveView(ApprovalChangeBaseView):
-
     def action(self, commit):
         commit.reviewedversioncommit.approve(self.request.user)
         commit.save()
@@ -91,7 +90,6 @@ class ApproveView(ApprovalChangeBaseView):
 
 
 class UnapproveView(ApprovalChangeBaseView):
-
     def action(self, commit):
         commit.reviewedversioncommit.unapprove(self.request.user)
         commit.save()

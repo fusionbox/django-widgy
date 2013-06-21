@@ -15,7 +15,6 @@ from .views import (
 
 
 class ReviewedWidgySite(WidgySite):
-
     def __init__(self, *args, **kwargs):
         super(ReviewedWidgySite, self).__init__(*args, **kwargs)
 

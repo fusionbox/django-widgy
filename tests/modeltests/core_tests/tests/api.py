@@ -11,7 +11,6 @@ from modeltests.core_tests.tests.base import RootNodeTestCase, HttpTestCase, mak
 
 
 class TestApi(RootNodeTestCase, HttpTestCase):
-
     def setUp(self):
         super(TestApi, self).setUp()
         self.node_url = self.widgy_site.reverse(self.widgy_site.node_view)

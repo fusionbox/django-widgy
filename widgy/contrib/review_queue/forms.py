@@ -9,7 +9,6 @@ from widgy.models import VersionCommit
 
 
 class JsonField(forms.CharField):
-
     def to_python(self, value):
         try:
             result = json.loads(value)
