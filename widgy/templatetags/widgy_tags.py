@@ -68,11 +68,12 @@ def render_root(context, owner, field_name):
 
 @register.simple_tag
 def reverse_site_url(site, view_string, *args, **kwargs):
-    """We would be tempted to put
+    """
+    We would be tempted to use
         {% url site.view kwarg=value kwarg2=value2 %}
-    but site.view actually return a callable (the view itself).
-    And Django template variable tries solver call it, fails
-    and resolve `site.view' as an empty string.
+    but site.view actually returns a callable (the view itself). The Django
+    template variable resolver tries to call it, which fails and resolves
+    `site.view' as an empty string.
     """
     view = getattr(site, view_string)
     return site.reverse(view, args=args, kwargs=kwargs)

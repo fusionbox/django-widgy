@@ -100,7 +100,7 @@ class VersionCommitAdminBase(AuthorizedAdminMixin, ModelAdmin):
     approve_selected.short_description = _('Approve selected commits')
 
     def save_form(self, request, form, change):
-        # Default save_form just do
+        # Default save_form just does
         #   form.save(commit=false)
         # This allows the form to have access to the request, especially
         # request.user during the saving.
