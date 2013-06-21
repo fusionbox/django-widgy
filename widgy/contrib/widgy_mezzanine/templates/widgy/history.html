@@ -27,7 +27,7 @@
           {% if commit.publish_at > commit.created_at  %}
             (
             {% if not commit.is_published %}
-              <span title="Not live yet">
+              <span title="{% trans "Not live yet" %}">
               {% trans "Scheduled to be published at" %}
             {% else %}
               {% trans "Published at" %}

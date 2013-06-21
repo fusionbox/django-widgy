@@ -95,14 +95,12 @@ class UnapproveView(ApprovalChangeBaseView):
         commit.save()
 
     def get_message(self, commit, history_url):
-        return _('Commit %s has been unapproved') % commit
+        return _('Commit %s has been unapproved.') % commit
 
 
 class UndoApprovalsView(AuthorizedMixin, FormView):
     http_method_names = ['post']
-
-    def get_form_class(self):
-        return UndoApprovalsForm
+    form_class = UndoApprovalsForm
 
     def form_valid(self, form):
         approved_commits = form.cleaned_data['actions']
