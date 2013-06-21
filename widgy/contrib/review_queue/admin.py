@@ -2,7 +2,7 @@ from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import ugettext_lazy as _, ugettext, ungettext
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
@@ -75,13 +75,14 @@ class VersionCommitAdminBase(AuthorizedAdminMixin, ModelAdmin):
             c.approve(request.user)
 
         commit_count = queryset.count()
-        if commit_count > 1:
-            approved = _('%d commits have been approved')
-        else:
-            approved = _('%d commit has been approved')
+
+        message = ungettext(
+            '%d commit has been approved.',
+            '%d commits have been approved.',
+            commit_count
+        ) % (commit_count,)
 
         from .forms import UndoApprovalsForm
-        message = approved % queryset.count()
         if HTML_IN_MESSAGES:
             message = format_html(
                 '{0} {1}',
