@@ -405,6 +405,7 @@ class Content(models.Model):
     # the API
     draggable = True
     deletable = True
+    editable = False
     accepting_children = False
     shelf = False
 
@@ -449,11 +450,12 @@ class Content(models.Model):
             'template_url': site.reverse(site.node_templates_view, kwargs=node_pk_kwargs),
             'preview_template': self.get_preview_template(site),
             'pop_out': self.pop_out,
-            'edit_url': site.reverse(site.node_edit_view, kwargs=node_pk_kwargs),
             'shelf': self.shelf,
             'attributes': self.get_attributes(),
             'form_prefix': self.get_form_prefix(),
         }
+        if self.editable:
+            data['edit_url'] = site.reverse(site.node_edit_view, kwargs=node_pk_kwargs)
         return data
 
     def get_attributes(self):
