@@ -123,6 +123,17 @@ class Html(Content):
 
 
 @widgy.register
+class UnsafeHtml(Content):
+    content = models.TextField(null=False, default='')
+
+    editable = True
+
+    class Meta:
+        verbose_name = _('unsafe HTML')
+        verbose_name_plural = _('unsafe HTML editors')
+
+
+@widgy.register
 class CalloutBucket(Bucket):
     @classmethod
     def valid_child_of(cls, parent, obj=None):
