@@ -564,9 +564,10 @@ class BaseChoiceField(FormField):
 
     @property
     def widget_attrs(self):
-        return {
-            'required': self.required,
-        }
+        attrs = {}
+        if self.required:
+            attrs.update(required='required')
+        return attrs
 
 
 @widgy.register

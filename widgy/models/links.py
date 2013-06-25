@@ -88,12 +88,12 @@ class LinkField(WidgyGenericForeignKey):
         if self.fk_field is None:
             self.fk_field = '%s_object_id' % name
 
-        if self.ct_field not in cls._meta.get_all_field_names():
+        if self.ct_field not in [i.name for i in cls._meta.local_fields]:
             ct_field = models.ForeignKey(ContentType, related_name='+',
                                          null=self.null, editable=False)
             cls.add_to_class(self.ct_field, ct_field)
 
-        if self.fk_field not in cls._meta.get_all_field_names():
+        if self.fk_field not in [i.name for i in cls._meta.local_fields]:
             fk_field = models.PositiveIntegerField(null=self.null,
                                                    editable=False)
             cls.add_to_class(self.fk_field, fk_field)

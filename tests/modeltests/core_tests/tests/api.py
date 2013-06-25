@@ -223,15 +223,20 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         # not sure there's much else we can test here
         self.assertIn('<form', json.loads(r.content)['edit_template'])
 
+    def test_editable_toggles_existence_of_edit_url(self):
+        self.root_node.content.editable = True
+        self.assertIn('edit_url', self.root_node.content.to_json(widgy_site))
+        self.root_node.content.editable = False
+        self.assertNotIn('edit_url', self.root_node.content.to_json(widgy_site))
 
     def test_node_edit_view(self):
+        self.root_node.content.editable = True
         r = self.client.get(self.root_node.content.to_json(widgy_site)['edit_url'])
         self.assertEqual(r.status_code, 200)
 
         # this is a template view, so there's not much we can test.
         self.assertIn('new Widgy', r.content)
         self.assertIn(urlresolvers.reverse(widgy_site.node_view), r.content)
-
 
     def test_node_404(self):
         left, right = make_a_nice_tree(self.root_node)
