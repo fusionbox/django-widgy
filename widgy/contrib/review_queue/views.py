@@ -6,21 +6,10 @@ from django.views.generic import RedirectView, FormView
 from django.core.exceptions import PermissionDenied
 
 from widgy.views.base import AuthorizedMixin
-from widgy.views.versioning import VersionTrackerMixin, CommitForm, CommitView
+from widgy.views.versioning import VersionTrackerMixin, CommitView
 
-from .forms import UndoApprovalsForm
+from .forms import UndoApprovalsForm, ReviewedCommitForm
 from .models import ReviewedVersionCommit
-
-
-class ReviewedCommitForm(CommitForm):
-    def commit(self, obj, user):
-        cleaned_data = self.cleaned_data.copy()
-        approve_it = 'approve_it' in self.data
-
-        commit = obj.commit(user, **cleaned_data)
-
-        if approve_it:
-            commit.reviewedversioncommit.approve(user)
 
 
 class ReviewedCommitView(CommitView):

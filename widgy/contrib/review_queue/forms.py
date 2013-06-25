@@ -6,6 +6,7 @@ from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 
 from widgy.models import VersionCommit
+from widgy.views.versioning import CommitForm
 
 
 class JsonField(forms.CharField):
@@ -53,3 +54,14 @@ class ApproveForm(forms.ModelForm):
         if self.cleaned_data['approve']:
             self.instance.approve(request.user, commit=commit)
         return super(ApproveForm, self).save(commit=commit)
+
+
+class ReviewedCommitForm(CommitForm):
+    def commit(self, obj, user):
+        cleaned_data = self.cleaned_data.copy()
+        approve_it = 'approve_it' in self.data
+
+        commit = obj.commit(user, **cleaned_data)
+
+        if approve_it:
+            commit.reviewedversioncommit.approve(user)
