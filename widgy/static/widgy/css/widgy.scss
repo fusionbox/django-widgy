@@ -411,6 +411,10 @@ li.node_drop_target {
 
           &.formField {
             margin-bottom: 10px;
+            
+            select {
+              width: 212px;
+            }
 
             .cke {
               float: left;
