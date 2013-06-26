@@ -1,6 +1,9 @@
 import json
+import imp
 
 from django.core import urlresolvers
+from django.core.exceptions import PermissionDenied
+from django.utils.functional import cached_property
 
 from widgy.views import extract_id
 from widgy.models import Node
@@ -8,9 +11,18 @@ from widgy.contrib.review_queue.site import ReviewedWidgySite
 
 from modeltests.core_tests.models import ImmovableBucket, UndeletableRawTextWidget, RawTextWidget
 from modeltests.core_tests.tests.base import RootNodeTestCase, HttpTestCase, make_a_nice_tree
+from modeltests.core_tests.widgy_config import widgy_site
 
 
 class TestApi(RootNodeTestCase, HttpTestCase):
+    widgy_site = widgy_site
+
+    @cached_property
+    def urls(self):
+        urls = imp.new_module('urls')
+        urls.urlpatterns = self.widgy_site.get_urls()
+        return urls
+
     def setUp(self):
         super(TestApi, self).setUp()
         self.node_url = self.widgy_site.reverse(self.widgy_site.node_view)
@@ -279,4 +291,9 @@ class TestApi(RootNodeTestCase, HttpTestCase):
 
 
 class TestApiReviewed(TestApi):
-    widgy_site_class = ReviewedWidgySite
+    class Site(ReviewedWidgySite):
+        def authorize(self, request, *args, **kwargs):
+            if request.COOKIES.get('unauthorized_access'):
+                raise PermissionDenied
+
+    widgy_site = Site()
