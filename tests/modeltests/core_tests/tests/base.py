@@ -145,3 +145,7 @@ def make_a_nice_tree(root_node, widgy_site=widgy_site):
                     text='right_2')
 
     return left.node, right.node
+
+
+def refetch(obj):
+    return obj.__class__.objects.get(pk=obj.pk)

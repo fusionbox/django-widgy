@@ -44,7 +44,7 @@ class VersionCommitAdminBase(AuthorizedAdminMixin, ModelAdmin):
         except AttributeError:
             # BBB: In django 1.5 queryset changed to get_queryset
             qs = super(VersionCommitAdminBase, self).queryset(request)
-        return qs.get_non_approved()
+        return qs.unapproved()
 
     queryset = get_queryset
 

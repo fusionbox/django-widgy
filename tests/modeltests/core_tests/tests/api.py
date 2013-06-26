@@ -4,12 +4,10 @@ import json
 import imp
 
 from django.core import urlresolvers
-from django.core.exceptions import PermissionDenied
 from django.utils.functional import cached_property
 
 from widgy.views import extract_id
 from widgy.models import Node
-from widgy.contrib.review_queue.site import ReviewedWidgySite
 
 from modeltests.core_tests.widgy_config import widgy_site, authorized_site
 from modeltests.core_tests.models import (
@@ -293,15 +291,6 @@ class TestApi(RootNodeTestCase, HttpTestCase):
 
         left = Node.objects.get(pk=left.pk)
         self.assertEqual(before_children + 1, len(left.get_children()))
-
-
-class TestApiReviewed(TestApi):
-    class Site(ReviewedWidgySite):
-        def authorize(self, request, *args, **kwargs):
-            if request.COOKIES.get('unauthorized_access'):
-                raise PermissionDenied
-
-    widgy_site = Site()
 
 
 class PermissionsTest(SwitchUserTestCase, RootNodeTestCase, HttpTestCase):

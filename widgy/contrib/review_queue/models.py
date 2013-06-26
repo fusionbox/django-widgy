@@ -21,7 +21,7 @@ class ReviewedVersionCommit(VersionCommit):
     objects = QuerySetManager()
 
     class QuerySet(QuerySet):
-        def get_non_approved(self):
+        def unapproved(self):
             return self.filter(approved_at__isnull=True,
                                approved_by__isnull=True)
 
