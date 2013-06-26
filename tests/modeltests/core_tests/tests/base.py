@@ -2,53 +2,22 @@ import json
 
 from django.test import TestCase
 from django.contrib.auth.models import User
-from django.core.exceptions import PermissionDenied
-
-from widgy.site import WidgySite
 
 from modeltests.core_tests.models import Layout, RawTextWidget, Bucket
+from modeltests.core_tests.widgy_config import widgy_site
 
 
-class UnauthenticatedWidgySiteMixin(object):
-    def authorize(self, request, *args, **kwargs):
-        if request.COOKIES.get('unauthorized_access'):
-            raise PermissionDenied
-
-
-class FakeUrlsModule(object):
-    def __init__(self, urlpatterns):
-        self.urlpatterns = urlpatterns
-
-
-class WidgySiteTestMixin(object):
-    widgy_site_class = WidgySite
-    widgy_site_kwargs = {}
-
-    @property
-    def widgy_site(self):
-        if not hasattr(self, '_widgy_site'):
-            WidgySiteClass = type('WidgySiteClass',
-                                  (UnauthenticatedWidgySiteMixin,
-                                   self.widgy_site_class),
-                                  {})
-            self._widgy_site = WidgySiteClass(**self.widgy_site_kwargs)
-        return self._widgy_site
-
-    @property
-    def urls(self):
-        if not hasattr(self, '_urls'):
-            self._urls = FakeUrlsModule(self.widgy_site.get_urls())
-        return self._urls
-
-
-
-class RootNodeTestCase(WidgySiteTestMixin, TestCase):
+class RootNodeTestCase(TestCase):
     def setUp(self):
-        self.root_node = Layout.add_root(self.widgy_site).node
+        super(RootNodeTestCase, self).setUp()
+
+        self.root_node = Layout.add_root(widgy_site).node
 
 
 class HttpTestCase(TestCase):
     def setUp(self):
+        super(HttpTestCase, self).setUp()
+
         u = User.objects.create_user(
             username='testuser',
             email='asdf@example.com',
@@ -98,7 +67,7 @@ def display_node(node):
     proc.communicate(tree_to_dot(node))
 
 
-def make_a_nice_tree(root_node, widgy_site):
+def make_a_nice_tree(root_node, widgy_site=widgy_site):
     left, right = root_node.content.get_children()
     left.add_child(widgy_site,
                    RawTextWidget,
