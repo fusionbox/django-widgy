@@ -1,10 +1,11 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
-from widgy.utils import format_html
+from django.utils.http import is_safe_url
 from django.views.generic import RedirectView, FormView
 from django.core.exceptions import PermissionDenied
 
+from widgy.utils import format_html
 from widgy.views.base import AuthorizedMixin
 from widgy.views.versioning import VersionTrackerMixin, CommitView
 
@@ -31,6 +32,7 @@ class ApprovalChangeBaseView(AuthorizedMixin, VersionTrackerMixin, RedirectView)
     Abstract class for approving or unapproving commits
     """
     http_method_names = ['post']
+    permanent = False
 
     def get_redirect_url(self, pk, commit_pk):
         vt = get_object_or_404(self.get_queryset(), pk=pk)
@@ -94,13 +96,16 @@ class UndoApprovalsView(AuthorizedMixin, FormView):
     def form_valid(self, form):
         approved_commits = form.cleaned_data['actions']
         if not isinstance(approved_commits, list) or \
-           not all([isinstance(i, int) for i in approved_commits]):
+           not all(isinstance(i, int) for i in approved_commits):
             return self.form_invalid()
 
         commits = ReviewedVersionCommit.objects.filter(pk__in=approved_commits)
         for c in commits:
             c.unapprove(self.request.user)
-        return redirect(form.cleaned_data['referer'])
+        url = form.cleaned_data['referer']
+        if not is_safe_url(url=url, host=self.request.get_host()):
+            url = '/'
+        return redirect(url)
 
     def form_invalid(self, form):
         return redirect('/')

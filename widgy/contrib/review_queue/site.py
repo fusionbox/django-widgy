@@ -36,7 +36,7 @@ class ReviewedWidgySite(WidgySite):
         approval_views = (VersionCommitAdminBase, ApproveView, UndoApprovalsView,
                           UnapproveView)
         if isinstance(view, approval_views):
-            if not request.user.has_perm('widgy.change_versioncommit'):
+            if not request.user.has_perm('review_queue.change_reviewedversioncommit'):
                 raise PermissionDenied
 
     @cached_property

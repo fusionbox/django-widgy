@@ -28,7 +28,7 @@ class UndoApprovalsForm(forms.Form):
     def render(self, request, site):
         return mark_safe(
             render_to_string(
-                'widgy/undoform.html',
+                'review_queue/undoform.html',
                 {
                     'form': self,
                     'site': site,

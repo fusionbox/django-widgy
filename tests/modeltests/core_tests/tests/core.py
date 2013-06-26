@@ -9,10 +9,8 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils import unittest, timezone
 from django.db.models.deletion import ProtectedError
-from django.contrib.auth.models import Permission
 
 from widgy.models import Node, UnknownWidget, VersionTracker, Content
-from widgy.contrib.review_queue.models import ReviewedVersionTracker
 from widgy.exceptions import (
     ParentWasRejected, ChildWasRejected, MutualRejection, InvalidTreeMovement,
     InvalidOperation)
@@ -23,7 +21,7 @@ from modeltests.core_tests.models import (
     Layout, Bucket, RawTextWidget, CantGoAnywhereWidget, PickyBucket,
     ImmovableBucket, AnotherLayout, VowelBucket, VersionedPage, VersionedPage2,
     VersionedPage3, VersionedPage4, VersionPageThrough, Related,
-    ForeignKeyWidget, WeirdPkBucket, ReviewedVersionedPage
+    ForeignKeyWidget, WeirdPkBucket
 )
 from modeltests.core_tests.tests.base import RootNodeTestCase, make_a_nice_tree
 
@@ -736,38 +734,6 @@ class TestVersioning(RootNodeTestCase):
         commit.save()
         self.assertEqual(created_at, commit.created_at)
 
-    def refetch(self, obj):
-        return obj.__class__.objects.get(pk=obj.pk)
-
-    def test_review_queue(self):
-        tracker, commit1 = self.make_commit(vt_class=ReviewedVersionTracker)
-
-        p = Permission.objects.get(codename='change_versioncommit')
-        user = User.objects.create()
-        user.user_permissions.add(p)
-        user.save()
-
-        request_factory = RequestFactory()
-
-        tracker = self.refetch(tracker)
-        self.assertFalse(tracker.get_published_node(request_factory.get('/')))
-
-        commit1.approve(user)
-
-        tracker = self.refetch(tracker)
-        self.assertEqual(tracker.get_published_node(request_factory.get('/')),
-                         commit1.root_node)
-
-        commit2 = tracker.commit(publish_at=timezone.now())
-        tracker = self.refetch(tracker)
-        self.assertEqual(tracker.get_published_node(request_factory.get('/')),
-                         commit1.root_node)
-
-        commit2.approve(user)
-        tracker = self.refetch(tracker)
-        self.assertEqual(tracker.get_published_node(request_factory.get('/')),
-                         commit2.root_node)
-
     def test_cloning_multi_table_inheritance(self):
         root = PickyBucket.add_root(widgy_site)
         new_root = root.clone()
@@ -812,21 +778,6 @@ class TestVersioning(RootNodeTestCase):
         tracker.commit()
         tracker.revert_to(commit)
         tracker.delete()
-
-    def test_foreign_key_to_proxy_works(self):
-        """
-        If ReviewedVersionTracker is implemented as a proxy, ensure a
-        foreign key returns a ReviewedVersionTracker instance (instead
-        of the base model).
-        """
-        tracker, commit1 = self.make_commit(vt_class=ReviewedVersionTracker)
-        page = ReviewedVersionedPage.objects.create(
-            version_tracker=tracker,
-        )
-
-        page = ReviewedVersionedPage.objects.get(pk=page.pk)
-        self.assertIsInstance(page.version_tracker, ReviewedVersionTracker)
-        self.assertEqual(page.version_tracker, tracker)
 
 
 class TestPrefetchTree(RootNodeTestCase):
