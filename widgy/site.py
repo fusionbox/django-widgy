@@ -74,11 +74,8 @@ class WidgySite(object):
         except AttributeError:
             raise ValueError("View does not inherit from WidgyViewMixin")
 
-    def has_add_permission(self, user, content_class):
-        return True
-
     def authorize(self, request, *args, **kwargs):
-        if not request.user.is_authenticated() or not request.user.is_staff:
+        if not request.user.is_authenticated():
             raise PermissionDenied
 
     def has_add_permission(self, request, content_class):
@@ -88,7 +85,10 @@ class WidgySite(object):
         return request.user.has_perm('%s.%s' % (obj._meta.app_label, obj._meta.get_change_permission()))
 
     def has_delete_permission(self, request, obj):
-        return request.user.has_perm('%s.%s' % (obj._meta.app_label, obj._meta.get_delete_permission()))
+        return all(
+            request.user.has_perm('%s.%s' % (o._meta.app_label, o._meta.get_delete_permission()))
+            for o in obj.depth_first_order()
+        )
 
     # These must return the same instance throughout the whole lifetime
     # of the widgy site for reverse to work.

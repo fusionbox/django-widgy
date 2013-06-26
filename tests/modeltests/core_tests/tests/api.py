@@ -326,28 +326,26 @@ class PermissionsTest(SwitchUserTestCase, RootNodeTestCase, HttpTestCase):
             data = json.loads(resp.content)
             self.assertCompatibilityContains('core_tests.bucket', data)
 
-        # not logged in
-        fail()
+        fail()  # not logged in
 
-        # not staff
         with self.logged_in() as user:
-            fail()
+            resp = doit()  # not staff
+            self.assertEqual(resp.status_code, 200)
+            data = json.loads(resp.content)
+            self.assertEqual(data, {self.root_node.get_api_url(self.widgy_site): []})
 
-        # staff, no permissions
         with self.as_staffuser() as user:
-            resp = doit()
+            resp = doit()  # staff, no permissions
             self.assertEqual(resp.status_code, 200)
             data = json.loads(resp.content)
             self.assertCompatibilityNotContains('core_tests.bucket', data)
 
-        # staff, with permissions
         with self.as_staffuser() as user:
             with self.with_permission(user, 'add', Bucket):
-                win()
+                win()  # staff, with permissions
 
-        # superuser
         with self.as_superuser():
-            win()
+            win()  # superuser
 
     def as_different_types_of_user(self, permissionsargs, fail, win):
         fail()  # not logged in
@@ -443,6 +441,16 @@ class PermissionsTest(SwitchUserTestCase, RootNodeTestCase, HttpTestCase):
             left = self.root_node.content.add_child(self.widgy_site, Bucket)
 
         self.as_different_types_of_user(('delete', Bucket), fail, win)
+
+    def test_delete_deep_node(self):
+        self.root_node.content.add_child(self.widgy_site, Bucket)
+
+        with self.as_staffuser() as user:
+            with self.with_permission(user, 'delete', Layout):
+                url = self.root_node.get_api_url(self.widgy_site)
+                resp = self.delete(url)
+                self.assertEqual(resp.status_code, 403)
+                self.assertTrue(Bucket.objects.exists())
 
     def test_edit_content(self):
         content = RawTextWidget.add_root(self.widgy_site)
