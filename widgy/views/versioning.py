@@ -3,7 +3,11 @@ import subprocess
 import contextlib
 
 from django import forms
-from django.views.generic import FormView, DetailView, TemplateView
+from django.views.generic import (
+    FormView,
+    DetailView,
+    TemplateView,
+)
 from django.views.generic.detail import SingleObjectMixin
 from django.shortcuts import get_object_or_404
 from django.conf import settings
@@ -35,9 +39,8 @@ class CommitForm(forms.Form):
     publish_at = forms.DateTimeField(required=True,
                                      initial=timezone.now)
 
-
-class RevertForm(CommitForm):
-    pass
+    def commit(self, obj, user):
+        obj.commit(user, **self.cleaned_data)
 
 
 class VersionTrackerMixin(SingleObjectMixin):
@@ -56,6 +59,7 @@ class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
         self.object = self.get_object()
         kwargs = super(CommitView, self).get_context_data(**kwargs)
         kwargs['object'] = self.object
+        kwargs['site'] = self.site
         kwargs['commit_url'] = self.site.reverse(self.site.commit_view,
                                                  kwargs={'pk': self.object.pk})
         if self.object.head:
@@ -69,9 +73,8 @@ class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        object = self.get_object()
-        object.commit(user=self.request.user,
-                      **form.cleaned_data)
+        obj = self.get_object()
+        form.commit(obj, self.request.user)
         return self.response_class(
             request=self.request,
             template='widgy/commit_success.html',
@@ -106,12 +109,9 @@ class HistoryView(AuthorizedMixin, VersionTrackerMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(HistoryView, self).get_context_data(**kwargs)
+        kwargs['site'] = self.site
         kwargs['commits'] = self.object.get_history_list()
         for commit in kwargs['commits']:
-            if commit.root_node != commit.tracker.head.root_node:
-                commit.revert_url = self.site.reverse(
-                    self.site.revert_view,
-                    kwargs={'pk': commit.tracker.pk, 'commit_pk': commit.pk})
             if commit.parent_id:
                 commit.diff_url = diff_url(self.site,
                                            commit.parent.root_node,
@@ -122,7 +122,7 @@ class HistoryView(AuthorizedMixin, VersionTrackerMixin, DetailView):
 class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
     template_name = 'widgy/revert.html'
     pk_url_kwarg = 'commit_pk'
-    form_class = RevertForm
+    form_class = CommitForm
 
     def get_context_data(self, **kwargs):
         kwargs['object'] = self.object

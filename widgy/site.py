@@ -68,9 +68,15 @@ class WidgySite(object):
         """
         return reverse(*args, **kwargs)
 
-    def authorize(self, request):
+    def authorize(self, request, view, obj=None):
         if not request.user.is_authenticated():
             raise PermissionDenied
+
+    def get_view_instance(self, view):
+        try:
+            return view.view_instance
+        except AttributeError:
+            raise ValueError("View does not inherit from WidgyViewMixin")
 
     # These must return the same instance throughout the whole lifetime
     # of the widgy site for reverse to work.

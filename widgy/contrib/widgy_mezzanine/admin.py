@@ -18,10 +18,18 @@ from mezzanine.pages.models import Link
 
 from widgy.forms import WidgyFormMixin
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
+from widgy.contrib.widgy_mezzanine.views import get_page_from_node
 from widgy.utils import fancy_import, format_html
 from widgy.models import links
 
+from widgy.contrib.review_queue.admin import VersionCommitAdminBase
+
 WidgyPage = get_widgypage_model()
+
+
+class GetSiteMixin(object):
+    def get_site(self):
+        return fancy_import(settings.WIDGY_MEZZANINE_SITE)
 
 
 class WidgyPageAdminForm(WidgyFormMixin, PageAdminForm):
@@ -42,12 +50,9 @@ class WidgyPageAdminForm(WidgyFormMixin, PageAdminForm):
         return status
 
 
-class WidgyPageAdmin(PageAdmin):
+class WidgyPageAdmin(PageAdmin, GetSiteMixin):
     change_form_template = 'widgy/page_builder/widgypage_change_form.html'
     form = WidgyPageAdminForm
-
-    def get_site(self):
-        return fancy_import(settings.WIDGY_MEZZANINE_SITE)
 
     def render_change_form(self, request, context, *args, **kwargs):
         if 'original' in context and context['original'].root_node:
@@ -128,12 +133,25 @@ class UndeletePage(WidgyPage):
         return super(UndeletePage, self).__init__(*args, **kwargs)
 
 
+class VersionCommitAdmin(GetSiteMixin, VersionCommitAdminBase):
+    def get_commit_name(self, commit):
+        return get_page_from_node(commit.root_node).title
+
+    def get_commit_preview_url(self, commit):
+        return reverse('widgy.contrib.widgy_mezzanine.views.preview',
+                       kwargs={'node_pk': commit.root_node.pk})
+
+
 # Remove built in Mezzanine models from the admin center
 from mezzanine.pages.models import RichTextPage
+from widgy.contrib.review_queue.models import ReviewedVersionCommit
 
 admin.site.unregister(RichTextPage)
 
 admin.site.register(WidgyPage, WidgyPageAdmin)
 admin.site.register(UndeletePage, UndeletePageAdmin)
+
+if 'widgy.contrib.review_queue' in settings.INSTALLED_APPS:
+    admin.site.register(ReviewedVersionCommit, VersionCommitAdmin)
 
 links.register(Link)

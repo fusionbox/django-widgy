@@ -1,0 +1,19 @@
+{% load i18n %}
+{% load url from future %}
+<form method="post" class="commit_form" action="{{ action_url }}">
+  {% csrf_token %}
+  {% for field in form %}
+    {% include "widgy/field_as_div.html" %}
+  {% endfor %}
+
+  <p class="submitRow">
+    {% block submit_row %}
+      <input type="submit" value="{% trans 'Commit' %}">
+      {# TODO: this is dependent on widgy_mezzanine #}
+      <a class="button" target="_blank" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=commit.pk %}">{% trans "Preview" %}</a>
+      {% if diff_url %}
+        <a class="button" target="_blank" href="{{ diff_url }}">{% trans "Diff" %}</a>
+      {% endif %}
+    {% endblock %}
+  </p>
+</form>

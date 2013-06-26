@@ -3,20 +3,21 @@ import json
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from modeltests.core_tests.widgy_config import widgy_site
 from modeltests.core_tests.models import Layout, RawTextWidget, Bucket
+from modeltests.core_tests.widgy_config import widgy_site
 
 
 class RootNodeTestCase(TestCase):
-    urls = 'modeltests.core_tests.urls'
-
     def setUp(self):
-        self.root_node = Layout.add_root(widgy_site).node
+        super(RootNodeTestCase, self).setUp()
 
+        self.root_node = Layout.add_root(widgy_site).node
 
 
 class HttpTestCase(TestCase):
     def setUp(self):
+        super(HttpTestCase, self).setUp()
+
         u = User.objects.create_user(
             username='testuser',
             email='asdf@example.com',
@@ -66,7 +67,7 @@ def display_node(node):
     proc.communicate(tree_to_dot(node))
 
 
-def make_a_nice_tree(root_node):
+def make_a_nice_tree(root_node, widgy_site=widgy_site):
     left, right = root_node.content.get_children()
     left.add_child(widgy_site,
                    RawTextWidget,

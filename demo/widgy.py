@@ -1,10 +1,11 @@
 from __future__ import absolute_import
 
-from widgy.site import WidgySite
+from widgy.contrib.review_queue.site import ReviewedWidgySite
 
 
-class DemoWidgySite(WidgySite):
+class DemoWidgySite(ReviewedWidgySite):
     def valid_parent_of(self, parent, child_class, obj=None):
+        from widgy.contrib.widgy_i18n.models import I18NLayout
         if isinstance(parent, I18NLayout):
             return True
         else:
@@ -12,4 +13,3 @@ class DemoWidgySite(WidgySite):
 
 widgy_site = DemoWidgySite()
 
-from widgy.contrib.widgy_i18n.models import I18NLayout

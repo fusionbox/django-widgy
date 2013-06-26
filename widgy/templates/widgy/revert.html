@@ -3,17 +3,7 @@
 <script src="{% static 'widgy/js/lib/jquery.form.js' %}'"></script>
 
 <div class="commit popUp">
-  <form method="post" class="commit_form" action="{{ revert_url }}">
-    {% csrf_token %}
-    {% for field in form %}
-      {% include "widgy/field_as_div.html" %}
-    {% endfor %}
-    <p class="submitRow">
-    <input type="submit" value="Commit">
-    {# TODO: this is dependent on widgy_mezzanine #}
-    <a class="button" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=object.root_node.pk %}">{% trans "Preview" %}</a>
-    </p>
-  </form>
+  {% include "widgy/_commit_form.html" with commit=object.root_node action_url=revert_url %}
   <script>
     $('.commit_form').ajaxForm({target: 'div.commit'});
   </script>

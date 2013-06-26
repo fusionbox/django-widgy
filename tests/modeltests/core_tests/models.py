@@ -198,3 +198,11 @@ class VariegatedFieldsWidget(Content):
     date = models.DateField(null=True)
     time = models.TimeField(null=True)
     datetime = models.DateTimeField(null=True)
+
+
+class ReviewedVersionedPage(models.Model):
+    version_tracker = VersionedWidgyField(
+        site='modeltests.core_tests.widgy_config.widgy_site',
+        root_choices=[Layout, AnotherLayout],
+        to='review_queue.ReviewedVersionTracker',
+    )
