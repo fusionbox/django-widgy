@@ -1,8 +1,10 @@
+{% extends "widgy/popup_base.html" %}
 {% load url from future %}
 {% load i18n %}
-<script src="{% static 'widgy/js/lib/jquery.form.js' %}'"></script>
 
-<div class="commit popUp">
+{% block content %}
+  <h2>{% trans "Revert Commit" %}</h2>
+
   <form method="post" class="commit_form" action="{{ revert_url }}">
     {% csrf_token %}
     {% for field in form %}
@@ -11,11 +13,7 @@
     <p class="submitRow">
     <input type="submit" value="Commit">
     {# TODO: this is dependent on widgy_mezzanine #}
-    <a class="button" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=object.root_node.pk %}">{% trans "Preview" %}</a>
+    <a class="button" target="_blank" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=object.root_node.pk %}">{% trans "Preview" %}</a>
     </p>
   </form>
-  <script>
-    $('.commit_form').ajaxForm({target: 'div.commit'});
-  </script>
-</div>
-</body>
+{% endblock %}
