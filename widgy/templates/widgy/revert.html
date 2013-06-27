@@ -1,11 +1,9 @@
+{% extends "widgy/popup_base.html" %}
 {% load url from future %}
 {% load i18n %}
-<script src="{% static 'widgy/js/lib/jquery.form.js' %}'"></script>
 
-<div class="commit popUp">
+{% block content %}
+  <h2>{% trans "Revert Commit" %}</h2>
+
   {% include "widgy/_commit_form.html" with commit=object.root_node action_url=revert_url %}
-  <script>
-    $('.commit_form').ajaxForm({target: 'div.commit'});
-  </script>
-</div>
-</body>
+{% endblock %}
