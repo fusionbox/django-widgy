@@ -12,9 +12,14 @@ class AuthorizedAdminMixin(object):
         except PermissionDenied:
             return False
 
-    has_add_permission = _has_permission
-    has_delete_permission = _has_permission
-    has_change_permission = _has_permission
+    def has_add_permission(self, request, obj=None):
+        return super(AuthorizedAdminMixin, self).has_add_permission(request, obj) and self._has_permission(request, obj)
+
+    def has_change_permission(self, request, obj=None):
+        return super(AuthorizedAdminMixin, self).has_change_permission(request, obj) and self._has_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        return super(AuthorizedAdminMixin, self).has_delete_permission(request, obj) and self._has_permission(request, obj)
 
 
 class WidgyAdmin(ModelAdmin):

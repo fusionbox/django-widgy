@@ -12,6 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.views.generic import DetailView
 from django.views.generic.detail import SingleObjectMixin
 from django.db.models import get_model, ProtectedError
+from django.utils.translation import ugettext as _
 
 from fusionbox.views.rest import RestView
 
@@ -56,7 +57,7 @@ class ContentView(WidgyView):
     def put(self, request, app_label, object_name, object_pk):
         obj = self.get_object(app_label, object_name, object_pk)
         if not self.site.has_change_permission(request, obj):
-            raise PermissionDenied
+            raise PermissionDenied(_("You don't have permission to edit this widget."))
 
         data = self.data()['attributes']
         form = obj.get_form(request, data=data)
@@ -105,7 +106,7 @@ class NodeView(WidgyView):
         if not content_class:
             raise Http404
         if not self.site.has_add_permission(request, content_class):
-            raise PermissionDenied
+            raise PermissionDenied(_("You don't have permission to add this widget."))
 
         try:
             right = get_object_or_404(Node, pk=extract_id(data['right_id']))
@@ -132,7 +133,7 @@ class NodeView(WidgyView):
         data = self.data()
 
         if not self.site.has_change_permission(request, node.content):
-            raise PermissionDenied
+            raise PermissionDenied(_("You don't have permission to move this widget."))
         if not node.content.draggable:
             raise InvalidTreeMovement({'message': "You can't move me"})
 
@@ -152,7 +153,7 @@ class NodeView(WidgyView):
         node = get_object_or_404(Node, pk=node_pk)
 
         if not self.site.has_delete_permission(request, node.content):
-            raise PermissionDenied
+            raise PermissionDenied(_("You don't have permission to delete this widget."))
         if not node.content.deletable:
             raise InvalidTreeMovement({'message': "You can't delete me"})
 
@@ -222,7 +223,7 @@ class NodeEditView(NodeSingleObjectMixin, AuthorizedMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         if not self.site.has_change_permission(self.request, self.object):
-            raise PermissionDenied
+            raise PermissionDenied(_("You don't have permission to edit this widget."))
         kwargs = super(NodeEditView, self).get_context_data(**kwargs)
         kwargs.update(
             html_id='node_%s' % (self.object.pk),
@@ -239,7 +240,7 @@ class NodeTemplatesView(NodeSingleObjectMixin, WidgyView):
     def get(self, request, *args, **kwargs):
         node = self.object = self.get_object()
         if not self.site.has_change_permission(request, node.content):
-            raise PermissionDenied
+            raise PermissionDenied(_("You don't have permission to edit this widget."))
         return self.render_to_response(node.content.get_templates(request))
 
 
@@ -251,7 +252,7 @@ class NodeParentsView(NodeSingleObjectMixin, WidgyView):
     def get(self, request, *args, **kwargs):
         node = self.object = self.get_object()
         if not self.site.has_change_permission(request, node.content):
-            raise PermissionDenied
+            raise PermissionDenied(_("You don't have permission to move this widget."))
         node.prefetch_tree()
         possible_parents = node.possible_parents(self.site, node.get_root())
         return self.render_to_response([i.get_api_url(self.site) for i in possible_parents])

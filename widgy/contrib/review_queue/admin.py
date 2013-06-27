@@ -98,7 +98,6 @@ class VersionCommitAdminBase(AuthorizedAdminMixin, ModelAdmin):
             )
 
         messages.info(request, message, extra_tags='safe')
-
     approve_selected.short_description = _('Approve selected commits')
 
     def save_form(self, request, form, change):

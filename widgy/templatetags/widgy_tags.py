@@ -1,8 +1,6 @@
 from django import template
 from django.conf import settings
 from django.utils.safestring import mark_safe
-from django.template import TemplateSyntaxError, Node
-from django.core.exceptions import PermissionDenied
 
 import markdown
 
@@ -79,50 +77,16 @@ def reverse_site_url(site, view_string, *args, **kwargs):
     return site.reverse(view, args=args, kwargs=kwargs)
 
 
-class SitepermsWrapper(object):
-    def __init__(self, request, site):
-        self._request = request
-        self._site = site
-
-    def __getitem__(self, item):
-        try:
-            view = getattr(self._site, item)
-            view_instance = self._site.get_view_instance(view)
-            self._site.authorize(self._request, view_instance)
-            return True
-        except (AttributeError, ValueError):
-            # View does not exists, either getattr or
-            # get_view_instance has failed
-            raise KeyError
-        except PermissionDenied:
-            return False
+@register.assignment_tag(takes_context=True)
+def has_change_permission(context, site, obj):
+    return site.has_change_permission(context['request'], obj)
 
 
-class SitepermsNode(Node):
-    def __init__(self, site, siteperms):
-        self.site = template.Variable(site)
-        self.siteperms = siteperms
-
-    def render(self, context):
-        try:
-            site = self.site.resolve(context)
-        except template.VariableDoesNotExist:
-            raise TemplateSyntaxError(("'siteperms' variable %s "
-                                       "not in context") % self.site)
-        context[self.siteperms] = SitepermsWrapper(context['request'], site)
-        return ''
+@register.assignment_tag(takes_context=True)
+def has_add_permission(context, site, obj):
+    return site.has_add_permission(context['request'], obj)
 
 
-@register.tag
-def siteperms(parser, token):
-    bits = token.split_contents()
-    # TODO: Support for permissions on one specific object
-    # {% siteperms site as variable %}
-    # {% siteperms site as variable with object %}
-    # {% siteperms site with object as variable %}
-    if len(bits) != 4 and bits[2] != 'as':
-        raise TemplateSyntaxError("'siteperms' syntax should be "
-                                  "{% siteperms site as variable %}")
-    site = bits[1]
-    siteperms = bits[3]
-    return SitepermsNode(site, siteperms)
+@register.assignment_tag(takes_context=True)
+def has_delete_permission(context, site, obj):
+    return site.has_delete_permission(context['request'], obj)

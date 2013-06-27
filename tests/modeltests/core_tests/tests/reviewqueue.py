@@ -95,19 +95,22 @@ class ReviewQueueViewsTest(SwitchUserTestCase, RootNodeTestCase):
         return urls
 
     def test_commit_view(self):
-        tracker, _ = make_commit()
+        tracker, first_commit = make_commit()
         url = self.widgy_site.reverse(self.widgy_site.commit_view, kwargs={
             'pk': tracker.pk,
         })
 
         with self.as_staffuser() as user:
-            self.client.post(url, {'approve_it': 1, 'publish_at': timezone.now()})
-            self.assertFalse(refetch(tracker).head.reviewedversioncommit.is_approved)
+            with self.with_permission(user, 'add', ReviewedVersionCommit):
+                self.client.post(url, {'approve_it': 1, 'publish_at': timezone.now()})
+                self.assertNotEqual(refetch(tracker).head.reviewedversioncommit, first_commit)
+                self.assertFalse(refetch(tracker).head.reviewedversioncommit.is_approved)
 
         with self.as_staffuser() as user:
             with self.with_permission(user, 'change', ReviewedVersionCommit):
-                self.client.post(url, {'approve_it': 1, 'publish_at': timezone.now()})
-                self.assertTrue(refetch(tracker).head.reviewedversioncommit.is_approved)
+                with self.with_permission(user, 'add', ReviewedVersionCommit):
+                    self.client.post(url, {'approve_it': 1, 'publish_at': timezone.now()})
+                    self.assertTrue(refetch(tracker).head.reviewedversioncommit.is_approved)
 
     def test_approve_view(self):
         tracker, commit = make_commit()
