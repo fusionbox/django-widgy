@@ -7,7 +7,7 @@ from widgy.forms import WidgyForm
 class AuthorizedAdminMixin(object):
     def _has_permission(self, request, obj=None):
         try:
-            self.get_site().authorize(request, self, obj)
+            self.get_site().authorize_view(request, self)
             return True
         except PermissionDenied:
             return False

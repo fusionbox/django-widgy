@@ -74,7 +74,7 @@ class WidgySite(object):
         except AttributeError:
             raise ValueError("View does not inherit from WidgyViewMixin")
 
-    def authorize(self, request, *args, **kwargs):
+    def authorize_view(self, request, view):
         if not request.user.is_authenticated():
             raise PermissionDenied
 
