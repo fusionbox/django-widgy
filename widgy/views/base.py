@@ -2,7 +2,7 @@ class WidgyViewMixin(object):
     site = None
 
     def auth(self, request, *args, **kwargs):
-        self.site.authorize(request, self)
+        self.site.authorize_view(request, self)
 
     @classmethod
     def as_view(cls, **initkwargs):
