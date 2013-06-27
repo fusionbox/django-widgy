@@ -1,8 +1,8 @@
+{% extends "widgy/popup_base.html" %}
 {% load url from future %}
 {% load i18n %}
-<script src="{% static 'widgy/js/lib/jquery.form.js' %}'"></script>
 
-<div class="reset popUp">
+{% block content %}
   <h2>{% trans "Reset" %}</h2>
   {% if not has_commits %}
   <p>{% trans "There are no commits yet, nothing to reset to" %}</p>
@@ -12,11 +12,7 @@
       {% csrf_token %}
       <p class="submitRow"><input type=submit value="{% trans 'Yes' %}"></p>
     </form>
-    <script>
-      $('.reset form').ajaxForm({target: 'div.reset'});
-    </script>
   {% else %}
     <p>{% trans "Nothing has changed -- no need to reset." %}</p>
   {% endif %}
-</div>
-</body>
+{% endblock %}
