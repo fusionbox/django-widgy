@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.core.exceptions import PermissionDenied
 
 from BeautifulSoup import BeautifulSoup
 
@@ -54,6 +55,7 @@ class VersionTrackerMixin(SingleObjectMixin):
 class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
     template_name = 'widgy/commit.html'
     form_class = CommitForm
+    permission_error_message = _("You don't have permission to commit.")
 
     def get_context_data(self, **kwargs):
         self.object = self.get_object()
@@ -62,6 +64,9 @@ class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
         kwargs['site'] = self.site
         kwargs['commit_url'] = self.site.reverse(self.site.commit_view,
                                                  kwargs={'pk': self.object.pk})
+        if not self.has_permission(self.object):
+            kwargs['permission_error_message'] = self.permission_error_message
+
         if self.object.head:
             kwargs['diff_url'] = diff_url(self.site,
                                           self.object.working_copy,
@@ -72,8 +77,15 @@ class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
 
         return kwargs
 
+    def has_permission(self, object):
+        return self.site.has_add_permission(self.request, object.commit_model)
+
     def form_valid(self, form):
         obj = self.get_object()
+
+        if not self.has_permission(obj):
+            raise PermissionDenied(self.permission_error_message)
+
         form.commit(obj, self.request.user)
         return self.response_class(
             request=self.request,
@@ -84,6 +96,7 @@ class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
 
 class ResetView(AuthorizedMixin, VersionTrackerMixin, TemplateView):
     template_name = 'widgy/reset.html'
+    permission_error_message = _("You don't have permission to reset.")
 
     def get_context_data(self, **kwargs):
         self.object = self.get_object()
@@ -92,10 +105,24 @@ class ResetView(AuthorizedMixin, VersionTrackerMixin, TemplateView):
         kwargs['changed_anything'] = self.object.has_changes()
         kwargs['has_commits'] = bool(self.object.head)
         kwargs['reset_url'] = self.request.get_full_path()
+
+        if not self.has_permission(self.object):
+            kwargs['permission_error_message'] = self.permission_error_message
+
         return kwargs
+
+
+    def has_permission(self, object):
+        # We don't really add a commit while resetting, but this permission is
+        # used for everything commit related.
+        return self.site.has_add_permission(self.request, object.commit_model)
 
     def post(self, request, *args, **kwargs):
         version_tracker = self.get_object()
+
+        if not self.has_permission(version_tracker):
+            raise PermissionDenied(self.permission_error_message)
+
         version_tracker.reset()
         return self.response_class(
             request=self.request,
@@ -123,6 +150,7 @@ class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
     template_name = 'widgy/revert.html'
     pk_url_kwarg = 'commit_pk'
     form_class = CommitForm
+    permission_error_message = _("You don't have permission to revert.")
 
     def get_context_data(self, **kwargs):
         kwargs['object'] = self.object
@@ -130,6 +158,10 @@ class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
         kwargs['revert_url'] = self.site.reverse(
             self.site.revert_view,
             kwargs={'pk': self.object.tracker.pk, 'commit_pk': self.object.pk})
+
+        if not self.has_permission(self.object):
+            kwargs['permission_error_message'] = self.permission_error_message
+
         return kwargs
 
     def get_object(self, queryset=None):
@@ -149,8 +181,15 @@ class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
         }
         return kwargs
 
+    def has_permission(self, object):
+        return self.site.has_add_permission(self.request, object)
+
     def form_valid(self, form):
         commit = self.get_object()
+
+        if not self.has_permission(commit):
+            raise PermissionDenied(self.permission_error_message)
+
         commit.tracker.revert_to(commit, user=self.request.user, **form.cleaned_data)
 
         return self.response_class(

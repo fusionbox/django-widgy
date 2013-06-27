@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 from django.utils.http import is_safe_url
 from django.views.generic import RedirectView, FormView
 from django.core.exceptions import PermissionDenied
@@ -17,13 +17,9 @@ class ReviewedCommitView(CommitView):
     template_name = 'review_queue/commit.html'
 
     def get_form_class(self):
-        try:
-            self.site.authorize(
-                self.request,
-                self.site.get_view_instance(self.site.approve_view),
-            )
+        if self.site.has_change_permission(self.request, ReviewedVersionCommit):
             return ReviewedCommitForm
-        except PermissionDenied:
+        else:
             return super(ReviewedCommitView, self).get_form_class()
 
 
@@ -39,6 +35,9 @@ class ApprovalChangeBaseView(AuthorizedMixin, VersionTrackerMixin, RedirectView)
         commit = get_object_or_404(vt.commits.select_related('root_node'),
                                    pk=commit_pk)
         commit.tracker = vt
+
+        if not self.site.has_change_permission(self.request, commit.reviewedversioncommit):
+            raise PermissionDenied(_("You don't have permission to approve commits."))
 
         self.action(commit)
 
@@ -100,6 +99,10 @@ class UndoApprovalsView(AuthorizedMixin, FormView):
             return self.form_invalid()
 
         commits = ReviewedVersionCommit.objects.filter(pk__in=approved_commits)
+
+        if not all(self.site.has_change_permission(self.request, c) for c in commits):
+            raise PermissionDenied(_("You don't have permission to approve commits."))
+
         for c in commits:
             c.unapprove(self.request.user)
         url = form.cleaned_data['referer']

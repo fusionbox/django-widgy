@@ -81,14 +81,17 @@ class WidgySite(object):
     def has_add_permission(self, request, content_class):
         return request.user.has_perm('%s.%s' % (content_class._meta.app_label, content_class._meta.get_add_permission()))
 
-    def has_change_permission(self, request, obj):
-        return request.user.has_perm('%s.%s' % (obj._meta.app_label, obj._meta.get_change_permission()))
+    def has_change_permission(self, request, obj_or_class):
+        return request.user.has_perm('%s.%s' % (obj_or_class._meta.app_label, obj_or_class._meta.get_change_permission()))
 
-    def has_delete_permission(self, request, obj):
-        return all(
-            request.user.has_perm('%s.%s' % (o._meta.app_label, o._meta.get_delete_permission()))
-            for o in obj.depth_first_order()
-        )
+    def has_delete_permission(self, request, obj_or_class):
+        def has_perm(o):
+            return request.user.has_perm('%s.%s' % (o._meta.app_label, o._meta.get_delete_permission()))
+
+        if isinstance(obj_or_class, type):
+            return has_perm(obj_or_class)
+        else:
+            return all(map(has_perm, obj_or_class.depth_first_order()))
 
     # These must return the same instance throughout the whole lifetime
     # of the widgy site for reverse to work.
