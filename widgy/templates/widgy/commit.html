@@ -1,30 +1,14 @@
+{% extends "widgy/popup_base.html" %}
 {% load url from future %}
 {% load i18n %}
-<script src="{% static 'widgy/js/lib/jquery.form.js' %}'"></script>
 
-<div class="commit popUp">
+{% block content %}
   <h2>{% trans "Commit Changes" %}</h2>
   {% if changed_anything %}
-    <form method="post" class="commit_form" action="{{ commit_url }}">
-      {% csrf_token %}
-      {% for field in form %}
-        {% include "widgy/field_as_div.html" %}
-      {% endfor %}
-      
-      <p class="submitRow">
-        <input type="submit" value="{% trans 'Commit' %}">
-      {# TODO: this is dependent on widgy_mezzanine #}
-        <a class="button" target="_blank" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=object.working_copy.pk %}">{% trans "Preview" %}</a>
-      {% if diff_url %}
-        <a class="button" target="_blank" href="{{ diff_url }}">{% trans "Diff" %}</a>
-      {% endif %}
-      </p>
-    </form>
-    <script>
-      $('.commit_form').ajaxForm({target: 'div.commit'});
-    </script>
+    {% block commit_form %}
+      {% include "widgy/_commit_form.html" with commit=object.working_copy action_url=commit_url %}
+    {% endblock %}
   {% else %}
     <p>{% trans "Nothing has changed -- no need to commit." %}</p>
   {% endif %}
-</div>
-</body>
+{% endblock %}

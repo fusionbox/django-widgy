@@ -151,7 +151,10 @@ $green:       #559911;
     color: $green;
     height: auto;
     font-weight: bold;
-    padding: 2px !important;
+    line-height: 16px;
+    padding: 5px !important;
+    position: relative;
+    top: -1px;
     
     &:hover {
       background: lighten($green,50%);
@@ -221,14 +224,35 @@ section.main {
       margin: 0px 0px 15px 0px;
       padding: 0px;
       
-      p.top {
+      div.top {
         border-bottom: 1px solid #cccccc;
+        display: block;
+        float: none;
+        height: auto;
         line-height: 26px;
         margin: 0px !important;
         padding: 5px 10px 5px 10px;
+        width: auto;
         
-        span.actions {
+        div.actions {
           float: right;
+        }
+      }
+        
+      form {
+        display: inline;
+
+        input.button[type='submit'] {
+          @include button;
+          
+          &.unapprove {
+            border-color: $red;
+            color: $red;
+    
+            &:hover {
+              background: lighten($red,35%);
+            }
+          }
         }
       }
       
@@ -241,6 +265,17 @@ section.main {
           margin: 0px !important;
         }
       }
+    }
+  }
+}
+
+/* Message List Form Fix
+--------------------------------------------------*/
+
+ul.messagelist {
+  li {
+    form {
+      display: inline;
     }
   }
 }

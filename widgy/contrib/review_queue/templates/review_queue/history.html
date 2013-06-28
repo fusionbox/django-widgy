@@ -1,0 +1,50 @@
+{% extends "widgy/history.html" %}
+{% load i18n %}
+{% load url from future %}
+{% load widgy_tags %}
+
+{% block commit_info %}
+  {# Better solution? I'm all ears #}
+  {% with author=commit.author %}
+  {% with created_at=commit.created_at|date:"SHORT_DATETIME_FORMAT" %}
+  {% with approved_by=commit.reviewedversioncommit.approved_by %}
+  {% with approved_at=commit.reviewedversioncommit.approved_at|date:"SHORT_DATETIME_FORMAT" %}
+  {% with is_approved=commit.reviewedversioncommit.is_approved %} 
+  {% with is_published=commit.is_published %}
+  {% with publish_at=commit.publish_at|date:"SHORT_DATETIME_FORMAT" %}
+    {% if is_approved and not is_published %}
+      {% blocktrans %}
+        <strong>{{ created_at }}</strong> by {{ author }}, approved by <strong>{{ approved_by }}</strong>. (Scheduled to be published at {{ publish_at }}.)<span title="Not live yet">*</span>
+      {% endblocktrans %}
+    {% elif is_approved and commit.publish_at > commit.created_at and is_published %}
+      {% blocktrans %}
+        <strong>{{ created_at }}</strong> by {{ author }}, approved by <strong>{{ approved_by }}</strong>. (Was published at {{ publish_at }}.)
+      {% endblocktrans %}
+    {% elif is_approved %}
+      {% blocktrans %}
+        <strong>{{ created_at }}</strong> by {{ author }}, approved by <strong>{{ approved_by }}</strong>.
+      {% endblocktrans %}
+    {% else %}
+      {% blocktrans %}
+        <strong>{{ created_at }}</strong> by {{ author }}. (Not approved yet.)<span title="Not live yet">*</span>
+      {% endblocktrans %}
+    {% endif %}
+  {% endwith %}{% endwith %}{% endwith %}{% endwith %}{% endwith %}{% endwith %}{% endwith %}
+{% endblock %}
+
+{% block commit_actions %}
+  {{ block.super }}
+  {% has_change_permission site commit.reviewedversioncommit as can_change %}
+  {% if can_change %}
+    {% if not commit.reviewedversioncommit.is_approved %}
+      <form method="post" action="{% reverse_site_url site 'approve_view' pk=commit.tracker.pk commit_pk=commit.pk %}">
+        <input class="button approve" type="submit" value="{% trans "Approve this Commit" %}">
+    {% else %}
+      {# unapprove_view avoid generating a UndoApprovalsForm for each commit #}
+      <form method="post" action="{% reverse_site_url site 'unapprove_view' pk=commit.tracker.pk commit_pk=commit.pk %}">
+        <input class="button unapprove" type="submit" value="{% trans "Unapprove this Commit" %}">
+    {% endif %}
+      {% csrf_token %}
+    </form>
+  {% endif %}
+{% endblock %}

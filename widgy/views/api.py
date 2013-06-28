@@ -2,14 +2,17 @@
 Resource views that can be included to enable a REST style API
 for Widgy nodes and Content objects.
 """
+from functools import partial
+
 from django.http import Http404
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 from django.views.generic import DetailView
 from django.views.generic.detail import SingleObjectMixin
 from django.db.models import get_model, ProtectedError
+from django.utils.translation import ugettext as _
 
 from fusionbox.views.rest import RestView
 
@@ -34,6 +37,8 @@ class ContentView(WidgyView):
     .. todo::
         change ``put`` method to be more generic.
     """
+    def dispatch(self, request, app_label, object_name, object_pk):
+        return super(ContentView, self).dispatch(request, app_label, object_name, object_pk)
 
     def get_object(self, app_label, object_name, object_pk):
         """
@@ -51,6 +56,9 @@ class ContentView(WidgyView):
 
     def put(self, request, app_label, object_name, object_pk):
         obj = self.get_object(app_label, object_name, object_pk)
+        if not self.site.has_change_permission(request, obj):
+            raise PermissionDenied(_("You don't have permission to edit this widget."))
+
         data = self.data()['attributes']
         form = obj.get_form(request, data=data)
         if not form.is_valid():
@@ -82,7 +90,7 @@ class NodeView(WidgyView):
         compatibility_node_url = self.request.GET.get('include_compatibility_for', None)
         if compatibility_node_url:
             node = get_object_or_404(Node, pk=extract_id(compatibility_node_url))
-            obj['compatibility'] = ShelfView.get_compatibility_data(self.site, node)
+            obj['compatibility'] = ShelfView.get_compatibility_data(self.site, self.request, node)
 
         return self.render_to_response(obj, *args, **kwargs)
 
@@ -97,6 +105,8 @@ class NodeView(WidgyView):
         content_class = get_model(app_label, model)
         if not content_class:
             raise Http404
+        if not self.site.has_add_permission(request, content_class):
+            raise PermissionDenied(_("You don't have permission to add this widget."))
 
         try:
             right = get_object_or_404(Node, pk=extract_id(data['right_id']))
@@ -122,6 +132,8 @@ class NodeView(WidgyView):
         node = get_object_or_404(Node, pk=node_pk)
         data = self.data()
 
+        if not self.site.has_change_permission(request, node.content):
+            raise PermissionDenied(_("You don't have permission to move this widget."))
         if not node.content.draggable:
             raise InvalidTreeMovement({'message': "You can't move me"})
 
@@ -140,6 +152,8 @@ class NodeView(WidgyView):
     def delete(self, request, node_pk):
         node = get_object_or_404(Node, pk=node_pk)
 
+        if not self.site.has_delete_permission(request, node.content):
+            raise PermissionDenied(_("You don't have permission to delete this widget."))
         if not node.content.deletable:
             raise InvalidTreeMovement({'message': "You can't delete me"})
 
@@ -183,23 +197,24 @@ class ShelfView(WidgyView):
         return res
 
     @staticmethod
-    def get_compatibility_data(site, root_node):
+    def get_compatibility_data(site, request, root_node):
         root_node.maybe_prefetch_tree()
         content_classes = site.get_all_content_classes()
+        content_classes = filter(partial(site.has_add_permission, request), content_classes)
         content_classes = root_node.filter_child_classes_recursive(site, content_classes)
         return ShelfView.serialize_content_classes(site, content_classes)
 
     def get(self, request, node_pk):
         node = get_object_or_404(Node, pk=node_pk)
-        return self.render_to_response(self.get_compatibility_data(self.site, node))
+        return self.render_to_response(self.get_compatibility_data(self.site, request, node))
 
 
-class NodeSingleObjectMixin(SingleObjectMixin, AuthorizedMixin):
+class NodeSingleObjectMixin(SingleObjectMixin):
     model = Node
     pk_url_kwarg = 'node_pk'
 
 
-class NodeEditView(NodeSingleObjectMixin, DetailView):
+class NodeEditView(NodeSingleObjectMixin, AuthorizedMixin, DetailView):
     """
     The only TemplateView in widgy: The interface for popped out node editing.
     """
@@ -207,6 +222,8 @@ class NodeEditView(NodeSingleObjectMixin, DetailView):
     template_name = 'widgy/views/edit_node.html'
 
     def get_context_data(self, **kwargs):
+        if not self.site.has_change_permission(self.request, self.object):
+            raise PermissionDenied(_("You don't have permission to edit this widget."))
         kwargs = super(NodeEditView, self).get_context_data(**kwargs)
         kwargs.update(
             html_id='node_%s' % (self.object.pk),
@@ -220,9 +237,10 @@ class NodeTemplatesView(NodeSingleObjectMixin, WidgyView):
     """
     Gets the dynamic [needing request] templates for a node.
     """
-
     def get(self, request, *args, **kwargs):
         node = self.object = self.get_object()
+        if not self.site.has_change_permission(request, node.content):
+            raise PermissionDenied(_("You don't have permission to edit this widget."))
         return self.render_to_response(node.content.get_templates(request))
 
 
@@ -233,6 +251,8 @@ class NodeParentsView(NodeSingleObjectMixin, WidgyView):
 
     def get(self, request, *args, **kwargs):
         node = self.object = self.get_object()
+        if not self.site.has_change_permission(request, node.content):
+            raise PermissionDenied(_("You don't have permission to move this widget."))
         node.prefetch_tree()
         possible_parents = node.possible_parents(self.site, node.get_root())
         return self.render_to_response([i.get_api_url(self.site) for i in possible_parents])

@@ -50,12 +50,17 @@ define([ 'widgy.backbone',
     if ( resp.getResponseHeader('content-type').indexOf('application/json') !== -1 ) {
       var data = JSON.parse(resp.responseText);
       var message;
-      if ( data.message )
-         message =  data.message;
-      else if ( resp.status == 404 )
-        message = 'Try refreshing the page';
+
+      if ( _.isObject(data) )
+        message = data.message;
       else
-        message = 'Unkown error';
+        message = data;
+
+      if ( resp.status == 404 )
+        message = 'Try refreshing the page';
+
+      if ( ! message )
+        message = 'Unknown error';
 
       raiseError(message);
     } else {

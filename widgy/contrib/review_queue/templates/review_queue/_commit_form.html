@@ -1,0 +1,11 @@
+{% extends "widgy/_commit_form.html" %}
+{% load i18n %}
+{% load widgy_tags %}
+
+{% block submit_row %}
+  {% has_change_permission site site.get_version_tracker_model.commit_model as can_approve %}
+  {% if can_approve %}
+    <input type="submit" name="approve_it" value="{% trans 'Commit and approve' %}">
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

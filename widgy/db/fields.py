@@ -14,6 +14,13 @@ add_introspection_rules([], ["^widgy\.db.fields\.WidgyField"])
 add_introspection_rules([], ["^widgy\.db.fields\.VersionedWidgyField"])
 
 
+def get_site(site):
+    if isinstance(site, basestring):
+        return fancy_import(site)
+    else:
+        return site
+
+
 class WidgyFieldObjectDescriptor(ReverseSingleRelatedObjectDescriptor):
     """
     .. note::
@@ -49,10 +56,7 @@ class WidgyField(models.ForeignKey):
         }
         defaults.update(kwargs)
 
-        if isinstance(site, basestring):
-            self.site = fancy_import(site)
-        else:
-            self.site = site
+        self.site = get_site(site)
 
         super(WidgyField, self).__init__(to, **defaults)
 
@@ -151,7 +155,7 @@ class WidgyField(models.ForeignKey):
 class VersionedWidgyField(WidgyField):
     def __init__(self, site=None, to=None, root_choices=None, **kwargs):
         if to is None:
-            to = 'widgy.VersionTracker'
+            to = get_site(site).get_version_tracker_model()
         super(VersionedWidgyField, self).__init__(site, to, root_choices, **kwargs)
 
     def pre_save(self, model_instance, add):
@@ -174,7 +178,7 @@ class VersionedWidgyField(WidgyField):
 
             return version_tracker.pk
 
-        return super(WidgyField, self).pre_save(model_instance, add)
+        return super(VersionedWidgyField, self).pre_save(model_instance, add)
 
     def formfield(self, **kwargs):
         from widgy.forms import VersionedWidgyFormField

@@ -1,0 +1,5 @@
+{% load compress %}
+<iframe src="{{ commit_url }}"></iframe>
+{% compress css %}
+<link type="text/x-scss" rel="stylesheet" href="{% static 'widgy/css/unapproved_commits.scss' %}">
+{% endcompress %}

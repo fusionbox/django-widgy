@@ -1,12 +1,14 @@
 {% extends "admin/base_site.html" %}
 {% load url from future %}
 {% load compress i18n %}
+{% load widgy_tags %}
 
 {% block extrahead %}
 {{ block.super }}
 {% compress css %}
 <link rel="stylesheet" href="{% static 'widgy/fancybox/jquery.fancybox-1.3.4.css' %}">
 <link rel="stylesheet" href="{% static 'widgy/css/django.fusionbox.scss' %}" type="text/x-scss">
+<link rel="stylesheet" href="{% static 'widgy/css/widgy.scss' %}" type="text/x-scss">
 {% endcompress %}
 {% compress js %}
 <script src="{% static 'widgy/fancybox/jquery.fancybox-1.3.4.js' %}"></script>
@@ -19,34 +21,40 @@
 <ol class="history">
     {% for commit in commits %}
     <li>
-      <p class="top">
+      <div class="top">
+        {% block commit_info %}
         <strong>{{ commit.created_at|date:"SHORT_DATETIME_FORMAT" }}</strong>
-        {% if commit.author %}{% blocktrans with author=commit.author %} by <strong>{{ author }}</strong>{% endblocktrans %}{% endif %}
-        {% if commit.publish_at > commit.created_at  %}
-          (
-          {% if not commit.is_published %}
-            <span title="Not live yet">
+        {% if commit.author %}{% blocktrans with author=commit.author %} by <strong>{{ author }}</strong>.{% endblocktrans %}{% endif %}
+          {% if commit.publish_at > commit.created_at  %}
+            (
+            {% if not commit.is_published %}
+              <span title="{% trans "Not live yet" %}">
               {% trans "Scheduled to be published at" %}
-          {% else %}
-            {% trans "Published at" %}
+            {% else %}
+              {% trans "Published at" %}
+            {% endif %}
+              {{ commit.publish_at|date:"SHORT_DATETIME_FORMAT" }}.
+            )
+            {% if not commit.is_published %}
+              *</span>
+            {% endif %}
           {% endif %}
-          {{ commit.publish_at|date:"SHORT_DATETIME_FORMAT" }})
-          {% if not commit.is_published %}
-            *</span>
-          {% endif %}
-        {% endif %}
-        <span class="actions">
-        {% if commit.revert_url %}
-          <a class="button widgy-fancybox" href="{{ commit.revert_url }}">{% trans "Revert to this Version" %}</a>
-        {% else %}
-          {% trans "Can't revert; this is the same as the current version." %}
-        {% endif %}  
-        {% if commit.diff_url %}
-          <a class="button" href="{{ commit.diff_url }}">{% trans "Diff" %}</a>
-        {% endif %}  
-          <a class="button" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=commit.root_node.pk %}">{% trans "View" %}</a>  
-        </span>
-      </p>
+        {% endblock %}
+          <div class="actions">
+            {% block commit_actions %}
+            {% has_add_permission site commit as can_revert %}
+            {% if commit.root_node != commit.tracker.head.root_node and can_revert %}
+              <a class="button widgy-fancybox" href="{% reverse_site_url site 'revert_view' pk=commit.tracker.pk commit_pk=commit.pk %}">{% trans "Revert to this Version" %}</a>
+            {% elif can_revert %}
+              {% trans "Can't revert; this is the same as the current version." %}
+            {% endif %}
+            {% if commit.diff_url %}
+              <a class="button" href="{{ commit.diff_url }}">{% trans "Diff" %}</a>
+            {% endif %}
+            <a class="button" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=commit.root_node.pk %}">{% trans "View" %}</a>
+            {% endblock %}
+          </div>
+      </div>
       {% if commit.message %}
         <blockquote>{{ commit.message|linebreaks }}</blockquote>
       {% endif %}

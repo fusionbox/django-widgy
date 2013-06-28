@@ -2,17 +2,42 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.db.models.deletion import ProtectedError
+from django.conf import settings
 
 from fusionbox.db.models import QuerySetManager
 
-from widgy.utils import get_user_model
 from widgy.db.fields import WidgyField
 from widgy.models.base import Node
 
-User = get_user_model()
+
+class VersionCommit(models.Model):
+    tracker = models.ForeignKey('VersionTracker', related_name='commits')
+    parent = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT)
+    root_node = WidgyField(on_delete=models.PROTECT)
+    author = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
+                               null=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+    message = models.TextField(blank=True, null=True)
+    publish_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        app_label = 'widgy'
+
+    @property
+    def is_published(self):
+        return self.publish_at <= timezone.now()
+
+    def __unicode__(self):
+        if self.message:
+            subject = " - '%s'" % self.message.strip().split('\n')[0]
+        else:
+            subject = ''
+        return '%s %s%s' % (self.id, self.created_at, subject)
 
 
 class VersionTracker(models.Model):
+    commit_model = VersionCommit
+
     head = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT, unique=True)
     working_copy = models.ForeignKey(Node, on_delete=models.PROTECT, unique=True)
 
@@ -38,7 +63,7 @@ class VersionTracker(models.Model):
             return self.filter(**filters)
 
     def commit(self, user=None, **kwargs):
-        self.head = VersionCommit.objects.create(
+        self.head = self.commit_model.objects.create(
             parent=self.head,
             author=user,
             root_node=self.working_copy.clone_tree(),
@@ -51,7 +76,7 @@ class VersionTracker(models.Model):
         return self.head
 
     def revert_to(self, commit, user=None, **kwargs):
-        self.head = VersionCommit.objects.create(
+        self.head = self.commit_model.objects.create(
             parent=self.head,
             author=user,
             root_node=commit.root_node,
@@ -136,27 +161,3 @@ class VersionTracker(models.Model):
         for root_node in trees_to_delete:
             Node.get_tree(root_node).update(is_frozen=False)
             root_node.content.delete()
-
-
-class VersionCommit(models.Model):
-    tracker = models.ForeignKey(VersionTracker, related_name='commits')
-    parent = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT)
-    root_node = WidgyField(on_delete=models.PROTECT)
-    author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-    created_at = models.DateTimeField(auto_now_add=True)
-    message = models.TextField(blank=True, null=True)
-    publish_at = models.DateTimeField(default=timezone.now)
-
-    @property
-    def is_published(self):
-        return self.publish_at <= timezone.now()
-
-    class Meta:
-        app_label = 'widgy'
-
-    def __unicode__(self):
-        if self.message:
-            subject = " - '%s'" % self.message.strip().split('\n')[0]
-        else:
-            subject = ''
-        return '%s %s%s' % (self.id, self.created_at, subject)

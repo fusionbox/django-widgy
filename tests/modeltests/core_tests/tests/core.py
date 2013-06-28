@@ -10,7 +10,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils import unittest, timezone
 from django.db.models.deletion import ProtectedError
 
-from widgy.models import Node, UnknownWidget, VersionTracker, Content
+from widgy.models import Node, UnknownWidget, VersionTracker, Content, VersionCommit
 from widgy.exceptions import (
     ParentWasRejected, ChildWasRejected, MutualRejection, InvalidTreeMovement,
     InvalidOperation)
@@ -23,9 +23,8 @@ from modeltests.core_tests.models import (
     VersionedPage3, VersionedPage4, VersionPageThrough, Related,
     ForeignKeyWidget, WeirdPkBucket
 )
-
-
-from modeltests.core_tests.tests.base import RootNodeTestCase, make_a_nice_tree
+from modeltests.core_tests.tests.base import (
+    RootNodeTestCase, make_a_nice_tree, SwitchUserTestCase, refetch)
 
 
 class TestCore(RootNodeTestCase):
@@ -244,14 +243,13 @@ class TestTreesEqual(RootNodeTestCase):
         self.assertTrue(a.node.trees_equal(b.node))
 
 
+def make_commit(delta=datetime.timedelta(0), vt_class=VersionTracker):
+    root_node = RawTextWidget.add_root(widgy_site, text='first').node
+    tracker = vt_class.objects.create(working_copy=root_node)
+    commit = tracker.commit(publish_at=timezone.now() + delta)
+
+    return (tracker, commit)
 class TestVersioning(RootNodeTestCase):
-
-    def make_commit(self, delta=datetime.timedelta(0)):
-        root_node = RawTextWidget.add_root(widgy_site, text='first').node
-        tracker = VersionTracker.objects.create(working_copy=root_node)
-        commit = tracker.commit(publish_at=timezone.now() + delta)
-
-        return (tracker, commit)
 
     def test_clone_tree(self):
         left, right = make_a_nice_tree(self.root_node)
@@ -515,7 +513,9 @@ class TestVersioning(RootNodeTestCase):
 
             self.assertEqual(list(commits), history)
 
-        tracker = VersionTracker.objects.create(working_copy=RawTextWidget.add_root(widgy_site).node)
+        tracker = VersionTracker.objects.create(
+            working_copy=RawTextWidget.add_root(widgy_site).node
+        )
         self.assertEqual(tracker.get_history_list(), [])
 
     def orphan_helper(self):
@@ -703,33 +703,33 @@ class TestVersioning(RootNodeTestCase):
         self.assertEqual(textwidget_content.text, 'first')
 
     def test_publish_at(self):
-        tracker, commit1 = self.make_commit(datetime.timedelta(days=1))
+        tracker, commit1 = make_commit(datetime.timedelta(days=1))
 
         request_factory = RequestFactory()
         self.assertFalse(tracker.get_published_node(request_factory.get('/')))
 
     def test_multiple_publish_at(self):
-        tracker, commit1 = self.make_commit(datetime.timedelta(days=-1))
+        tracker, commit1 = make_commit(datetime.timedelta(days=-1))
 
         request_factory = RequestFactory()
         self.assertEqual(tracker.get_published_node(request_factory.get('/')),
-                          commit1.root_node)
+                         commit1.root_node)
 
         commit2 = tracker.commit(publish_at=timezone.now() + datetime.timedelta(days=1))
         self.assertEqual(tracker.get_published_node(request_factory.get('/')),
-                          commit1.root_node)
+                         commit1.root_node)
 
     def test_rollback_commit_publish(self):
-        tracker, commit1 = self.make_commit(datetime.timedelta(days=1))
+        tracker, commit1 = make_commit(datetime.timedelta(days=1))
 
         request_factory = RequestFactory()
 
         commit2 = tracker.commit(publish_at=timezone.now() - datetime.timedelta(days=1))
         self.assertEqual(tracker.get_published_node(request_factory.get('/')),
-                          commit2.root_node)
+                         commit2.root_node)
 
     def test_created_at(self):
-        tracker, commit = self.make_commit()
+        tracker, commit = make_commit()
         created_at = commit.created_at
         time.sleep(.1)
         commit.save()
@@ -750,7 +750,7 @@ class TestVersioning(RootNodeTestCase):
         Some widgets can't be deleted. We should still be able to reset.
         """
 
-        tracker, commit1 = self.make_commit(datetime.timedelta(days=-1))
+        tracker, commit1 = make_commit(datetime.timedelta(days=-1))
 
         with mock.patch.object(tracker.working_copy.content, 'delete') as delete:
             delete.side_effect = ProtectedError("can't delete", [])
@@ -759,7 +759,7 @@ class TestVersioning(RootNodeTestCase):
 
     def test_delete(self):
         self.assertEqual(RawTextWidget.objects.count(), 0)
-        tracker, commit = self.make_commit()
+        tracker, commit = make_commit()
         self.assertNotEqual(RawTextWidget.objects.count(), 0)
         tracker.delete()
         self.assertEqual(RawTextWidget.objects.count(), 0)
@@ -775,10 +775,76 @@ class TestVersioning(RootNodeTestCase):
         self.assertEqual(VersionTracker.objects.filter(pk=tracker.pk).count(), 0)
 
     def test_delete_after_revert(self):
-        tracker, commit = self.make_commit()
+        tracker, commit = make_commit()
         tracker.commit()
         tracker.revert_to(commit)
         tracker.delete()
+
+
+class VersioningViewsTest(SwitchUserTestCase, RootNodeTestCase):
+    def test_commit_view(self):
+        tracker, first_commit = make_commit()
+
+        url = widgy_site.reverse(widgy_site.commit_view, kwargs={
+            'pk': tracker.pk,
+        })
+
+        with self.as_staffuser() as user:
+            r = self.client.post(url, {'publish_at': timezone.now()})
+            self.assertEqual(r.status_code, 403)
+            self.assertEquals(len(refetch(tracker).get_history_list()), 1)
+            self.assertEqual(refetch(tracker).head, first_commit)
+
+        with self.as_staffuser() as user:
+            with self.with_permission(user, 'add', VersionCommit):
+                r = self.client.post(url, {'publish_at': timezone.now()})
+                self.assertEqual(r.status_code, 200)
+                self.assertEquals(len(refetch(tracker).get_history_list()), 2)
+
+    def test_reset_view(self):
+        tracker, commit = make_commit()
+
+        url = widgy_site.reverse(widgy_site.reset_view, kwargs={
+            'pk': tracker.pk,
+        })
+
+
+        root = tracker.working_copy.content
+        root.text = 'changed'
+        root.save()
+
+        with self.as_staffuser() as user:
+            r = self.client.post(url)
+            self.assertEqual(r.status_code, 403)
+            self.assertEqual(refetch(root).text, 'changed')
+
+        with self.as_staffuser() as user:
+            with self.with_permission(user, 'add', VersionCommit):
+                r = self.client.post(url)
+                self.assertEqual(r.status_code, 200)
+                with self.assertRaises(RawTextWidget.DoesNotExist):
+                    refetch(root)
+
+    def test_revert_view(self):
+        tracker, commit = make_commit()
+
+        url = widgy_site.reverse(widgy_site.revert_view, kwargs={
+            'pk': tracker.pk,
+            'commit_pk': commit.pk,
+        })
+
+        with self.as_staffuser() as user:
+            r = self.client.post(url, {'publish_at': timezone.now()})
+            self.assertEqual(r.status_code, 403)
+            self.assertEquals(len(refetch(tracker).get_history_list()), 1)
+            self.assertEqual(refetch(tracker).head, commit)
+
+        with self.as_staffuser() as user:
+            with self.with_permission(user, 'add', VersionCommit):
+                r = self.client.post(url, {'publish_at': timezone.now()})
+                self.assertEqual(r.status_code, 200)
+                self.assertEquals(len(refetch(tracker).get_history_list()), 2)
+
 
 
 class TestPrefetchTree(RootNodeTestCase):
@@ -820,7 +886,8 @@ class TestPrefetchTree(RootNodeTestCase):
             right_children = list(right.get_children())
             self.assertEqual(right_children[0].text, 'right_1')
             self.assertEqual(right_children[1].text, 'right_2')
-            self.assertTrue(all(isinstance(i, Content) for i in root_node.content.depth_first_order()))
+            self.assertTrue(all(isinstance(i, Content)
+                                for i in root_node.content.depth_first_order()))
 
         # verify some convience methods are prefetched as well
         with self.assertNumQueries(0):

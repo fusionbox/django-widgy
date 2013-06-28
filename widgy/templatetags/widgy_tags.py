@@ -62,3 +62,31 @@ def render_root(context, owner, field_name):
     field = owner._meta.get_field_by_name(field_name)[0]
     with update_context(context, {'root_node_override': None}):
         return field.render(owner, context=context, node=root_node)
+
+
+@register.simple_tag
+def reverse_site_url(site, view_string, *args, **kwargs):
+    """
+    We would be tempted to use
+        {% url site.view kwarg=value kwarg2=value2 %}
+    but site.view actually returns a callable (the view itself). The Django
+    template variable resolver tries to call it, which fails and resolves
+    `site.view' as an empty string.
+    """
+    view = getattr(site, view_string)
+    return site.reverse(view, args=args, kwargs=kwargs)
+
+
+@register.assignment_tag(takes_context=True)
+def has_change_permission(context, site, obj):
+    return site.has_change_permission(context['request'], obj)
+
+
+@register.assignment_tag(takes_context=True)
+def has_add_permission(context, site, obj):
+    return site.has_add_permission(context['request'], obj)
+
+
+@register.assignment_tag(takes_context=True)
+def has_delete_permission(context, site, obj):
+    return site.has_delete_permission(context['request'], obj)

@@ -1,0 +1,5 @@
+{% extends "widgy/commit.html" %}
+
+{% block commit_form %}
+  {% include "review_queue/_commit_form.html" with commit=object.working_copy action_url=commit_url %}
+{% endblock %}
