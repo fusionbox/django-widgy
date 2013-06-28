@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import csv
+
 from django.db import models
 from django import forms
 from django.utils.datastructures import SortedDict
@@ -18,7 +20,7 @@ from fusionbox.forms.fields import PhoneNumberField
 from widgy.models import Content, Node
 from widgy.signals import pre_delete_widget
 from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, DisplayNameMixin
-from widgy.utils import update_context, build_url
+from widgy.utils import update_context, build_url, force_bytes
 from widgy.contrib.page_builder.db.fields import MarkdownField
 from widgy.contrib.page_builder.models import Bucket, Html
 from widgy.contrib.page_builder.forms import MiniCKEditorField
@@ -708,6 +710,26 @@ class FormSubmission(behaviors.Timestampable, models.Model):
             for submission in self.as_dictionaries():
                 yield SortedDict((ident, submission.get(ident, ''))
                                  for ident in order)
+
+        def to_csv(self, output):
+            """
+            Write out our submissions as csv to output, a file-like object.
+            """
+
+            values = self.as_dictionaries()
+            headers = self.get_formfield_labels()
+
+            writer = csv.DictWriter(output, list(headers))
+
+            def encode(d):
+                return dict(
+                    (k, force_bytes(v)) for k, v in d.items()
+                )
+
+            writer.writerow(encode(headers))
+
+            for row in values:
+                writer.writerow(encode(row))
 
         def submit(self, form, data):
             submission = self.create(

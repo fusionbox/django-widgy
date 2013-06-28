@@ -36,9 +36,11 @@ except ImportError:
 
 try:
     from django.utils.encoding import force_text
+    from django.utils.encoding import force_bytes
 except ImportError:
     # Django 1.4
-    from django.utils.encoding import force_unicode
+    from django.utils.encoding import force_unicode, smart_str
+    force_bytes = smart_str
     force_text = force_unicode
 
 

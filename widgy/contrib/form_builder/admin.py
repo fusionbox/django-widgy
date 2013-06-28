@@ -54,17 +54,11 @@ class FormAdmin(admin.ModelAdmin):
 
     def download_view(self, request, object_id, *args, **kwargs):
         obj = self.get_object(request, unquote(object_id))
-        resp = HttpResponse(content_type='text/csv')
+        resp = HttpResponse(content_type='text/csv; charset=utf-8')
         resp['Content-Disposition'] = 'attachment; filename="%s"' % self.csv_file_name(obj)
 
-        values = obj.submissions.as_dictionaries()
-        headers = obj.submissions.get_formfield_labels()
+        obj.submissions.to_csv(resp)
 
-        writer = csv.DictWriter(resp, list(headers))
-        writer.writerow(headers)
-
-        for row in values:
-            writer.writerow(row)
         return resp
 
     def submission_count(self, obj):

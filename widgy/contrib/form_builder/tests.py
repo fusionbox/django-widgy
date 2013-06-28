@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import contextlib
+from StringIO import StringIO
 
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -69,7 +70,7 @@ class GetFormTest(TestCase):
 
 @contextlib.contextmanager
 def mock_now():
-    now = timezone.now()
+    now = timezone.now().replace(microsecond=0) # mysql only has second precision
     with mock.patch('django.utils.timezone.now') as tz_now:
         tz_now.return_value = now
         yield now
@@ -256,6 +257,22 @@ class TestForm(TestCase):
         serialize.assert_called_with('3')
 
         self.assertEqual(submission.as_dict()[self.fields[2].ident], serialize.return_value)
+
+    def test_csv_unicode(self):
+        f = self.fields[0]
+        f.label = '\N{INTERROBANG}'
+        f.save()
+
+        with mock_now() as now:
+            self.submit('\N{SNOWMAN}', '2', '3')
+
+        csv_output = StringIO()
+        self.form.submissions.to_csv(csv_output)
+
+        self.assertEqual(csv_output.getvalue(), (
+            "Created at,\N{INTERROBANG},field 2,field 3\r\n"
+            "%s,\N{SNOWMAN},2,3\r\n" % (now,)).encode('utf-8')
+        )
 
 
 class TestFormHandler(TestCase):
