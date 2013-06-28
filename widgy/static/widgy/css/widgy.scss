@@ -384,17 +384,8 @@ li.node_drop_target {
 
         button.edit,
         button.delete {
-          float: none;
-          margin-left: 0;
-          position: absolute;
-          top: 3px;
-          right: 3px;
-          z-index: 10;
-        }
-
-        // If you nest this in the previous statement the selector becomes .edit.edit, which is too specific.
-        button.edit {
-          right: 74px;
+          float: right;
+          margin: 1px 1px 0px 3px;
         }
 
         .dragHandle {
@@ -855,13 +846,15 @@ li.node_drop_target {
         li.shelfItem {
           display: inline-block;
           padding: 1px 1px 1px 1px;
-          width: auto !important;
+          width: 210px !important;
 
           span.title {
             background-position: 5px 3px;
             font-size: 11px;
-            padding: 2px 0px 2px 26px;
+            max-width: 160px;
+            padding: 4px 0px 2px 26px;
             text-transform: capitalize;
+            width: 160px;
           }
 
           span.icon-move {
