@@ -419,10 +419,11 @@ class PermissionsTest(SwitchUserTestCase, RootNodeTestCase, HttpTestCase):
         self.as_different_types_of_user(('change', PickyBucket), fail, win)
 
     def test_delete_node(self):
-        left = self.root_node.content.add_child(self.widgy_site, Bucket)
+        # we need to mutate this to reset
+        _left = [self.root_node.content.add_child(self.widgy_site, Bucket)]
 
         def doit():
-            url = left.node.get_api_url(self.widgy_site)
+            url = _left[0].node.get_api_url(self.widgy_site)
             return self.delete(url)
 
         def fail():
@@ -437,8 +438,7 @@ class PermissionsTest(SwitchUserTestCase, RootNodeTestCase, HttpTestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(Bucket.objects.count(), before - 1)
             # reset
-            global left
-            left = self.root_node.content.add_child(self.widgy_site, Bucket)
+            _left[0] = self.root_node.content.add_child(self.widgy_site, Bucket)
 
         self.as_different_types_of_user(('delete', Bucket), fail, win)
 
