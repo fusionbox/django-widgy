@@ -1,0 +1,71 @@
+@import 'widgy_common';
+
+$label_width: 150px;
+
+// Clean up grappelli-safe leftovers
+.popup {
+  .breadcrumbs,
+  #footer {
+    display: none;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #container {
+    min-width: 660px;
+  }
+
+  #content {
+    margin: 0 15px !important;
+  }
+}
+
+.popUp {
+  .loading {
+    @extend %loading;
+  }
+
+  .denied {
+    color: $red;
+  }
+
+  .formField {
+    @include clearfix;
+
+    margin-bottom: 1em;
+
+    & > label {
+      display: block;
+      float: left;
+      width: $label_width;
+    }
+
+    textarea {
+      width: 500px;
+      height: 100px;
+    }
+
+    &.publish_at {
+      li {
+        display: inline-block;
+      }
+
+      ul {
+        display: inline-block;
+        margin-bottom: 1em;
+      }
+
+      .publish_at_container {
+        @include clearfix;
+
+        margin-left: $label_width;
+      }
+    }
+  }
+
+  .submitRow {
+    input[type=submit] {
+      float: right;
+    }
+  }
+}
