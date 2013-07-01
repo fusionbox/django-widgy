@@ -70,6 +70,10 @@ class WidgyField(models.ForeignKey):
         super(WidgyField, self).contribute_to_class(cls, name)
         setattr(cls, self.name, WidgyFieldObjectDescriptor(self))
 
+    def add_root(self, model_instance, root_content_kwargs={}):
+        value = getattr(model_instance, self.name)
+        return value._ct.model_class().add_root(self.site, **root_content_kwargs).node
+
     def pre_save(self, model_instance, add):
         """
         Relies on WidgyFieldObjectDescriptor to set the content type on an
@@ -79,13 +83,9 @@ class WidgyField(models.ForeignKey):
         value = getattr(model_instance, self.name)
 
         if hasattr(value, '_ct'):
-            ct = value._ct
-
-            node = ct.model_class().add_root(self.site).node
+            node = self.add_root(model_instance)
             setattr(model_instance, self.name, node)
             setattr(model_instance, self.attname, node.pk)
-
-            return node.pk
 
         return super(WidgyField, self).pre_save(model_instance, add)
 
@@ -158,27 +158,13 @@ class VersionedWidgyField(WidgyField):
             to = get_site(site).get_version_tracker_model()
         super(VersionedWidgyField, self).__init__(site, to, root_choices, **kwargs)
 
-    def pre_save(self, model_instance, add):
-        """
-        Relies on WidgyFieldObjectDescriptor to set the content type on an
-        unsaved throwaway Node so that we know how to properly instantiate a
-        real node later on.
-        """
+    def add_root(self, model_instance, root_content_kwargs={}):
         VersionTracker = self.site.get_version_tracker_model()
-        value = getattr(model_instance, self.name)
-
-        if hasattr(value, '_ct'):
-            ct = value._ct
-            node = ct.model_class().add_root(self.site).node
-            version_tracker = VersionTracker.objects.create(
-                working_copy=node
-            )
-            setattr(model_instance, self.name, version_tracker)
-            setattr(model_instance, self.attname, version_tracker.pk)
-
-            return version_tracker.pk
-
-        return super(VersionedWidgyField, self).pre_save(model_instance, add)
+        node = super(VersionedWidgyField, self).add_root(model_instance, root_content_kwargs)
+        version_tracker = VersionTracker.objects.create(
+            working_copy=node
+        )
+        return version_tracker
 
     def formfield(self, **kwargs):
         from widgy.forms import VersionedWidgyFormField

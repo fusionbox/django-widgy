@@ -53,6 +53,15 @@ class TestWidgyField(TestCase):
         self.assertEqual(len(layout_contenttypes), 1)
         self.assertIn(the_layout_contenttype, layout_contenttypes)
 
+    def test_add_root(self):
+        instance = HasAWidgy()
+        instance.widgy = ContentType.objects.get_for_model(Layout)
+        root_node = HasAWidgy._meta.get_field('widgy').add_root(instance, {
+            'pk': 1337,
+        })
+
+        self.assertEqual(root_node.content.pk, 1337)
+
 class TestPlainForm(TestCase):
     def setUp(self):
         # WidgyForms cannot be at the root level of a test because they make
