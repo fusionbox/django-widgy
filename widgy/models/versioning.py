@@ -3,6 +3,7 @@ from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.db.models.deletion import ProtectedError
 from django.conf import settings
+from django.template.defaultfilters import date as date_format
 
 from fusionbox.db.models import QuerySetManager
 
@@ -32,7 +33,8 @@ class VersionCommit(models.Model):
             subject = " - '%s'" % self.message.strip().split('\n')[0]
         else:
             subject = ''
-        return '%s %s%s' % (self.id, self.created_at, subject)
+        date = date_format(self.created_at, 'DATETIME_FORMAT')
+        return '#%s %s%s' % (self.id, date, subject)
 
 
 class VersionTracker(models.Model):
