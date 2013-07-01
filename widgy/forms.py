@@ -5,6 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 
 from widgy.utils import format_html
 from widgy.models import Node
@@ -169,9 +170,9 @@ class WidgyFormMixin(object):
 
         for name, field in self.fields.iteritems():
             if isinstance(field, WidgyFormField):
-                if hasattr(self, 'instance'):
+                try:
                     value = getattr(self.instance, name)
-                else:
+                except (AttributeError, ObjectDoesNotExist):
                     value = None
                 field.conform_to_value(value)
 

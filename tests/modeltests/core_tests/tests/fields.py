@@ -12,7 +12,7 @@ from widgy.models import Node, VersionTracker
 
 from modeltests.core_tests.widgy_config import widgy_site
 from modeltests.core_tests.models import (
-    HasAWidgy, Layout, HasAWidgyOnlyAnotherLayout, AnotherLayout,
+    HasAWidgy, HasAWidgyNonNull, Layout, HasAWidgyOnlyAnotherLayout, AnotherLayout,
     VersionedPage, RawTextWidget)
 
 
@@ -194,6 +194,16 @@ class TestModelForm(TestCase):
         self.assertTrue(x.is_valid())
         instance = x.save()
         self.assertIsInstance(instance.widgy.content, AnotherLayout)
+
+    def test_formfield_non_null(self):
+        class TheForm(WidgyFormMixin, forms.ModelForm):
+            class Meta:
+                model = HasAWidgyNonNull
+
+        x = TheForm({})
+        self.assertTrue(x.is_valid())
+        obj = x.save()
+        self.assertTrue(obj.widgy)
 
 
 class TestVersionedModelForm(TestCase):

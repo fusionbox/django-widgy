@@ -111,13 +111,23 @@ registry.register(VowelBucket)
 
 class HasAWidgy(models.Model):
     widgy = WidgyField(
+        null=True,
+        blank=True,
         root_choices=[Layout],
+        site='modeltests.core_tests.widgy_config.widgy_site',
+    )
+
+class HasAWidgyNonNull(models.Model):
+    widgy = WidgyField(
+        root_choices=[AnotherLayout],
         site='modeltests.core_tests.widgy_config.widgy_site',
     )
 
 
 class HasAWidgyOnlyAnotherLayout(models.Model):
     widgy = WidgyField(
+        null=True,
+        blank=True,
         root_choices=[AnotherLayout],
         site='modeltests.core_tests.widgy_config.widgy_site'
     )
@@ -131,11 +141,13 @@ class VersionedPage(models.Model):
     version_tracker = VersionedWidgyField(
         site='modeltests.core_tests.widgy_config.widgy_site',
         root_choices=[Layout, AnotherLayout],
+        blank=True,
+        null=True,
     )
 
 
 class VersionedPage2(models.Model):
-    bar = VersionedWidgyField(site='modeltests.core_tests.widgy_config.widgy_site', related_name='asdf')
+    bar = VersionedWidgyField(site='modeltests.core_tests.widgy_config.widgy_site', related_name='asdf', null=True)
 
 
 class VersionedPage3(models.Model):

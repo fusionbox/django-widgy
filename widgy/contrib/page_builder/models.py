@@ -151,6 +151,8 @@ class Callout(models.Model):
     name = models.CharField(max_length=255, verbose_name=_('name'))
     root_node = WidgyField(
         site=settings.WIDGY_MEZZANINE_SITE,
+        null=True,
+        on_delete=models.SET_NULL,
         verbose_name=_('Widgy Content'),
         root_choices=(
             'CalloutBucket',
