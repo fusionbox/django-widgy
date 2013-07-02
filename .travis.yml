@@ -4,13 +4,13 @@ python:
   - "2.6"
 env:
   - DATABASE_ENGINE=sqlite DJANGO_PACKAGE=Django==1.5.1
-  - DATABASE_ENGINE=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip
+  - DATABASE_ENGINE=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
   - DATABASE_ENGINE=sqlite DJANGO_PACKAGE=Django==1.4.5
   - DATABASE_ENGINE=postgres DJANGO_PACKAGE=Django==1.5.1
-  - DATABASE_ENGINE=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip
+  - DATABASE_ENGINE=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
   - DATABASE_ENGINE=postgres DJANGO_PACKAGE=Django==1.4.5
   - DATABASE_ENGINE=mysql DJANGO_PACKAGE=Django==1.5.1
-  - DATABASE_ENGINE=mysql DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip
+  - DATABASE_ENGINE=mysql DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
   - DATABASE_ENGINE=mysql DJANGO_PACKAGE=Django==1.4.5
 install:
   - pip install -q $DJANGO_PACKAGE --use-mirrors
