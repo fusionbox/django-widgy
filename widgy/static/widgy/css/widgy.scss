@@ -224,6 +224,11 @@ li.node_drop_target {
       cursor: pointer;
     }
 
+    &.deleting * {
+      // fixme!
+      background-color: red;
+    }
+
     // specific node styles
     &.invisible {
       background-color: inherit;

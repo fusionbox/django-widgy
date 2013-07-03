@@ -453,6 +453,7 @@ class Content(models.Model):
             'shelf': self.shelf,
             'attributes': self.get_attributes(),
             'form_prefix': self.get_form_prefix(),
+            'display_name': self.display_name,
         }
         if self.editable:
             data['edit_url'] = site.reverse(site.node_edit_view, kwargs=node_pk_kwargs)
@@ -478,7 +479,7 @@ class Content(models.Model):
 
     @property
     def display_name(self):
-        return capfirst(self._meta.verbose_name)
+        return unicode(self._meta.verbose_name)
 
     @property
     def class_name(self):
