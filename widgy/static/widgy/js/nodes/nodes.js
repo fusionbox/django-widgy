@@ -183,7 +183,14 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
     'delete': function(event) {
       // TODO: A better UI experience would be undo, but this is a stop gap.
-      modal.confirm('Are you sure?', this.deleteSelf);
+      this.$el.addClass('deleting');
+      modal.confirm(
+        'Are you sure you want to delete this ' + this.content.get('display_name') + '?',
+        this.deleteSelf,
+        _.bind(function() {
+          this.$el.removeClass('deleting');
+        }, this)
+      );
       return false;
     },
 

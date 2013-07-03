@@ -68,10 +68,13 @@ define([ 'widgy.backbone',
     }
   }
 
-  function confirm(message, success) {
+  function confirm(message, success, failure) {
     if ( window.confirm(message) ) {
       success();
+    } else if ( failure ) {
+      failure();
     }
+
   }
 
   return {

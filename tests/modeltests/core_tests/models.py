@@ -33,6 +33,10 @@ class Bucket(Content):
     def render(self, context, template=None):
         return ''.join(i.render(context) for i in self.get_children())
 
+    class Meta:
+        # test that stuff works with lazily translated strings
+        verbose_name = _("bucket")
+
 
 class RawTextWidget(Content):
     text = models.TextField()
