@@ -16,7 +16,7 @@ install_requires = [
     'mezzanine >= 1.3.0',
     'django-fusionbox',
     'django-treebeard',
-    'django-filer==0.9.5a1.dev1',
+    'django-filer==0.9.5',
     # We don't actually require polymorphic -- filer does. we do need to
     # increase the minimum version though, to one that supports django
     # 1.6.
@@ -55,7 +55,6 @@ setup(
     dependency_links=[
         'http://github.com/fusionbox/django-fusionbox/tarball/master#egg=django-fusionbox-0.0.2',
         'http://github.com/fusionbox/pyScss/tarball/master#egg=pyscss-1.1.5',
-        'http://github.com/fusionbox/django-filer/tarball/feature/django-1.5-compat-migrations#egg=django-filer-0.9.5a1.dev1',
         'http://github.com/chrisglass/django_polymorphic/tarball/master#egg=django_polymorphic-0.5.1',
     ],
     zip_safe=False,
