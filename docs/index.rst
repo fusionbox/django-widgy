@@ -10,10 +10,6 @@ Welcome to django-widgy's documentation!
    :maxdepth: 2
 
    intro
-   todo
-   widgy/index
-   cms/index
-   plugins/index
 
 
 Indices and tables
