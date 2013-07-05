@@ -72,9 +72,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       this
         .listenTo(this.node, 'remove', this.close);
 
-      this
-        .listenTo(this.content, 'change:preview_template', this.rerender);
-
       this.list = new Backbone.ViewList();
     },
 
