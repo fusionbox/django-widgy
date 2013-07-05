@@ -47,7 +47,7 @@ class WidgySite(object):
             url('^commit/(?P<pk>[^/]+)/$', self.commit_view),
             url('^history/(?P<pk>[^/]+)/$', self.history_view),
             url('^reset/(?P<pk>[^/]+)/$', self.reset_view),
-            url('^diff/(?P<before_pk>[^/]+)/(?P<after_pk>[^/]+)/$', self.diff_view),
+            url('^diff/$', self.diff_view),
         )
         return urlpatterns
 

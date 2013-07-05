@@ -1,5 +1,13 @@
-{% load compress %}
-<iframe src="{{ commit_url }}"></iframe>
+{% load compress widgy_tags %}
+{% for owner in owners %}
+  {% get_action_links owner node as links %}
+  {% for link in links %}
+    {% if link.type == 'preview' %}
+      {{ link.text }}
+      <iframe src="{{ link.url }}"></iframe>
+    {% endif %}
+  {% endfor %}
+{% endfor %}
 {% compress css %}
 <link type="text/x-scss" rel="stylesheet" href="{% static 'widgy/css/unapproved_commits.scss' %}">
 {% endcompress %}

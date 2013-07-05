@@ -7,6 +7,9 @@ from django import forms
 from django.conf import settings
 
 from widgy.site import WidgySite
+from widgy.utils import get_user_model
+
+User = get_user_model()
 widgy_site = WidgySite()
 
 FORM_BUILDER_INSTALLED = 'widgy.contrib.form_builder' in settings.INSTALLED_APPS
@@ -50,6 +53,7 @@ class TestFormHandler(TestCase):
                                                )
 
         req = self.factory.post('/?from=/foo/')
+        req.user = User(is_superuser=True)
 
         with mock.patch.object(Form, 'execute') as form_execute:
             with mock.patch('widgy.contrib.widgy_mezzanine.views.page_view') as page_view:

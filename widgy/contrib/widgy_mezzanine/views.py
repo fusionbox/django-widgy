@@ -1,10 +1,11 @@
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.db.models import Q
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
 from django.conf import settings
 
 from mezzanine.pages.views import page as page_view
+from mezzanine.pages.models import Page
 
 from widgy.contrib.form_builder.views import HandleFormMixin
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
@@ -30,18 +31,27 @@ def get_page_from_node(node):
         )
 
 
-class HandleFormView(HandleFormMixin, View):
+class PageViewMixin(object):
+    def get_page(self):
+        try:
+            return Page.objects.published(for_user=self.request.user).get(slug=self.kwargs['slug'])
+        except (KeyError, Page.DoesNotExist):
+            # restoring, use a fake page
+            return WidgyPage(
+                titles='restoring page',
+                content_model='widgypage',
+            )
+
+
+class HandleFormView(HandleFormMixin, PageViewMixin, View):
     def get(self, request, *args, **kwargs):
         # This will raise a KeyError when `from` is for some reason
         # missing. What should it actually do?
         return redirect(request.GET['from'])
 
     def form_invalid(self, form):
-        try:
-            root_node = get_object_or_404(Node, pk=self.kwargs['root_node_pk'])
-        except KeyError:
-            root_node = self.form_node.get_root()
-        page = get_page_from_node(root_node)
+        root_node = self.form_node.get_root()
+        page = self.get_page()
 
         return page_view(self.request, page.slug, extra_context=self.get_context_data(
             form=form,
@@ -52,14 +62,13 @@ class HandleFormView(HandleFormMixin, View):
 handle_form = HandleFormView.as_view()
 
 
-class PreviewView(AuthorizedMixin, SingleObjectMixin, View):
+class PreviewView(AuthorizedMixin, SingleObjectMixin, PageViewMixin, View):
     model = Node
     pk_url_kwarg = 'node_pk'
 
-    def get(self, request, node_pk, node=None):
-        node = node or self.get_object()
-
-        page = get_page_from_node(node)
+    def get(self, request, *args, **kwargs):
+        node = self.get_object()
+        page = self.get_page()
 
         context = {
             'page': page,

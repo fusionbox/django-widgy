@@ -221,6 +221,7 @@ section.main {
       @include gradient(#eeeeee,#fafafa);
       @include rounded(5px);
       @include shadow($black30,0px,2px,0px);
+      @include clearfix;
       margin: 0px 0px 15px 0px;
       padding: 0px;
       

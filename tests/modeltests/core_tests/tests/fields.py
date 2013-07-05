@@ -4,6 +4,7 @@ from django.test import TestCase
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.template import Context
+from django.utils import unittest
 
 import mock
 
@@ -62,6 +63,8 @@ class TestWidgyField(TestCase):
 
         self.assertEqual(root_node.content.pk, 1337)
 
+
+@unittest.skip("We want WidgyFields to work with non-modelforms, but we haven't designed an API yet.")
 class TestPlainForm(TestCase):
     def setUp(self):
         # WidgyForms cannot be at the root level of a test because they make
@@ -109,6 +112,7 @@ class TestPlainForm(TestCase):
         # todo...I don't even know what the api for a non-modelform widgy field is
         root_node = Layout.add_root(widgy_site)
         x = self.form(initial={'widgy_field': root_node})
+
 
 class TestModelForm(TestCase):
     def setUp(self):

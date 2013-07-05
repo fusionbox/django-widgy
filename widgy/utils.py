@@ -2,9 +2,10 @@
 Some utility functions used throughout the project.
 """
 from itertools import ifilterfalse
+from contextlib import contextmanager
 
 import bs4
-from contextlib import contextmanager
+
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 from django.template import Context
@@ -46,10 +47,8 @@ except ImportError:
 
 def extract_id(url):
     """
-    :Returns: the -2 index of a URL path.
-
     >>> extract_id('/bacon/eggs/')
-    'bacon'
+    'eggs'
     """
     return url and url.split('/')[-2]
 

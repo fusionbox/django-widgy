@@ -49,10 +49,15 @@
             {% elif can_revert %}
               {% trans "Can't revert; this is the same as the current version." %}
             {% endif %}
-            {% if commit.diff_url %}
-              <a class="button" href="{{ commit.diff_url }}">{% trans "Diff" %}</a>
-            {% endif %}
-            <a class="button" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=commit.root_node.pk %}">{% trans "View" %}</a>
+            {% for diff_url in commit.diff_urls %}
+              <a class="button diff" href="{{ diff_url }}">{% trans "Diff" %}</a>
+            {% endfor %}
+            {% for owner in object.owners %}
+              {% get_action_links owner commit.root_node as links %}
+              {% for link in links %}
+                <a class="button {{ link.type }}" target="_blank" href="{{ link.url }}">{{ link.text }}</a>
+              {% endfor %}
+            {% endfor %}
             {% endblock %}
           </div>
       </div>

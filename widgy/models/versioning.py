@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.db.models.deletion import ProtectedError
 from django.conf import settings
 from django.template.defaultfilters import date as date_format
@@ -163,3 +164,18 @@ class VersionTracker(models.Model):
         for root_node in trees_to_delete:
             Node.get_tree(root_node).update(is_frozen=False)
             root_node.content.delete()
+
+    @classmethod
+    def get_owner_related_names(cls):
+        """
+        Names of reverse relationships of WidgyFields that point to us.
+        """
+        for rel_obj in cls._meta.get_all_related_objects():
+            if isinstance(rel_obj.field, WidgyField):
+                yield rel_obj.get_accessor_name()
+
+    @cached_property
+    def owners(self):
+        return list(owner
+                    for attr in self.get_owner_related_names()
+                    for owner in getattr(self, attr).all())
