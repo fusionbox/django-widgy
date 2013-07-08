@@ -2,9 +2,23 @@
 {% load url from future %}
 <form method="post" class="commit_form" action="{{ action_url }}">
   {% csrf_token %}
-  {% for field in form %}
-    {% include "widgy/field_as_div.html" %}
-  {% endfor %}
+  {{ form.media }}
+
+  {% include "widgy/field_as_div.html" with field=form.message %}
+
+  <div class="publish_at formField">
+    {{ form.publish_at.label_tag }}
+    {{ form.publish_radio }}
+
+    <div class="publish_at_container">
+      {{ form.publish_at }}
+      {{ form.publish_at.errors }}
+    </div>
+
+    {% if form.publish_at.help_text %}
+      <p class="help_text">{{ form.publish_at.help_text }}</p>
+    {% endif %}
+  </div>
 
   <p class="submitRow">
     {% block submit_row %}

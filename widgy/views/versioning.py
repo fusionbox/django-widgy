@@ -14,6 +14,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
+from django.contrib.admin.widgets import AdminSplitDateTime
 
 from BeautifulSoup import BeautifulSoup
 
@@ -34,14 +35,44 @@ def diff_url(site, before, after):
 
 
 class CommitForm(forms.Form):
+    PUBLISH_RADIO_CHOICES = (
+        ('now', _('Immediately')),
+        ('later', _('Later')),
+    )
+
     message = forms.CharField(widget=forms.Textarea,
                               label=_('Notes (optional)'),
                               required=False)
-    publish_at = forms.DateTimeField(required=True,
-                                     initial=timezone.now)
+    publish_radio = forms.ChoiceField(label=_('Publish at'),
+                                      widget=forms.RadioSelect,
+                                      choices=PUBLISH_RADIO_CHOICES,
+                                      initial=PUBLISH_RADIO_CHOICES[0][0],
+                                      )
+    publish_at = forms.DateTimeField(widget=AdminSplitDateTime,
+                                     initial=timezone.now,
+                                     required=False)
+
+    def get_publish_at(self):
+        if self.cleaned_data['publish_radio'] == 'now':
+            publish_at = timezone.now()
+        else:
+            publish_at = self.cleaned_data['publish_at']
+        return publish_at
 
     def commit(self, obj, user):
-        obj.commit(user, **self.cleaned_data)
+        return obj.commit(user,
+                          message=self.cleaned_data['message'],
+                          publish_at=self.get_publish_at())
+
+
+class RevertForm(CommitForm):
+    def commit(self, obj, user):
+        return obj.tracker.revert_to(
+            commit=obj,
+            user=user,
+            message=self.cleaned_data['message'],
+            publish_at=self.get_publish_at(),
+        )
 
 
 class VersionTrackerMixin(SingleObjectMixin):
@@ -52,7 +83,14 @@ class VersionTrackerMixin(SingleObjectMixin):
             'working_copy')
 
 
-class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
+class PopupView(object):
+    def get_context_data(self, **kwargs):
+        kwargs['is_popup'] = True
+        kwargs['request'] = self.request
+        return super(PopupView, self).get_context_data(**kwargs)
+
+
+class CommitView(PopupView, AuthorizedMixin, VersionTrackerMixin, FormView):
     template_name = 'widgy/commit.html'
     form_class = CommitForm
     permission_error_message = _("You don't have permission to commit.")
@@ -60,6 +98,7 @@ class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
     def get_context_data(self, **kwargs):
         self.object = self.get_object()
         kwargs = super(CommitView, self).get_context_data(**kwargs)
+        kwargs['title'] = _('Commit Changes')
         kwargs['object'] = self.object
         kwargs['site'] = self.site
         kwargs['commit_url'] = self.site.reverse(self.site.commit_view,
@@ -87,6 +126,7 @@ class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
             raise PermissionDenied(self.permission_error_message)
 
         form.commit(obj, self.request.user)
+        # because this is a popup, we shouldn't redirect.
         return self.response_class(
             request=self.request,
             template='widgy/commit_success.html',
@@ -94,13 +134,14 @@ class CommitView(AuthorizedMixin, VersionTrackerMixin, FormView):
         )
 
 
-class ResetView(AuthorizedMixin, VersionTrackerMixin, TemplateView):
+class ResetView(PopupView, AuthorizedMixin, VersionTrackerMixin, TemplateView):
     template_name = 'widgy/reset.html'
     permission_error_message = _("You don't have permission to reset.")
 
     def get_context_data(self, **kwargs):
         self.object = self.get_object()
         kwargs = super(ResetView, self).get_context_data(**kwargs)
+        kwargs['title'] = _('Reset')
         kwargs['object'] = self.object
         kwargs['changed_anything'] = self.object.has_changes()
         kwargs['has_commits'] = bool(self.object.head)
@@ -146,13 +187,14 @@ class HistoryView(AuthorizedMixin, VersionTrackerMixin, DetailView):
         return kwargs
 
 
-class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
+class RevertView(PopupView, AuthorizedMixin, VersionTrackerMixin, FormView):
     template_name = 'widgy/revert.html'
     pk_url_kwarg = 'commit_pk'
-    form_class = CommitForm
+    form_class = RevertForm
     permission_error_message = _("You don't have permission to revert.")
 
     def get_context_data(self, **kwargs):
+        kwargs['title'] = _('Revert Commit')
         kwargs['object'] = self.object
         kwargs = super(RevertView, self).get_context_data(**kwargs)
         kwargs['revert_url'] = self.site.reverse(
@@ -190,7 +232,7 @@ class RevertView(AuthorizedMixin, VersionTrackerMixin, FormView):
         if not self.has_permission(commit):
             raise PermissionDenied(self.permission_error_message)
 
-        commit.tracker.revert_to(commit, user=self.request.user, **form.cleaned_data)
+        form.commit(commit, user=self.request.user)
 
         return self.response_class(
             request=self.request,

@@ -53,10 +53,9 @@ class ApproveForm(forms.ModelForm):
 
 class ReviewedCommitForm(CommitForm):
     def commit(self, obj, user):
-        cleaned_data = self.cleaned_data.copy()
         approve_it = 'approve_it' in self.data
 
-        commit = obj.commit(user, **cleaned_data)
+        commit = super(ReviewedCommitForm, self).commit(obj, user)
 
         if approve_it:
             commit.reviewedversioncommit.approve(user)

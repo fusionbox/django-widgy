@@ -790,14 +790,14 @@ class VersioningViewsTest(SwitchUserTestCase, RootNodeTestCase):
         })
 
         with self.as_staffuser() as user:
-            r = self.client.post(url, {'publish_at': timezone.now()})
+            r = self.client.post(url, {'publish_radio': 'now'})
             self.assertEqual(r.status_code, 403)
             self.assertEquals(len(refetch(tracker).get_history_list()), 1)
             self.assertEqual(refetch(tracker).head, first_commit)
 
         with self.as_staffuser() as user:
             with self.with_permission(user, 'add', VersionCommit):
-                r = self.client.post(url, {'publish_at': timezone.now()})
+                r = self.client.post(url, {'publish_radio': 'now'})
                 self.assertEqual(r.status_code, 200)
                 self.assertEquals(len(refetch(tracker).get_history_list()), 2)
 
@@ -834,14 +834,14 @@ class VersioningViewsTest(SwitchUserTestCase, RootNodeTestCase):
         })
 
         with self.as_staffuser() as user:
-            r = self.client.post(url, {'publish_at': timezone.now()})
+            r = self.client.post(url, {'publish_radio': 'now'})
             self.assertEqual(r.status_code, 403)
             self.assertEquals(len(refetch(tracker).get_history_list()), 1)
             self.assertEqual(refetch(tracker).head, commit)
 
         with self.as_staffuser() as user:
             with self.with_permission(user, 'add', VersionCommit):
-                r = self.client.post(url, {'publish_at': timezone.now()})
+                r = self.client.post(url, {'publish_radio': 'now'})
                 self.assertEqual(r.status_code, 200)
                 self.assertEquals(len(refetch(tracker).get_history_list()), 2)
 
