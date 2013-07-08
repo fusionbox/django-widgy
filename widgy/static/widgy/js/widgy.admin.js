@@ -1,4 +1,4 @@
-$(function() {
+jQuery(function($) {
   $('a.widgy-fancybox').fancybox({
     width: 700,
     type: 'iframe',
