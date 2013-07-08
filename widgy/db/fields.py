@@ -49,16 +49,9 @@ class WidgyField(models.ForeignKey):
 
         self.root_choices = root_choices
 
-        defaults = {
-            'blank': True,
-            'null': True,
-            'on_delete': models.SET_NULL
-        }
-        defaults.update(kwargs)
-
         self.site = get_site(site)
 
-        super(WidgyField, self).__init__(to, **defaults)
+        super(WidgyField, self).__init__(to, **kwargs)
 
     def contribute_to_class(self, cls, name):
         """
@@ -80,7 +73,10 @@ class WidgyField(models.ForeignKey):
         unsaved throwaway Node so that we know how to properly instantiate a
         real node later on.
         """
-        value = getattr(model_instance, self.name)
+        try:
+            value = getattr(model_instance, self.name)
+        except models.ObjectDoesNotExist:
+            value = None
 
         if hasattr(value, '_ct'):
             node = self.add_root(model_instance)
@@ -150,6 +146,16 @@ class WidgyField(models.ForeignKey):
         }
         with update_context(context, env) as context:
             return root_node.render(context)
+
+    def validate(self, value, model_instance):
+        # `value` is our root node's pk. If we're currently creating
+        # the root node, it isn't saved so it can't have a pk. The base
+        # field's validate will fail, even though pre_save will actually
+        # create a node and set the fk field.
+        if value is None and not self.blank and getattr(model_instance, self.name):
+            return
+        else:
+            return super(WidgyField, self).validate(value, model_instance)
 
 
 class VersionedWidgyField(WidgyField):

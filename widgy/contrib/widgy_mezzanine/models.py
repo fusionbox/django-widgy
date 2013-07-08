@@ -1,3 +1,4 @@
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core import urlresolvers
@@ -57,11 +58,14 @@ if getattr(settings, 'WIDGY_MEZZANINE_PAGE_MODEL', None) is None:
     class WidgyPage(WidgyPageMixin, Page):
         root_node = VersionedWidgyField(
             site=settings.WIDGY_MEZZANINE_SITE,
-            to=getattr(settings, 'WIDGY_MEZZANINE_VERSIONTRACKER', None),
             verbose_name=_('widgy content'),
             root_choices=(
                 'page_builder.Layout',
-            ))
+            ),
+            # WidgyField used to have these as defaults.
+            null=True,
+            on_delete=models.SET_NULL,
+        )
 
         class Meta:
             verbose_name = _('widgy page')
