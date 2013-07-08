@@ -144,6 +144,14 @@ define([ 'underscore', 'widgy.backbone', 'lib/q'
           options.app.setCompatibility(resp.compatibility);
         }
 
+        // Don't pass url onto the success method.  The options are passed all
+        // the way down to the Model constructor which picks it off of options
+        // and sets it on the model, overriding the Node#url function.
+        //
+        // This only manifested itself when a widget that had default children
+        // was added and attempting to delete or move those direct children.
+        delete options.url;
+
         if ( old_success ) old_success(resp, status, xhr);
       };
 
