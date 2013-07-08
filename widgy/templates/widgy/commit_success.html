@@ -1,9 +1,8 @@
 {% extends "widgy/popup_base.html" %}
 {% load i18n %}
-{% block content %}
-  <h2>{% trans "Commit" %}</h2>
+{% block popup-content %}
   <p>{% trans "Change(s) successfully committed." %}</p>
   <script>
-    setTimeout(window.closeFancybox, 1000);
+    setTimeout(parent.closeFancybox, 1000);
   </script>
 {% endblock %}

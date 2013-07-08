@@ -1,18 +1,37 @@
+{% extends "admin/base.html" %}
+{% load url from future %}
 {% load compress static %}
+
+{% block extrastyle %}{{ block.super }}
+{% compress css %}
+<link rel="stylesheet" type="text/x-scss" href="{% static 'widgy/css/popup.scss' %}">
+{% endcompress %}
+{% endblock %}
+
+{% block extrahead %}{{ block.super }}
+{% url 'admin:jsi18n' as jsi18nurl %}
+<script type="text/javascript" src="{{ jsi18nurl|default:"../../../jsi18n/" }}"></script>
+{% compress js %}
+<script src="{% static 'admin/js/core.js' %}"></script>
+<script src="{% static 'admin/js/jquery.js' %}"></script>
+<script src="{% static 'admin/js/jquery.init.js' %}"></script>
+<script src="{% static 'widgy/js/lib/jquery.js' %}"></script>
+<script src="{% static 'widgy/js/popup.js' %}"></script>
+{% endcompress %}
+<script type="text/javascript">
+  window.__admin_media_prefix__ = "{% filter escapejs %}{% static "admin/" %}{% endfilter %}";
+</script>
+{% endblock %}
+
+{% block content %}
 <div class="popUp">
   {% if permission_error_message %}
     {% block perms_lacking %}
       <h2 class="denied">{{ permission_error_message }}</h2>
     {% endblock %}
   {% else %}
-    {% block content %}
+    {% block popup-content %}
     {% endblock %}
   {% endif %}
 </div>
-{% compress js %}
-<script src="{% static 'widgy/js/lib/jquery.form.js' %}"></script>
-<script src="{% static 'widgy/js/popup.js' %}"></script>
-{% endcompress %}
-{# this will insert a debug toolbar when viewing the popup as #}
-{# a standalone page. #}
-</body>
+{% endblock %}

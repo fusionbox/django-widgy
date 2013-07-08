@@ -102,14 +102,14 @@ class ReviewQueueViewsTest(SwitchUserTestCase, RootNodeTestCase):
 
         with self.as_staffuser() as user:
             with self.with_permission(user, 'add', ReviewedVersionCommit):
-                self.client.post(url, {'approve_it': 1, 'publish_at': timezone.now()})
+                self.client.post(url, {'approve_it': 1, 'publish_radio': 'now'})
                 self.assertNotEqual(refetch(tracker).head.reviewedversioncommit, first_commit)
                 self.assertFalse(refetch(tracker).head.reviewedversioncommit.is_approved)
 
         with self.as_staffuser() as user:
             with self.with_permission(user, 'change', ReviewedVersionCommit):
                 with self.with_permission(user, 'add', ReviewedVersionCommit):
-                    self.client.post(url, {'approve_it': 1, 'publish_at': timezone.now()})
+                    self.client.post(url, {'approve_it': 1, 'publish_radio': 'now'})
                     self.assertTrue(refetch(tracker).head.reviewedversioncommit.is_approved)
 
     def test_approve_view(self):

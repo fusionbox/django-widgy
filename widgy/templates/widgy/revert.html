@@ -2,8 +2,6 @@
 {% load url from future %}
 {% load i18n %}
 
-{% block content %}
-  <h2>{% trans "Revert Commit" %}</h2>
-
+{% block popup-content %}
   {% include "widgy/_commit_form.html" with commit=object.root_node action_url=revert_url %}
 {% endblock %}

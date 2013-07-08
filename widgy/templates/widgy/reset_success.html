@@ -1,10 +1,10 @@
 {% extends "widgy/popup_base.html" %}
 {% load i18n %}
 
-{% block content %}
-  <h2>{% trans 'Reset successful.' %}</h2>
+{% block popup-content %}
+  <p>{% trans 'Your changes were successfully erased.' %}</p>
   <script>
     // refresh page because the working copy was destroyed.
-    window.location = window.location;
+    parent.location = parent.location;
   </script>
 {% endblock %}
