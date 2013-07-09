@@ -358,12 +358,14 @@ li.node_drop_target {
     }
     
     div.widget {
+      @include rounded(4px);
       background: white;
       padding: 0px;
       
       p.drag-row {
         @include clearfix;
         @include gradient(#eee,#fff);
+        @include rounded(4px);
         display: block;
         float: none;
         height: auto;
