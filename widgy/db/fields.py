@@ -111,8 +111,8 @@ class WidgyField(models.ForeignKey):
             return getattr(get_app(app_label), model_name)
 
         layouts = tuple(map(normalize, layouts))
-        classes = (cls for cls in self.site.get_all_content_classes()
-                   if issubclass(cls, layouts))
+        classes = set(cls for cls in self.site.get_all_content_classes()
+                      if self.site.valid_root_of(self.model, cls, layouts))
 
         # This method must return a queryset, because it is used as
         # choices for a ModelChoiceField.
