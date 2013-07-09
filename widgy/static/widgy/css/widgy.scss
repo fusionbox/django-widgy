@@ -214,9 +214,17 @@ li.node_drop_target {
       cursor: pointer;
     }
 
-    &.deleting * {
-      // fixme!
-      background-color: red;
+    &.deleting {
+      @include shadow($black50,0px,5px,15px);
+      border-color: $red;
+      
+      div.widget {
+        p.drag-row {
+          span.title {
+            color: $red;
+          }
+        }
+      }
     }
 
     // specific node styles
