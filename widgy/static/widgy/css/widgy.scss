@@ -541,7 +541,7 @@ li.node_drop_target {
             border: 0px;
             margin: 0 1em;
             overflow: visible;
-            padding: 0px 0px 0px 40px;
+            padding: 0px 0px 0px 60px;
           
             > div.widget {
               > p.drag-row {
@@ -675,7 +675,7 @@ li.node_drop_target {
             border: 0px;
             margin: 0 1em;
             overflow: visible;
-            padding: 0px 0px 0px 40px;
+            padding: 0px 0px 0px 60px;
             
             div.widget {
               ul.nodeChildren {
@@ -707,6 +707,26 @@ li.node_drop_target {
                         position: absolute;
                         top: 3px;
                         left: -40px;
+                        width: 15px;
+                        z-index: 10;
+                  
+                        i {
+                          width: 1em;
+                        }
+                        
+                        span {
+                          display: none;
+                        }
+                      }
+                      
+                      button.edit {
+                        font-size: 9px;
+                        line-height: 9px;
+                        height: 15px;
+                        padding: 0px;
+                        position: absolute;
+                        top: 3px;
+                        left: -60px;
                         width: 15px;
                         z-index: 10;
                   
@@ -845,7 +865,7 @@ li.node_drop_target {
           width: auto !important;
 
           span.title {
-            background-position: 5px 5px;
+            background-position: 5px 3px;
             font-size: 11px;
             padding: 2px 0px 2px 26px;
             text-transform: capitalize;
