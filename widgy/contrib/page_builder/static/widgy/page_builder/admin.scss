@@ -16,4 +16,5 @@ li.shelfItem {
   @include node-icon("page_builder.tablerow", "../image/widget-tablerow.png");
   @include node-icon("page_builder.tabs", "../image/widget-tab.png");
   @include node-icon("page_builder.video", "../image/widget-video.gif");
+  @include node-icon("page_builder.unsafehtml", "../image/widget-skull-and-crossbones.png");
 }
