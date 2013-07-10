@@ -954,10 +954,17 @@ div.widgy {
           
           button, input[type='submit'] {
             @include button;
+            float: left;
+            margin-left: 10px;
             
             &.cancel {
+              line-height: 11px;
               margin-left: 130px;
             }
+          }
+          
+          p.help_text {
+            padding-left: 130px;
           }
         }
       }
