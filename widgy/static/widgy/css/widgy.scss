@@ -925,10 +925,40 @@ div.widgy {
           padding: 5px 0;
         }
         
+        p.drag-row {
+          button {
+            position: relative;
+            top: -5px;
+          }
+        }
+        
         > ul.nodeChildren {
           clear: left;
           float: left;
           width: 63% !important;
+        }
+        
+        > div.preview {
+          // top-level forms
+          width: 63%;
+          
+          > div {
+            margin: 0px 0px 10px 0px;
+          }
+          
+          .formField {
+            clear: both;
+            display: block;
+            margin: 0px 0px 10px 0px;
+          }
+          
+          button, input[type='submit'] {
+            @include button;
+            
+            &.cancel {
+              margin-left: 130px;
+            }
+          }
         }
       }
       
