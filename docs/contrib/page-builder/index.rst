@@ -29,7 +29,7 @@ Page builder is a collection of widgets for the purpose of creating HTML pages.
     capability to add images or tables, because there are already widgets that
     the developer can control.
 
-    .. warning::
+    .. note::
 
         There is a possible permission escalation vulnerability with allowing
         any admin user to add HTML. For this reason, the :class:`Html` widget
@@ -41,6 +41,13 @@ Page builder is a collection of widgets for the purpose of creating HTML pages.
     This is a widget which allows the user to output arbitrary HTML. It is
     unsafe because a non-superuser could gain publishing the unsafe HTML on the
     website with XSS code to cause permission escalation.
+
+    .. warning::
+
+        The ``page_builder.add_unsafehtml`` and ``page_builder.edit_unsafehtml``
+        permissions are equivalent to ``is_superuser`` status because of the
+        possibility of a staff user inserting JavaScript that a superuser will
+        execute.
 
 .. class:: CalloutWidget
 

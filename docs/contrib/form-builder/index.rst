@@ -53,10 +53,20 @@ Views
     even more robust example implementation.
 
 
+.. currentmodule:: widgy.contrib.form_builder.models
+
+Success Handlers
+----------------
+
+When a user submits a :class:`Form`, the :class:`Form` will loop through all of
+the success handler widgets to do the things that you would normally put in the
+``form_valid`` method of a :class:`~django:django.views.generic.FormView`, for
+example.  Form Builder provides a couple of built-in success handlers that do
+things like saving the data, sending emails, or submitting to Salesforce.
+
+
 Widgets
 -------
-
-.. currentmodule:: widgy.contrib.form_builder.models
 
 .. class:: Form
 

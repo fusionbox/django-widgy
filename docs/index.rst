@@ -13,16 +13,10 @@ many different uses.
 .. toctree::
    :maxdepth: 2
 
-   intro
-   quickstart
-   tutorial
-   customizing
-   versioning
+   design/index
    contrib/index
-   links
-   owners
-   models
-   site
+   api/index
+   tutorials/index
 
 
 Development

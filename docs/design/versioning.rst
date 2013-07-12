@@ -16,3 +16,8 @@ publish time for a commit that allows a user to future publish content.
 To enable versioning, all you need to do is use
 :class:`widgy.db.fields.VersionedWidgyfield` instead of
 :class:`widgy.db.fields.WidgyField`.
+
+
+.. todo::
+
+    diagram
