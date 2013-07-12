@@ -29,7 +29,9 @@ class PatchUrlconfMiddleware(object):
         return qs
 
     @classmethod
-    def get_urlconf(cls, root_urlconf, qs):
+    def get_urlconf(cls, root_urlconf, qs=None):
+        if qs is None:
+            qs = cls.get_pages(logged_in=False)
         urlconf_pages = sorted(qs, key=lambda p: len(p.slug))
 
         new_urlconf = imp.new_module('urlconf')
