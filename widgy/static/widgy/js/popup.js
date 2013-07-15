@@ -22,8 +22,14 @@ jQuery(function($) {
     var $form = $(this);
     var $submits = $form.find('[type=submit]');
     if ( $form.find('.loading').length == 0 ) {
+      // enter pressed
       $submits.first().addClass('loading');
     }
-    $submits.attr('disabled', true);
+    // We want to disable the submit buttons to prevent double-submission, but
+    // we need the data from the submit button to be submitted, which won't
+    // happen if it's disabled in this frame.
+    setTimeout(function() {
+      $submits.attr('disabled', true);
+    }, 0);
   });
 });
