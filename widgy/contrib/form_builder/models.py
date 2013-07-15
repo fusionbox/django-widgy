@@ -50,7 +50,7 @@ class FormElement(Content):
 
 
 class FormSuccessHandler(FormElement):
-    draggable = False
+    draggable = True
 
     class Meta:
         abstract = True
