@@ -4,7 +4,7 @@ from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _, ugettext, ungettext
+from django.utils.translation import ugettext_lazy as _, ungettext
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
@@ -14,6 +14,7 @@ from widgy.utils import format_html
 from widgy.admin import AuthorizedAdminMixin
 
 from .forms import ApproveForm
+from .models import ReviewedVersionTracker
 
 
 # BBB: Before django 1.5, only session storage supported safe string in
@@ -31,12 +32,30 @@ class VersionCommitChangeList(ChangeList):
     def get_ordering(self, request, queryset):
         return ['tracker__pk', ] + super(VersionCommitChangeList, self).get_ordering(request, queryset) or []
 
+    def get_results(self, request):
+        ret = super(VersionCommitChangeList, self).get_results(request)
+
+        # Manually prefetch owners. We can't do a normal
+        # ReviewedVersionCommit.objects.prefetch_related('tracker__widgypage_set')
+        # because ReviewedVersionCommit.tracker is a VersionTracker (which
+        # doesn't have the reverse relationship), not a ReviewedVersionTracker.
+        trackers = ReviewedVersionTracker.objects.prefetch_related(
+            *ReviewedVersionTracker.get_owner_related_names()
+        ).in_bulk(
+            set(commit.tracker_id for commit in self.result_list)
+        )
+        for commit in self.result_list:
+            commit.tracker = trackers[commit.tracker_id]
+
+        return ret
+
 
 class VersionCommitAdminBase(AuthorizedAdminMixin, ModelAdmin):
     list_display = ('commit_name', 'author', 'publish_at', 'commit_preview')
     readonly_fields = ('preview', )
     list_select_related = True
     form = ApproveForm
+    actions = ['approve_selected']
 
     def get_queryset(self, request):
         try:
@@ -44,8 +63,7 @@ class VersionCommitAdminBase(AuthorizedAdminMixin, ModelAdmin):
         except AttributeError:
             # BBB: In django 1.5 queryset changed to get_queryset
             qs = super(VersionCommitAdminBase, self).queryset(request)
-        return qs.unapproved()
-
+        return qs.unapproved().select_related('author', 'root_node')
     queryset = get_queryset
 
     def get_object(self, request, object_id):
@@ -64,8 +82,6 @@ class VersionCommitAdminBase(AuthorizedAdminMixin, ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
-
-    actions = ['approve_selected']
 
     def get_actions(self, request):
         actions = super(VersionCommitAdminBase, self).get_actions(request)
@@ -107,36 +123,33 @@ class VersionCommitAdminBase(AuthorizedAdminMixin, ModelAdmin):
         # request.user during the saving.
         return form.save(request, commit=False)
 
+    def commit_name(self, commit):
+        assert isinstance(commit.tracker, ReviewedVersionTracker), (
+            "We rely on the VersionCommitChangeList to set commit.tracker"
+            " to a ReviewedVersionTracker."
+        )
+        return ', '.join(unicode(owner) for owner in commit.tracker.owners)
+    commit_name.short_description = _("Commit name")
+
     def commit_preview(self, commit):
-        url = self.get_commit_preview_url(commit)
-        return format_html('<a href="{url}" class="button">{preview}</a>',
-                           url=url, preview=ugettext('preview'))
+        res = []
+        for owner in commit.tracker.owners:
+            if hasattr(owner, 'get_action_links'):
+                for link in owner.get_action_links(commit.root_node):
+                    res.append(format_html('<a href="{url}">{text}</a>', **link))
+        return ' '.join(res)
     commit_preview.short_description = ''
     commit_preview.allow_tags = True
 
     def preview(self, commit):
         context = {
-            'commit_url': self.get_commit_preview_url(commit)
+            'owners': ReviewedVersionTracker.objects.get(pk=commit.tracker_id).owners,
+            'node': commit.root_node,
         }
         return mark_safe(render_to_string('review_queue/commit_preview.html',
                                           context))
     preview.short_description = _('Preview')
 
-    def commit_name(self, commit):
-        return self.get_commit_name(commit)
-    commit_name.short_description = _("Commit name")
-
     # Override this method in subclasses
     def get_site(self):
-        raise NotImplementedError('get_site should be implemented in '
-                                  'in subclasses')
-
-    # Override this method in subclasses
-    def get_commit_name(self, commit):
-        raise NotImplementedError('get_commit_name should be implemented '
-                                  'in subclasses')
-
-    # Override this method in subclasses
-    def get_commit_preview_url(self, commit):
-        raise NotImplementedError('get_commit_preview_url should be '
-                                  'in subclasses')
+        raise NotImplementedError('get_site should be implemented in subclasses')

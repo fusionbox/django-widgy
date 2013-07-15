@@ -3,5 +3,5 @@
 {% load i18n %}
 
 {% block popup-content %}
-  {% include "widgy/_commit_form.html" with commit=object.root_node action_url=revert_url %}
+  {% include "widgy/_commit_form.html" with commit=tracker.root_node action_url=revert_url %}
 {% endblock %}

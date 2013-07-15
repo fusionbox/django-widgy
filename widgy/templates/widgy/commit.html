@@ -5,7 +5,7 @@
 {% block popup-content %}
   {% if changed_anything %}
     {% block commit_form %}
-      {% include "widgy/_commit_form.html" with commit=object.working_copy action_url=commit_url %}
+      {% include "widgy/_commit_form.html" with commit=tracker.working_copy action_url=commit_url %}
     {% endblock %}
   {% else %}
     <p>{% trans "Nothing has changed &mdash; no need to commit." %}</p>

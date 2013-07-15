@@ -18,7 +18,6 @@ from mezzanine.pages.models import Link
 
 from widgy.forms import WidgyFormMixin
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
-from widgy.contrib.widgy_mezzanine.views import get_page_from_node
 from widgy.utils import fancy_import, format_html
 from widgy.models import links
 
@@ -27,19 +26,18 @@ from widgy.contrib.review_queue.admin import VersionCommitAdminBase
 WidgyPage = get_widgypage_model()
 
 
-class GetSiteMixin(object):
-    def get_site(self):
-        return fancy_import(settings.WIDGY_MEZZANINE_SITE)
-
-
 class WidgyPageAdminForm(WidgyFormMixin, PageAdminForm):
     class Meta:
         model = WidgyPage
 
     def __init__(self, *args, **kwargs):
         super(WidgyPageAdminForm, self).__init__(*args, **kwargs)
-        self.fields['publish_date'].help_text = _("If you enter a date here, the page will not be viewable on the site until then")
-        self.fields['expiry_date'].help_text = _("If you enter a date here, the page will not be viewable after this time")
+        self.fields['publish_date'].help_text = _(
+            "If you enter a date here, the page will not be viewable on the site until then"
+        )
+        self.fields['expiry_date'].help_text = _(
+            "If you enter a date here, the page will not be viewable after this time"
+        )
         self.fields['status'].initial = CONTENT_STATUS_DRAFT
 
     def clean_status(self):
@@ -50,16 +48,9 @@ class WidgyPageAdminForm(WidgyFormMixin, PageAdminForm):
         return status
 
 
-class WidgyPageAdmin(PageAdmin, GetSiteMixin):
+class WidgyPageAdmin(PageAdmin):
     change_form_template = 'widgy/page_builder/widgypage_change_form.html'
     form = WidgyPageAdminForm
-
-    def render_change_form(self, request, context, *args, **kwargs):
-        if 'original' in context and context['original'].root_node:
-            # we are rendering a change form
-            obj = context['original']
-            site = self.get_site()
-        return super(WidgyPageAdmin, self).render_change_form(request, context, *args, **kwargs)
 
 
 class UndeleteField(forms.ModelChoiceField):
@@ -133,13 +124,9 @@ class UndeletePage(WidgyPage):
         return super(UndeletePage, self).__init__(*args, **kwargs)
 
 
-class VersionCommitAdmin(GetSiteMixin, VersionCommitAdminBase):
-    def get_commit_name(self, commit):
-        return get_page_from_node(commit.root_node).title
-
-    def get_commit_preview_url(self, commit):
-        return reverse('widgy.contrib.widgy_mezzanine.views.preview',
-                       kwargs={'node_pk': commit.root_node.pk})
+class VersionCommitAdmin(VersionCommitAdminBase):
+    def get_site(self):
+        return fancy_import(settings.WIDGY_MEZZANINE_SITE)
 
 
 # Remove built in Mezzanine models from the admin center

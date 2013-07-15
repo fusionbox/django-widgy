@@ -42,6 +42,7 @@ class WidgyWidget(forms.HiddenInput):
             'node': self.node,
             'api_url': reverse(self.site.node_view),
             'site': self.site,
+            'owner': self.owner,
         }
         defaults.update(context)
         return render_to_string(self.template_name, defaults)
@@ -89,12 +90,13 @@ class WidgyFormField(forms.ModelChoiceField):
         self.site = kwargs.pop('site')
         super(WidgyFormField, self).__init__(*args, **kwargs)
 
-    def conform_to_value(self, value):
+    def conform_to_value(self, owner, value):
         """
         When no root node has been set, we prompt the user to choose one from
         the list of choices.  Otherwise, we set the ``WidgyWidget`` class as
         the widget we use for this field instance.
         """
+        self.owner = owner
         if isinstance(value, Node):
             self.node = value
             try:
@@ -118,8 +120,10 @@ class WidgyFormField(forms.ModelChoiceField):
 
         try:
             self.widget.widget.site = self.site
+            self.widget.widget.owner = owner
         except AttributeError:
             self.widget.site = self.site
+            self.widget.owner = owner
 
     def clean(self, value):
         value = getattr(self, '_value', value)
@@ -152,9 +156,9 @@ class VersionedWidgyWidget(WidgyWidget):
 class VersionedWidgyFormField(WidgyFormField):
     widget = VersionedWidgyWidget
 
-    def conform_to_value(self, value):
+    def conform_to_value(self, owner, value):
         self.version_tracker = value
-        return super(VersionedWidgyFormField, self).conform_to_value(value and value.working_copy)
+        super(VersionedWidgyFormField, self).conform_to_value(owner, value and value.working_copy)
 
     def clean(self, value):
         return self.version_tracker or super(VersionedWidgyFormField, self).clean(value)
@@ -172,9 +176,9 @@ class WidgyFormMixin(object):
             if isinstance(field, WidgyFormField):
                 try:
                     value = getattr(self.instance, name)
-                except (AttributeError, ObjectDoesNotExist):
+                except ObjectDoesNotExist:
                     value = None
-                field.conform_to_value(value)
+                field.conform_to_value(self.instance, value)
 
 
 class WidgyForm(WidgyFormMixin, forms.ModelForm):

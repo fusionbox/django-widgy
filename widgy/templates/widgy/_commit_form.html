@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load widgy_tags %}
 {% load url from future %}
 <form method="post" class="commit_form" action="{{ action_url }}">
   {% csrf_token %}
@@ -23,11 +24,15 @@
   <p class="submitRow">
     {% block submit_row %}
       <input type="submit" value="{% trans 'Commit' %}">
-      {# TODO: this is dependent on widgy_mezzanine #}
-      <a class="button" target="_blank" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=commit.pk %}">{% trans "Preview" %}</a>
-      {% if diff_url %}
-        <a class="button" target="_blank" href="{{ diff_url }}">{% trans "Diff" %}</a>
-      {% endif %}
+      {% for owner in tracker.owners %}
+        {% get_action_links owner tracker.working_copy as links %}
+        {% for link in links %}
+          <a class="button {{ link.type }}" target="_blank" href="{{ link.url }}">{{ link.text }}</a>
+        {% endfor %}
+      {% endfor %}
+      {% for diff_url in diff_urls %}
+        <a class="button diff" target="_blank" href="{{ diff_url }}">{% trans "Diff" %}</a>
+      {% endfor %}
     {% endblock %}
   </p>
 </form>

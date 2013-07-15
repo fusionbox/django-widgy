@@ -1,7 +1,0 @@
-{% extends "widgy/preview.html" %}
-{% load i18n %}
-{% load url from future %}
-{% block title %}
-  {{ block.super }}
-  <a class="preview" target="_blank" href="{% url 'widgy.contrib.widgy_mezzanine.views.preview' node_pk=self.node.pk %}">{% trans "Preview" %}</a>
-{% endblock %}

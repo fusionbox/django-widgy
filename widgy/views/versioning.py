@@ -14,24 +14,16 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
+from django.core import urlresolvers
 from django.contrib.admin.widgets import AdminSplitDateTime
+from django.http import Http404
 
 from BeautifulSoup import BeautifulSoup
 
 from widgy.views.base import AuthorizedMixin
-from widgy.models import Node
+from widgy.utils import build_url
 
 DIFF_ENABLED = bool(getattr(settings, 'DAISYDIFF_JAR_PATH', False))
-
-
-def diff_url(site, before, after):
-    if DIFF_ENABLED:
-        return site.reverse(site.diff_view, kwargs={
-            'before_pk': before.pk,
-            'after_pk': after.pk,
-        })
-    else:
-        return None
 
 
 class CommitForm(forms.Form):
@@ -82,6 +74,20 @@ class VersionTrackerMixin(SingleObjectMixin):
             'head__root_node',
             'working_copy')
 
+    def get_preview_urls(self, root_node):
+        for owner in self.object.owners:
+            if hasattr(owner, 'get_action_links'):
+                for link in owner.get_action_links(root_node):
+                    if link['type'] == 'preview':
+                        yield link
+
+    def get_diff_urls(self, before_node, after_node):
+        if DIFF_ENABLED:
+            for a, b in zip(self.get_preview_urls(before_node), self.get_preview_urls(after_node)):
+                yield build_url(self.site.reverse(self.site.diff_view),
+                                before=a['url'],
+                                after=b['url'])
+
 
 class PopupView(object):
     def get_context_data(self, **kwargs):
@@ -99,7 +105,7 @@ class CommitView(PopupView, AuthorizedMixin, VersionTrackerMixin, FormView):
         self.object = self.get_object()
         kwargs = super(CommitView, self).get_context_data(**kwargs)
         kwargs['title'] = _('Commit Changes')
-        kwargs['object'] = self.object
+        kwargs['tracker'] = self.object
         kwargs['site'] = self.site
         kwargs['commit_url'] = self.site.reverse(self.site.commit_view,
                                                  kwargs={'pk': self.object.pk})
@@ -107,9 +113,8 @@ class CommitView(PopupView, AuthorizedMixin, VersionTrackerMixin, FormView):
             kwargs['permission_error_message'] = self.permission_error_message
 
         if self.object.head:
-            kwargs['diff_url'] = diff_url(self.site,
-                                          self.object.working_copy,
-                                          self.object.head.root_node)
+            kwargs['diff_urls'] = self.get_diff_urls(self.object.working_copy,
+                                                     self.object.head.root_node)
 
         # lazy because the template doesn't always use it
         kwargs['changed_anything'] = lambda: self.object.has_changes()
@@ -142,7 +147,7 @@ class ResetView(PopupView, AuthorizedMixin, VersionTrackerMixin, TemplateView):
         self.object = self.get_object()
         kwargs = super(ResetView, self).get_context_data(**kwargs)
         kwargs['title'] = _('Reset')
-        kwargs['object'] = self.object
+        kwargs['tracker'] = self.object
         kwargs['changed_anything'] = self.object.has_changes()
         kwargs['has_commits'] = bool(self.object.head)
         kwargs['reset_url'] = self.request.get_full_path()
@@ -151,7 +156,6 @@ class ResetView(PopupView, AuthorizedMixin, VersionTrackerMixin, TemplateView):
             kwargs['permission_error_message'] = self.permission_error_message
 
         return kwargs
-
 
     def has_permission(self, object):
         # We don't really add a commit while resetting, but this permission is
@@ -181,9 +185,7 @@ class HistoryView(AuthorizedMixin, VersionTrackerMixin, DetailView):
         kwargs['commits'] = self.object.get_history_list()
         for commit in kwargs['commits']:
             if commit.parent_id:
-                commit.diff_url = diff_url(self.site,
-                                           commit.parent.root_node,
-                                           commit.root_node)
+                commit.diff_urls = self.get_diff_urls(commit.root_node, commit.parent.root_node)
         return kwargs
 
 
@@ -195,7 +197,8 @@ class RevertView(PopupView, AuthorizedMixin, VersionTrackerMixin, FormView):
 
     def get_context_data(self, **kwargs):
         kwargs['title'] = _('Revert Commit')
-        kwargs['object'] = self.object
+        kwargs['commit'] = self.object
+        kwargs['tracker'] = self.object.tracker
         kwargs = super(RevertView, self).get_context_data(**kwargs)
         kwargs['revert_url'] = self.site.reverse(
             self.site.revert_view,
@@ -244,18 +247,22 @@ class RevertView(PopupView, AuthorizedMixin, VersionTrackerMixin, FormView):
 class DiffView(AuthorizedMixin, TemplateView):
     template_name = 'widgy/diff.html'
 
+    def call_view_from_url(self, url):
+        view, args, kwargs = urlresolvers.resolve(url)
+        return view(self.request, *args, **kwargs).rendered_content
+
     def get_context_data(self, **kwargs):
-        from widgy.contrib.widgy_mezzanine.views import preview
-
         kwargs = super(DiffView, self).get_context_data(**kwargs)
+        try:
+            before_url = self.request.GET['before']
+            after_url = self.request.GET['after']
+        except KeyError:
+            raise Http404
 
-        before_node = get_object_or_404(Node, pk=self.kwargs['before_pk'])
-        after_node = get_object_or_404(Node, pk=self.kwargs['after_pk'])
-        Node.prefetch_trees(before_node, after_node)
-        a = preview(self.request, before_node.pk, node=before_node)
-        b = preview(self.request, after_node.pk, node=after_node)
+        before = self.call_view_from_url(before_url)
+        after = self.call_view_from_url(after_url)
 
-        kwargs['diff'] = daisydiff(a.rendered_content, b.rendered_content)
+        kwargs['diff'] = daisydiff(before, after)
 
         return kwargs
 
