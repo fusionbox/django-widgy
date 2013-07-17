@@ -42,6 +42,7 @@ class CommitForm(forms.Form):
                                       )
     publish_at = forms.DateTimeField(widget=AdminSplitDateTime,
                                      initial=timezone.now,
+                                     localize=True,
                                      required=False)
 
     def get_publish_at(self):
