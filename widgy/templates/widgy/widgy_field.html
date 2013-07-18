@@ -1,4 +1,4 @@
-{% load compress %}{% load fusionbox_tags %}{% load static %}{% load widgy_tags %}
+{% load compress %}{% load fusionbox_tags %}{% load staticfiles %}{% load widgy_tags %}
 {% comment %}
 Hitting return in a form clicks its first button. Without this dummy
 button, the first button in the form would be a widget's delete button.
@@ -24,7 +24,6 @@ the admin center.
 {% if html_name %}
 <input type="hidden" name="{{ html_name }}" value="{{ value }}">
 {% endif %}
-<script data-main="/static/widgy/js/main" src="/static/widgy/js/require/require.js"></script>
 {% block widgy_container %}
 <ul class="widgy-tools">
   {% block widgy_tools %}
@@ -37,6 +36,25 @@ the admin center.
 <div id="{{ html_id }}" class="widgy"></div>
 {% endblock %}
 {% compress js %}
+<script src="{% static 'widgy/js/require/require.js' %}"></script>
+<script>
+  require.config({
+    paths: {
+      'jquery': './lib/jquery',
+      'underscore': './lib/underscore',
+      'backbone': './lib/backbone',
+      'text': 'require/text'
+    },
+    {% comment %}
+    This looks like it might not work on paths with quotes in them, but
+    the output of staticfiles.static [static.static DOES NOT, fyi] does
+    get escaped. It still doesn't work because you're not supposed to
+    use entities inside of raw text elements, but short of our own tag
+    just for this purpose there's nothing we can do about it.
+    {% endcomment %}
+    baseUrl: "{% static 'widgy/js' %}"
+  });
+</script>
 <script src="{% static 'widgy/fancybox/jquery.fancybox-1.3.4.js' %}"></script>
 <script src="{% static 'widgy/js/widgy.admin.js' %}"></script>
 {% endcompress %}
