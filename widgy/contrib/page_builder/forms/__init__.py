@@ -66,6 +66,7 @@ class CKEditorWidget(forms.Textarea):
         'removeButtons': '',
         'extraPlugins': 'justify',
         'justifyClasses': ['align-left', 'align-center', 'align-right', 'align-justify'],
+        'indentClasses': ['text-indent-%d' % i for i in xrange(1,6)],
         'contentsCss': staticfiles_storage.url('widgy/css/html.css'),
     }
 
