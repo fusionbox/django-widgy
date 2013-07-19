@@ -249,6 +249,8 @@ def make_commit(delta=datetime.timedelta(0), vt_class=VersionTracker):
     commit = tracker.commit(publish_at=timezone.now() + delta)
 
     return (tracker, commit)
+
+
 class TestVersioning(RootNodeTestCase):
 
     def test_clone_tree(self):
