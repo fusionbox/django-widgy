@@ -147,13 +147,18 @@ def unique_everseen(iterable, key=None):
 
 class SelectRelatedManager(models.Manager):
     """
-    A Manager that always uses select_related.
+    A Manager that makes it easy to always use prefetch_related or
+    select_related. ::
+
+        objects = SelectRelatedManager(select_related=['image'])
+
     """
 
     def __init__(self, *args, **kwargs):
         self.select_related = kwargs.pop('select_related', [])
+        self.prefetch_related = kwargs.pop('prefetch_related', [])
         super(SelectRelatedManager, self).__init__(*args, **kwargs)
 
     def get_query_set(self, *args, **kwargs):
         qs = super(SelectRelatedManager, self).get_query_set(*args, **kwargs)
-        return qs.select_related(*self.select_related)
+        return qs.select_related(*self.select_related).prefetch_related(*self.prefetch_related)
