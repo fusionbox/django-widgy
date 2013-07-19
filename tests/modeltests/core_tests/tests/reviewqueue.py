@@ -213,3 +213,31 @@ class ReviewQueueViewsTest(SwitchUserTestCase, RootNodeTestCase):
                     self.assertEqual(response.status_code, 302)
                     self.assertTrue(good_url in response['Location'],
                                     "%s should be allowed" % good_url)
+
+    def test_published_versiontrackers(self):
+        vt_class = self.widgy_site.get_version_tracker_model()
+        tracker = make_tracker(self.widgy_site, vt_class)
+
+        self.assertNotIn(tracker, vt_class.objects.published())
+
+        commit = tracker.commit(publish_at=timezone.now())
+        self.assertNotIn(tracker, vt_class.objects.published())
+        commit.approve(self.user)
+        self.assertIn(tracker, vt_class.objects.published())
+
+        tracker2 = make_tracker(self.widgy_site, vt_class)
+        self.assertIn(tracker, vt_class.objects.published())
+        self.assertNotIn(tracker2, vt_class.objects.published())
+
+        commit2 = tracker2.commit(publish_at=timezone.now())
+        self.assertIn(tracker, vt_class.objects.published())
+        self.assertNotIn(tracker2, vt_class.objects.published())
+
+        other_commit = tracker.commit(publish_at=timezone.now())
+        other_commit.approve(self.user)
+        self.assertIn(tracker, vt_class.objects.published())
+        self.assertNotIn(tracker2, vt_class.objects.published())
+
+        commit2.approve(self.user)
+        self.assertIn(tracker, vt_class.objects.published())
+        self.assertIn(tracker2, vt_class.objects.published())
