@@ -8,3 +8,4 @@ API Reference
     forms
     site
     links
+    template-tags
