@@ -3,13 +3,16 @@ from itertools import chain
 import json
 import imp
 
+import mock
+
 from django.core import urlresolvers
 from django.utils.functional import cached_property
+from django.core.exceptions import PermissionDenied
 
 from widgy.views import extract_id
 from widgy.models import Node
 
-from modeltests.core_tests.widgy_config import widgy_site, authorized_site
+from modeltests.core_tests.widgy_config import widgy_site
 from modeltests.core_tests.models import (
     Bucket, ImmovableBucket, UndeletableRawTextWidget, RawTextWidget, Layout,
     PickyBucket,
@@ -156,12 +159,15 @@ class TestApi(RootNodeTestCase, HttpTestCase):
             for method in self.client.options(url)['Allow'].lower().split(','):
                 method = method.strip()
 
-                # The view should call widgy_site.authorize before doing
+                # The view should call widgy_site.authorize_view before doing
                 # anything.  If there is an exception raised here, it is likely
-                # that the view didn't call widgy_site.authorize.
-                resp = getattr(self.client, method)(url, HTTP_COOKIE='unauthorized_access=1')
+                # that the view didn't call widgy_site.authorize_view.
+                with mock.patch.object(self.widgy_site, 'authorize_view') as authorize_mock:
+                    authorize_mock.side_effect = PermissionDenied
+                    resp = getattr(self.client, method)(url)
+                    self.assertEqual(resp.status_code, 403)
+                    authorize_mock.assert_called_once()
 
-                self.assertEqual(resp.status_code, 403)
 
     def test_possible_parents(self):
         def order_ignorant_equals(a, b):
@@ -294,7 +300,7 @@ class TestApi(RootNodeTestCase, HttpTestCase):
 
 
 class PermissionsTest(SwitchUserTestCase, RootNodeTestCase, HttpTestCase):
-    widgy_site = authorized_site
+    widgy_site = widgy_site
 
     def setUp(self):
         super(PermissionsTest, self).setUp()

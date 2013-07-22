@@ -1,16 +1,8 @@
-from django.core.exceptions import PermissionDenied
-
 from widgy.site import WidgySite
 from widgy.db.fields import VersionedWidgyField, WidgyField
 
 
-class UnauthenticatedWidgySite(WidgySite):
-    def authorize(self, request, *args, **kwargs):
-        if request.COOKIES.get('unauthorized_access'):
-            raise PermissionDenied
-
-widgy_site = UnauthenticatedWidgySite()
-authorized_site = WidgySite()
+widgy_site = WidgySite()
 
 # This emulates importing models from a site file. It must come after
 # widgy_site is defined, because widgy doesn't exist yet without the

@@ -4,7 +4,6 @@ import json
 
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Permission, User
 from django.test.client import RequestFactory
 
@@ -30,16 +29,10 @@ def make_commit(delta=datetime.timedelta(0), vt_class=ReviewedVersionTracker):
 
 
 class TestApiReviewed(TestApi):
-    class Site(ReviewedWidgySite):
-        def authorize(self, request, *args, **kwargs):
-            if request.COOKIES.get('unauthorized_access'):
-                raise PermissionDenied
-
-    widgy_site = Site()
+    widgy_site = ReviewedWidgySite()
 
 
 class ReviewQueueTest(RootNodeTestCase):
-
     def test_review_queue(self):
         tracker, commit1 = make_commit(vt_class=ReviewedVersionTracker)
 
