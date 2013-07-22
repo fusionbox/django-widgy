@@ -2,3 +2,7 @@
 .align-center { text-align: center; }
 .align-right { text-align: right; }
 .align-justify { text-align: justify; }
+
+@for $i from 1 through 5 {
+  .text-indent-#{$i} { text-indent: 10px * $i; }
+}
