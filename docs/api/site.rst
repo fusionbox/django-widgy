@@ -55,7 +55,8 @@ Widgy Site
     .. method:: has_add_permission(self, request, content_class)
 
     Given a :class:`~widgy.models.Content` class, can this request add a new
-    instance? Returns ``True`` or ``False``.
+    instance? Returns ``True`` or ``False``.  The default implementation uses
+    the Django Permission framework.
 
     .. method:: has_change_permission(self, request, obj_or_class)
 
@@ -139,8 +140,8 @@ Widgy Site
 
     .. attribute:: scss_files
 
-    Returns a list of scss files to be included on the front-end.
-    Widgets can add scss files just by making a file available
+    Returns a list of SCSS files to be included on the front-end.
+    Widgets can add SCSS files just by making a file available
     at a location determined by its app label and name (see
     :func:`widgy.models.Content.get_templates_hierarchy`). For example::
 
@@ -148,7 +149,7 @@ Widgy Site
 
     .. attribute:: js_files
 
-       Like ``scss_files``, but javascript files.
+       Like ``scss_files``, but JavaScript files.
 
     .. attribute:: admin_scss_files
 
@@ -161,7 +162,5 @@ Widgy Site
 
           widgy/page_builder/table.admin.scss
 
-      If you want to included javascript for the editing interface, you should
-      use a component.
-
-      .. todo:: link to component
+      If you want to included JavaScript for the editing interface, you should
+      use a :attr:`component <widgy.models.base.Content.component_name>`.

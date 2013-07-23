@@ -1,4 +1,4 @@
-Template tags
+Template Tags
 -------------
 
 To use these, you'll need to ``{% load widgy_tags %}``.
@@ -7,9 +7,9 @@ To use these, you'll need to ``{% load widgy_tags %}``.
 
 .. function:: render(node)
 
-Renders a node. Use this in your ``render.html`` templates to render children.
-It's a template tag only to be able to be able to pass the current context to
-:meth:`Content.render <widgy.models.Content.render>`
+Renders a node. Use this in your ``render.html`` templates to render any node
+that isn't a root node.  Under the hood, this template tag calls
+:meth:`Content.render <widgy.models.Content.render>` with the current context.
 
 Example:
 
@@ -22,8 +22,11 @@ Example:
 .. function:: scss_files(site)
 .. function:: js_files(site)
 
-A way to use all :attr:`WidgySite.scss_files <widgy.site.WidgySite.scss_files>`
-and :attr:`~widgy.site.WidgySite.js_files` with a site determined from a setting.
+These template tags provide a way to extract the :attr:`WidgySite.scss_files
+<widgy.site.WidgySite.scss_files>` off of a site. This is required if you don't
+have access to the site in the context, but do have a reference to it in your
+settings file.  :func:`scss_files` and :func:`js_files` can also accept an
+import path to the site.
 
 .. code-block:: html+django
 

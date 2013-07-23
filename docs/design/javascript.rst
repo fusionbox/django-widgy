@@ -10,3 +10,7 @@ form of a Django formfield.
 
 The editor is built on Backbone.js and RequireJS to provide a modular and
 customizable interface.
+
+.. figure:: _images/form-builder-example.png
+   :scale: 50 %
+   :alt: Form Builder example

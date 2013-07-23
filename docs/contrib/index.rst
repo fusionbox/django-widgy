@@ -1,4 +1,4 @@
-Contrib packages
+Contrib Packages
 ================
 
 Here is where we keep the batteries. These packages are Django apps that add

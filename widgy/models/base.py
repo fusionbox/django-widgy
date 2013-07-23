@@ -684,7 +684,7 @@ class Content(models.Model):
 
     def get_preview_template(self, site):
         """
-        :Returns: Rendered preview template with the given context, if any.
+        :Returns: Rendered preview template.
         """
         return render_to_string(self.preview_templates, {
             'self': self,
