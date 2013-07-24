@@ -1,9 +1,14 @@
+import os
+
 from django import forms
 from django.utils.safestring import mark_safe
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.contrib.staticfiles import finders
 from django.template.loader import render_to_string
+from django.conf import settings
 
 import bleach
+from scss import Scss
 
 
 PAGEDOWN_EDITOR_TEMPLATE = u'''
@@ -11,6 +16,16 @@ PAGEDOWN_EDITOR_TEMPLATE = u'''
 {textarea}
 <div class="pagedown-preview"></div>
 '''
+
+def scss_compile(scss_filename):
+    scss_filename = finders.find(scss_filename)
+    # In order to specify include path, put this in your
+    # settings.py
+    #   from scss import config as scss_config
+    #   scss_config.LOAD_PATHS = ['path1', 'path2/subdirectory']
+    scss = Scss()
+    css_content = scss.compile(scss_file=scss_filename)
+    return css_content
 
 
 class MarkdownWidget(forms.Textarea):
@@ -66,7 +81,8 @@ class CKEditorWidget(forms.Textarea):
         'removeButtons': '',
         'extraPlugins': 'justify',
         'justifyClasses': ['align-left', 'align-center', 'align-right', 'align-justify'],
-        'contentsCss': staticfiles_storage.url('widgy/css/html.css'),
+        'indentClasses': ['text-indent-%d' % i for i in xrange(1,6)],
+        'contentsCss': scss_compile('widgy/page_builder/html.scss'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -134,7 +150,7 @@ class MiniCKEditorWidget(CKEditorWidget):
             {'name': 'mode', 'groups': ['mode'], 'items': ['Source']},
             {'name': 'editing', 'groups': ['find', 'selection', 'spellchecker'], 'items': ['Scayt']},
         ],
-        'contentsCss': staticfiles_storage.url('widgy/css/html.css'),
+        'contentsCss': scss_compile('widgy/page_builder/html.scss')
     }
 
 
