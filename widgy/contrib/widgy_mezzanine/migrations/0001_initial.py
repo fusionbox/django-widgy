@@ -8,6 +8,7 @@ from django.db import models
 class Migration(SchemaMigration):
     depends_on = [
         ('widgy', '0001_initial'),
+        ('pages', '0001_initial'),
     ]
 
     def forwards(self, orm):
