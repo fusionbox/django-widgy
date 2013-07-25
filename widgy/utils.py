@@ -9,8 +9,10 @@ import bs4
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 from django.template import Context
+from django.template.loader import select_template, get_template
 from django.db import models
 from django.utils.http import urlencode
+from django.utils.functional import memoize
 
 try:
     from django.contrib.auth import get_user_model
@@ -162,3 +164,31 @@ class SelectRelatedManager(models.Manager):
     def get_query_set(self, *args, **kwargs):
         qs = super(SelectRelatedManager, self).get_query_set(*args, **kwargs)
         return qs.select_related(*self.select_related).prefetch_related(*self.prefetch_related)
+
+
+# Pending https://code.djangoproject.com/ticket/20806, Widgy's use of
+# select_template is very slow (calling it many times with a long list
+# of templates to choose from). Until it's fixed in Django, memoizing
+# select_template has the same effect. It's OK to do this always,
+# including DEBUG=False, because `memoize` doesn't cache exceptions. If
+# memoize did cache exceptions, new templates wouldn't be discovered
+# without restarting the server.
+select_template = memoize(select_template, {}, 1)
+def render_to_string(template_name, dictionary=None, context_instance=None):
+    """
+    Loads the given template_name and renders it with the given dictionary as
+    context. The template_name may be a string to load a single template using
+    get_template, or it may be a tuple to use select_template to find one of
+    the templates in the list. Returns a string.
+    """
+    dictionary = dictionary or {}
+    if isinstance(template_name, (list, tuple)):
+        t = select_template(tuple(template_name))
+    else:
+        t = get_template(template_name)
+    if not context_instance:
+        return t.render(Context(dictionary))
+    # Add the dictionary to the context stack, ensuring it gets removed again
+    # to keep the context_instance in the same state it started in.
+    with context_instance.push(dictionary):
+        return t.render(context_instance)
