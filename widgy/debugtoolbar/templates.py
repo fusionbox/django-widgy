@@ -19,20 +19,24 @@ def unique_list(lst):
             res.append(item)
     return res
 
-# Monkey patch in our own, instrumented, get_templates_hierarchy. Make sure to
-# keep it a classmethod.
-old_get_templates_hierarchy_unbound = Content.get_templates_hierarchy.im_func
 
-def new_get_templates_hierarchy(cls, **kwargs):
-    res = old_get_templates_hierarchy_unbound(cls, **kwargs)
-    res = unique_list(res)
-    try:
-        name = select_template(res).name
-    except TemplateDoesNotExist:
-        name = [i for i in res if finders.find(i)]
-    template_hierarchy_called.send(sender=cls, cls=cls, kwargs=kwargs, templates=res, used=name)
-    return res
-Content.get_templates_hierarchy = classmethod(new_get_templates_hierarchy)
+def monkey_patch():
+    """
+    Monkey patch in our own, instrumented, get_templates_hierarchy. Make
+    sure to keep it a classmethod.
+    """
+    old_get_templates_hierarchy_unbound = Content.get_templates_hierarchy.im_func
+
+    def new_get_templates_hierarchy(cls, **kwargs):
+        res = old_get_templates_hierarchy_unbound(cls, **kwargs)
+        res = unique_list(res)
+        try:
+            name = select_template(res).name
+        except TemplateDoesNotExist:
+            name = [i for i in res if finders.find(i)]
+        template_hierarchy_called.send(sender=cls, cls=cls, kwargs=kwargs, templates=res, used=name)
+        return res
+    Content.get_templates_hierarchy = classmethod(new_get_templates_hierarchy)
 
 
 class TemplatePanel(DebugPanel):
@@ -41,6 +45,7 @@ class TemplatePanel(DebugPanel):
 
     def __init__(self, *args, **kwargs):
         super(TemplatePanel, self).__init__(*args, **kwargs)
+        monkey_patch()
         template_hierarchy_called.connect(self._store_info)
         self.calls = []
 
