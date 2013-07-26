@@ -59,24 +59,39 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'lib/q', 'nodes/n
     },
 
     renderPromise: function() {
-      return Q.all([Backbone.View.prototype.renderPromise.apply(this, arguments), this.root_node_promise])
+      var compatibility_promise = this.fetchCompatibility();
+
+      var render_promise = Q.all([Backbone.View.prototype.renderPromise.apply(this, arguments), this.root_node_promise])
         .spread(function(app, view) {
           app.$editor = app.$el.children('.editor');
           return view.renderPromise().then(function(view) {
             app.$editor.append(view.el);
-            app.refreshCompatibility();
           }).thenResolve(app);
+        });
+
+      return Q.all([render_promise, compatibility_promise])
+        .spread(function(app, compatibility) {
+          app.setCompatibility(compatibility);
+          return app;
         });
     },
 
-    refreshCompatibility: function() {
+    /**
+     * Returns a promise for the root node's compatibility data.
+     */
+    fetchCompatibility: function() {
       if ( this.inflight )
         this.inflight.abort();
 
       this.inflight = $.ajax({
         url: this.root_node.get('available_children_url'),
-        success: this.setCompatibility
       });
+
+      return Q(this.inflight);
+    },
+
+    refreshCompatibility: function() {
+      this.fetchCompatibility().then(this.setCompatibility).done();
     },
 
     setCompatibility: function(data) {
