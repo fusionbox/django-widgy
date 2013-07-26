@@ -159,13 +159,11 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/base',
     },
 
     startBeingDragged: function(event) {
+      this.placeholder = this.$el.clone()
+        .css({'visibility': 'hidden'})
+        .insertAfter(this.$el);
+
       DraggableView.prototype.startBeingDragged.apply(this, arguments);
-
-      var placeholder = this.placeholder = $('<li class="drag_placeholder">&nbsp;</li>').css({
-        width: this.$el.width()
-      });
-
-      this.$el.after(placeholder);
     },
 
     stopBeingDragged: function() {
