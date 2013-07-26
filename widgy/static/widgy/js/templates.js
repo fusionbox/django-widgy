@@ -10,8 +10,6 @@ define([
       modal
       ) {
 
-  var templates = new Backbone.Collection();
-
   var Template = Backbone.Model.extend({
     initialize: function() {
       Backbone.Model.prototype.initialize.apply(this, arguments);
@@ -27,31 +25,15 @@ define([
   });
 
   var getTemplate = function(template_id) {
-    var template = templates.get(template_id);
-
-    if ( template ) {
-      return Q(template);
-    } else {
-      return Q(Backbone.ajax({url: template_id, cache: false}))
-        .then(function(template) {
-          var model = new Template(_.extend({url: template_id}, template));
-          templates.add(model);
-
-          return model;
-        })
-        .fail(modal.ajaxError);
-    }
-  };
-
-  var remove = function(template_id) {
-    var template = templates.get(template_id);
-
-    if ( template )
-      templates.remove(template);
+    return Q(Backbone.ajax({url: template_id, cache: false}))
+      .then(function(template) {
+        var model = new Template(_.extend({url: template_id}, template));
+        return model;
+      })
+      .fail(modal.ajaxError);
   };
 
   return {
-    getTemplate: getTemplate,
-    remove: remove
+    getTemplate: getTemplate
   };
 });

@@ -78,8 +78,6 @@ define([
     },
 
     handleSuccess: function(model, response, options) {
-      // kill the template cache.
-      templates.remove(model.get('template_url'));
       this.close();
     },
 
