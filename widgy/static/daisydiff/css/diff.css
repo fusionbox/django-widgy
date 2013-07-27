@@ -39,7 +39,7 @@ span.diff-html-removed {
 }
 
 span.diff-html-changed {
-  background: url(/static/daisydiff/images/diffunderline.gif) bottom repeat-x;
+  /* background: url(/static/daisydiff/images/diffunderline.gif) bottom repeat-x; */
   *background-color: #c6c6fd; /* light blue */
   cursor: pointer;
 }
