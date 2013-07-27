@@ -401,6 +401,10 @@ URLCONF_INCLUDE_CHOICES = (
 
 DAISYDIFF_JAR_PATH = os.path.join(PROJECT_ROOT, '..', 'bin', 'daisydiff', 'daisydiff.jar')
 
+REQUIRE_BUILD_PROFILE = 'widgy.build.js'
+REQUIRE_BASE_URL = 'widgy/js'
+STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
+
 ###################
 # DEPLOY SETTINGS #
 ###################

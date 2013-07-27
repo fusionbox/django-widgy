@@ -44,6 +44,7 @@ class WidgyWidget(forms.HiddenInput):
             'site': self.site,
             'owner': self.owner,
         }
+
         defaults.update(context)
         return render_to_string(self.template_name, defaults)
 
