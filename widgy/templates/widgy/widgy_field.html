@@ -52,7 +52,8 @@ the admin center.
     use entities inside of raw text elements, but short of our own tag
     just for this purpose there's nothing we can do about it.
     {% endcomment %}
-    baseUrl: "{% static 'widgy/js' %}"
+    baseUrl: "{% static 'widgy/js' %}",
+    urlArgs: {{ cachebust|json }}
   };
 </script>
 {% compress js %}

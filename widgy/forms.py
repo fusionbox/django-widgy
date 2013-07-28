@@ -1,3 +1,5 @@
+import time
+
 from django import forms
 from django.template.loader import render_to_string
 from django.forms import widgets
@@ -6,6 +8,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 
 from widgy.utils import format_html
 from widgy.models import Node
@@ -44,6 +47,9 @@ class WidgyWidget(forms.HiddenInput):
             'site': self.site,
             'owner': self.owner,
         }
+
+        if settings.DEBUG:
+            defaults['cachebust'] = time.time()
 
         defaults.update(context)
         return render_to_string(self.template_name, defaults)
