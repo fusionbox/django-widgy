@@ -56,8 +56,8 @@ class CNBCUrl(VideoUrl):
 
 
 VIDEO_URL_CLASSES = {
-    r'^https?:\/\/(?:www\.)?youtube.com\/watch\?(?=.*v=(?P<id>\w+))(?:\S+)?$': YoutubeUrl,
-    r'^https?:\/\/youtu\.be\/(?P<id>\w+)$': YoutubeUrl,
+    r'^https?:\/\/(?:www\.)?youtube.com\/watch\?(?=.*v=(?P<id>[\w-]+))(?:\S+)?$': YoutubeUrl,
+    r'^https?:\/\/youtu\.be\/(?P<id>[\w-]+)$': YoutubeUrl,
     r'^https?:\/\/(?:www\.)?vimeo.com\/(?P<id>\d+)$': VimeoUrl,
     r'^https?:\/\/video.cnbc.com/gallery/\?(?=.*video=(?P<id>\d+))(?:\S*)$': CNBCUrl,
 }
