@@ -81,30 +81,21 @@ the company.
   - Designer magic wand.
 
 ## JavaScript
+
 We use require.js to handle dependency management and to encourage code
 modularity.  This helps a lot in development, but it also means that page loads
-may be rather slow.  If page loads are too slow for you while you are
-developing, you can run the optimizer to compile and minify the file into one
-file and then you will have zippier page loads.
+may be rather slow. Widgy comes with a require.js build profile to use with
+`django-require`. To use it, install `django-require` and add to your
+settings:
 
-Steps:
+    REQUIRE_BUILD_PROFILE = 'widgy.build.js'
+    REQUIRE_BASE_URL = 'widgy/js'
+    STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
 
-  1.  Install the RequireJS command line tool.
-
-      $ [sudo] npm install -g requirejs
-
-  2.  From the project path root, run the optimizer.
-
-      $ r.js -o build.js
-
-      This will create an optimized file which is placed in
-      static/widgy/js/widgy-built.js
-
-  3.  Change your script tag to update the new location of the widgy files.
-
-      <script data-main="/static/widgy/js/widgy-built" src="/static/widgy/js/require/require.js"></script>
-
-**Note:** Please avoid committing the change in step 3.
+This will automatically build the javascript bundle during `collectstatic`.
+This will require either `node` or `rhino` to run r.js. `django-require` with
+detect whichever one you have installed. `rhino` is nice because it can be
+apt-got.
 
 # testing
 
