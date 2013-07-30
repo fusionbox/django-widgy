@@ -99,6 +99,14 @@ class UndeletableRawTextWidget(RawTextWidget):
     class Meta:
         proxy = True
 
+class UnnestableWidget(Bucket):
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        for p in list(parent.get_ancestors()) + [parent]:
+            if isinstance(p, UnnestableWidget):
+                return False
+        return super(UnnestableWidget, cls).valid_child_of(parent, obj)
+
 registry.register(Layout)
 registry.register(Bucket)
 registry.register(RawTextWidget)
@@ -107,6 +115,7 @@ registry.register(PickyBucket)
 registry.register(ImmovableBucket)
 registry.register(AnotherLayout)
 registry.register(VowelBucket)
+registry.register(UnnestableWidget)
 
 
 class HasAWidgy(models.Model):

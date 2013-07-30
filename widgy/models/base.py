@@ -737,6 +737,8 @@ class Content(models.Model):
 
     def reposition(self, site, right=None, parent=None):
         self.check_frozen()
+        old_parent_node = self.node.get_parent()
+        old_right_node = self.node.get_next_sibling()
         if right:
             if right.node.is_root():
                 raise InvalidTreeMovement({'message': 'You can\'t move the root'})
@@ -748,6 +750,28 @@ class Content(models.Model):
             self.node.move(parent.node, pos='last-child')
         else:
             assert right or parent
+
+        try:
+            # When moving, it's necessary to recheck compatibility for all of
+            # our children. For example, this detects deep nesting of
+            # un-nestable widgets.
+            node = self._nodes.get()  # use a new, uncached node
+            # use a prefetched tree
+            node.prefetch_tree()
+            node.content._recheck_children(site)
+        except ParentChildRejection:
+            # Backout. It'd be nice to rely on a transaction here and have this
+            # happen automatically.
+            if old_right_node:
+                self.node.move(old_right_node, pos='left')
+            else:
+                self.node.move(old_parent_node, pos='last-child')
+            raise
+
+    def _recheck_children(self, site):
+        for c in self.get_children():
+            site.validate_relationship(self, c)
+            c._recheck_children(site)
 
     def delete(self, raw=False):
         self.check_frozen()

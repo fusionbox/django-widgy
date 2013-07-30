@@ -13,7 +13,7 @@ from django.db.models.deletion import ProtectedError
 from widgy.models import Node, UnknownWidget, VersionTracker, Content, VersionCommit
 from widgy.exceptions import (
     ParentWasRejected, ChildWasRejected, MutualRejection, InvalidTreeMovement,
-    InvalidOperation)
+    InvalidOperation, ParentChildRejection)
 from widgy.views.versioning import daisydiff
 
 from modeltests.core_tests.widgy_config import widgy_site
@@ -21,7 +21,7 @@ from modeltests.core_tests.models import (
     Layout, Bucket, RawTextWidget, CantGoAnywhereWidget, PickyBucket,
     ImmovableBucket, AnotherLayout, VowelBucket, VersionedPage, VersionedPage2,
     VersionedPage3, VersionedPage4, VersionPageThrough, Related,
-    ForeignKeyWidget, WeirdPkBucket
+    ForeignKeyWidget, WeirdPkBucket, UnnestableWidget
 )
 from modeltests.core_tests.tests.base import (
     RootNodeTestCase, make_a_nice_tree, SwitchUserTestCase, refetch)
@@ -75,6 +75,43 @@ class TestCore(RootNodeTestCase):
         with self.assertRaises(ChildWasRejected):
             picky_bucket.add_child(self.widgy_site,
                                    Layout)
+
+    def test_reposition_rechecks_deep_deep_compatibility(self):
+        a = self.root_node.content.add_child(widgy_site, UnnestableWidget)
+        first_bucket = self.root_node.content.add_child(widgy_site, Bucket)
+        bucket = first_bucket.add_child(widgy_site, Bucket)
+        b = bucket.add_child(widgy_site, UnnestableWidget)
+
+        with self.assertRaises(ParentChildRejection):
+            first_bucket.reposition(widgy_site, parent=a)
+
+        self.assertEqual(len(a.get_children()), 0)
+        self.assertEqual(bucket.get_parent(), first_bucket)
+
+    def test_reposition_rechecks_deep_compatibility(self):
+        a = self.root_node.content.add_child(widgy_site, UnnestableWidget)
+        bucket = self.root_node.content.add_child(widgy_site, Bucket)
+        b = bucket.add_child(widgy_site, UnnestableWidget)
+
+        with self.assertRaises(ParentChildRejection):
+            bucket.reposition(widgy_site, parent=a)
+
+        self.assertEqual(len(a.get_children()), 0)
+        self.assertEqual(bucket.get_parent(), self.root_node.content)
+
+    def test_reposition_rechecks_deep_compatibility_old_right_node(self):
+        # another test for all code paths of reposition's backout code
+        a = self.root_node.content.add_child(widgy_site, UnnestableWidget)
+        first_bucket = self.root_node.content.add_child(widgy_site, Bucket)
+        bucket = first_bucket.add_sibling(widgy_site, Bucket)
+        b = bucket.add_child(widgy_site, UnnestableWidget)
+
+        with self.assertRaises(ParentChildRejection):
+            bucket.reposition(widgy_site, parent=a)
+
+        self.assertEqual(len(a.get_children()), 0)
+        self.assertEqual(bucket.get_parent(), self.root_node.content)
+        self.assertEqual(bucket.get_next_sibling(), first_bucket)
 
     def test_to_json_works_for_multi_table_inheritance(self):
         picky_bucket = self.root_node.content.add_child(self.widgy_site,
