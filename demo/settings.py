@@ -293,6 +293,7 @@ INSTALLED_APPS = (
     'filer',
     'easy_thumbnails',
     'widgy.contrib.urlconf_include',
+    'sorl.thumbnail',
 
     # local project
     'demo.demo_widgets'
