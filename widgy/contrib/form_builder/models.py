@@ -13,7 +13,6 @@ from django.shortcuts import redirect
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 
-from fusionbox import behaviors
 from fusionbox.db.models import QuerySetManager
 from django_extensions.db.fields import UUIDField
 from fusionbox.forms.fields import PhoneNumberField
@@ -706,11 +705,12 @@ class Uncaptcha(BaseFormField):
         verbose_name_plural = _('uncaptchas')
 
 
-class FormSubmission(behaviors.Timestampable, models.Model):
+class FormSubmission(models.Model):
     """
     Holds the data from one submission of a Form.
     """
 
+    created_at = models.DateTimeField(auto_now_add=True)
     form_node = models.ForeignKey(Node, on_delete=models.PROTECT, related_name='form_submissions')
     form_ident = models.CharField(max_length=Form._meta.get_field_by_name('ident')[0].max_length)
 
