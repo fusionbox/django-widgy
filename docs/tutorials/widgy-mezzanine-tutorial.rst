@@ -100,7 +100,7 @@ add Widgy scss includes::
 **Note:** Please put this before you define the ``COMPRESS_PRECOMPILERS``::
 
     COMPRESS_PRECOMPILERS = (
-        ('text/x-scss', 'python -mscss.tool -C -o {outfile} %s' %
+        ('text/x-scss', 'python -mscss.tool -C %s' %
          ' '.join(['-I "%s"' % d for d in SCSS_IMPORTS])
          )
     )
