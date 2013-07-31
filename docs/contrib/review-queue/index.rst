@@ -30,6 +30,14 @@ To enabled the review queue,
 
         admin.site.register(ReviewedVersionCommit, VersionCommitAdmin)
 
+4.  If upgrading from a non-reviewed site, a
+    :class:`widgy.contrib.review_queue.models.ReviewedVersionCommit`
+    object must be created for each :class:`widgy.models.VersionCommit`.
+    There is a management command to do this for you. It assumes that
+    all existing commits should be approved. ::
+
+      ./manage.py populate_review_queue
+
 
 .. class:: admin.VersionCommitAdminBase
 
