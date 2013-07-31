@@ -228,7 +228,7 @@ Base Models
 
         If ``obj`` is provided, return ``True`` if it could be a child of the
         current widget.  ``cls`` is the type of ``obj``.
-        
+
         If ``obj`` isn't provided, return ``True`` if a new instance of ``cls``
         could be a child of the current widget.
 
@@ -277,37 +277,59 @@ Base Models
                             return False
                     return super(Foo, cls).valid_child_of(parent, obj)
 
+    .. method:: equal(self, other)
+
+        Should return ``True`` if ``self`` is equal to ``other``. The default
+        implementation checks the equality of each widget's
+        :meth:`.get_attributes`.
+
 
 .. class:: Node
 
     .. attribute:: content
 
+        A generic foreign key point to our :class:`Content` instance.
+
     .. attribute:: is_frozen
 
-    .. method:: to_json(self, site)
+        A boolean field indicating whether this node is frozen and can't be
+        changed in any way. This is used to preserve old tree versions for
+        versioning.
 
     .. method:: render(self, *args, **kwargs)
 
+        Renders this subtree and returns a string. Normally you shouldn't
+        call it directly, use :meth:`widgy.db.fields.WidgyField.render`
+        or :func:`widgy.templatetags.widgy_tags.render`.
+
     .. method:: depth_first_order(self)
 
-    .. classmethod:: prefetch_trees(cls, *root_nodes)
+        Like :meth:`Content.depth_first_order`, but over nodes.
 
     .. method:: prefetch_tree(self)
 
+        Efficiently fetches an entire tree (or subtree), including content
+        instances. It uses ``1 + m`` queries, where ``m`` is the number of
+        distinct content types in the tree.
+
+    .. classmethod:: prefetch_trees(cls, *root_nodes)
+
+        Prefetches multiple trees. Uses ``1 + m`` queries, where ``m``
+        is the number of distinct content types across `all` the trees.
+
     .. method:: maybe_prefetch_tree(self)
 
-    .. method:: filter_child_classes(self, site, classes)
-
-    .. method:: filter_child_classes_recursive(self, site, classes)
-
-    .. method:: possible_parents(self, site, root_node)
-
-    .. method:: clone_tree(self, freeze=True)
-
-    .. method:: check_frozen(self)
-
-    .. method:: delete(self, *args, **kwargs)
-
-    .. method:: trees_equal(self, other)
+        Prefetches the tree unless it has been prefetched already.
 
     .. classmethod:: find_widgy_problems(cls, site=None)
+
+        When a Widgy tree is edited without protection from a transaction, it is
+        possible to get into an inconsistent state. This method returns a tuple
+        containing two lists:
+
+          1. A list of node pks whose `content` pointer is dangling --
+             pointing to a content that doesn't exist.
+          2. A list of node pks whose `content_type` doesn't exist. This might
+             happen when you switch branches and remove the code for a widget,
+             but still have the widget in your database. These are represented
+             by :class:`UnknownWidget` instances.
