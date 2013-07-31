@@ -47,7 +47,6 @@ INSTALLED_APPS = (
     'filer',
     'easy_thumbnails',
     'compressor',
-    'fusionbox.core',
     'scss',
     'sorl.thumbnail',
     'south',
