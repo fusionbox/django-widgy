@@ -7,4 +7,148 @@ This quickstart assumes you wish to use the following packages:
 -  Page Builder
 -  Form Builder
 
-.. explain how to get started from 0 with mezzanine and widgy.
+
+Install the Widgy package::
+
+    cd widgy
+    pip install -e .
+
+Add Mezzanine apps to ``INSTALLED_APPS``::
+
+        'mezzanine.boot',
+        'mezzanine.conf',
+        'mezzanine.core',
+        'mezzanine.generic',
+        'mezzanine.pages',
+        'django.contrib.comments',
+        'filebrowser_safe',
+        'grappelli_safe',
+
+``fusionbox.core`` must come after ``mezzanine.core``, because the have
+the same app label and migrations don't work otherwise.
+
+add Widgy to ``INSTALLED_APPS``::
+
+        'widgy',
+        'widgy.contrib.page_builder',
+        'widgy.contrib.form_builder',
+        'widgy.contrib.widgy_mezzanine',
+        'widgy.contrib.urlconf_include',
+        'filer',
+        'easy_thumbnails',
+
+add Mezzanine middleware::
+
+        'mezzanine.core.request.CurrentRequestMiddleware',
+        'mezzanine.core.middleware.TemplateForDeviceMiddleware',
+        'mezzanine.core.middleware.TemplateForHostMiddleware',
+        'mezzanine.core.middleware.AdminLoginInterfaceSelectorMiddleware',
+        'mezzanine.pages.middleware.PageMiddleware',
+
+add ``urlconf_include`` middleware::
+
+        'widgy.contrib.urlconf_include.middleware.PatchUrlconfMiddleware',
+
+Mezzanine settings::
+
+    PACKAGE_NAME_FILEBROWSER = "filebrowser_safe"
+    PACKAGE_NAME_GRAPPELLI = "grappelli_safe"
+    ADMIN_MEDIA_PREFIX = STATIC_URL + "grappelli/"
+
+    # at the very bottom of settings
+    from mezzanine.utils.conf import set_dynamic_settings
+    set_dynamic_settings(globals())
+
+add Mezzanine context processor::
+
+    TEMPLATE_CONTEXT_PROCESSORS += (
+        'mezzanine.conf.context_processors.settings',
+    )
+
+make a Widgy site and set it in settings::
+
+    # demo/widgy_site.py
+    from widgy.site import WidgySite
+
+    class WidgySite(WidgySite):
+        pass
+
+    site = WidgySite()
+
+    # settings.py
+    WIDGY_MEZZANINE_SITE = 'demo.widgy_site.site'
+
+syncdb; migrate
+
+add urls::
+
+    from demo.widgy_site import site as widgy_site
+    # widgy admin
+    url(r'^admin/widgy/', include(widgy_site.urls)),
+    # widgy frontend
+    url(r'^widgy/', include('widgy.contrib.widgy_mezzanine.urls')),
+    url(r'^', include('mezzanine.urls')),
+
+add Widgy scss includes::
+
+    import imp
+    WIDGY_ROOT = imp.find_module('widgy')[1]
+    SCSS_IMPORTS += (
+        os.path.join(WIDGY_ROOT, 'static', 'widgy', 'css'),
+    )
+
+**Note:** Please put this before you define the ``COMPRESS_PRECOMPILERS``::
+
+    COMPRESS_PRECOMPILERS = (
+        ('text/x-scss', 'python -mscss.tool -C -o {outfile} %s' %
+         ' '.join(['-I "%s"' % d for d in SCSS_IMPORTS])
+         )
+    )
+
+Widgy requires that django-compressor be configured with a precompiler
+for ``text/x-scss``.
+
+Make sure you have a url pattern named ``home`` or the admin templates
+will not work right.
+
+If you are using ``GenericTemplateFinderMiddleware``, use the one from
+``widgy.contrib.widgy_mezzanine.middleware``. It has been patched to
+work with Mezzanine.
+
+How to edit home page
+---------------------
+
+1. Add the homepage to your urls.py::
+
+       url(r'^$', 'mezzanine.pages.views.page', {'slug': '/'}, name='home'),
+
+   **Note:** it must be a named URL, with the name 'home'
+
+2. Make a page with the slug ``/`` and publish it.
+
+3. Make a template called ``pages/index.html`` and put::
+
+       {% extends "pages/widgypage.html" %}
+
+   **Note:** If you don't do this you will likely get the following
+   error::
+
+       AttributeError: 'Settings' object has no attribute 'FORMS_EXTRA_FIELDS'
+
+   This is caused by Mezzanine falling back its own template
+   ``pages/index.html`` which tries to provide the inline editing feature,
+   which requires ``mezzanine.forms`` to be installed.
+
+Admin center
+------------
+
+A nice ``ADMIN_MENU_ORDER``::
+
+    ADMIN_MENU_ORDER = [
+        ('Widgy', (
+            'pages.Page',
+            'page_builder.Callout',
+            'form_builder.Form',
+            ('Review queue', 'review_queue.ReviewedVersionCommit'),
+        )),
+    ]
