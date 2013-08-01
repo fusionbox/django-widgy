@@ -168,9 +168,14 @@ class EmailUserHandler(EmailSuccessHandlerBase):
         verbose_name_plural = _('user success emails')
 
     def get_to_emails(self, form):
-        to = [f for f in self.parent_form.depth_first_order()
-              if hasattr(f, 'ident') and f.ident == self.to_ident][0]
-        return [form.cleaned_data[to.get_formfield_name()]]
+        try:
+            to = [f for f in self.parent_form.depth_first_order()
+                  if hasattr(f, 'ident') and f.ident == self.to_ident][0]
+        except IndexError:
+            # no matching fields found, or to_ident is blank
+            return []
+        else:
+            return [form.cleaned_data[to.get_formfield_name()]]
 
     def get_email_fields(self):
         return [i for i in self.parent_form.depth_first_order()
