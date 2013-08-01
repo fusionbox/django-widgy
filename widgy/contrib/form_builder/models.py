@@ -102,6 +102,7 @@ class EmailSuccessHandlerBase(FormSuccessHandler):
         verbose_name=_('include form data'),
         help_text=_("Should the form's data be included in the email?"),
         blank=True,
+        default=False,
     )
 
     form = EmailSuccessHandlerBaseForm
