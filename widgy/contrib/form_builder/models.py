@@ -16,14 +16,14 @@ from fusionbox import behaviors
 from fusionbox.db.models import QuerySetManager
 from django_extensions.db.fields import UUIDField
 from fusionbox.forms.fields import PhoneNumberField
+import html2text
 
 from widgy.models import Content, Node
 from widgy.signals import pre_delete_widget
 from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, DisplayNameMixin
 from widgy.utils import update_context, build_url, force_bytes
-from widgy.contrib.page_builder.db.fields import MarkdownField
 from widgy.contrib.page_builder.models import Bucket, Html
-from widgy.contrib.page_builder.forms import MiniCKEditorField
+from widgy.contrib.page_builder.forms import MiniCKEditorField, CKEditorField
 import widgy
 
 
@@ -80,24 +80,31 @@ class SaveDataHandler(FormSuccessHandler):
         verbose_name_plural = _('save data handlers')
 
 
-def send_markdown_mail(subject, content, from_email, to):
-    from widgy.templatetags.widgy_tags import mdown
-    msg = EmailMultiAlternatives(subject, content, from_email, to)
-    msg.attach_alternative(mdown(content), 'text/html')
+def send_html_mail(subject, content, from_email, to):
+    msg = EmailMultiAlternatives(
+        subject=subject,
+        body=html2text.html2text(content),
+        from_email=from_email,
+        to=to)
+    msg.attach_alternative(content, 'text/html')
     msg.send()
+
+
+class EmailSuccessHandlerForm(forms.ModelForm):
+    content = CKEditorField()
 
 
 class EmailSuccessHandlerBase(FormSuccessHandler):
     subject = models.CharField(max_length=255, verbose_name=_('subject'))
-    content = MarkdownField(blank=True, verbose_name=_('content'))
+    content = models.TextField(blank=True, verbose_name=_('content'))
 
-    component_name = 'markdown'
+    form = EmailSuccessHandlerForm
 
     class Meta:
         abstract = True
 
     def execute(self, request, form):
-        send_markdown_mail(self.subject, self.content, settings.SERVER_EMAIL, self.get_to_emails(form))
+        send_html_mail(self.subject, self.content, settings.SERVER_EMAIL, self.get_to_emails(form))
 
     def get_to_emails(self, form):
         raise NotImplemented
