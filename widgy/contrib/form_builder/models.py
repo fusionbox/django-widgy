@@ -11,6 +11,7 @@ from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.shortcuts import redirect
 from django.dispatch import receiver
+from django.template.loader import render_to_string
 
 from fusionbox import behaviors
 from fusionbox.db.models import QuerySetManager
@@ -90,21 +91,39 @@ def send_html_mail(subject, content, from_email, to):
     msg.send()
 
 
-class EmailSuccessHandlerForm(forms.ModelForm):
+class EmailSuccessHandlerBaseForm(forms.ModelForm):
     content = CKEditorField()
 
 
 class EmailSuccessHandlerBase(FormSuccessHandler):
     subject = models.CharField(max_length=255, verbose_name=_('subject'))
     content = models.TextField(blank=True, verbose_name=_('content'))
+    include_form_data = models.BooleanField(
+        verbose_name=_('include form data'),
+        help_text=_("Should the form's data be included in the email?"),
+        blank=True,
+    )
 
-    form = EmailSuccessHandlerForm
+    form = EmailSuccessHandlerBaseForm
 
     class Meta:
         abstract = True
 
+    def format_message(self, request, form):
+        data = []
+        # keep the data in the same order as the form
+        for name, field in self.parent_form.get_fields().items():
+            data.append(
+                (field.label, form.cleaned_data[name])
+            )
+        return render_to_string('widgy/form_builder/form_email.html', {
+            'data': data,
+            'self': self,
+        })
+
     def execute(self, request, form):
-        send_html_mail(self.subject, self.content, settings.SERVER_EMAIL, self.get_to_emails(form))
+        message = self.format_message(request, form)
+        send_html_mail(self.subject, message, settings.SERVER_EMAIL, self.get_to_emails(form))
 
     def get_to_emails(self, form):
         raise NotImplemented
@@ -121,12 +140,15 @@ class EmailSuccessHandler(EmailSuccessHandlerBase):
     def get_to_emails(self, form):
         return [self.to]
 
+# This is the only way to change a field provided by a base class.
+EmailSuccessHandler._meta.get_field('include_form_data').default = True
 
-class EmailUserHandlerForm(forms.ModelForm):
+
+class EmailUserHandlerForm(EmailSuccessHandlerBaseForm):
     to_ident = forms.ChoiceField(label=_('To'), choices=[])
 
     class Meta:
-        fields = ('to_ident', 'subject', 'content')
+        fields = ('to_ident', 'subject', 'content', 'include_form_data')
 
     def __init__(self, *args, **kwargs):
         super(EmailUserHandlerForm, self).__init__(*args, **kwargs)

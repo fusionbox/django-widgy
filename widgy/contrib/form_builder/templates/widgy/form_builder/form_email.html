@@ -1,0 +1,13 @@
+{{ self.content|safe }}
+{% if self.include_form_data %}
+<h2>Form Data</h2>
+
+<table>
+{% for label, value in data %}
+  <tr>
+    <th>{{ label }}</th>
+    <td>{{ value|linebreaksbr }}</td>
+  </tr>
+{% endfor %}
+</table>
+{% endif %}
