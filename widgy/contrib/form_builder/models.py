@@ -13,7 +13,6 @@ from django.dispatch import receiver
 from django.template.loader import render_to_string
 
 from django_extensions.db.fields import UUIDField
-from fusionbox.forms.fields import PhoneNumberField
 import html2text
 
 from widgy.models import Content, Node
@@ -22,6 +21,7 @@ from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin
 from widgy.utils import update_context, build_url, force_bytes, QuerySet
 from widgy.contrib.page_builder.models import Bucket, Html
 from widgy.contrib.page_builder.forms import MiniCKEditorField, CKEditorField
+from .forms import PhoneNumberField
 import widgy
 
 
