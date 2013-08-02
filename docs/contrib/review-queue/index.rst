@@ -49,3 +49,10 @@ To enabled the review queue,
 
         The :class:`~widgy.site.WidgySite` that this specific
         :class:`~admin.VersionCommitAdminBase` needs to work on.
+
+.. note::
+
+    The review queue's undo (it can undo approvals) support requires Django >=
+    1.5 or the session-based ``MESSAGE_STORAGE``::
+
+        MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
