@@ -123,12 +123,17 @@ syncdb; migrate
 
 add urls::
 
+    from django.conf.urls import patterns, include, url
     from demo.widgy_site import site as widgy_site
-    # widgy admin
-    url(r'^admin/widgy/', include(widgy_site.urls)),
-    # widgy frontend
-    url(r'^widgy/', include('widgy.contrib.widgy_mezzanine.urls')),
-    url(r'^', include('mezzanine.urls')),
+
+    urlpatterns = patterns('',
+        # ...
+        # widgy admin
+        url(r'^admin/widgy/', include(widgy_site.urls)),
+        # widgy frontend
+        url(r'^widgy/', include('widgy.contrib.widgy_mezzanine.urls')),
+        url(r'^', include('mezzanine.urls')),
+    )
 
 
 Make sure you have a url pattern named ``home`` or the admin templates
