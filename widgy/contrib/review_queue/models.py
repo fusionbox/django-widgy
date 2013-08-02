@@ -48,6 +48,15 @@ class ReviewedVersionTracker(VersionTracker):
     class Meta:
         proxy = True
 
+    objects = QuerySetManager()
+
+    class QuerySet(VersionTracker.QuerySet):
+        def published(self):
+            commits = super(ReviewedVersionTracker.QuerySet, self).published()
+            return commits.filter(commits__reviewedversioncommit__approved_by__isnull=False,
+                                  commits__reviewedversioncommit__approved_at__isnull=False)\
+                    .distinct()
+
     def get_published_node(self, request):
         for commit in self.get_history():
             if commit.is_published and commit.reviewedversioncommit.is_approved:

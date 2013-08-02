@@ -11,6 +11,7 @@
 # situations, so it is recommended to run the test suite against as many
 # database backends as possible.  You may want to create a separate settings
 # file for each of the backends you test against.
+import os
 
 DATABASES = {
     'default': {
@@ -28,7 +29,7 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.SHA1PasswordHasher',
 )
 
-SOUTH_TESTS_MIGRATE = False
+SOUTH_TESTS_MIGRATE = os.environ.get('SOUTH_TESTS_MIGRATE', False)
 
 URLCONF_INCLUDE_CHOICES = tuple()
 TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
