@@ -27,9 +27,9 @@ def convert_model(ModelClass, converter):
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-
-        convert_model(orm.EmailSuccessHandler, process_markdown)
-        convert_model(orm.EmailUserHandler, process_markdown)
+        if not db.dry_run:
+            convert_model(orm.EmailSuccessHandler, process_markdown)
+            convert_model(orm.EmailUserHandler, process_markdown)
 
         # Changing field 'EmailSuccessHandler.content'
         db.alter_column(u'form_builder_emailsuccesshandler', 'content', self.gf('django.db.models.fields.TextField')())
@@ -38,9 +38,9 @@ class Migration(SchemaMigration):
         db.alter_column(u'form_builder_emailuserhandler', 'content', self.gf('django.db.models.fields.TextField')())
 
     def backwards(self, orm):
-
-        convert_model(orm.EmailSuccessHandler, html2text.html2text)
-        convert_model(orm.EmailUserHandler, html2text.html2text)
+        if not db.dry_run:
+            convert_model(orm.EmailSuccessHandler, html2text.html2text)
+            convert_model(orm.EmailUserHandler, html2text.html2text)
 
         # Changing field 'EmailSuccessHandler.content'
         db.alter_column(u'form_builder_emailsuccesshandler', 'content', self.gf('widgy.contrib.page_builder.db.fields.MarkdownField')())
