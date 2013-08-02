@@ -20,9 +20,13 @@ from modeltests.core_tests.models import ReviewedVersionedPage, RawTextWidget
 from modeltests.core_tests.widgy_config import widgy_site
 
 
-def make_commit(delta=datetime.timedelta(0), vt_class=ReviewedVersionTracker):
-    root_node = RawTextWidget.add_root(widgy_site, text='first').node
+def make_tracker(site, vt_class=ReviewedVersionTracker):
+    root_node = RawTextWidget.add_root(site, text='first').node
     tracker = vt_class.objects.create(working_copy=root_node)
+    return tracker
+
+def make_commit(site, delta=datetime.timedelta(0), vt_class=ReviewedVersionTracker):
+    tracker = make_tracker(site, vt_class)
     commit = tracker.commit(publish_at=timezone.now() + delta)
 
     return (tracker, commit)
@@ -33,8 +37,10 @@ class TestApiReviewed(TestApi):
 
 
 class ReviewQueueTest(RootNodeTestCase):
+    widgy_site = widgy_site
+
     def test_review_queue(self):
-        tracker, commit1 = make_commit(vt_class=ReviewedVersionTracker)
+        tracker, commit1 = make_commit(self.widgy_site, vt_class=ReviewedVersionTracker)
 
         p = Permission.objects.get(codename='change_versioncommit')
         user = User.objects.create()
@@ -68,7 +74,7 @@ class ReviewQueueTest(RootNodeTestCase):
         foreign key returns a ReviewedVersionTracker instance (instead
         of the base model).
         """
-        tracker, commit1 = make_commit(vt_class=ReviewedVersionTracker)
+        tracker, commit1 = make_commit(self.widgy_site, vt_class=ReviewedVersionTracker)
         page = ReviewedVersionedPage.objects.create(
             version_tracker=tracker,
         )
@@ -88,7 +94,7 @@ class ReviewQueueViewsTest(SwitchUserTestCase, RootNodeTestCase):
         return urls
 
     def test_commit_view(self):
-        tracker, first_commit = make_commit()
+        tracker, first_commit = make_commit(self.widgy_site)
         url = self.widgy_site.reverse(self.widgy_site.commit_view, kwargs={
             'pk': tracker.pk,
         })
@@ -106,7 +112,7 @@ class ReviewQueueViewsTest(SwitchUserTestCase, RootNodeTestCase):
                     self.assertTrue(refetch(tracker).head.reviewedversioncommit.is_approved)
 
     def test_approve_view(self):
-        tracker, commit = make_commit()
+        tracker, commit = make_commit(self.widgy_site)
         url = self.widgy_site.reverse(self.widgy_site.approve_view, kwargs={
             'pk': tracker.pk,
             'commit_pk': commit.pk,
@@ -126,7 +132,7 @@ class ReviewQueueViewsTest(SwitchUserTestCase, RootNodeTestCase):
         self.assertTrue(refetch(commit).is_approved)
 
     def test_unapprove_view(self):
-        tracker, commit = make_commit()
+        tracker, commit = make_commit(self.widgy_site)
         url = self.widgy_site.reverse(self.widgy_site.unapprove_view, kwargs={
             'pk': tracker.pk,
             'commit_pk': commit.pk,
@@ -147,8 +153,8 @@ class ReviewQueueViewsTest(SwitchUserTestCase, RootNodeTestCase):
         self.assertFalse(refetch(commit).is_approved)
 
     def test_undo_approvals_view(self):
-        tracker, commit = make_commit()
-        tracker2, commit2 = make_commit()
+        tracker, commit = make_commit(self.widgy_site)
+        tracker2, commit2 = make_commit(self.widgy_site)
         url = self.widgy_site.reverse(self.widgy_site.undo_approvals_view)
         commit.approve(self.user)
         commit2.approve(self.user)
@@ -176,7 +182,7 @@ class ReviewQueueViewsTest(SwitchUserTestCase, RootNodeTestCase):
         self.assertTrue(refetch(commit2).is_approved)
 
     def test_undo_approvals_view_safe_redirect(self):
-        tracker, commit = make_commit()
+        tracker, commit = make_commit(self.widgy_site)
         url = self.widgy_site.reverse(self.widgy_site.undo_approvals_view)
         with self.as_staffuser() as user:
             with self.with_permission(user, 'change', ReviewedVersionCommit):
@@ -207,3 +213,31 @@ class ReviewQueueViewsTest(SwitchUserTestCase, RootNodeTestCase):
                     self.assertEqual(response.status_code, 302)
                     self.assertTrue(good_url in response['Location'],
                                     "%s should be allowed" % good_url)
+
+    def test_published_versiontrackers(self):
+        vt_class = self.widgy_site.get_version_tracker_model()
+        tracker = make_tracker(self.widgy_site, vt_class)
+
+        self.assertNotIn(tracker, vt_class.objects.published())
+
+        commit = tracker.commit(publish_at=timezone.now())
+        self.assertNotIn(tracker, vt_class.objects.published())
+        commit.approve(self.user)
+        self.assertIn(tracker, vt_class.objects.published())
+
+        tracker2 = make_tracker(self.widgy_site, vt_class)
+        self.assertIn(tracker, vt_class.objects.published())
+        self.assertNotIn(tracker2, vt_class.objects.published())
+
+        commit2 = tracker2.commit(publish_at=timezone.now())
+        self.assertIn(tracker, vt_class.objects.published())
+        self.assertNotIn(tracker2, vt_class.objects.published())
+
+        other_commit = tracker.commit(publish_at=timezone.now())
+        other_commit.approve(self.user)
+        self.assertIn(tracker, vt_class.objects.published())
+        self.assertNotIn(tracker2, vt_class.objects.published())
+
+        commit2.approve(self.user)
+        self.assertIn(tracker, vt_class.objects.published())
+        self.assertIn(tracker2, vt_class.objects.published())

@@ -65,6 +65,14 @@ class VersionTracker(models.Model):
                     filters[name + '__isnull'] = True
             return self.filter(**filters)
 
+        def published(self):
+            """
+            Filter the queryset to only include version tracker that have a
+            published commits.
+            """
+            return self.filter(commits__publish_at__lte=timezone.now()).distinct()
+
+
     def commit(self, user=None, **kwargs):
         self.head = self.commit_model.objects.create(
             parent=self.head,
