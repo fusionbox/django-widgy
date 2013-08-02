@@ -117,6 +117,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+# review_queue request this on django < 1.5
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'demo', 'public'),
