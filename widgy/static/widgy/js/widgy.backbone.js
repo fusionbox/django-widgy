@@ -31,7 +31,7 @@ define([ 'jquery', 'underscore', 'backbone', 'lib/mustache', 'lib/q' ], function
 
     /**
      * These are DOM Events that just trigger an event on the View.
-     * 
+     *
      * Inspired by Derick Bailey's Backbone.Marionette:
      * https://github.com/derickbailey/backbone.marionette/blob/master/src/backbone.marionette.view.js#L70
      */
@@ -159,7 +159,7 @@ define([ 'jquery', 'underscore', 'backbone', 'lib/mustache', 'lib/q' ], function
    *
    * The AppView has an instance of this list to keep track of all of the node
    * views.
-   * 
+   *
    * This is analogous to a Collection for Views.
    */
   function ViewList() {
@@ -212,6 +212,14 @@ define([ 'jquery', 'underscore', 'backbone', 'lib/mustache', 'lib/q' ], function
       return this.find(function(view) {
         return model === view.model;
       });
+    },
+
+    getLength: function() {
+      return this.list.length;
+    },
+
+    at: function(index) {
+      return this.list[index];
     }
   });
 
