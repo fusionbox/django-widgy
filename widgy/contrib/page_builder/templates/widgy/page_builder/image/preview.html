@@ -4,7 +4,7 @@
 {% block content %}
   {% if self.image %}
     {% easy_thumbnail self.image.file "100x100" as im %}
-    <img src="{% media im.name %}">
+    <img src="{{ im.url }}">
   {% else %}
     <div class="noImage"></div>
   {% endif %}
