@@ -52,6 +52,7 @@ INSTALLED_APPS = (
     'south',
     'debug_toolbar',
     'django_extensions',
+    'argonauts',
 
     'demo.demo_widgets',
 )
