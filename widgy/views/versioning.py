@@ -18,7 +18,7 @@ from django.core import urlresolvers
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.http import Http404
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from widgy.views.base import AuthorizedMixin
 from widgy.utils import build_url
@@ -299,6 +299,6 @@ def daisydiff(before, after):
         # remove the daisydiff chrome so we can add our own
         parsed = BeautifulSoup(diff_html)
         body = parsed.find('body')
-        for i in body.findAll(recursive=False)[:6]:
+        for i in body.find_all(recursive=False)[:6]:
             i.extract()
         return unicode(body)
