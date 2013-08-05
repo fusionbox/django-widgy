@@ -1,10 +1,9 @@
 from django.db import models
-from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from fusionbox.db.models import QuerySetManager
+from widgy.utils import QuerySet
 
 from widgy.models.versioning import VersionTracker, VersionCommit
 
@@ -18,12 +17,13 @@ class ReviewedVersionCommit(VersionCommit):
         verbose_name = _('unapproved commit')
         verbose_name_plural = _('unapproved commits')
 
-    objects = QuerySetManager()
 
-    class QuerySet(QuerySet):
+    class ReviewedVersionCommitQuerySet(QuerySet):
         def unapproved(self):
             return self.filter(approved_at__isnull=True,
                                approved_by__isnull=True)
+
+    objects = ReviewedVersionCommitQuerySet.as_manager()
 
     @property
     def is_approved(self):
