@@ -30,6 +30,7 @@ install_requires = [
     'beautifulsoup4',
     'sorl-thumbnail==11.12',
     'html2text==3.200.3',
+    'phonenumbers',
 ]
 
 version = (0, 0, 1, 'alpha')
