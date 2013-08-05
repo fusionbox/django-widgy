@@ -168,3 +168,6 @@ URLCONF_INCLUDE_CHOICES = (
 )
 
 WIDGY_MEZZANINE_SITE = 'demo.widgy.widgy_site'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'demo', 'media')
+MEDIA_URL = '/media/'

@@ -45,6 +45,7 @@ add required Widgy apps to ``INSTALLED_APPS``::
         'sorl.thumbnail',
         'south',
 
+
 ``django.contrib.admin`` should be installed after Mezzanine and Widgy,
 so move it under them in ``INSTALLED_APPS``.
 
