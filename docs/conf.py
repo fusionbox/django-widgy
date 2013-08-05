@@ -13,6 +13,9 @@
 
 import sys, os
 
+sys.path.append(os.path.abspath('_themes'))
+sys.path.append(os.path.abspath('_ext'))
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -25,7 +28,8 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.viewcode']
+extensions = ['sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.viewcode',
+              'sphinx.ext.intersphinx', 'sphinx.ext.autodoc', 'djangodocs']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -41,7 +45,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'django-widgy'
-copyright = u'2012, Programmers at Fusionbox'
+copyright = u'2013, Fusionbox, Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -64,7 +68,7 @@ release = '0.0.1'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = []
+exclude_patterns = ['_build']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None
@@ -91,7 +95,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+html_theme = 'kr'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -99,7 +103,7 @@ html_theme = 'default'
 #html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
+html_theme_path = ['_themes']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -243,8 +247,10 @@ todo_include_todos = True
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 
 # all teh paths!
-sys.path.insert(0, os.path.abspath('../../demo'))
 sys.path.insert(0, os.path.abspath('../..'))
-sys.path.insert(0, os.path.abspath('..'))
-sys.path.insert(0, os.path.abspath('.'))
-os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'demo.settings'
+
+intersphinx_mapping = {
+    'django': ('https://docs.djangoproject.com/en/1.5/', 'https://docs.djangoproject.com/en/1.5/_objects/'),
+    'treebeard': ('https://tabo.pe/projects/django-treebeard/docs/2.0b1/', None),
+}

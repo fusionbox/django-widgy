@@ -1,6 +1,8 @@
 {% extends "admin/base_site.html" %}
-{% load i18n filermedia staticfiles %}
+{% load i18n %}
+{% load filermedia %}
 {% load compress %}
+{% load staticfiles %}
 
 {% block extrastyle %}{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% filer_staticmedia_prefix %}css/admin_style.css" />
