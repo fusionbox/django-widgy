@@ -18,7 +18,7 @@ from django.core import urlresolvers
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.http import Http404
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from widgy.views.base import AuthorizedMixin
 from widgy.utils import build_url
