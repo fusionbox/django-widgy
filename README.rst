@@ -1,0 +1,51 @@
+Widgy: Tree Editor for Django
+=============================
+
+.. image:: https://travis-ci.org/fusionbox/django-widgy.png
+   :target: http://travis-ci.org/fusionbox/django-widgy
+   :alt: Build Status
+
+Widgy is a content editor somewhat in the line of CKEditor. It is not a
+WYSIWYG editor though. Widgy is more suited than CKEditor for editing
+pages, as in a CMS because it allows you to edit specific parts of the
+page and those parts know how to render themselves. Whereas a WYSIWYG
+stores its data in HTML, Widgy stores it in a Tree where each node can
+render itself.
+
+Widgy is available under the 2-clause BSD license. Contribute on github.
+
+Documentation
+-------------
+
+Read Widgy's documentation at http://django-widgy.readthedocs.org.
+
+Installation
+------------
+
+Widgy does not yet have a stable release, so it should be installed from
+source. ::
+
+    pip install -e git://github.com/fusionbox/django-widgy#egg=widgy
+
+When developing Widgy, it might be handy to clone the repository then install
+it. ::
+
+    git clone git://github.com/fusionbox/django-widgy
+    cd django-widgy
+    pip install -e .
+
+Design Philosophy
+-----------------
+
+Read about Widgy's data model at
+http://django-widgy.readthedocs.org/en/latest/design/data-model.html.
+
+Running the Tests
+-----------------
+
+::
+
+    make test
+
+``make test`` will run both the JavaScript and Python tests. To test one
+or the other, use ``make test-js`` or ``make test-py``.
