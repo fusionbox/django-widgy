@@ -6,51 +6,8 @@ with the creation of HTML forms.
 
 .. form_builder does actually rely on Html existing.
 
-In order to install Form Builder, you must do the following:
-
-1.  Add ``widgy.contrib.form_builder`` to your
-    :django:setting:`INSTALLED_APPS`.
-
-2.  Each widgy owner that you want to support forms needs to implement a method
-    called ``get_form_action_url`` that returns a URL that points to a view
-    (see step 3).
-
-3.  Create a view to handle form submissions. Form Builder provides the
-    class-based views mixin,
-    :class:`~widgy.contrib.form_builder.views.HandleFormMixin`, to make this
-    easier.
-
-
-Views
------
-
-.. class:: widgy.contrib.form_builder.views.HandleFormMixin
-
-    An abstract view mixin for handling form_builder.Form submissions. It
-    inherits from
-    :class:`django.views.generic.edit.FormMixin`.
-
-    It should be registered with a URL similar to the following. ::
-
-        url('^form/(?P<form_node_pk>[^/]*)/$', 'your_view')
-
-
-    :class:`~widgy.contrib.form_builder.views.HandleFormMixin` does not
-    implement a GET method, so your subclass should handle that.  Here is an
-    example of a fully functioning implementation::
-
-        from django.views.generic import DetailView
-        from widgy.contrib.form_builder.views import HandleFormMixin
-
-        class EventDetailView(HandleFormMixin, DetailView):
-            model = Event
-
-            def post(self, *args, **kwargs):
-                self.object = self.get_object()
-                return super(EventDetailView, self).post(*args, **kwargs)
-
-    :class:`widgy.contrib.widgy_mezzanine.views.HandleFormView` provides an
-    even more robust example implementation.
+To enable Form Builder, add ``widgy.contrib.form_builder`` to
+your :django:setting:`INSTALLED_APPS`.
 
 
 .. currentmodule:: widgy.contrib.form_builder.models
@@ -120,3 +77,51 @@ Widgets
 
 
 .. class:: MultipleChoiceField
+
+
+Owner Contract
+--------------
+
+For custom :ref:`Widgy owners <owners>`, Form Builder needs to have a
+view to use for handling form submissions.
+
+1.  Each widgy owner should implement a
+    ``get_form_action_url(form, widgy_context)`` method that returns a
+    URL that points to a view (see step 2).
+
+2.  Create a view to handle form submissions for each owner. Form Builder provides the
+    class-based views mixin,
+    :class:`~widgy.contrib.form_builder.views.HandleFormMixin`, to make this
+    easier.
+
+
+Views
+-----
+
+.. class:: widgy.contrib.form_builder.views.HandleFormMixin
+
+    An abstract view mixin for handling form_builder.Form submissions. It
+    inherits from
+    :class:`django.views.generic.edit.FormMixin`.
+
+    It should be registered with a URL similar to the following. ::
+
+        url('^form/(?P<form_node_pk>[^/]*)/$', 'your_view')
+
+
+    :class:`~widgy.contrib.form_builder.views.HandleFormMixin` does not
+    implement a GET method, so your subclass should handle that.  Here is an
+    example of a fully functioning implementation::
+
+        from django.views.generic import DetailView
+        from widgy.contrib.form_builder.views import HandleFormMixin
+
+        class EventDetailView(HandleFormMixin, DetailView):
+            model = Event
+
+            def post(self, *args, **kwargs):
+                self.object = self.get_object()
+                return super(EventDetailView, self).post(*args, **kwargs)
+
+    :class:`widgy.contrib.widgy_mezzanine.views.HandleFormView` provides an
+    even more robust example implementation.
