@@ -117,7 +117,17 @@ def setup(verbosity, test_labels):
     settings.WIDGY_MEZZANINE_SITE = 'modeltests.core_tests.widgy_config.widgy_site'
     settings.DAISYDIFF_JAR_PATH = os.path.join(os.path.dirname(__file__),
                                                '..', 'bin', 'daisydiff', 'daisydiff.jar')
-
+    settings.TEMPLATE_CONTEXT_PROCESSORS = (
+        "django.contrib.auth.context_processors.auth",
+        "django.core.context_processors.debug",
+        "django.core.context_processors.i18n",
+        "django.core.context_processors.media",
+        "django.core.context_processors.static",
+        "django.core.context_processors.tz",
+        "django.contrib.messages.context_processors.messages",
+        "django.core.context_processors.request",
+        'mezzanine.conf.context_processors.settings',
+    )
 
     # mezzanine junk
     settings.PACKAGE_NAME_FILEBROWSER = "filebrowser_safe"
