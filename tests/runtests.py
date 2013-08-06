@@ -44,6 +44,7 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.admin',
     'django.contrib.staticfiles',
+    'django.contrib.comments',
     "mezzanine.boot",
     "mezzanine.conf",
     "mezzanine.core",
@@ -112,6 +113,7 @@ def setup(verbosity, test_labels):
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.common.CommonMiddleware',
+        'mezzanine.pages.middleware.PageMiddleware',
     )
     settings.SITE_ID = 1
     settings.WIDGY_MEZZANINE_SITE = 'modeltests.core_tests.widgy_config.widgy_site'
