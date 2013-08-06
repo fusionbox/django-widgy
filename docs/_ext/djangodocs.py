@@ -4,3 +4,8 @@ def setup(app):
         rolename="setting",
         indextemplate="pair: %s; setting",
     )
+
+    app.add_crossref_type(
+        directivename="django-admin",
+        rolename="djadmin",
+    )
