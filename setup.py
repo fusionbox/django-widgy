@@ -50,7 +50,7 @@ setup(
     name='widgy',
     version=get_version(),
     description=__doc__,
-    long_description=read('README.md'),
+    long_description=read('README.rst'),
     packages=[package for package in find_packages() if package.startswith('widgy')],
     install_requires=install_requires,
     dependency_links=[
