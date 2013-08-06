@@ -30,7 +30,7 @@ class WidgySite(object):
         return registry
 
     def get_all_content_classes(self):
-        return self.get_registry().keys()
+        return self.get_registry()
 
     def get_urls(self):
         urlpatterns = patterns('',

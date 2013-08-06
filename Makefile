@@ -34,5 +34,8 @@ widgy/locale/xx_pseudo/LC_MESSAGES/django.mo: widgy/locale/xx_pseudo/LC_MESSAGES
 
 t10n: widgy/locale/xx_pseudo/LC_MESSAGES/django.mo
 
+docs:
+	cd docs && $(MAKE) html
 
-.PHONY: test coverage browser test-py test-js
+
+.PHONY: test coverage browser test-py test-js docs

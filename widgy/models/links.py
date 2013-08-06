@@ -3,29 +3,13 @@ import itertools
 
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ImproperlyConfigured
 from django import forms
 
 from widgy.generic import WidgyGenericForeignKey
+from widgy import BaseRegistry
 
 
-class LinkRegistry(set):
-
-    def register(self, model):
-        if model in self:
-            raise ImproperlyConfigured(("You cannot register the same "
-                                        "content ('{0}') twice.").format(model))
-        if not issubclass(model, models.Model):
-            raise ImproperlyConfigured(("{0} is not a subclass of django.db.models.Model, "
-                                        "so it cannot be registered").format(model))
-        self.add(model)
-
-        # This allow LinkRegistry.register to be used as a decorator
-        return model
-
-    def unregister(self, model):
-        self.remove(model)
-
+class LinkRegistry(BaseRegistry):
     def get_links(self, obj):
         if not isinstance(obj, tuple(self)):
             raise ValueError("The object class is not registered linkable")

@@ -1,5 +1,5 @@
 {% load thumbnail_libs %}
 
 {% sorl_thumbnail self.image.file.name "500x500" upscale=False as im %}
-  <img src="{% media im.name %}" alt="{{ self.image.label }}">
+  <img src="{{ im.url }}" alt="{{ self.image.label }}">
 {% endthumbnail %}

@@ -1,4 +1,0 @@
-Django==1.4.1
-Fabric==1.4.3
-South
-BeautifulSoup==3.2.1
