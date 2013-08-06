@@ -42,5 +42,5 @@ class TestAdminPages(HttpTestCase):
         self.assertEqual(response.status_code, 200)
         
     def test_open_comments(self):
-        response = self.client.get('/admin/comments/comment/')
+        response = self.client.get('/admin/generic/threadedcomment/')
         self.assertEqual(response.status_code, 200)
