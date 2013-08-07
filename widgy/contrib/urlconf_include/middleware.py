@@ -10,6 +10,22 @@ from django.core import urlresolvers
 from .models import UrlconfIncludePage
 
 
+def uncache_urlconf(urlconf):
+    # Django's urlresolvers.get_resolver function is memoized. Since we
+    # create a new urlconf module for every request, the memoize cache
+    # keeps them all alive forever, causing a memory leak. Since we know
+    # we're never going to need to use this specific urlconf module
+    # object again, we can remove it from the cache.
+    #
+    # We could use urlresolvers.clear_url_caches to avoid using the
+    # private `_resolver_cache`, but that might affect performance
+    # because the entire cache would be cleared.
+    try:
+        del urlresolvers._resolver_cache[(urlconf,)]
+    except KeyError:
+        pass
+
+
 class PatchUrlconfMiddleware(object):
     def process_request(self, request):
         root_urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
@@ -48,6 +64,11 @@ class PatchUrlconfMiddleware(object):
         return new_urlconf
 
     def process_response(self, request, response):
+        # Our process_request may not have been called if another middleware's
+        # process_request short circuited, so check first. This could still
+        # leak if another middleware's process_response raises an exception.
+        if hasattr(request, 'urlconf'):
+            uncache_urlconf(request.urlconf)
         if response.status_code == 404 and not request.user.is_authenticated():
             # This 404 response might be because we never installed the
             # login_required urlpatterns. To be sure, try to resolve
@@ -64,6 +85,8 @@ class PatchUrlconfMiddleware(object):
             else:
                 from django.contrib.auth.views import redirect_to_login
                 return redirect_to_login(request.get_full_path())
+            finally:
+                uncache_urlconf(urlconf)
         return response
 
 
