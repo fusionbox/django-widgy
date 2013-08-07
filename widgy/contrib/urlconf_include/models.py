@@ -5,6 +5,8 @@ from django.conf import settings
 
 from mezzanine.pages.models import Page
 
+from widgy.models import links
+
 URLCONF_INCLUDE_CHOICES = getattr(settings, 'URLCONF_INCLUDE_CHOICES', None)
 # Application developers using widgy.contrib.urlconf_include should set
 # settings.URLCONF_INCLUDE_CHOICES.
@@ -17,6 +19,7 @@ if URLCONF_INCLUDE_CHOICES is None:
                                'be a list of choices of urls modules')
 
 
+@links.register
 class UrlconfIncludePage(Page):
     urlconf_name = models.CharField(max_length=255, verbose_name=_('plugin name'),
                                     choices=URLCONF_INCLUDE_CHOICES)
