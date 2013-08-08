@@ -247,7 +247,7 @@ todo_include_todos = True
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 
 # all teh paths!
-sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('..'))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'demo.settings'
 
 intersphinx_mapping = {
