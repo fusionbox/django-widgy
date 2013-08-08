@@ -314,8 +314,9 @@ Base Models
 
     .. classmethod:: prefetch_trees(cls, *root_nodes)
 
-        Prefetches multiple trees. Uses ``1 + m`` queries, where ``m``
-        is the number of distinct content types across `all` the trees.
+        Prefetches multiple trees. Uses ``n + m`` queries, where ``n``
+        is the number of trees and ``m`` is the number of distinct
+        content types across `all` the trees.
 
     .. method:: maybe_prefetch_tree(self)
 
