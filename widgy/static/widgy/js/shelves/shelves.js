@@ -173,7 +173,14 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/base',
 
     cssClasses: function() {
       return this.model.get('css_classes');
+    },
+
+    render: function() {
+      DraggableView.prototype.render.apply(this, arguments);
+      this.$el.attr('title', this.model.get('help_text'));
+      return this;
     }
+
   });
 
 

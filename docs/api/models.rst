@@ -99,6 +99,10 @@ Base Models
 
             screenshot
 
+    .. attribute:: help_text
+
+        A class attribute that sets the tooltip for this widget on the shelf.
+
     .. attribute:: css_classes
 
         A list of CSS classes to apply to the widget element in the Editor.
