@@ -26,7 +26,7 @@ from widgy.exceptions import (
 )
 from widgy.signals import pre_delete_widget
 from widgy.generic import WidgyGenericForeignKey, ProxyGenericRelation
-from widgy.utils import exception_to_bool, update_context, render_to_string
+from widgy.utils import exception_to_bool, update_context, render_to_string, force_text
 from widgy.widgets import DateTimeWidget, DateWidget, TimeWidget
 
 logger = logging.getLogger(__name__)
@@ -407,6 +407,7 @@ class Content(models.Model):
     editable = False
     accepting_children = False
     shelf = False
+    help_text = None
 
     component_name = 'widget'
 
@@ -474,6 +475,7 @@ class Content(models.Model):
             '__class__': "%s.%s" % (cls._meta.app_label, cls._meta.module_name),
             'title': capfirst(cls._meta.verbose_name),
             'css_classes': (cls._meta.app_label, cls._meta.module_name),
+            'help_text': cls.help_text and force_text(cls.help_text),
         }
 
     @property
