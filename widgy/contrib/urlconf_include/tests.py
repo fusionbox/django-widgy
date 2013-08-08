@@ -1,9 +1,12 @@
+import imp
+
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.decorators import decorator_from_middleware
 from django.http import HttpResponse, HttpResponseNotFound
 from django.core import urlresolvers
 from django.contrib.auth.models import AnonymousUser
+from django.conf.urls import include, url, patterns
 
 from widgy.contrib.urlconf_include.middleware import PatchUrlconfMiddleware
 from widgy.contrib.urlconf_include.models import UrlconfIncludePage
@@ -33,6 +36,18 @@ def view_that_reverses(request, desired):
 @patch_decorator
 def view_not_found(request):
     return HttpResponseNotFound('')
+
+@patch_decorator
+def view_that_switches_urlconf(request, login_url):
+    urlresolvers.resolve(login_url, request.urlconf)
+
+    new_urlconf = imp.new_module('urlconf')
+    new_urlconf.urlpatterns = patterns('', url(r'^bar/', include('django.contrib.auth.urls')))
+    request.urlconf = new_urlconf
+
+    urlresolvers.resolve('/bar/login/', request.urlconf)
+
+    return HttpResponse('')
 
 
 class TestMiddleware(TestCase):
@@ -74,6 +89,11 @@ class TestMiddleware(TestCase):
     def test_memory_leak_404(self):
         def doit():
             view_not_found(self.get_request('/asdf/asdfasdf/'))
+        self.do_test_memory_leak(doit)
+
+    def test_memory_leak_urlconf_replaced(self):
+        def doit():
+            view_that_switches_urlconf(self.get_request(), '/foo/login/')
         self.do_test_memory_leak(doit)
 
     def test_change_url(self):

@@ -32,6 +32,7 @@ class PatchUrlconfMiddleware(object):
         if isinstance(root_urlconf, basestring):
             root_urlconf = import_module(root_urlconf)
         request.urlconf = self.get_urlconf(root_urlconf, self.get_pages(logged_in=request.user.is_authenticated()))
+        request._patch_urlconf_middleware_urlconf = request.urlconf
 
     @classmethod
     def get_pattern_for_page(cls, page):
@@ -69,6 +70,8 @@ class PatchUrlconfMiddleware(object):
         # leak if another middleware's process_response raises an exception.
         if hasattr(request, 'urlconf'):
             uncache_urlconf(request.urlconf)
+        if hasattr(request, '_patch_urlconf_middleware_urlconf'):
+            uncache_urlconf(request._patch_urlconf_middleware_urlconf)
         if response.status_code == 404 and not request.user.is_authenticated():
             # This 404 response might be because we never installed the
             # login_required urlpatterns. To be sure, try to resolve
