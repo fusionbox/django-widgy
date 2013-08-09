@@ -44,6 +44,7 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.admin',
     'django.contrib.staticfiles',
+    #'django.contrib.comments',
     "mezzanine.boot",
     "mezzanine.conf",
     "mezzanine.core",
@@ -112,12 +113,23 @@ def setup(verbosity, test_labels):
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.common.CommonMiddleware',
+        'mezzanine.pages.middleware.PageMiddleware',
     )
     settings.SITE_ID = 1
     settings.WIDGY_MEZZANINE_SITE = 'modeltests.core_tests.widgy_config.widgy_site'
     settings.DAISYDIFF_JAR_PATH = os.path.join(os.path.dirname(__file__),
                                                '..', 'bin', 'daisydiff', 'daisydiff.jar')
-
+    settings.TEMPLATE_CONTEXT_PROCESSORS = (
+        "django.contrib.auth.context_processors.auth",
+        "django.core.context_processors.debug",
+        "django.core.context_processors.i18n",
+        "django.core.context_processors.media",
+        "django.core.context_processors.static",
+        "django.core.context_processors.tz",
+        "django.contrib.messages.context_processors.messages",
+        "django.core.context_processors.request",
+        'mezzanine.conf.context_processors.settings',
+    )
 
     # mezzanine junk
     settings.PACKAGE_NAME_FILEBROWSER = "filebrowser_safe"
