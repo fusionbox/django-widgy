@@ -210,6 +210,8 @@ Base Models
         Returns a template name or list of template names for frontend
         rendering.
 
+    .. _compatibility:
+
     .. rubric:: Compatibility
 
     Widgy provide robust machinery for compatibility between Contents.  Widgy

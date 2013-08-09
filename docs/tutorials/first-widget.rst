@@ -2,17 +2,20 @@ Writing Your First Widget
 =========================
 
 In this tutorial, we will build a Slideshow widget. You probably want to read
-the :doc:`widgy-mezzanine-tutorial` before you do this one.
+the :doc:`widgy-mezzanine-tutorial` to get a Widgy site running before you do
+this one.
 
 We currently have a static slideshow that we need to make editable. Users need
 to be able to add any number of slides. Users also want to be able to change
 the delay between each slide.
 
-Here is the current slideshow HTML that is using jQuery Cycle2:
+Here is the current slideshow HTML that is using `jQuery Cycle2`_:
 
-.. code-block:: html
+.. code-block:: html+django
 
-    <div class="cycle-slideshow" data-cycle-timeout=2000 data-cycle-caption-template="{{alt}}">
+    <div class="cycle-slideshow"
+         data-cycle-timeout="2000"
+         data-cycle-caption-template="{% templatetag openvariable %}alt{% templatetag closevariable %}">
       <div class="cycle-caption"></div>
 
       <img src="http://placekitten.com/800/300" alt="Cute cat">
@@ -20,6 +23,14 @@ Here is the current slideshow HTML that is using jQuery Cycle2:
       <img src="http://placekitten.com/800/300" alt="Another cute cat">
       <img src="http://placekitten.com/800/300" alt="Awwww">
     </div>
+
+.. seealso::
+
+    :django:ttag:`templatetag`
+         This template tag allows inserting the ``{{`` and ``}}`` characters
+         needed by Cycle2.
+
+.. _jQuery Cycle2: http://jquery.malsup.com/cycle2/
 
 1.  Write the Models
 --------------------
@@ -45,22 +56,39 @@ container and a ``Slide`` model that represents the individual images. ::
 
     @widgy.register
     class Slideshow(Content):
-        delay = models.PositiveIntegerField(default=2)
+        delay = models.PositiveIntegerField(default=2,
+            help_text="The delay in seconds between slides.")
+
+        accepting_children = True
+        editable = True
 
     @widgy.register
     class Slide(Content):
         image = models.ImageField(upload_to='slides/', null=True)
         caption = models.CharField(max_length=255)
 
+        editable = True
+
 All widget classes inherit from :class:`widgy.models.base.Content`. This
-creates the relationship with :class:`widgy.models.Node` and ensures that all
-of the required methods are implemented.
+creates the relationship with :class:`widgy.models.base.Node` and ensures that
+all of the required methods are implemented.
 
 In order to make a widget visible to Widgy, you have to add it to the registry.
 There are two functions in the :mod:`widgy` module that help with this,
 :func:`widgy.register` and :func:`widgy.unregister`. You should use the
 :func:`widgy.register` class decorator on any model class that you wish to use
 as a widget.
+
+Both widgets need to have :attr:`~widgy.models.base.Content.editable` set to
+``True``.  This will make an edit button appear in the editor, allowing the
+user to set the ``image``, ``caption``, and ``delay`` values.
+
+``Slideshow`` has :attr:`~widgy.models.base.Content.accepting_children` set to
+``True`` so that you can put a ``Slide`` in it.  The default implementation of
+:meth:`~widgy.models.base.Content.valid_parent_of` checks
+:attr:`~widgy.models.base.Content.accepting_children`. We only need this until
+we override :meth:`~widgy.models.base.Content.valid_parent_of` in :ref:`Step 3
+<slideshow-compatibility>`.
 
 .. note::
 
@@ -88,16 +116,18 @@ And now run the migration.
 2.  Write the Templates
 -----------------------
 
-After that, we need to write our templates. The templates are expected to be
-in ``slideshow/templates/widgy/slideshow/slideshow/render.html`` and 
-``slideshow/templates/widgy/slideshow/slide.html``.
+After that, we need to write our templates. The templates are
+expected to be named ``widgy/slideshow/slideshow/render.html`` and
+``widgy/slideshow/slide/render.html``.
+
+To create the slideshow template, add a file at
+:file:`slideshow/templates/widgy/slideshow/slideshow/render.html`.
 
 .. code-block:: html+django
 
-    # widgy/slideshow/slideshow/render.html
     {% load widgy_tags %}
     <div class="cycle-slideshow"
-      data-cycle-timeout={{ self.get_delay_millesconds }}
+      data-cycle-timeout="{{ self.get_delay_milliseconds }}"
       data-cycle-caption-template="{% templatetag openvariable %}alt{% templatetag closevariable %}">
       <div class="cycle-caption"></div>
 
@@ -106,7 +136,10 @@ in ``slideshow/templates/widgy/slideshow/slideshow/render.html`` and
       {% endfor %}
     </div>
 
-    # widgy/slideshow/slideshow/render.html
+For the slide, it's :file:`slideshow/templates/widgy/slideshow/slide/render.html`.
+
+.. code-block:: html+django
+
     <img src="{{ self.image.url }}" alt="{{ self.caption }}">
 
 .. seealso::
@@ -120,7 +153,7 @@ delay, we need to add a method to the ``Slideshow`` class. ::
 
     class Slideshow(Content):
         # ...
-        def get_delay_millesconds(self):
+        def get_delay_milliseconds(self):
             return self.delay * 1000
 
 The :class:`~widgy.models.base.Content` class mirrors several methods of the
@@ -132,9 +165,11 @@ render a child :class:`~widgy.models.base.Content`, use the
 .. caution::
 
     You might be tempted to include the HTML for each ``Slide`` inside the
-    render template for ``Slideshow``. While this does work, it is not
-    compartmentalized, and makes it difficult for slides (or subclasses
-    thereof) to change how they are rendered.
+    render template for ``Slideshow``. While this does work, it is a violation
+    of the single responsibility principle and makes it difficult for slides
+    (or subclasses thereof) to change how they are rendered.
+
+.. _slideshow-compatibility:
 
 3.  Write the Compatibility
 ---------------------------
@@ -142,7 +177,7 @@ render a child :class:`~widgy.models.base.Content`, use the
 Right now, the ``Slideshow`` and ``Slide`` render and could be considered
 complete; however, the way we have it, ``Slideshow`` can accept any widget as a
 child and a ``Slide`` can go in any parent. To disallow this, we have to write
-some :ref:`compatibility` methods. ::
+some :ref:`Compatibility <compatibility>` methods. ::
 
     class Slideshow(Content):
         def valid_parent_of(self, cls, obj=None):
@@ -155,6 +190,8 @@ some :ref:`compatibility` methods. ::
             # only go in Slideshows
             return isinstance(parent, Slideshow)
 
+
+Done.
 
 Addendum: Limit Number of Children
 ----------------------------------
