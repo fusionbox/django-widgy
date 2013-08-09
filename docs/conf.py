@@ -253,4 +253,5 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'demo.settings'
 intersphinx_mapping = {
     'django': ('https://docs.djangoproject.com/en/1.5/', 'https://docs.djangoproject.com/en/1.5/_objects/'),
     'treebeard': ('https://tabo.pe/projects/django-treebeard/docs/2.0b1/', None),
+    'filer': ('http://django-filer.readthedocs.org/en/latest/', None),
 }

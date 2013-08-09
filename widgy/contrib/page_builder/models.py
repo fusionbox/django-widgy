@@ -1,5 +1,3 @@
-import os
-
 from django import forms
 from django.db import models
 from django.conf import settings
@@ -8,9 +6,6 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.dispatch import receiver
 from django.template.defaultfilters import truncatechars
 
-from filer.fields.file import FilerFileField
-from filer.models.filemodels import File
-
 from widgy.models import Content
 from widgy.models.mixins import (
     StrictDefaultChildrenMixin, InvisibleMixin, StrDisplayNameMixin,
@@ -18,7 +13,7 @@ from widgy.models.mixins import (
 )
 from widgy.models.links import LinkField, LinkFormField, LinkFormMixin
 from widgy.db.fields import WidgyField
-from widgy.contrib.page_builder.db.fields import MarkdownField, VideoField
+from widgy.contrib.page_builder.db.fields import MarkdownField, VideoField, ImageField
 from widgy.contrib.page_builder.forms import CKEditorField
 from widgy.signals import pre_delete_widget
 from widgy.utils import build_url, SelectRelatedManager
@@ -250,40 +245,11 @@ class Section(StrDisplayNameMixin, Content):
         return self.title
 
 
-def validate_image(file_pk):
-    file = File.objects.get(pk=file_pk)
-    iext = os.path.splitext(file.file.name)[1].lower()
-    if not iext in ['.jpg', '.jpeg', '.png', '.gif']:
-        raise forms.ValidationError('File type must be jpg, png, or gif')
-    return file_pk
-
-
-def ImageField(*args, **kwargs):
-    """
-    This is a convenience function to wrap the default args that we always
-    want.  This is implemented as a function to avoid invoking the wrath of
-    South's model introspection.
-    """
-    defaults = {
-        'null': True,
-        'blank': True,
-        'verbose_name': _('image'),
-        'validators': [validate_image],
-        'related_name': '+',
-        # What should happen on_delete.  Set to models.PROTECT so this is harder to
-        # ignore and forget about.
-        'on_delete': models.PROTECT,
-    }
-    defaults.update(kwargs)
-
-    return FilerFileField(*args, **defaults)
-
-
 @widgy.register
 class Image(Content):
     editable = True
 
-    image = ImageField()
+    image = ImageField(verbose_name=_('image'))
 
     objects = SelectRelatedManager(select_related=['image'])
 
