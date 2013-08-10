@@ -151,7 +151,7 @@ $purple:      #A56ED3;
   }
 }
 
-$widget_icon_sprite: sprite-map("widgy/image/widget-*");
+$widget_icon_sprite: sprite-map("widgy/image/widget-*", $spacing: 7);
 
 @mixin node-icon-sprite ($class, $icon, $sprite: $widget_icon_sprite) {
   @include node-icon-base($class, sprite($sprite, $icon));

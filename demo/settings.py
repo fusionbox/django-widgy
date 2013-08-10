@@ -136,6 +136,8 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'demo', 'media')
 MEDIA_URL = '/media/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'demo', 'public'),
 )
@@ -158,15 +160,7 @@ SCSS_IMPORTS = STATICFILES_DIRS + (
 
 COMPRESS_ENABLED = True
 COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', 'python -mscss.tool --no-compress'
-                    ' --assets-root={assets_path}'
-                    ' --static-root={static_path}'
-                    ' --load-path={load_paths}'.format(
-                        load_paths=','.join(['"%s"' % d for d in SCSS_IMPORTS]),
-                        assets_path=os.path.join(BASE_DIR, 'static', 'assets'),
-                        static_path='widgy/static/',
-                        )
-                    ),
+    ('text/x-scss', 'widgy.compressor.scss_filter.ScssFilter'),
 )
 
 INTERNAL_IPS = (

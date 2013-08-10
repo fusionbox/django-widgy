@@ -4,7 +4,7 @@ Django==1.4.4
 South
 Werkzeug
 django-cachebuster
-django-compressor
+django-compressor==1.3
 django-debug-toolbar
 django-extensions
 Mezzanine
