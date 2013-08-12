@@ -36,12 +36,19 @@ config.ASSETS_ROOT = os.path.join(settings.COMPRESS_ROOT, 'scss', 'assets')
 # PyScss expects a trailing slash.
 config.ASSETS_URL = staticfiles_storage.url('scss/assets/')
 
+SCSS_IMPORTS = list(getattr(settings, 'SCSS_IMPORTS', []))
+
+WIDGY_ROOT = os.path.dirname(os.path.dirname(__file__))
+WIDGY_SCSS_LOAD_PATH = os.path.join(WIDGY_ROOT, 'static', 'widgy', 'css')
+if WIDGY_SCSS_LOAD_PATH not in SCSS_IMPORTS:
+    SCSS_IMPORTS.append(WIDGY_SCSS_LOAD_PATH)
+
 compiler = scss.Scss(
     scss_opts={
         'compress': False,
         'debug_info': False,
         # PyScss expects a list not a tuple.
-        'load_paths': list(settings.SCSS_IMPORTS),
+        'load_paths': SCSS_IMPORTS,
     }
 )
 
