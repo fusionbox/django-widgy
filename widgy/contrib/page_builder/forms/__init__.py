@@ -1,14 +1,12 @@
-import os
-
 from django import forms
 from django.utils.safestring import mark_safe
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.contrib.staticfiles import finders
 from django.template.loader import render_to_string
-from django.conf import settings
 
 import bleach
-from scss import Scss
+
+from widgy.compressor.scss_filter import compiler as scss
 
 
 PAGEDOWN_EDITOR_TEMPLATE = u'''
@@ -17,13 +15,9 @@ PAGEDOWN_EDITOR_TEMPLATE = u'''
 <div class="pagedown-preview"></div>
 '''
 
+
 def scss_compile(scss_filename):
     scss_filename = finders.find(scss_filename)
-    # In order to specify include path, put this in your
-    # settings.py
-    #   from scss import config as scss_config
-    #   scss_config.LOAD_PATHS = ['path1', 'path2/subdirectory']
-    scss = Scss()
     css_content = scss.compile(scss_file=scss_filename)
     return css_content
 
@@ -81,7 +75,7 @@ class CKEditorWidget(forms.Textarea):
         'removeButtons': '',
         'extraPlugins': 'justify',
         'justifyClasses': ['align-left', 'align-center', 'align-right', 'align-justify'],
-        'indentClasses': ['text-indent-%d' % i for i in xrange(1,6)],
+        'indentClasses': ['text-indent-%d' % i for i in xrange(1, 6)],
         'contentsCss': scss_compile('widgy/page_builder/html.scss'),
     }
 
