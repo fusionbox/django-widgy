@@ -4,8 +4,10 @@ from django.conf import settings
 from django.core import urlresolvers
 
 from mezzanine.pages.managers import PageManager
+from mezzanine.pages.models import Link
 
 from widgy.utils import SelectRelatedManager
+from widgy.models import links
 
 
 class WidgyPageMixin(object):
@@ -59,12 +61,12 @@ class PageSelectRelatedManager(SelectRelatedManager, PageManager):
     """
     use_for_related_fields = True
 
+links.register(Link)
 
 # In Django 1.5+, we could use swappable = True
 if getattr(settings, 'WIDGY_MEZZANINE_PAGE_MODEL', None) is None:
     from mezzanine.pages.models import Page
     from widgy.db.fields import VersionedWidgyField
-    from widgy.models import links
 
     @links.register
     class WidgyPage(WidgyPageMixin, Page):
