@@ -10,11 +10,11 @@
     <span class="title">{{ self.display_name|capfirst }}</span>
     {% endblock %}
     
-    {% if self.editable %}
-    <button class="edit"><i class="icon-pencil"></i> <span>{% trans "Edit" %}</span></button>
-    {% endif %}
     {% if self.deletable %}
     <button class="delete"><i class="icon-remove"></i> <span>{% trans "Delete" %}</span></button>
+    {% endif %}
+    {% if self.editable %}
+    <button class="edit"><i class="icon-pencil"></i> <span>{% trans "Edit" %}</span></button>
     {% endif %}
     {% if self.pop_out %}
     <a href="{{ edit_url }}" class="pop_out">{% trans "pop out" %}</a>
