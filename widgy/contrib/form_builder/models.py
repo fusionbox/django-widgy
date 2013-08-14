@@ -69,6 +69,8 @@ class FormReponseHandler(FormSuccessHandler):
 @widgy.register
 class SaveDataHandler(FormSuccessHandler):
     editable = False
+    tooltip = _("Saves the data when the Form is filled out. This is enabled by"
+                " default.")
 
     def execute(self, request, form):
         FormSubmission.objects.submit(
@@ -134,6 +136,10 @@ class EmailSuccessHandlerBase(FormSuccessHandler):
 class EmailSuccessHandler(EmailSuccessHandlerBase):
     to = models.EmailField(verbose_name=_('to'))
 
+    tooltip = _("This widget can be used to send yourself an email when a form"
+                " has been filled out. You can customize the body of the"
+                " email.")
+
     class Meta:
         verbose_name = _('admin success email')
         verbose_name_plural = _('admin success emails')
@@ -160,6 +166,8 @@ class EmailUserHandlerForm(EmailSuccessHandlerBaseForm):
 class EmailUserHandler(EmailSuccessHandlerBase):
     editable = True
     form = EmailUserHandlerForm
+    tooltip = _("This widget can be used to send the user an email when they"
+                " fill out a form. You can customize the body of the email.")
 
     # an input in our form
     to_ident = models.CharField(_('to'), max_length=36)
@@ -192,6 +200,8 @@ class EmailUserHandler(EmailSuccessHandlerBase):
 @widgy.register
 class SubmitButton(FormElement):
     text = models.CharField(max_length=255, default=lambda: ugettext('submit'), verbose_name=_('text'))
+
+    tooltip = _("The submit button for a form.")
 
     @property
     def deletable(self):
@@ -296,6 +306,7 @@ class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChi
         ('fields', FormBody, (), {}),
         ('meta', FormMeta, (), {}),
     ]
+    tooltip = _("Use this widget to build a Form that your users can fill out.")
 
     objects = QuerySetManager()
 
@@ -540,6 +551,10 @@ class FormInput(FormField):
 
     type = models.CharField(choices=FORM_INPUT_TYPES, max_length=255, verbose_name=_('type'))
 
+    tooltip = _("A single form input. This widget can accept different types of"
+                " input like text, number, or email. See a more complete list"
+                " inside the widget.")
+
     @property
     def formfield_class(self):
         return self.FORMFIELD_CLASSES.get(self.type, forms.CharField)
@@ -567,6 +582,9 @@ class FormInput(FormField):
 @widgy.register
 class Textarea(FormField):
     formfield_class = forms.CharField
+
+    tooltip = _("Add this to your form to allow users to add large amounts of"
+                " text.")
 
     @property
     def widget(self):
@@ -623,6 +641,10 @@ class ChoiceField(BaseChoiceField):
         ('radios', _('Radio buttons')),
     ])
 
+    tooltip = _("Use this to allow your users to choose from a list of"
+                " options. ChoiceFields can be displayed as radio buttons"
+                " or as a dropdown.")
+
     def get_choices(self):
         choices = super(ChoiceField, self).get_choices()
         if self.type == 'select':
@@ -647,6 +669,10 @@ class MultipleChoiceField(BaseChoiceField):
         ('checkboxes', _('Checkboxes')),
         ('select', _('Multi-select')),
     ])
+
+    tooltip = _("Use this to allow your users to choose one or more options"
+                " from a list of choices. This field can be displayed as"
+                " checkboxes or as a multi-select dropdown.")
 
     @property
     def widget_attrs(self):
@@ -675,6 +701,9 @@ class MultipleChoiceField(BaseChoiceField):
 class Uncaptcha(BaseFormField):
     editable = False
     formfield_class = forms.CharField
+
+    tooltip = _("This widget uses a special script to detect and prevent"
+                " spam.")
 
     def get_form_mixins(self):
         # since validating an uncaptcha widget requires access to the
