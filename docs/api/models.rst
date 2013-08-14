@@ -99,7 +99,7 @@ Base Models
 
             screenshot
 
-    .. attribute:: help_text
+    .. attribute:: tooltip
 
         A class attribute that sets the tooltip for this widget on the shelf.
 
