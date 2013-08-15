@@ -14,12 +14,10 @@ except ImportError:
 
 from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
-from mezzanine.pages.models import Link
 
 from widgy.forms import WidgyFormMixin
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.utils import fancy_import, format_html
-from widgy.models import links
 
 from widgy.contrib.review_queue.admin import VersionCommitAdminBase
 
@@ -140,5 +138,3 @@ admin.site.register(UndeletePage, UndeletePageAdmin)
 
 if 'widgy.contrib.review_queue' in settings.INSTALLED_APPS:
     admin.site.register(ReviewedVersionCommit, VersionCommitAdmin)
-
-links.register(Link)
