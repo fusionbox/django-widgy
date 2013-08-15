@@ -1,4 +1,6 @@
 from __future__ import unicode_literals
+from operator import attrgetter
+import urllib
 
 import csv
 
@@ -12,6 +14,8 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 from django.shortcuts import redirect
 from django.dispatch import receiver
 from django.template.loader import render_to_string
+from django.utils.functional import cached_property
+from django.utils.encoding import smart_text
 
 from fusionbox import behaviors
 from fusionbox.db.models import QuerySetManager
@@ -79,6 +83,131 @@ class SaveDataHandler(FormSuccessHandler):
     class Meta:
         verbose_name = _('save data handler')
         verbose_name_plural = _('save data handlers')
+
+
+class BaseMappingHandler(FormSuccessHandler):
+    """
+    Abstract class for easily creating a form mapper.
+
+    Inherit from this class if you want to create a mapper which
+    upload the form data to a FTP server for example.
+    """
+
+    class Meta:
+        abstract = True
+
+    def get_mapping(self, request, form):
+        mapping = dict()
+        for child in self.get_children():
+            child.update_mapping(mapping, form)
+        return mapping
+
+
+class RepostHandler(BaseMappingHandler):
+    """
+    Abstract class for easily creating a mapper that repost data
+    to another form.
+
+    The subclass must have a url_to_post field.
+    """
+
+    class Meta:
+        abstract = True
+
+    def execute(self, request, form):
+        query_string = urllib.urlencode(self.get_mapping(request, form))
+        urllib.urlopen(self.url_to_post, query_string)
+
+
+class MappingValue(DisplayNameMixin(smart_text), FormElement):
+    """
+    Abstract class for creating a mapping value.
+
+    Inherit from this class if you want to create a ConstantMappingValue
+    for example.
+
+    You need to implement update_mapping(self, mapping, form) in subclasses.
+    """
+    class Meta:
+        abstract = True
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        return isinstance(parent, BaseMappingHandler)
+
+
+class FieldMappingValueForm(forms.ModelForm):
+    field_ident = forms.ChoiceField(label=_('Field'), choices=[])
+
+    def __init__(self, *args, **kwargs):
+        super(FieldMappingValueForm, self).__init__(*args, **kwargs)
+        self.fields['field_ident'].choices = [('', _('------'))] + [
+            (str(i.ident), i) for i in self.instance.get_fields()
+        ]
+
+
+@widgy.register
+class FieldMappingValue(DisplayNameMixin(smart_text), MappingValue):
+    """
+    MappingValue that maps a form field to another value.
+    """
+    form = FieldMappingValueForm
+    name = models.CharField(max_length=255)
+
+    field_ident = models.CharField(max_length=36)
+
+    class Meta:
+        verbose_name = _('mapped field')
+        verbose_name_plural = _('mapped field')
+
+    def get_fields(self):
+        return [f for f in self.parent_form.depth_first_order()
+                if isinstance(f, FormField)]
+
+    def update_mapping(self, mapping, form):
+        try:
+            form_field_name = self.fields_mapping[self.field_ident].get_formfield_name()
+            mapping[self.name] = form.cleaned_data[form_field_name]
+        except KeyError:
+            pass
+
+    @cached_property
+    def fields_mapping(self):
+        # Dict comprehension syntax for Python <2.7
+        return dict(
+            (field.ident, field)
+            for field in self.parent_form.depth_first_order()
+            if isinstance(field, FormField)
+        )
+
+    def __unicode__(self):
+        try:
+            label = self.fields_mapping[self.field_ident].label
+        except KeyError:
+            return u''
+        else:
+            return _('{0} to {1}').format(label, self.name)
+
+
+@widgy.register
+class WebToLeadMapperHandler(RepostHandler):
+    """
+    Mapper which repost form data to SalesForce
+    """
+    url_to_post = 'https://www.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8'
+    oid = models.CharField(_('Organization ID (OID)'), max_length=16)
+
+    class Meta:
+        verbose_name = _('Salesforce Web-to-Lead')
+        verbose_name_plural = _('Salesforce Web-to-Lead')
+
+    def get_mapping(self, request, form):
+        mapping = super(WebToLeadMapperHandler, self).get_mapping(request, form)
+        mapping.update(oid=self.oid)
+        return mapping
+
+    def valid_parent_of(self, cls, obj=None):
+        return issubclass(cls, FieldMappingValue)
 
 
 def send_html_mail(subject, content, from_email, to):
