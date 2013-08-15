@@ -12,4 +12,6 @@ li.shelfItem {
   @include node-icon("form_builder.submitbutton", "../image/widget-button.png");
   @include node-icon("form_builder.textarea", "../image/widget-textarea.gif");
   @include node-icon("form_builder.uncaptcha", "../image/widget-hidden-field.png");
+  @include node-icon("form_builder.webtoleadmapperhandler", "../image/widget-salesforce.png");
+  @include node-icon("form_builder.fieldmappingvalue", "../image/widget-icon-mapped-field.png");
 }
