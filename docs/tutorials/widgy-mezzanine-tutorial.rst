@@ -112,9 +112,7 @@ add Widgy scss includes::
 **Note:** Please put this before you define the ``COMPRESS_PRECOMPILERS``::
 
     COMPRESS_PRECOMPILERS = (
-        ('text/x-scss', 'python -mscss.tool -C %s' %
-         ' '.join(['-I "%s"' % d for d in SCSS_IMPORTS])
-         ),
+        ('text/x-scss', 'widgy.compressor.scss_filter.ScssFilter'),
     )
 
 Widgy requires that django-compressor be configured with a precompiler

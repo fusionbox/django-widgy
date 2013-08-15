@@ -2,14 +2,14 @@
 
 li.node,
 li.shelfItem {
-  @include node-icon("form_builder.choicefield", "../image/widget-radio.png");
-  @include node-icon("form_builder.emailsuccesshandler", "../image/widget-email.gif");
-  @include node-icon("form_builder.emailuserhandler", "../image/widget-email.gif");
-  @include node-icon("form_builder.form", "../image/widget-form.gif");
-  @include node-icon("form_builder.forminput", "../image/widget-form.gif");
-  @include node-icon("form_builder.multiplechoicefield", "../image/widget-checkbox.png");
-  @include node-icon("form_builder.savedatahandler", "../image/widget-save-data.png");
-  @include node-icon("form_builder.submitbutton", "../image/widget-button.png");
-  @include node-icon("form_builder.textarea", "../image/widget-textarea.gif");
-  @include node-icon("form_builder.uncaptcha", "../image/widget-hidden-field.png");
+  @include node-icon-sprite("form_builder.choicefield", "widget-radio");
+  @include node-icon-sprite("form_builder.emailsuccesshandler", "widget-email");
+  @include node-icon-sprite("form_builder.emailuserhandler", "widget-email");
+  @include node-icon-sprite("form_builder.form", "widget-form");
+  @include node-icon-sprite("form_builder.forminput", "widget-form");
+  @include node-icon-sprite("form_builder.multiplechoicefield", "widget-checkbox");
+  @include node-icon-sprite("form_builder.savedatahandler", "widget-save-data");
+  @include node-icon-sprite("form_builder.submitbutton", "widget-button");
+  @include node-icon-sprite("form_builder.textarea", "widget-textarea");
+  @include node-icon-sprite("form_builder.uncaptcha", "widget-hidden-field");
 }

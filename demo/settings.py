@@ -1,5 +1,4 @@
 import os
-import imp
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -136,6 +135,8 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'demo', 'media')
 MEDIA_URL = '/media/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'demo', 'public'),
 )
@@ -150,18 +151,9 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'demo', 'templates'),
 )
 
-WIDGY_ROOT = imp.find_module('widgy')[1]
-
-SCSS_IMPORTS = STATICFILES_DIRS + (
-    os.path.join(WIDGY_ROOT, 'static', 'widgy', 'css'),
-)
-
 COMPRESS_ENABLED = True
-
 COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', 'python -mscss.tool -C %s' %
-     ' '.join(['-I "%s"' % d for d in SCSS_IMPORTS])
-     ),
+    ('text/x-scss', 'widgy.compressor.scss_filter.ScssFilter'),
 )
 
 INTERNAL_IPS = (
@@ -183,7 +175,7 @@ URLCONF_INCLUDE_CHOICES = (
     ('demo.demo_url.urls', 'Demo url'),
 )
 
-DAISYDIFF_JAR_PATH = os.path.join(WIDGY_ROOT, '..', 'bin', 'daisydiff', 'daisydiff.jar')
+DAISYDIFF_JAR_PATH = os.path.join(BASE_DIR, 'bin', 'daisydiff', 'daisydiff.jar')
 
 REQUIRE_BUILD_PROFILE = 'widgy.build.js'
 REQUIRE_BASE_URL = 'widgy/js'
