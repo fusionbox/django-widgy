@@ -47,12 +47,12 @@ INSTALLED_APPS = (
     'filer',
     'easy_thumbnails',
     'compressor',
-    'fusionbox.core',
     'scss',
     'sorl.thumbnail',
     'south',
     'debug_toolbar',
     'django_extensions',
+    'argonauts',
 
     'demo.demo_widgets',
 )

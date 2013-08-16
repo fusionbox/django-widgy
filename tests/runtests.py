@@ -55,7 +55,7 @@ ALWAYS_INSTALLED_APPS = [
     "widgy",
     "treebeard",
     "compressor",
-    "fusionbox.core",
+    "argonauts",
     "filer",
     "south",
 ]

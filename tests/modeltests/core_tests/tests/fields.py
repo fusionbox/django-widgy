@@ -159,7 +159,7 @@ class TestModelForm(TestCase):
         self.assertFalse(x.is_valid())
 
     def test_second_render(self):
-        from fusionbox.core.templatetags.fusionbox_tags import json as json_tag
+        from argonauts.templatetags.argonauts import json as json_tag
         instance = HasAWidgy.objects.create(
             widgy=Layout.add_root(widgy_site).node
         )

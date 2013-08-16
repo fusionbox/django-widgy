@@ -14,7 +14,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.db.models import get_model, ProtectedError
 from django.utils.translation import ugettext as _
 
-from fusionbox.views.rest import RestView
+from argonauts.views import RestView
 
 from widgy.models import Node
 from widgy.exceptions import InvalidTreeMovement
