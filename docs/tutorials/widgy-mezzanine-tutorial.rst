@@ -25,9 +25,6 @@ Add Mezzanine apps to ``INSTALLED_APPS``::
         'filebrowser_safe',
         'grappelli_safe',
 
-``fusionbox.core`` must come after ``mezzanine.core``, because the have
-the same app label and migrations don't work otherwise.
-
 add Widgy to ``INSTALLED_APPS``::
 
         'widgy',
@@ -40,7 +37,7 @@ add required Widgy apps to ``INSTALLED_APPS``::
         'filer',
         'easy_thumbnails',
         'compressor',
-        'fusionbox.core',
+        'argonauts',
         'scss',
         'sorl.thumbnail',
         'south',
@@ -141,7 +138,7 @@ Make sure you have a url pattern named ``home`` or the admin templates
 will not work right.
 
 If you are using ``GenericTemplateFinderMiddleware``, use the one from
-``widgy.contrib.widgy_mezzanine.middleware``. It has been patched to
+``fusionbox.mezzanine.middleware``. It has been patched to
 work with Mezzanine.
 
 How to edit home page

@@ -9,7 +9,6 @@ from django import forms
 from django.utils.datastructures import SortedDict
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
-from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.shortcuts import redirect
 from django.dispatch import receiver
@@ -17,18 +16,16 @@ from django.template.loader import render_to_string
 from django.utils.functional import cached_property
 from django.utils.encoding import smart_text
 
-from fusionbox import behaviors
-from fusionbox.db.models import QuerySetManager
 from django_extensions.db.fields import UUIDField
-from fusionbox.forms.fields import PhoneNumberField
 import html2text
 
 from widgy.models import Content, Node
 from widgy.signals import pre_delete_widget
 from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, DisplayNameMixin
-from widgy.utils import update_context, build_url, force_bytes
+from widgy.utils import update_context, build_url, force_bytes, QuerySet
 from widgy.contrib.page_builder.models import Bucket, Html
 from widgy.contrib.page_builder.forms import MiniCKEditorField, CKEditorField
+from .forms import PhoneNumberField
 import widgy
 
 
@@ -426,19 +423,19 @@ class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChi
         ('meta', FormMeta, (), {}),
     ]
 
-    objects = QuerySetManager()
-
     class Meta:
         verbose_name = _('form')
         verbose_name_plural = _('forms')
 
-    class QuerySet(QuerySet):
+    class FormQuerySet(QuerySet):
         def annotate_submission_count(self):
             return self.extra(select={
                 'submission_count':
                 'SELECT COUNT(*) FROM form_builder_formsubmission'
                 ' WHERE form_ident = form_builder_form.ident'
             })
+
+    objects = FormQuerySet.as_manager()
 
     def __unicode__(self):
         return self.name
@@ -835,17 +832,16 @@ class Uncaptcha(BaseFormField):
         verbose_name_plural = _('uncaptchas')
 
 
-class FormSubmission(behaviors.Timestampable, models.Model):
+class FormSubmission(models.Model):
     """
     Holds the data from one submission of a Form.
     """
 
+    created_at = models.DateTimeField(auto_now_add=True)
     form_node = models.ForeignKey(Node, on_delete=models.PROTECT, related_name='form_submissions')
     form_ident = models.CharField(max_length=Form._meta.get_field_by_name('ident')[0].max_length)
 
-    objects = QuerySetManager()
-
-    class QuerySet(QuerySet):
+    class FormSubmissionQuerySet(QuerySet):
         def get_formfield_labels(self):
             """
             A dictionary of field uuid to field label. We use the label of the
@@ -910,6 +906,8 @@ class FormSubmission(behaviors.Timestampable, models.Model):
                     value=value,
                 )
             return submission
+
+    objects = FormSubmissionQuerySet.as_manager()
 
     def as_dict(self):
         ret = {'created_at': self.created_at}

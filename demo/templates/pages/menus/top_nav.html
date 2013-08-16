@@ -1,5 +1,4 @@
 {% load pages_tags %}
-{% load fusionbox_tags %}
 <!-- navbar -->
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
@@ -12,11 +11,9 @@
       <a class="brand" href="#">Project name</a>
       <div class="nav-collapse">
         <ul class="nav">
-          {% highlight_here %}
             {% for page in page_branch %}
-              <li><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
+              <li><a href="{{ page.get_absolute_url }}"{% if page.is_current_or_ascendant %} class="here"{% endif %}>{{ page.title }}</a></li>
             {% endfor %}
-          {% endhighlight %}
         </ul>
       </div><!--/.nav-collapse -->
     </div>

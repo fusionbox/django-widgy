@@ -1,15 +1,13 @@
 from django.db import models
-from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.db.models.deletion import ProtectedError
 from django.conf import settings
 from django.template.defaultfilters import date as date_format
 
-from fusionbox.db.models import QuerySetManager
-
 from widgy.db.fields import WidgyField
 from widgy.models.base import Node
+from widgy.utils import QuerySet
 
 
 class VersionCommit(models.Model):
@@ -47,9 +45,7 @@ class VersionTracker(models.Model):
     class Meta:
         app_label = 'widgy'
 
-    objects = QuerySetManager()
-
-    class QuerySet(QuerySet):
+    class VersionTrackerQuerySet(QuerySet):
         def orphan(self):
             """
             Filters the queryset to only include 'orphan' VersionTrackers. That
@@ -72,6 +68,7 @@ class VersionTracker(models.Model):
             """
             return self.filter(commits__publish_at__lte=timezone.now()).distinct()
 
+    objects = VersionTrackerQuerySet.as_manager()
 
     def commit(self, user=None, **kwargs):
         self.head = self.commit_model.objects.create(
