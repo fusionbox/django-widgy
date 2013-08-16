@@ -16,6 +16,7 @@ env:
     - DATABASE_ENGINE=mysql DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
     - DATABASE_ENGINE=mysql DJANGO_PACKAGE=Django==1.4.5
 install:
+  - pip install --upgrade pip
   - pip install -q $DJANGO_PACKAGE --use-mirrors
   - pip install -q --use-mirrors mock
   - |
@@ -29,12 +30,12 @@ install:
       pip install -q --use-mirrors psycopg2
     fi
   - pip install --use-mirrors .
-  # mezzanine tries to override our django version sometimes
   - |
-    if [ "`pip freeze|grep '^Django=='`" != "$DJANGO_PACKAGE" ]
+    if echo "$DJANGO_PACKAGE" | grep -q '1.6.x'
     then
-      pip install -q --use-mirrors $DJANGO_PACKAGE
+      pip install --use-mirrors -e git://github.com/fusionbox/mezzanine@69acbfd#egg=mezzanine
     fi
+  - pip freeze
 before_script:
   - psql -c 'create database widgy;' -U postgres
   - mysql -e 'create database widgy;'
