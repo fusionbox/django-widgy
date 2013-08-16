@@ -30,7 +30,7 @@ install_requires = [
     'beautifulsoup4',
     'sorl-thumbnail==11.12',
     'html2text==3.200.3',
-    'phonenumbers',
+    'phonenumbers>=5',
     'django-argonauts==1.0.0',
 ]
 
