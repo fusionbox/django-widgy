@@ -11,6 +11,22 @@ define([ 'underscore', 'widgy.backbone', 'components/widget/component' ], functi
       _.bindAll(this,
         'stealThingsFromChild'
       );
+
+      this.listenTo(this.collection, 'remove', this.showTabAfterTabDestroy);
+    },
+
+    showTabAfterTabDestroy: function(model, collection, options) {
+      if(this.list.getLength() < 1) {
+        return;
+      }
+
+      var index_to_show = options.index;
+
+      if(index_to_show > 0) {
+        index_to_show--;
+      }
+
+      this.showTab(this.list.at(index_to_show));
     },
 
     showTabClick: function(event) {
@@ -38,8 +54,6 @@ define([ 'underscore', 'widgy.backbone', 'components/widget/component' ], functi
       if ( view.hasShelf() ) {
         view.shelf.$el.show();
       }
-
-      return false;
     },
 
     renderNode: function() {
