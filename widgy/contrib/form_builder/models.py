@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
-from operator import attrgetter
-import urllib
 
 import csv
+import urllib
+import base64
+import hashlib
 
 from django.db import models
 from django import forms
@@ -406,6 +407,16 @@ class FormMeta(StrictDefaultChildrenMixin, Bucket):
         return isinstance(parent, Form)
 
 
+def friendly_uuid(uuid):
+    """
+    A shortend version of a UUID to use when collisions are acceptable.
+    The returned string will have 40 bits of entropy assuming a UUID4.
+    """
+    result = base64.b32encode(hashlib.sha1(str(uuid)).digest()[:5]).lower()
+    # avoid accidental profanity
+    return result.replace('e', '0').replace('o', '1').replace('u', '8').replace('i', '9')
+
+
 @widgy.register
 class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChildrenMixin, Content):
     name = models.CharField(verbose_name=_('Name'),
@@ -465,6 +476,16 @@ class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChi
     def context_var(self):
         return 'form_instance_{node_pk}'.format(node_pk=self.node.pk)
 
+    @property
+    def success_key(self):
+        """
+        Used in the success URL to decide which form's success message
+        to show. Collisions are OK because there aren't expected to be
+        many forms on one page, and a collision will only result in both
+        forms' success messages being shown.
+        """
+        return friendly_uuid(self.ident)
+
     def action_url(self, widgy, tried=()):
         # the `tried` argument is just for nice error reporting
         assert widgy, 'get_form_action_url not found in any owners. Tried: %s' % (tried,)
@@ -491,7 +512,7 @@ class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChi
         ctx = {
             'form': form,
             'action_url': action_url,
-            'success': request and request.GET.get('success') == str(self.node.pk),
+            'success': request and request.GET.get('success') == self.success_key,
         }
 
         with update_context(context, ctx):
@@ -503,7 +524,7 @@ class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChi
         # the model too.
         resp = redirect(build_url(
             request.GET['from'],
-            success=self.node.pk,
+            success=self.success_key,
         ))
         for child in self.depth_first_order():
             if isinstance(child, FormReponseHandler):
