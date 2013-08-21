@@ -707,7 +707,8 @@ class Textarea(FormField):
 
 
 class BaseChoiceField(FormField):
-    choices = models.TextField()
+    choices = models.TextField(
+        help_text=_("Place each choice on a separate line."))
 
     class Meta:
         abstract = True
