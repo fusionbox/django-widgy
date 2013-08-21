@@ -27,7 +27,7 @@ describe('ShelfView', function() {
           shelf = node_view.makeShelf();
 
       shelf.collection.add({});
-      var shelf_item = shelf.list.list[0];
+      var shelf_item = shelf.list.at(0);
 
       shelf.on('foo', callback);
       assert.isFalse(callback.called);
