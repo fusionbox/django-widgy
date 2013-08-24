@@ -14,6 +14,7 @@ from django.db import connection
 import mock
 
 from modeltests.core_tests.widgy_config import widgy_site
+from widgy.contrib.form_builder.forms import PhoneNumberField
 from widgy.contrib.form_builder.models import (
     Form, FormInput, Textarea, FormSubmission, FormField, Uncaptcha,
     EmailUserHandler, EmailSuccessHandler
@@ -347,3 +348,32 @@ class TestFormCompatibility(TestCase):
 
         assert not Uncaptcha.valid_child_of(fields)
         self.assertRaises(ParentChildRejection, fields.add_child, widgy_site, Uncaptcha)
+
+
+class TestPhoneNumberField(TestCase):
+    def test_good_phone_number(self):
+        self.assertEqual(PhoneNumberField().clean('13035555555'), '(303) 555-5555')
+
+    def test_bad_phone_number(self):
+        with self.assertRaises(forms.ValidationError):
+            PhoneNumberField().clean('978121')
+
+    def test_phone_number_with_good_extension(self):
+        self.assertEqual(PhoneNumberField().clean('13035555555ex555555'),
+            '(303) 555-5555 ext. 555555')
+
+    def test_phone_number_with_bad_extension(self):
+        with self.assertRaises(forms.ValidationError):
+            PhoneNumberField().clean('13035555555ex1BAD')
+
+    def test_international_phone_number(self):
+        self.assertEqual(PhoneNumberField().clean('+4991319402813'),
+            '+49 9131 9402813')
+
+    def test_string_in_phone_number(self):
+        with self.assertRaises(forms.ValidationError):
+            PhoneNumberField().clean('BADNUMBER')
+
+    def test_phone_number_extension_error(self):
+        with self.assertRaises(forms.ValidationError):
+            PhoneNumberField(allow_extension=False).clean('13035555555ex123')
