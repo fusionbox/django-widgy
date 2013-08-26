@@ -31,9 +31,11 @@ describe('Widgy ViewLists', function(){
 
 
   it('should push views onto the list property', function(){
-    var mockview = new this.MockView(1);
+    var mockview = new this.MockView(1),
+        mockview1 = new this.MockView(2);
     this.view_list.push(mockview);
-    assert.deepEqual(this.view_list.list, [ mockview ]);
+    this.view_list.push(mockview1);
+    assert.deepEqual(this.view_list.list, [ mockview, mockview1 ]);
   });
 
 
@@ -97,6 +99,53 @@ describe('Widgy ViewLists', function(){
         mockview2 = new this.MockView(3);
     this.view_list.list = [ mockview, mockview1, mockview2 ];
     assert.strictEqual(this.view_list.findByModel(mockview1.model), mockview1);
+  });
+
+  it('should find return a view at a certain location', function(){
+    var mockview = new this.MockView(1),
+        mockview1 = new this.MockView(2),
+        mockview2 = new this.MockView(3);
+    this.view_list.list = [ mockview, mockview1, mockview2 ];
+    assert.strictEqual(this.view_list.at(1), mockview1);
+  });
+
+  it('should find the index of a view', function(){
+    var mockview = new this.MockView(1),
+        mockview1 = new this.MockView(2),
+        mockview2 = new this.MockView(3);
+    this.view_list.list = [ mockview, mockview1, mockview2 ];
+    assert.strictEqual(this.view_list.indexOf(mockview2), 2);
+  });
+
+  it('should test the setting of a ViewList', function(){
+    var mockview = new this.MockView(1),
+        mockview1 = new this.MockView(2),
+        mockview2 = new this.MockView(3);
+    this.view_list.set([ mockview, mockview1, mockview2 ]);
+    assert.strictEqual(this.view_list.at(0), mockview);
+    assert.strictEqual(this.view_list.at(1), mockview1);
+    assert.strictEqual(this.view_list.at(2), mockview2);
+    assert.isUndefined(this.view_list.at(3));
+  });
+
+  it('should find the number of items in ViewList', function(){
+    var mockview = new this.MockView(1),
+        mockview1 = new this.MockView(2),
+        mockview2 = new this.MockView(3);
+    this.view_list.list = [ mockview, mockview1, mockview2 ];
+    assert.strictEqual(this.view_list.size(), 3);
+  });
+
+  it('should push a view into a certain index', function(){
+    var mockview = new this.MockView(1),
+        mockview1 = new this.MockView(2),
+        mockview2 = new this.MockView(3);
+    this.view_list.list = [ mockview, mockview2 ];
+    this.view_list.push(mockview1, {at: 1});
+    assert.strictEqual(this.view_list.at(0), mockview);
+    assert.strictEqual(this.view_list.at(1), mockview1);
+    assert.strictEqual(this.view_list.at(2), mockview2);
+    assert.isUndefined(this.view_list.at(3));
   });
 });
 

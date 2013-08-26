@@ -137,7 +137,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       .then(function(node_view) {
         parent.app.node_view_list.push(node_view);
         if ( options && options.index ) {
-          parent.list.list.splice(options.index, 0, node_view);
+          parent.list.push(node_view, {at: options.index});
         } else {
           parent.list.push(node_view);
         }
@@ -175,7 +175,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
           new_list.push(node_view);
         }
       }, this);
-      this.list.list = new_list;
+      this.list.set(new_list);
     },
 
     'delete': function(event) {
@@ -299,13 +299,13 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       this.drop_targets_list.push(drop_target);
 
       if ( this.list.contains(view) ) {
-        var view_index = this.list.list.indexOf(view),
-            target_index = this.drop_targets_list.list.length - 1;
+        var view_index = this.list.indexOf(view),
+            target_index = this.drop_targets_list.size() - 1;
         if ( view_index == target_index ) {
           drop_target.activate().$el
             .addClass('previous')
             .attr('style', function(i, s) { return (s||'') + ' height: '+ view.$el.height() +'px !important;'; });
-          if ( view_index == this.list.list.length - 1 )
+          if ( view_index == this.list.size() - 1 )
             drop_target.$el.addClass('nm');
         } else if ( view_index == target_index - 1 ) {
           drop_target.$el.hide();

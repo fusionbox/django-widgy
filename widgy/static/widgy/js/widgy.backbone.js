@@ -172,9 +172,10 @@ define([ 'jquery', 'underscore', 'backbone', 'lib/mustache', 'lib/q' ], function
   }
 
   _.extend(ViewList.prototype, Backbone.Events, {
-    push: function(view) {
+    push: function(view, options) {
       view.on('close', this.remove);
-      this.list.push(view);
+      var index = _.defaults(options || {}, {at: this.list.length});
+      this.list.splice(index.at, 0, view);
       this.trigger('push', view);
     },
 
@@ -214,18 +215,18 @@ define([ 'jquery', 'underscore', 'backbone', 'lib/mustache', 'lib/q' ], function
       });
     },
 
-    getLength: function() {
-      return this.list.length;
-    },
-
     at: function(index) {
       return this.list[index];
+    },
+
+    set: function(new_list) {
+      this.list = new_list;
     }
   });
 
   // mixin some underscore methods.
   var methods = [
-    'each', 'find', 'contains'
+    'each', 'find', 'contains', 'indexOf', 'size'
     ];
 
   _.each(methods, function(method) {

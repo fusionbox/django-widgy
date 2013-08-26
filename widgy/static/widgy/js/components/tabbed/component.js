@@ -16,7 +16,7 @@ define([ 'underscore', 'widgy.backbone', 'components/widget/component' ], functi
     },
 
     showTabAfterTabDestroy: function(model, collection, options) {
-      if(this.list.getLength() < 1) {
+      if(this.list.size() < 1) {
         return;
       }
 
@@ -69,8 +69,8 @@ define([ 'underscore', 'widgy.backbone', 'components/widget/component' ], functi
       return widget.View.prototype.renderChildren.apply(this, arguments).then(function() {
         // Show the first tab on first render.
         // Does this always work?
-        if ( parent.list.list.length )
-          parent.showTab(parent.list.list[0]);
+        if ( parent.list.size() )
+          parent.showTab(parent.list.at(0));
 
         return parent;
       });
