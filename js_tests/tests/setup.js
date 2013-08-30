@@ -7,8 +7,12 @@ require('mocha-as-promised')();
 global.document = global.document || jsdom();
 global.window = global.window = global.document.createWindow();
 
+var baseUrl = process.env.COVERAGE ?
+    path.join(__dirname, "../coverage_js/") :
+    path.join(__dirname, "../../widgy/static/widgy/js/");
+
 requirejs.config({
-  baseUrl: path.join(__dirname, "../../widgy/static/widgy/js/"),
+  baseUrl: baseUrl,
   paths: {
     'jquery': './lib/jquery',
     'underscore': './lib/underscore',

@@ -55,13 +55,28 @@ Coverage
 Once coverage_ is installed (``pip install coverage``), the Makefile
 has two commands to help report on code coverage. ::
 
-    make coverage
+    make coverage-py
 
 will run the tests with coverage enabled and generate HTML coverage
 files. ::
 
-    make browser
+    make browser-py
 
 will run the tests and open the coverage report in your web browser.
 
+You can also run the JavaScript coverage by first installing node-jscoverage_
+and then running::
+
+    make coverage-js
+
+This will output a coverage report in js_tests/coverage.html.  You can open
+that file using::
+
+    make browser-js
+
+Like ``make test``, ``make coverage`` (and ``make browser``) will run both the
+Python and JavaScript coverage commands.
+
 .. _coverage: http://nedbatchelder.com/code/coverage/
+
+.. _node-jscoverage: https://github.com/visionmedia/node-jscoverage

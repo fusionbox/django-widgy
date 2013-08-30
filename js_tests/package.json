@@ -14,7 +14,8 @@
   },
   "devDependencies": {
     "mocha": "~1.8.1",
-    "mocha-as-promised": "~1.2.1"
+    "mocha-as-promised": "~1.2.1",
+    "visionmedia-jscoverage": ">=1.0.0"
   },
   "scripts": {
     "test": "mocha"
