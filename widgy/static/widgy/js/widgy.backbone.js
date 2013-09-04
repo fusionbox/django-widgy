@@ -138,7 +138,7 @@ define([ 'jquery', 'underscore', 'backbone', 'lib/mustache', 'lib/q' ], function
 
   /**
    * None of our models use ids, they all use URLs to communicate with the
-   * server.  See `widgy/models.py` for more on how to expose the URL.
+   * server.  See `widgy/models/base.py` for more on how to expose the URL.
    */
   var Model = Backbone.Model.extend({
     idAttribute: 'url',

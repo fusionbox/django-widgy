@@ -26,7 +26,7 @@ define([
         if (!ret[name].push) {
           ret[name] = [ret[name]];
         }
-        ret[name].push($(this).getValue()); 
+        ret[name].push($(this).getValue());
       } else {
         ret[name] = $(this).getValue();
       }

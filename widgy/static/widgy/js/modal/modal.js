@@ -74,7 +74,6 @@ define([ 'widgy.backbone',
     } else if ( failure ) {
       failure();
     }
-
   }
 
   return {
