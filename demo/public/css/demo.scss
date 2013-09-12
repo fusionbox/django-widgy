@@ -35,7 +35,41 @@ $font-default: "Roboto", Helvetica, Arial, sans-serif;
 $font-mono: monospace;
 
 $width: 960px;
+
+$inputFields: "input[type='text'], input[type='password'], input[type='email'], input[type='tel'], input[type='number'], textarea";
+
+
+
+/* Mixins
+------------------------------------------------------*/
+
+@mixin button {
+  @include gradient(darken($green,10%),darken($green,5%));
+  @include rounded(3px);
+  @include shadow($black30,0px,3px,5px);
+  @include transition;
+  border: 0px;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 16px;
+  margin: 0px;
+  padding: 5px 12px;
+  position: relative;
+  text-decoration: none;
+  top: 0px;
   
+  &:hover {
+    @include gradient(darken($green,5%),$green);
+    @include shadow($black30,0px,1px,2px);
+    position: relative;
+    top: 2px;
+  }
+}
+
+
 /* Tags
 ------------------------------------------------------*/
 
@@ -82,6 +116,84 @@ h4 {
 
 p {
   margin: 0px 0px 15px 0px;
+}
+  
+/* Forms
+------------------------------------------------------*/
+
+form {
+  @include clearfix;
+  @include rounded(3px);
+  border: 1px dashed $almostwhite;
+  clear: both;
+  margin-bottom: 20px;
+  padding: 20px;
+  
+  div.formField {
+    @include clearfix;
+    clear: both;
+    margin-bottom: 15px;
+    
+    &.required {
+      label {
+        font-weight: bold;
+        
+        &:after {
+          color: $red;
+          content: "*";
+        }
+      }
+      
+      ul {
+        label {
+          font-weight: normal;
+          
+          &:after {
+            content: "";
+          }
+        }
+      }
+    }
+    
+    label {
+      clear: both;
+      display: inline-block;
+      margin: 0px 0px 4px 0px;
+    }
+    
+    #{$inputFields} {
+      @include rounded(2px);
+      @include inset-shadow($black10,0px,1px,3px);
+      border: 1px solid $lightgrey;
+      margin: 0px;
+      padding: 5px;
+      width: 97.5%;
+    }
+    
+    ul, ol {
+      list-style: none;
+      padding: 0px;
+      
+      li {
+        input {
+          float: left;
+          margin: 4px 4px 0px 0px;
+        }
+      }
+    }
+    
+    div.help_text {
+      p {
+        color: $grey;
+        font-size: 11px;
+        margin: 0 !important;
+      }
+    }
+  }
+}
+
+a.button, button, input[type='submit'], input[type='button'] {
+  @include button;
 }
   
 /* Body
@@ -208,7 +320,7 @@ section.content {
       display: inline;
       float: left;
       height: auto;
-      width: 530px;
+      width: 525px;
     }
     
     section.sidebar {
@@ -220,26 +332,74 @@ section.content {
       
       div.callout {
         @include rounded(2px);
-        @include shadow($black10,0px,1px,3px);
-        background: lighten($almostwhite,5%);
+        @include inset-shadow($black10,0px,2px,2px);
+        background: lighten($almostwhite,7%);
         border: 1px solid $lightgrey;
-        padding: 10px 15px;
+        margin: 0px 0px 15px 0px;
+        padding: 15px;
   
         h1 {
           border: 0px;
           color: $darkgrey;
-          font-size: 18px;
+          font-size: 1.4em;
           letter-spacing: 0px;
           line-height: 24px;
-          margin: 0px 0px 10px 0px !important;
+          margin: 0px 0px 5px 0px !important;
           font-weight: bold;
           padding: 0px;
+        }
+        
+        h2 {
+          font-size: 1.3em;
+        }
+        
+        h3 {
+          font-size: 1.2em;
+        }
+        
+        h4 {
+          font-size: 1.1em;
         }
   
         p:last-child {
           margin-bottom: 0 !important;
         }
       }
+    }
+  }
+}
+
+div.accordion {
+  clear: both;
+  
+  details {
+    clear: both;
+    margin: 0px 0px 10px 0px;
+    
+    summary {
+      @include rounded(3px);
+      @include shadow($black10,0px,1px,3px);
+      background: $orange;
+      color: white;
+      cursor: pointer;
+      font-size: 15px;
+      line-height: 20px;
+      margin-bottom: 3px;
+      padding: 8px 10px;
+      
+      &:hover {
+        background: lighten($orange,10%);
+        @include shadow($black30,0px,2px,5px);
+      }
+    }
+    
+    div.accordionContent {
+      @include clearfix;
+      @include html;
+      @include rounded(3px);
+      @include inset-shadow($black10,0px,1px,3px);
+      border: 1px solid lighten($orange,30%);
+      padding: 8px 10px;
     }
   }
 }
