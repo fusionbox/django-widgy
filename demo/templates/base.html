@@ -9,15 +9,13 @@
   <meta name="description" content="{% block seo_description %}{% endblock %}" />
   <meta name="keywords" content="{% block seo_keywords %}{% endblock %}" />
   <title>{% block title %}Project name{% endblock %}</title>
+
+  <link href='//fonts.googleapis.com/css?family=Roboto:400,400italic,700italic,700,300,300italic' rel='stylesheet' type='text/css'>
+
   {% compress css %}
     {% block css %}
-    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}" />
-     <style>
-      body {
-        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-      }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/reset.css' %}">
+    <link rel="stylesheet" href="{% static 'css/demo.scss' %}" type="text/x-scss">
     {% for scss_file in 'WIDGY_MEZZANINE_SITE'|scss_files %}
     <link rel="stylesheet" href="{% static scss_file %}" type="text/x-scss">
     {% endfor %}
@@ -27,6 +25,7 @@
     {% block js %}
       <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
       <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+      <script type="text/javascript" src="{% static 'js/demo.js' %}"></script>
       {% for js_file in 'WIDGY_MEZZANINE_SITE'|js_files %}
       <script src="{% static js_file %}"></script>
       {% endfor %}
@@ -34,28 +33,37 @@
   {% endcompress %}
 </head>
 <body>
+  <div class="adapt">
   {% block body %}
-  {% page_menu 'pages/menus/top_nav.html' %}
-  <style>
-    .left_nav {
-      float: left;
-      width: 20%;
-    }
-    .container {
-      float: right;
-      width: 80%;
-    }
-  </style>
-  <div class="left_nav">
-      <div class="panel tree">{% page_menu "pages/menus/tree.html" %}</div>
-  </div>
 
-  <div class="container">
-    {% block content %}
-      {% block leftnav %}
-      {% endblock %}
-    {% endblock %}
-  </div>
+  <section class="mobile"><a href="#">Menu</a></section>
+
+  <header>
+    <div>
+      <span class="title">Widgy Demo</span>
+      <nav>
+        {% page_menu 'pages/menus/top_nav.html' %}
+      </nav>
+    </div>
+  </header>
+
+  <section class="content">
+    <div class="inner">
+
+      <nav>
+        <div class="panel tree">{% page_menu "pages/menus/tree.html" %}</div>
+      </nav>
+
+      <article>
+        {% block content %}
+          {% block leftnav %}
+          {% endblock %}
+        {% endblock %}
+      </article>
+
+    </div>
+  </section>
   {% endblock %}
+  </div>
 </body>
 </html>

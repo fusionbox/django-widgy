@@ -1,0 +1,195 @@
+/*
+ * Common SCSS File - SCSS v1.0
+ * last edited 02/17/12
+ * @author Justin Stollsteimer - Fusionbox, Inc.
+ * http://www.fusionbox.com
+ *
+ *
+ * Lists: Line
+ * HR: Line
+ * Table: Line
+ * Form Elements: Line
+ *
+ */
+
+/* SASS Mixins
+--------------------------------------------------*/
+
+@mixin shadow($color: rgba(0,0,0,0.3), $left: 0px, $top: 0px, $blur: 8px) {
+  box-shadow: $left $top $blur $color;
+    -o-box-shadow: $left $top $blur $color;
+    -ms-box-shadow: $left $top $blur $color;
+    -moz-box-shadow: $left $top $blur $color;
+    -webkit-box-shadow: $left $top $blur $color;
+}
+
+@mixin inset-shadow($color: rgba(0,0,0,0.3), $left: 0px, $top: 0px, $blur: 8px) {
+  box-shadow: inset $left $top $blur $color;
+    -o-box-shadow: inset $left $top $blur $color;
+    -ms-box-shadow: inset $left $top $blur $color;
+    -moz-box-shadow: inset $left $top $blur $color;
+    -webkit-box-shadow: inset $left $top $blur $color;
+}
+
+@mixin multi-shadow($shadow) {
+  box-shadow: #{$shadow};
+    -o-box-shadow: #{$shadow};
+    -ms-box-shadow: #{$shadow};
+    -moz-box-shadow: #{$shadow};
+    -webkit-box-shadow: #{$shadow};
+}
+
+@mixin text-shadow($color: rgba(0,0,0,0.3), $left: 0px, $top: 0px, $blur: 8px) {
+  text-shadow: $left $top $blur $color;
+    -o-text-shadow: $left $top $blur $color;
+    -moz-text-shadow: $left $top $blur $color;
+    -webkit-text-shadow: $left $top $blur $color;
+}
+
+@mixin rounded($radius) {
+  border-radius: $radius;
+    -o-border-radius: $radius;
+    -ms-border-radius: $radius;
+    -moz-border-radius: $radius;
+    -webkit-border-radius: $radius;
+}
+
+@mixin gradient($bottom,$top) {
+  background-color: $bottom;
+    background-image: -o-linear-gradient(center bottom, $bottom 1%, $top 100%);
+    background-image: -ms-linear-gradient(center bottom, $bottom 1%, $top 100%);
+    background-image: -moz-linear-gradient(center bottom, $bottom 1%, $top 100%);
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, $bottom), color-stop(1.00, $top));
+}
+
+@mixin transition($basic: all 0.25s ease 0s) {
+  transition: $basic;
+    -o-transition: $basic;
+    -ms-transition: $basic;
+    -moz-transition: $basic;
+    -webkit-transition: $basic;
+}
+
+@mixin transform($transformation)
+{
+  transform: #{$transformation};
+  -o-transform: #{$transformation};
+  -ms-transform: #{$transformation};
+  -moz-transform: #{$transformation};
+  -webkit-transform: #{$transformation};
+}
+
+@mixin transform-origin($transformationorigin)
+{
+  transform-origin: #{$transformationorigin};
+  -o-transform-origin: #{$transformationorigin};
+  -ms-transform-origin: #{$transformationorigin};
+  -moz-transform-origin: #{$transformationorigin};
+  -webkit-transform-origin: #{$transformationorigin};
+}
+
+@mixin default {
+  display: inline;
+  float: left;
+  height: auto;
+  width: 100%;
+}
+
+@mixin clearfix {
+  &:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+  }
+  * html & { height: 1px }
+}
+
+@mixin wrapper {
+  display: block;
+  height: auto;
+  min-width: 960px;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+
+@mixin inner {
+  display: block;
+  margin: 0 auto;
+  padding: 0px;
+  text-align: left;
+  width: 960px;
+}
+
+
+@mixin html {
+  h1, h2, h3, h4, h5, h6, p, blockquote, ol, ul, hgroup, hr {
+    display: block !important;
+    float: none !important;
+    margin: 0px 0px 15px 0px !important;
+    width: auto !important;
+  }
+  .fl { float: left; margin: 0px 25px 15px 0px; }
+  .fr { float: right; margin: 0px 0px 15px 25px; }
+  img { &.left { float: left; margin: 5px 20px 15px 0px; } &.right { float: right; margin: 5px 0px 15px 20px; }}
+  table { display: table; width: 100% !important; }
+}
+
+
+/* Common Classes
+------------------------------------------------------*/
+
+strong,
+.strong {
+  font-weight: bold;
+}
+
+em,
+.em {
+  font-style: italic;
+}
+
+sup {
+  bottom: .8em;
+  font-size: 60% !important;
+  position: relative;
+}
+
+sub {
+  font-size: 60% !important;
+  position: relative;
+  bottom: -.2em;
+}
+
+
+/* Block Elements
+------------------------------------------------------*/
+
+pre {
+  font-style: monospace;
+}
+
+code {
+  font-style: monospace;
+}
+
+
+/* Misc CKEditor Styles Tags
+------------------------------------------------------*/
+
+tt, kbd, samp, code { font-family: monospace; }
+cite { font-style: italic; padding: 10px; }
+small { font-size: 70%; }
+big { font-size: 150%; }
+address { display: inline; font-style: italic; }
+q { font-style: italic; }
+var { font-weight: bold; }
+del { text-decoration: line-through; }
+
+.error, .errors li { color: #A53A3A; }
+
+label.required{ font-weight: bold; }
+label.required:after { content: '*'; color: #cc2222; }
+

@@ -1,0 +1,742 @@
+@import "common.scss";
+
+/* Fonts & Colors
+------------------------------------------------------*/
+
+$white10: rgba(255,255,255,0.1);
+$white20: rgba(255,255,255,0.2);
+$white30: rgba(255,255,255,0.3);
+$white50: rgba(255,255,255,0.5);
+$white70: rgba(255,255,255,0.7);
+$white90: rgba(255,255,255,0.9);
+
+$black70: rgba(0,0,0,0.7);
+$black50: rgba(0,0,0,0.5);
+$black30: rgba(0,0,0,0.3);
+$black20: rgba(0,0,0,0.2);
+$black10: rgba(0,0,0,0.1);
+
+$darkblue: #001a2e;
+$blue: #005596;
+$lightblue: #1c9ad6;
+$green: #82c054;
+$orange: #f26522;
+$purple: #662d91;
+$red: #b8292f;
+$yellow: #faa61a;
+
+$darkgrey: #423a3a;
+$grey: #7a7b7b;
+$lightgrey: #babbbb;
+$almostwhite: #e5e5e5;
+
+$font-primary: "Roboto", Helvetica, Arial, sans-serif;
+$font-default: "Roboto", Helvetica, Arial, sans-serif;
+$font-mono: monospace;
+
+$width: 960px;
+
+$inputFields: "input[type='text'], input[type='password'], input[type='email'], input[type='tel'], input[type='number'], textarea";
+
+
+
+/* Mixins
+------------------------------------------------------*/
+
+@mixin button {
+  @include gradient(darken($green,10%),darken($green,5%));
+  @include rounded(3px);
+  @include shadow($black30,0px,3px,5px);
+  @include transition;
+  border: 0px;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 16px;
+  margin: 0px;
+  padding: 5px 12px;
+  position: relative;
+  text-decoration: none;
+  top: 0px;
+
+  &:hover {
+    @include gradient(darken($green,5%),$green);
+    @include shadow($black30,0px,1px,2px);
+    position: relative;
+    top: 2px;
+  }
+}
+
+
+/* Tags
+------------------------------------------------------*/
+
+p, h1, h2, h3, h4, h5, h6 {
+  @include default;
+}
+
+h1 {
+  border-bottom: 2px solid $orange;
+  font-size: 40px;
+  font-weight: 200;
+  line-height: 42px;
+  letter-spacing: -1px;
+  margin: 0px 0px 15px 0px;
+  padding: 0px 0px 5px 0px;
+}
+
+h2 {
+  color: $darkgrey;
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: bold;
+  letter-spacing: -1px;
+  margin: 0px 0px 5px 0px;
+}
+
+h3 {
+  border-bottom: 1px dotted $lightgrey;
+  color: $orange;
+  font-size: 16px;
+  font-weight: normal;
+  line-height: 22px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0px 0px 5px 0px;
+  padding: 0px 0px 3px 0px;
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0px 0px 5px 0px;
+}
+
+p {
+  margin: 0px 0px 15px 0px;
+}
+
+/* Forms
+------------------------------------------------------*/
+
+form {
+  @include clearfix;
+  @include rounded(3px);
+  border: 1px dashed $almostwhite;
+  clear: both;
+  margin-bottom: 20px;
+  padding: 20px;
+
+  div.formField {
+    @include clearfix;
+    clear: both;
+    margin-bottom: 15px;
+
+    &.required {
+      label {
+        font-weight: bold;
+
+        &:after {
+          color: $red;
+          content: "*";
+        }
+      }
+
+      ul {
+        label {
+          font-weight: normal;
+
+          &:after {
+            content: "";
+          }
+        }
+      }
+    }
+
+    label {
+      clear: both;
+      display: inline-block;
+      margin: 0px 0px 4px 0px;
+    }
+
+    #{$inputFields} {
+      @include rounded(2px);
+      @include inset-shadow($black10,0px,1px,3px);
+      border: 1px solid $lightgrey;
+      margin: 0px;
+      padding: 5px;
+      width: 97.5%;
+    }
+
+    ul, ol {
+      list-style: none;
+      padding: 0px;
+
+      li {
+        input {
+          float: left;
+          margin: 3px 4px 0px 0px;
+        }
+      }
+    }
+
+    div.help_text {
+      p {
+        color: $grey;
+        font-size: 11px;
+        margin: 0 !important;
+      }
+    }
+  }
+}
+
+a.button, button, input[type='submit'], input[type='button'] {
+  @include button;
+}
+
+/* Body
+------------------------------------------------------*/
+
+html, body {
+  background: $almostwhite url('../img/grunge.jpg');
+  color: $darkgrey;
+  font-size: 13px;
+  font-family: $font-default;
+  line-height: 18px;
+}
+
+div.adapt {
+  transition: all 0.25s ease 0s;
+    -o-transition: all 0.25s ease 0s;
+    -ms-transition: all 0.25s ease 0s;
+    -moz-transition: all 0.25s ease 0s;
+    -webkit-transition: all 0.25s ease 0s;
+  left: 0px;
+  position: relative;
+  top: 0px;
+}
+
+/* Mobile Menu
+------------------------------------------------------*/
+
+section.mobile {
+  display: none;
+  height: auto;
+  width: auto;
+
+  a {
+    background: darken($green,15%);
+    color: white;
+    display: block;
+    padding: 10px 3%;
+    font-weight: bold;
+    text-align: left;
+
+    &:hover {
+      background: darken($green,10%);
+    }
+  }
+}
+
+/* Header
+------------------------------------------------------*/
+
+header {
+  @include clearfix;
+  @include shadow($black30,0px,1px,3px);
+  @include wrapper;
+  background: $green url('../img/bg.jpg');
+  padding: 30px 0px;
+
+  > div {
+    @include clearfix;
+    @include inner;
+    color: white;
+
+    span.title {
+      @include text-shadow($black10,0px,-1px,0px);
+      float: left;
+      font-size: 30px;
+      line-height: 40px;
+      font-weight: bold;
+    }
+
+    nav {
+      float: right;
+      width: 70%;
+
+      ul {
+        list-style: none;
+        margin: 0px;
+        padding: 0px;
+        text-align: right;
+
+        li {
+          display: inline-block;
+          width: auto;
+
+          a {
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 40px;
+            text-transform: uppercase;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Content
+------------------------------------------------------*/
+
+section.content {
+  @include clearfix;
+  @include wrapper;
+  padding: 30px 0px;
+
+  > div {
+    @include clearfix;
+    @include inner;
+  }
+
+  nav {
+    display: inline;
+    height: auto;
+    float: left;
+    margin-top: 15px;
+    width: 160px;
+
+    ul {
+      border-top: 1px dotted $lightgrey;
+      list-style: none;
+      padding: 0px;
+
+      li {
+        border-bottom: 1px dotted $lightgrey;
+        padding: 8px 0px;
+
+        a {
+          color: $darkgrey;
+          display: inline;
+          font-size: 12px;
+          font-weight: bold;
+          letter-spacing: 2px;
+          line-height: 14px;
+          padding: 1px 2px;
+          text-decoration: none;
+          text-transform: uppercase;
+
+          &:hover {
+            background: $orange;
+            color: white;
+          }
+        }
+      }
+    }
+  }
+
+  article {
+    @include rounded(3px);
+    @include shadow($black30,0px,1px,3px);
+    background: white;
+    display: inline;
+    height: auto;
+    float: right;
+    padding: 25px;
+    width: 750px;
+
+    section.main {
+      @include html;
+      display: inline;
+      float: left;
+      height: auto;
+      width: 525px;
+
+      th, td {
+        p {
+          margin: 0 !important;
+        }
+      }
+    }
+
+    section.sidebar {
+      @include html;
+      display: inline;
+      float: right;
+      height: auto;
+      width: 200px;
+
+      div.callout {
+        @include rounded(2px);
+        @include inset-shadow($black10,0px,2px,2px);
+        background: lighten($almostwhite,7%);
+        border: 1px solid $lightgrey;
+        margin: 0px 0px 15px 0px;
+        padding: 15px;
+
+        h1 {
+          border: 0px;
+          color: $darkgrey;
+          font-size: 1.4em;
+          letter-spacing: 0px;
+          line-height: 24px;
+          margin: 0px 0px 5px 0px !important;
+          font-weight: bold;
+          padding: 0px;
+        }
+
+        h2 {
+          font-size: 1.3em;
+        }
+
+        h3 {
+          font-size: 1.2em;
+        }
+
+        h4 {
+          font-size: 1.1em;
+        }
+
+        p:last-child {
+          margin-bottom: 0 !important;
+        }
+
+        a.button {
+          display: block;
+          margin-top: 10px;
+          text-align: center;
+        }
+      }
+    }
+  }
+}
+
+/* Accordion
+------------------------------------------------------*/
+
+div.accordion {
+  clear: both;
+
+  details {
+    clear: both;
+    margin: 0px 0px 10px 0px;
+
+    summary {
+      @include rounded(3px);
+      @include shadow($black10,0px,1px,3px);
+      background: $orange;
+      color: white;
+      cursor: pointer;
+      font-size: 15px;
+      line-height: 20px;
+      margin-bottom: 3px;
+      padding: 8px 10px;
+
+      &:hover {
+        background: lighten($orange,10%);
+        @include shadow($black30,0px,2px,5px);
+      }
+    }
+
+    div.accordionContent {
+      @include clearfix;
+      @include html;
+      @include rounded(3px);
+      @include inset-shadow($black10,0px,1px,3px);
+      border: 1px solid lighten($orange,30%);
+      padding: 8px 10px;
+    }
+  }
+}
+
+/* Tabify
+------------------------------------------------------*/
+
+div.tabify {
+  @include clearfix;
+  clear: both;
+  margin: 0px 0px 10px 0px;
+
+  ul.tabs {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+
+    li {
+      display: inline;
+      float: left;
+      margin: 0px 0px 0px 5px;
+
+      a {
+        @include rounded(3px 3px 0px 0px);
+        background: darken($orange,15%);
+        color: white;
+        display: block;
+        font-size: 15px;
+        line-height: 20px;
+        padding: 8px 10px;
+        text-decoration: none;
+
+        &:hover {
+          background: lighten($orange,10%);
+        }
+
+        &.active {
+          background: $orange;
+        }
+      }
+    }
+  }
+
+  div.tabContent {
+    @include html;
+    @include rounded(3px);
+    border: dashed 1px $lightgrey;
+    border-top: 3px solid $orange;
+    clear: both;
+    padding: 15px;
+  }
+}
+
+/* Figure
+------------------------------------------------------*/
+
+figure {
+  @include rounded(3px);
+  @include shadow($black30,0px,1px,3px);
+  margin-bottom: 20px !important;
+  overflow: hidden;
+
+  img {
+    @include rounded(3px);
+    display: block;
+    height: auto;
+    max-height: 150px;
+    width: 100%;
+  }
+
+  &.center,
+  &.left,
+  &.right {
+    background: $green;
+    width: 200px;
+
+    img {
+      @include rounded(3px 3px 0px 0px);
+      height: auto;
+      margin: 0px;
+      width: 100%;
+    }
+
+    figcaption {
+      color: white;
+      display: block;
+      font-size: 12px;
+      font-style: italic;
+      line-height: 16px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    &.center {
+      display: block;
+      margin: 10px auto 25px auto;
+    }
+
+    &.left {
+      float: left;
+      margin: 10px 25px 25px 0px;
+    }
+
+    &.right {
+      float: right;
+      margin: 10px 0px 25px 25px;
+    }
+  }
+}
+
+/* Tables
+------------------------------------------------------*/
+
+table {
+  @include shadow($black30,0px,1px,3px);
+  @include rounded(3px);
+  border: 0px;
+  overflow: hidden;
+
+  thead {
+    th, td {
+      background: $green;
+      border: 0px;
+      color: white;
+      font-weight: bold;
+      padding: 10px;
+
+      p {
+        margin: 0 !important;
+      }
+    }
+  }
+
+  tbody {
+    th, td {
+      background: white;
+      border: 0px;
+      color: $grey;
+      font-weight: normal;
+      padding: 5px 10px;
+
+      p {
+        margin: 0 !important;
+      }
+    }
+
+    tr:nth-child(2n) {
+      th, td {
+        background: lighten($almostwhite,5%);
+      }
+    }
+  }
+}
+/*------------------------------------------------------
+
+  Responsive
+
+--------------------------------------------------------*/
+
+
+/* Fluid Responsive Designs
+--------------------------------------------------------*/
+
+
+@media screen and (min-width: 601px) and (max-width: 1020px) {
+
+  header,
+  section.content {
+    min-width: 580px;
+
+    > div {
+      width: 90%
+    }
+  }
+
+  section.content {
+    nav {
+      width: 20%;
+    }
+
+    article {
+      padding: 15px 3%;
+      width: 74%;
+
+      section.main {
+        width: 60%;
+      }
+
+      section.sidebar {
+        width: 35%;
+      }
+    }
+  }
+
+}
+
+
+/* Mobile Responsive Designs
+--------------------------------------------------------*/
+
+@media screen and (max-width: 600px) {
+
+  body {
+    overflow-x: hidden;
+  }
+
+  body.shift {
+    .adapt {
+      left: 270px;
+      top: 0px;
+    }
+  }
+
+  section.mobile {
+    display: block;
+  }
+
+  header,
+  section.content {
+    min-width: 280px;
+
+    > div {
+      width: 90%
+    }
+  }
+
+  header {
+    > div {
+      nav {
+        left: -200px;
+        position: absolute;
+        top: -25px;
+        width: 200px;
+
+        ul {
+          border-top: 1px dotted $lightgrey;
+          list-style: none;
+          padding: 0px;
+          display: block;
+          text-align: left;
+          width: 200px;
+
+          li {
+            border-bottom: 1px dotted $lightgrey;
+            padding: 8px 0px;
+            float: none;
+            margin: 0px;
+            width: 200px;
+
+            a {
+              color: $darkgrey;
+              display: inline;
+              font-size: 12px;
+              font-weight: bold;
+              letter-spacing: 2px;
+              line-height: 14px;
+              padding: 1px 2px;
+              text-align: left;
+              text-decoration: none;
+              text-transform: uppercase;
+
+              &:hover {
+                background: $orange;
+                color: white;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  section.content {
+    nav {
+      display: none;
+    }
+
+    article {
+      padding: 15px 3%;
+      width: 94%;
+
+      section.main {
+        width: 100%;
+      }
+
+      section.sidebar {
+        width: 100%;
+      }
+    }
+  }
+}
