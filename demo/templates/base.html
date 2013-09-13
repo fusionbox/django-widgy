@@ -25,6 +25,7 @@
     {% block js %}
       <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
       <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+      <script type="text/javascript" src="{% static 'js/demo.js' %}"></script>
       {% for js_file in 'WIDGY_MEZZANINE_SITE'|js_files %}
       <script src="{% static js_file %}"></script>
       {% endfor %}
@@ -32,7 +33,10 @@
   {% endcompress %}
 </head>
 <body>
+  <div class="adapt">
   {% block body %}
+  
+  <section class="mobile"><a href="#">Menu</a></section>
   
   <header>
     <div>
@@ -60,5 +64,6 @@
     </div>
   </section>
   {% endblock %}
+  </div>
 </body>
 </html>

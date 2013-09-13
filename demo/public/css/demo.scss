@@ -206,6 +206,39 @@ html, body {
   font-family: $font-default;
   line-height: 18px;
 }
+
+div.adapt {
+  transition: all 0.25s ease 0s;
+    -o-transition: all 0.25s ease 0s;
+    -ms-transition: all 0.25s ease 0s;
+    -moz-transition: all 0.25s ease 0s;
+    -webkit-transition: all 0.25s ease 0s;
+  left: 0px;
+  position: relative;
+  top: 0px;
+}
+  
+/* Mobile Menu
+------------------------------------------------------*/
+
+section.mobile {
+  display: none;
+  height: auto;
+  width: auto;
+  
+  a {
+    background: darken($green,15%);
+    color: white;
+    display: block;
+    padding: 10px 3%;
+    font-weight: bold;
+    text-align: left;
+    
+    &:hover {
+      background: darken($green,10%);
+    }
+  }
+}
   
 /* Header
 ------------------------------------------------------*/
@@ -565,6 +598,144 @@ table {
     tr:nth-child(2n) {
       th, td {
         background: lighten($almostwhite,5%);
+      }
+    }
+  }
+}
+/*------------------------------------------------------
+  
+  Responsive
+  
+--------------------------------------------------------*/
+
+
+/* Fluid Responsive Designs
+--------------------------------------------------------*/
+
+
+@media screen and (min-width: 601px) and (max-width: 1020px) {  
+
+  header,
+  section.content {
+    min-width: 580px;
+    
+    > div {
+      width: 90%
+    }
+  }
+  
+  section.content {
+    nav {
+      width: 20%;
+    }
+    
+    article {
+      padding: 15px 3%;
+      width: 74%;
+      
+      section.main {
+        width: 60%;
+      }
+      
+      section.sidebar {
+        width: 35%;
+      }
+    }
+  }
+  
+}
+
+
+/* Mobile Responsive Designs
+--------------------------------------------------------*/
+
+@media screen and (max-width: 600px) {  
+  
+  body {    
+    overflow-x: hidden;
+  }
+  
+  body.shift {
+    .adapt {
+      left: 270px;
+      top: 0px;
+    }
+  }
+
+  section.mobile {
+    display: block;
+  }
+
+  header,
+  section.content {
+    min-width: 280px;
+    
+    > div {
+      width: 90%
+    }
+  }
+  
+  header {
+    > div {
+      nav {
+        left: -200px;
+        position: absolute;
+        top: -25px;
+        width: 200px;
+      
+        ul {
+          border-top: 1px dotted $lightgrey;
+          list-style: none;
+          padding: 0px;
+          display: block;
+          text-align: left;
+          width: 200px;
+        
+          li {
+            border-bottom: 1px dotted $lightgrey;
+            padding: 8px 0px;
+            float: none;
+            margin: 0px;
+            width: 200px;
+          
+            a {
+              color: $darkgrey;
+              display: inline;
+              font-size: 12px;
+              font-weight: bold;
+              letter-spacing: 2px;
+              line-height: 14px;
+              padding: 1px 2px;
+              text-align: left;
+              text-decoration: none;
+              text-transform: uppercase;
+        
+              &:hover {
+                background: $orange;
+                color: white;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  section.content {
+    nav {
+      display: none;
+    }
+    
+    article {
+      padding: 15px 3%;
+      width: 94%;
+      
+      section.main {
+        width: 100%;
+      }
+      
+      section.sidebar {
+        width: 100%;
       }
     }
   }

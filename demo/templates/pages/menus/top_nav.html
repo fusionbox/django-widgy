@@ -1,5 +1,6 @@
 {% load pages_tags %}
 <ul class="nav">
+      <li><a href="/">Home</a></li>
     {% for page in page_branch %}
       <li><a href="{{ page.get_absolute_url }}"{% if page.is_current_or_ascendant %} class="here"{% endif %}>{{ page.title }}</a></li>
     {% endfor %}
