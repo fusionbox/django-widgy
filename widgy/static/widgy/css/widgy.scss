@@ -428,9 +428,13 @@ li.node_drop_target {
 
           &.formField {
             margin-bottom: 10px;
+          
+            #{$inputFields} {
+              width: 74% !important;
+            }
             
             select {
-              width: 212px;
+              width: 77%;
             }
 
             .cke {
@@ -485,7 +489,7 @@ li.node_drop_target {
             width: 20%;
           }
           
-          #{$inputFields} {
+          #{$inputFields}{
             width: 74% !important;
           }
           
