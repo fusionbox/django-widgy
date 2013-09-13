@@ -482,11 +482,16 @@ li.node_drop_target {
           label {
             clear: left;
             padding: 0 10px 10px 0;
+            width: 20%;
           }
-
-          textarea {
-            max-width: 98.5%;
-            width: 98.5%;
+          
+          #{$inputFields} {
+            width: 74% !important;
+          }
+          
+          p.help_text {
+            margin-left: 10px;
+            padding-left: 20%;
           }
           
           .cancel {
