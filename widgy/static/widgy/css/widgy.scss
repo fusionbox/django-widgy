@@ -697,7 +697,11 @@ li.node_drop_target {
             border: 0px;
             margin: 0 1em;
             overflow: visible;
-            padding: 0px 0px 0px 60px;
+            padding: 0;
+            
+            &.drop_target {
+              padding-left: 60px;
+            }
             
             div.widget {
               ul.nodeChildren {
