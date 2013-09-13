@@ -156,13 +156,13 @@ textarea {
 li.node_drop_target {
   @include rounded(3px);
   @include transition;
-
   border: none !important;
   background: lighten($green,25%) !important;
   font-size: 1.0em !important;
   font-style: italic !important;
   height: 1em !important;
-  margin: -1em 1em !important;
+  min-height: 15px !important;
+  margin: 0.25em 0 !important;
   padding: 0em !important;
   text-align: center;
 
