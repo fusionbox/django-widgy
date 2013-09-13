@@ -265,49 +265,70 @@ li.node_drop_target {
       }
       
       // tab container
-      > .widget > .nodeChildren {
-        @include default;
-        border-bottom: 2px solid $grey;
-        margin-bottom: 15px !important;
-        padding: 15px 0px 0px 0px !important;
-        width: 100% !important;
-      
-        li.node.formbody,
-        li.node.formmeta {
-          @include rounded(4px 4px 0px 0px);
-          background: #eeeeee !important;
-          border-color: #cccccc;
-          border-width: 1px 1px 0px 1px;
-          color: #999999;
-          display: inline-block;
-          float: left;
-          margin: 0 0 0 .5em !important;
-          padding: 0px !important;
-          position: relative;
-          top: 2px;
-          z-index: 10;
-    
-          .widget {
-            background: transparent !important;
-
-            .drag-row {
-              @include rounded(0px);
-              background: transparent !important;
+      > .widget {
         
-              span.title {
-                color: inherit;
+        > .nodeChildren {
+          @include default;
+          border-bottom: 2px solid $grey;
+          margin-bottom: 15px !important;
+          padding: 15px 0px 0px 0px !important;
+          width: 100% !important;
+      
+          li.node {
+            @include rounded(4px 4px 0px 0px);
+            background: #eeeeee !important;
+            border-color: #cccccc;
+            border-width: 1px 1px 0px 1px;
+            color: #999999;
+            display: inline-block;
+            float: left;
+            margin: 0 0 0 .5em !important;
+            padding: 0px !important;
+            position: relative;
+            top: 2px;
+            z-index: 10;
+    
+            .widget {
+              background: transparent !important;
+
+              .drag-row {
+                @include rounded(0px);
+                background: transparent !important;
+                padding-right: 10px;
+        
+                span.title {
+                  color: inherit;
+                }
+                
+                button.delete {
+                  position: absolute !important;
+                  right: 2px;
+                  top: 2px;
+                }
+                
+                button.edit {
+                  position: absolute !important;
+                  right: 27px;
+                  top: 2px;
+                }
               }
             }
-          }
     
-          &:hover {
-            background-color: #fafafa !important;
-          }
+            &:hover {
+              background-color: #fafafa !important;
+            }
 
-          &.active {
-            background-color: white !important;
-            border-bottom: 2px solid white;
-            color: #555555;
+            &.active {
+              background-color: white !important;
+              border-color: #999999;
+              color: #555555;
+              
+              .widget {
+                .drag-row {
+                  padding-right: 60px;
+                }
+              }
+            }
           }
         }
       }
