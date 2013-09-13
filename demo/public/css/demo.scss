@@ -177,7 +177,7 @@ form {
       li {
         input {
           float: left;
-          margin: 4px 4px 0px 0px;
+          margin: 3px 4px 0px 0px;
         }
       }
     }
@@ -317,10 +317,17 @@ section.content {
     width: 750px;
     
     section.main {
+      @include html;
       display: inline;
       float: left;
       height: auto;
       width: 525px;
+      
+      th, td {
+        p {
+          margin: 0 !important;
+        }
+      }
     }
     
     section.sidebar {
@@ -364,10 +371,19 @@ section.content {
         p:last-child {
           margin-bottom: 0 !important;
         }
+        
+        a.button {
+          display: block;
+          margin-top: 10px;
+          text-align: center;
+        }
       }
     }
   }
 }
+  
+/* Accordion
+------------------------------------------------------*/
 
 div.accordion {
   clear: both;
@@ -400,6 +416,156 @@ div.accordion {
       @include inset-shadow($black10,0px,1px,3px);
       border: 1px solid lighten($orange,30%);
       padding: 8px 10px;
+    }
+  }
+}
+  
+/* Tabify
+------------------------------------------------------*/
+
+div.tabify {
+  @include clearfix;
+  clear: both;
+  margin: 0px 0px 10px 0px;
+  
+  ul.tabs {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    
+    li {
+      display: inline;
+      float: left;
+      margin: 0px 0px 0px 5px;
+      
+      a {
+        @include rounded(3px 3px 0px 0px);
+        background: darken($orange,15%);
+        color: white;
+        display: block;
+        font-size: 15px;
+        line-height: 20px;
+        padding: 8px 10px;
+        text-decoration: none;
+      
+        &:hover {
+          background: lighten($orange,10%);
+        }
+        
+        &.active {
+          background: $orange;
+        }
+      }
+    }
+  }
+  
+  div.tabContent {
+    @include html;
+    @include rounded(3px);
+    border: dashed 1px $lightgrey;
+    border-top: 3px solid $orange;
+    clear: both;
+    padding: 15px;
+  }
+}
+
+/* Figure
+------------------------------------------------------*/
+
+figure {
+  @include rounded(3px);
+  @include shadow($black30,0px,1px,3px);
+  margin-bottom: 20px !important;
+  overflow: hidden;
+  
+  img {
+    @include rounded(3px);
+    display: block;
+    height: auto;
+    max-height: 150px;
+    width: 100%;
+  }
+  
+  &.center,
+  &.left,
+  &.right {
+    background: $green;
+    width: 200px;
+    
+    img {
+      @include rounded(3px 3px 0px 0px);
+      height: auto;
+      margin: 0px;
+      width: 100%;
+    }
+    
+    figcaption {
+      color: white;
+      display: block;
+      font-size: 12px;
+      font-style: italic;
+      line-height: 16px;
+      padding: 15px;
+      text-align: center;
+    }
+    
+    &.center {
+      display: block;
+      margin: 10px auto 25px auto;
+    }
+    
+    &.left {
+      float: left;
+      margin: 10px 25px 25px 0px;
+    }
+    
+    &.right {
+      float: right;
+      margin: 10px 0px 25px 25px;
+    }
+  }
+}
+  
+/* Tables
+------------------------------------------------------*/
+
+table {
+  @include shadow($black30,0px,1px,3px);
+  @include rounded(3px);
+  border: 0px;
+  overflow: hidden;
+  
+  thead {
+    th, td {
+      background: $green;
+      border: 0px;
+      color: white;
+      font-weight: bold;
+      padding: 10px;
+      
+      p {
+        margin: 0 !important;
+      }
+    }
+  }
+  
+  tbody {
+    th, td {
+      background: white;
+      border: 0px;
+      color: $grey;
+      font-weight: normal;
+      padding: 5px 10px;
+      
+      p {
+        margin: 0 !important;
+      }
+    }
+    
+    tr:nth-child(2n) {
+      th, td {
+        background: lighten($almostwhite,5%);
+      }
     }
   }
 }
