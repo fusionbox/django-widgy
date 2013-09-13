@@ -1300,3 +1300,34 @@ span.title {
 .vForeignKeyRawIdAdminField {
   display: none;
 }
+
+
+
+/* Responsive Shelf Width
+========================================================= 
+========================================================= 
+========================================================= 
+========================================================= */
+
+@media screen and (max-width: 1300px) { 
+
+  div.widgy div.editor section.node > div.widget > ul.nodeChildren {
+    width: 70% !important;
+  }
+
+  div.widgy div.editor section.node div.widget div.shelf {
+    width: 27%;
+    
+    ul.nodeChildren li.shelfItem {
+      margin: 0 1% 4px 0;
+      padding: 5px 6% 5px 3%;
+      width: 86%;
+      
+      &.being_dragged {
+        margin: 0 !important;
+        padding: 5px !important;
+        width: 180px !important;
+      }
+    }
+  }
+}
