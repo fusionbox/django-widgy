@@ -553,8 +553,8 @@ li.node_drop_target {
           margin: 1em;
           
           &.table {
-            @include shadow(transparent,0px,0px,0px);
-            border: 1px solid $lightgrey;
+            @include shadow($black30,0px,1px,3px);
+            border: 0px;
             
             > div.widget {
               > ul.nodeChildren {
