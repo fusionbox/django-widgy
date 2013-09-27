@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from mezzanine.core.views import direct_to_template
 
-from demo.widgy import widgy_site
+from demo.widgysite import widgy_site
 
 admin.autodiscover()
 
