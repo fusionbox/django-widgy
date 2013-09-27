@@ -2,8 +2,6 @@ from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
-from mezzanine.core.views import direct_to_template
-
 from demo.widgysite import widgy_site
 
 admin.autodiscover()
