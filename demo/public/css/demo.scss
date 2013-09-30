@@ -60,7 +60,7 @@ $inputFields: "input[type='text'], input[type='password'], input[type='email'], 
   position: relative;
   text-decoration: none;
   top: 0px;
-  
+
   &:hover {
     @include gradient(darken($green,5%),$green);
     @include shadow($black30,0px,1px,2px);
@@ -117,7 +117,7 @@ h4 {
 p {
   margin: 0px 0px 15px 0px;
 }
-  
+
 /* Forms
 ------------------------------------------------------*/
 
@@ -128,39 +128,39 @@ form {
   clear: both;
   margin-bottom: 20px;
   padding: 20px;
-  
+
   div.formField {
     @include clearfix;
     clear: both;
     margin-bottom: 15px;
-    
+
     &.required {
       label {
         font-weight: bold;
-        
+
         &:after {
           color: $red;
           content: "*";
         }
       }
-      
+
       ul {
         label {
           font-weight: normal;
-          
+
           &:after {
             content: "";
           }
         }
       }
     }
-    
+
     label {
       clear: both;
       display: inline-block;
       margin: 0px 0px 4px 0px;
     }
-    
+
     #{$inputFields} {
       @include rounded(2px);
       @include inset-shadow($black10,0px,1px,3px);
@@ -169,11 +169,11 @@ form {
       padding: 5px;
       width: 97.5%;
     }
-    
+
     ul, ol {
       list-style: none;
       padding: 0px;
-      
+
       li {
         input {
           float: left;
@@ -181,7 +181,7 @@ form {
         }
       }
     }
-    
+
     div.help_text {
       p {
         color: $grey;
@@ -195,7 +195,7 @@ form {
 a.button, button, input[type='submit'], input[type='button'] {
   @include button;
 }
-  
+
 /* Body
 ------------------------------------------------------*/
 
@@ -217,7 +217,7 @@ div.adapt {
   position: relative;
   top: 0px;
 }
-  
+
 /* Mobile Menu
 ------------------------------------------------------*/
 
@@ -225,7 +225,7 @@ section.mobile {
   display: none;
   height: auto;
   width: auto;
-  
+
   a {
     background: darken($green,15%);
     color: white;
@@ -233,13 +233,13 @@ section.mobile {
     padding: 10px 3%;
     font-weight: bold;
     text-align: left;
-    
+
     &:hover {
       background: darken($green,10%);
     }
   }
 }
-  
+
 /* Header
 ------------------------------------------------------*/
 
@@ -249,12 +249,12 @@ header {
   @include wrapper;
   background: $green url('../img/bg.jpg');
   padding: 30px 0px;
-  
+
   > div {
     @include clearfix;
     @include inner;
     color: white;
-    
+
     span.title {
       @include text-shadow($black10,0px,-1px,0px);
       float: left;
@@ -262,21 +262,21 @@ header {
       line-height: 40px;
       font-weight: bold;
     }
-    
+
     nav {
       float: right;
       width: 70%;
-      
+
       ul {
         list-style: none;
         margin: 0px;
         padding: 0px;
         text-align: right;
-        
+
         li {
           display: inline-block;
           width: auto;
-          
+
           a {
             color: white;
             font-size: 14px;
@@ -289,7 +289,7 @@ header {
     }
   }
 }
-  
+
 /* Content
 ------------------------------------------------------*/
 
@@ -297,28 +297,28 @@ section.content {
   @include clearfix;
   @include wrapper;
   padding: 30px 0px;
-  
+
   > div {
     @include clearfix;
     @include inner;
   }
-  
+
   nav {
     display: inline;
     height: auto;
     float: left;
     margin-top: 15px;
     width: 160px;
-    
+
     ul {
       border-top: 1px dotted $lightgrey;
       list-style: none;
       padding: 0px;
-      
+
       li {
         border-bottom: 1px dotted $lightgrey;
         padding: 8px 0px;
-        
+
         a {
           color: $darkgrey;
           display: inline;
@@ -329,7 +329,7 @@ section.content {
           padding: 1px 2px;
           text-decoration: none;
           text-transform: uppercase;
-          
+
           &:hover {
             background: $orange;
             color: white;
@@ -338,7 +338,7 @@ section.content {
       }
     }
   }
-  
+
   article {
     @include rounded(3px);
     @include shadow($black30,0px,1px,3px);
@@ -348,28 +348,28 @@ section.content {
     float: right;
     padding: 25px;
     width: 750px;
-    
+
     section.main {
       @include html;
       display: inline;
       float: left;
       height: auto;
       width: 525px;
-      
+
       th, td {
         p {
           margin: 0 !important;
         }
       }
     }
-    
+
     section.sidebar {
       @include html;
       display: inline;
       float: right;
       height: auto;
       width: 200px;
-      
+
       div.callout {
         @include rounded(2px);
         @include inset-shadow($black10,0px,2px,2px);
@@ -377,7 +377,7 @@ section.content {
         border: 1px solid $lightgrey;
         margin: 0px 0px 15px 0px;
         padding: 15px;
-  
+
         h1 {
           border: 0px;
           color: $darkgrey;
@@ -388,23 +388,23 @@ section.content {
           font-weight: bold;
           padding: 0px;
         }
-        
+
         h2 {
           font-size: 1.3em;
         }
-        
+
         h3 {
           font-size: 1.2em;
         }
-        
+
         h4 {
           font-size: 1.1em;
         }
-  
+
         p:last-child {
           margin-bottom: 0 !important;
         }
-        
+
         a.button {
           display: block;
           margin-top: 10px;
@@ -414,17 +414,17 @@ section.content {
     }
   }
 }
-  
+
 /* Accordion
 ------------------------------------------------------*/
 
 div.accordion {
   clear: both;
-  
+
   details {
     clear: both;
     margin: 0px 0px 10px 0px;
-    
+
     summary {
       @include rounded(3px);
       @include shadow($black10,0px,1px,3px);
@@ -435,13 +435,13 @@ div.accordion {
       line-height: 20px;
       margin-bottom: 3px;
       padding: 8px 10px;
-      
+
       &:hover {
         background: lighten($orange,10%);
         @include shadow($black30,0px,2px,5px);
       }
     }
-    
+
     div.accordionContent {
       @include clearfix;
       @include html;
@@ -452,7 +452,7 @@ div.accordion {
     }
   }
 }
-  
+
 /* Tabify
 ------------------------------------------------------*/
 
@@ -460,17 +460,17 @@ div.tabify {
   @include clearfix;
   clear: both;
   margin: 0px 0px 10px 0px;
-  
+
   ul.tabs {
     list-style: none;
     margin: 0px;
     padding: 0px;
-    
+
     li {
       display: inline;
       float: left;
       margin: 0px 0px 0px 5px;
-      
+
       a {
         @include rounded(3px 3px 0px 0px);
         background: darken($orange,15%);
@@ -480,18 +480,18 @@ div.tabify {
         line-height: 20px;
         padding: 8px 10px;
         text-decoration: none;
-      
+
         &:hover {
           background: lighten($orange,10%);
         }
-        
+
         &.active {
           background: $orange;
         }
       }
     }
   }
-  
+
   div.tabContent {
     @include html;
     @include rounded(3px);
@@ -510,7 +510,7 @@ figure {
   @include shadow($black30,0px,1px,3px);
   margin-bottom: 20px !important;
   overflow: hidden;
-  
+
   img {
     @include rounded(3px);
     display: block;
@@ -518,20 +518,20 @@ figure {
     max-height: 150px;
     width: 100%;
   }
-  
+
   &.center,
   &.left,
   &.right {
     background: $green;
     width: 200px;
-    
+
     img {
       @include rounded(3px 3px 0px 0px);
       height: auto;
       margin: 0px;
       width: 100%;
     }
-    
+
     figcaption {
       color: white;
       display: block;
@@ -541,24 +541,24 @@ figure {
       padding: 15px;
       text-align: center;
     }
-    
+
     &.center {
       display: block;
       margin: 10px auto 25px auto;
     }
-    
+
     &.left {
       float: left;
       margin: 10px 25px 25px 0px;
     }
-    
+
     &.right {
       float: right;
       margin: 10px 0px 25px 25px;
     }
   }
 }
-  
+
 /* Tables
 ------------------------------------------------------*/
 
@@ -567,7 +567,7 @@ table {
   @include rounded(3px);
   border: 0px;
   overflow: hidden;
-  
+
   thead {
     th, td {
       background: $green;
@@ -575,13 +575,13 @@ table {
       color: white;
       font-weight: bold;
       padding: 10px;
-      
+
       p {
         margin: 0 !important;
       }
     }
   }
-  
+
   tbody {
     th, td {
       background: white;
@@ -589,12 +589,12 @@ table {
       color: $grey;
       font-weight: normal;
       padding: 5px 10px;
-      
+
       p {
         margin: 0 !important;
       }
     }
-    
+
     tr:nth-child(2n) {
       th, td {
         background: lighten($almostwhite,5%);
@@ -603,9 +603,9 @@ table {
   }
 }
 /*------------------------------------------------------
-  
+
   Responsive
-  
+
 --------------------------------------------------------*/
 
 
@@ -613,48 +613,48 @@ table {
 --------------------------------------------------------*/
 
 
-@media screen and (min-width: 601px) and (max-width: 1020px) {  
+@media screen and (min-width: 601px) and (max-width: 1020px) {
 
   header,
   section.content {
     min-width: 580px;
-    
+
     > div {
       width: 90%
     }
   }
-  
+
   section.content {
     nav {
       width: 20%;
     }
-    
+
     article {
       padding: 15px 3%;
       width: 74%;
-      
+
       section.main {
         width: 60%;
       }
-      
+
       section.sidebar {
         width: 35%;
       }
     }
   }
-  
+
 }
 
 
 /* Mobile Responsive Designs
 --------------------------------------------------------*/
 
-@media screen and (max-width: 600px) {  
-  
-  body {    
+@media screen and (max-width: 600px) {
+
+  body {
     overflow-x: hidden;
   }
-  
+
   body.shift {
     .adapt {
       left: 270px;
@@ -669,12 +669,12 @@ table {
   header,
   section.content {
     min-width: 280px;
-    
+
     > div {
       width: 90%
     }
   }
-  
+
   header {
     > div {
       nav {
@@ -682,7 +682,7 @@ table {
         position: absolute;
         top: -25px;
         width: 200px;
-      
+
         ul {
           border-top: 1px dotted $lightgrey;
           list-style: none;
@@ -690,14 +690,14 @@ table {
           display: block;
           text-align: left;
           width: 200px;
-        
+
           li {
             border-bottom: 1px dotted $lightgrey;
             padding: 8px 0px;
             float: none;
             margin: 0px;
             width: 200px;
-          
+
             a {
               color: $darkgrey;
               display: inline;
@@ -709,7 +709,7 @@ table {
               text-align: left;
               text-decoration: none;
               text-transform: uppercase;
-        
+
               &:hover {
                 background: $orange;
                 color: white;
@@ -720,20 +720,20 @@ table {
       }
     }
   }
-  
+
   section.content {
     nav {
       display: none;
     }
-    
+
     article {
       padding: 15px 3%;
       width: 94%;
-      
+
       section.main {
         width: 100%;
       }
-      
+
       section.sidebar {
         width: 100%;
       }

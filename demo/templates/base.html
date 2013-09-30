@@ -9,7 +9,7 @@
   <meta name="description" content="{% block seo_description %}{% endblock %}" />
   <meta name="keywords" content="{% block seo_keywords %}{% endblock %}" />
   <title>{% block title %}Project name{% endblock %}</title>
-  
+
   <link href='//fonts.googleapis.com/css?family=Roboto:400,400italic,700italic,700,300,300italic' rel='stylesheet' type='text/css'>
 
   {% compress css %}
@@ -35,18 +35,18 @@
 <body>
   <div class="adapt">
   {% block body %}
-  
+
   <section class="mobile"><a href="#">Menu</a></section>
-  
+
   <header>
     <div>
-      <span class="title">Widgy Demo</span>
+      <a class="title" href="/">Widgy Demo</a>
       <nav>
         {% page_menu 'pages/menus/top_nav.html' %}
       </nav>
     </div>
   </header>
-  
+
   <section class="content">
     <div class="inner">
 
@@ -60,9 +60,13 @@
           {% endblock %}
         {% endblock %}
       </article>
-      
+
     </div>
   </section>
+
+  <footer>
+    {% page_menu "pages/menus/footer.html" %}
+  </footer>
   {% endblock %}
   </div>
 </body>

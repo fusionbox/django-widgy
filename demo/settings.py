@@ -189,7 +189,7 @@ REQUIRE_BUILD_PROFILE = 'widgy.build.js'
 REQUIRE_BASE_URL = 'widgy/js'
 STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
 
-WIDGY_MEZZANINE_SITE = 'demo.widgy.widgy_site'
+WIDGY_MEZZANINE_SITE = 'demo.widgysite.widgy_site'
 
 
 DATABASE_ENGINE = DATABASES['default']['ENGINE']

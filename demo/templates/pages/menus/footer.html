@@ -1,0 +1,19 @@
+<p class="links">
+  {% for page in page_branch %}
+    {% if page.in_menu %}
+      {% if page.is_current %}
+        <span class="nolink here">
+      {% else %}
+        <a href="{{ page.get_absolute_url }}"{% if page.is_current_or_ascendant %} class="here"{% endif %}>
+      {% endif %}
+
+        {{ page.title }}
+
+      {% if page.is_current %}
+        </span>
+      {% else %}
+        </a>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+</p>

@@ -1,8 +1,13 @@
-from django.shortcuts import redirect
 from django.db.models import Q
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
 from django.conf import settings
+from django.http import (
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponsePermanentRedirect,
+)
+from django.utils.http import is_safe_url
 
 from mezzanine.pages.views import page as page_view
 from mezzanine.pages.models import Page
@@ -45,9 +50,12 @@ class PageViewMixin(object):
 
 class HandleFormView(HandleFormMixin, PageViewMixin, View):
     def get(self, request, *args, **kwargs):
-        # This will raise a KeyError when `from` is for some reason
-        # missing. What should it actually do?
-        return redirect(request.GET['from'])
+        try:
+            if not is_safe_url(request.GET['from']):
+                return HttpResponseForbidden()
+            return HttpResponsePermanentRedirect(request.GET['from'])
+        except KeyError:
+            return HttpResponseBadRequest()
 
     def form_invalid(self, form):
         root_node = self.form_node.get_root()

@@ -1,17 +1,17 @@
 /*
  * Common SCSS File - SCSS v1.0
  * last edited 02/17/12
- * @author Justin Stollsteimer - Fusionbox, Inc. 
+ * @author Justin Stollsteimer - Fusionbox, Inc.
  * http://www.fusionbox.com
  *
  *
- * Lists: Line 
- * HR: Line 
- * Table: Line 
- * Form Elements: Line 
+ * Lists: Line
+ * HR: Line
+ * Table: Line
+ * Form Elements: Line
  *
  */
- 
+
 /* SASS Mixins
 --------------------------------------------------*/
 
@@ -138,28 +138,28 @@
 }
 
 
-/* Common Classes 
+/* Common Classes
 ------------------------------------------------------*/
 
-strong, 
+strong,
 .strong {
-  font-weight: bold; 
+  font-weight: bold;
 }
-  
-em, 
-.em { 
-  font-style: italic; 
+
+em,
+.em {
+  font-style: italic;
 }
-  
+
 sup {
   bottom: .8em;
   font-size: 60% !important;
-  position: relative; 
+  position: relative;
 }
-  
+
 sub {
   font-size: 60% !important;
-  position: relative; 
+  position: relative;
   bottom: -.2em;
 }
 
@@ -170,8 +170,8 @@ sub {
 pre {
   font-style: monospace;
 }
-      
-code { 
+
+code {
   font-style: monospace;
 }
 
