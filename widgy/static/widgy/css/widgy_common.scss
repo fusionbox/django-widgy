@@ -127,6 +127,60 @@
   -moz-box-sizing: $box-sizing;
 }
 
+@mixin button {
+  @include rounded(3px);
+  background: $blue;
+  border: 0px;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  height: auto;
+  font-weight: bold;
+  line-height: 12px;
+  padding: 2px 4px;
+  width: auto;
+
+  &:hover {
+    background: lighten($blue,10%);
+    color: white;
+  }
+
+  &.cancel {
+    background: $grey;
+    color: white;
+
+    &:hover {
+      background: lighten($grey,10%);
+    }
+  }
+
+  &.delete {
+    background: $red;
+    color: white;
+
+    &:hover {
+      background: lighten($red,10%);
+    }
+  }
+
+  &.loading {
+    @extend %loading;
+  }
+
+  &[type='submit'] {
+    @include rounded(3px);
+    background: $green;
+    color: white;
+    height: auto;
+    line-height: 15px;
+    font-weight: bold;
+    padding: 0px 4px 1px !important;
+
+    &:hover {
+      background: lighten($green,10%);
+    }
+  }
+}
 
 /* Variables
 -----------------------------------------------*/
