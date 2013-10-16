@@ -17,9 +17,9 @@ WidgySite
 
 - tracks installed widgets
 - stores URLs
-- authorization
-- allows centralized overriding of compatibility
-- allows having more than one instance of widgy
+- provides authorization
+- allows centralized overriding of compatibility between components
+- accomodates for multiple instances of widgy
 
 Proxying a Widget
 -----------------

@@ -2,7 +2,7 @@ Design
 ======
 
 django-widgy is a heterogeneous tree editor for Django. It enables you to
-combine different model of different types into a tree structure.
+combine models of different types into a tree structure.
 
 The django-widgy project is split into two main pieces. Widgy core provides
 :class:`~widgy.models.Node`, the :class:`~widgy.models.Content` abstract class,

@@ -2,8 +2,8 @@ Versioning
 ==========
 
 Widgy comes with an optional but powerful versioning system inspired
-by git. Versioning works by putting another model called a version
-tracker between the owner and the root node. Just like in git, each
+by Git. Versioning works by putting another model called a version
+tracker between the owner and the root node. Just like in Git, each
 :class:`~widgy.models.VersionTracker` has a reference to a current
 working copy and then a list of commits.  A
 :class:`~widgy.models.VersionCommit` is a frozen snapshot of the
