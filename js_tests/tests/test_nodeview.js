@@ -87,34 +87,26 @@ describe('CoreFunctions', function() {
     })
     .done();
   });
-/*
-  it('should handle methods onClose', function() {
-    return this.node.ready(function(node) {
-      var node_view = new nodes.NodeView({model: node});
-      var child_view = new nodes.NodeView({model: node});
-      node_view.list.push(child_view);
-      child_view.content.shelf = true;
-      child_view.shelf = child_view.makeShelf();
 
-      sinon.spy(child_view.list, 'closeAll');
-      sinon.spy(child_view.shelf, 'close');
-
-      child_view.onClose();
-
-      assert.isTrue(child_view.list.closeAll.calledOnce);
-      assert.isTrue(child_view.shelf.close.calledOnce);
-    });
-  });
-*/
   it('should deleteSelf', function() {
     return this.node.ready(function(node) {
       var node_view = new nodes.NodeView({model: node});
-      var child_view = new nodes.NodeView({model: node});
-      node_view.list.push(child_view);
-      node_view.shelf = child_view.makeShelf();
-
+      node_view.shelf = node_view.makeShelf();
       node_view.node.collection = node.children;
+
+      sinon.spy(node_view.node, 'destroy');
+      sinon.spy(node_view.list, 'closeAll');
+      sinon.spy(node_view.shelf, 'close');
+
       node_view.deleteSelf();
+
+      assert.isTrue(node_view.node.destroy.calledOnce);
+      assert.isTrue(node_view.list.closeAll.calledOnce);
+      assert.isTrue(node_view.shelf.close.calledOnce);
+
+      node_view.node.destroy.restore();
+      node_view.list.closeAll.restore();
+      node_view.shelf.close.restore();
     })
     .done();
   });

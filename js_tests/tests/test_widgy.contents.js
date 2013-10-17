@@ -105,7 +105,7 @@ describe('EditorView', function() {
       assert.isTrue(edit_view.handleSuccess.calledOnce);
 
       edit_view.handleSuccess.restore();
-      $.ajax.restore();
+      stub.restore();
     })
     .done();
   });
