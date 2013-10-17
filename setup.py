@@ -34,7 +34,7 @@ install_requires = [
     'django-argonauts==1.0.0',
 ]
 
-version = (0, 1, 0, 'final')
+version = (0, 2, 0, 'alpha')
 
 
 def get_version():
