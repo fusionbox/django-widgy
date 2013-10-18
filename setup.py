@@ -34,7 +34,7 @@ install_requires = [
     'django-argonauts==1.0.0',
 ]
 
-version = (0, 0, 1, 'alpha')
+version = (0, 2, 0, 'alpha')
 
 
 def get_version():
@@ -51,7 +51,7 @@ setup(
     name='widgy',
     version=get_version(),
     description=__doc__,
-    long_description=read('README.rst'),
+    long_description=read('README.rst') + '\n\n' + read('CHANGELOG.rst'),
     packages=[package for package in find_packages() if package.startswith('widgy')],
     install_requires=install_requires,
     dependency_links=[
