@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -82,7 +85,10 @@ class ImmovableBucket(Bucket):
 
 
 class AnotherLayout(Layout):
-    pass
+    class Meta:
+        # This tests verbose names that have unicode characters
+        verbose_name = 'Àñöthér Làyöùt'
+        verbose_name_plural = 'Àñöthér Làyöùts'
 
 
 class VowelBucket(Bucket):
