@@ -61,6 +61,14 @@ Mezzanine settings::
     GRAPPELLI_INSTALLED = True
     SITE_ID = 1
 
+If you want mezzanine to use
+:class:`~widgy.contrib.widgy_mezzanine.models.WidgyPage` as the default page,
+you can add the following line to your settings file::
+
+    ADD_PAGE_ORDER = (
+        'widgy_mezzanine.WidgyPage',
+    )
+
 add Mezzanine context processor. If you don't already have
 ``TEMPLATE_CONTEXT_PROCESSORS`` in your settings file, you should copy the
 default before add Mezzanine's::
