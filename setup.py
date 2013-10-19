@@ -50,8 +50,12 @@ def get_version():
 setup(
     name='widgy',
     version=get_version(),
+    author='Fusionbox, Inc.',
+    author_email='programmers@fusionbox.com',
     description=__doc__,
     long_description=read('README.rst') + '\n\n' + read('CHANGELOG.rst'),
+    url='https://django-widgy.readthedocs.org/',
+    license='BSD',
     packages=[package for package in find_packages() if package.startswith('widgy')],
     install_requires=install_requires,
     dependency_links=[
@@ -60,4 +64,18 @@ setup(
     ],
     zip_safe=False,
     include_package_data=True,
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Web Environment',
+        'Framework :: Django',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+        'Topic :: Internet :: WWW/HTTP :: Site Management',
+        'Natural Language :: English',
+        'Programming Language :: JavaScript',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+    ],
 )
