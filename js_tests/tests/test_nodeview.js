@@ -112,6 +112,7 @@ describe('CoreFunctions', function() {
   });
 
   it('should startDrag', function() {
+    test.create();
     var nodes_promise = Q.all([this.node.ready(), this.node2.ready()]);
     nodes_promise.then(function(node_array) {
       var deferal = {};
@@ -136,6 +137,7 @@ describe('CoreFunctions', function() {
             app_view.setCompatibility('1'); // This can probably go
             app_view.node_view_list.at(1).$el.height(100);
             app_view.node_view_list.at(0).startDrag(app_view.node_view_list.at(1));
+            test.destroy();
           });
         }
         sinon.stub(node_array[1].component.View.prototype, 'renderPromise', templateAPI);
