@@ -1,8 +1,13 @@
 Changelog
 =========
 
-Widgy 0.1.0
------------
+0.1.1 (2013-10-21)
+------------------
+
+* Adjust ``MANIFEST.in`` to fix PyPi install.
+
+0.1.0 (2013-10-18)
+------------------
 
 First release.
 
