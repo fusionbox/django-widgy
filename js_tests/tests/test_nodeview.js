@@ -42,7 +42,8 @@ describe('CoreFunctions', function() {
   beforeEach(function() {
     this.node = new nodes.Node({
       content: {
-        component: 'testcomponent'
+        component: 'testcomponent',
+        preview_template: '<span><%preview_template%></span>'
       }
     });
 
@@ -64,8 +65,6 @@ describe('CoreFunctions', function() {
       nodes.Node.prototype.getComponent.restore();
 
       app_view.root_node_promise.then(function() {
-        node_array[1].component.View.prototype.title = 'Root Node';
-
         var parent_view = app_view.node_view_list.at(0);
         parent_view.$preview = parent_view.$(' > .widget > .preview ');
         parent_view.$children = parent_view.$(' > .widget > .node_chidren ');
@@ -123,26 +122,108 @@ describe('CoreFunctions', function() {
       nodes.Node.prototype.getComponent.restore();
 
       app_view.root_node_promise.then(function() {
-        node_array[1].component.View.prototype.title = 'Root Node';
-
         var parent_view = app_view.node_view_list.at(0);
         parent_view.$preview = parent_view.$(' > .widget > .preview ');
         parent_view.$children = parent_view.$(' > .widget > .node_chidren ');
 
-        var draggable_view = new nodes.NodeView({model: node_array[1]});
-
         var templateAPI = function() {
           return Q('<span><%title%></span>').then(function() {
             node_array[1].component.View.prototype.renderPromise.restore();
-            app_view.node_view_list.at(0).startDrag(app_view.node_view_list.at(1));
+            parent_view.startDrag(app_view.node_view_list.at(1));
 
-            var drop_targets_list = app_view.node_view_list.at(0).drop_targets_list;
+            var drop_targets_list = parent_view.drop_targets_list;
 
+            assert.strictEqual(parent_view.dragged_view, app_view.node_view_list.at(1));
             assert.instanceOf(drop_targets_list.at(0), nodes.DropTargetView);
             assert.isTrue(drop_targets_list.at(0).$el.hasClass('previous'));
             assert.isFalse(drop_targets_list.at(1).$el.hasClass('previous'));
             assert.deepEqual(drop_targets_list.at(1).$el.css('display'), 'none');
             test.destroy();
+          });
+        }
+        sinon.stub(node_array[1].component.View.prototype, 'renderPromise', templateAPI);
+
+        deferal.children.add(node_array[1]);
+      })
+      .done();
+    })
+    .done();
+  });
+
+  it('should stopDrag', function() {
+    test.create();
+    var nodes_promise = Q.all([this.node.ready(), this.node2.ready()]);
+    nodes_promise.then(function(node_array) {
+      var deferal = {};
+      _.extend(deferal, node_array[0]);
+      var myAPI = function() { return Q(deferal); };
+      sinon.stub(nodes.Node.prototype, 'getComponent', myAPI);
+      var app_view = new widgy.AppView({root_node: node_array[0], model: node_array[0]});
+      nodes.Node.prototype.getComponent.restore();
+
+      app_view.root_node_promise.then(function() {
+        var parent_view = app_view.node_view_list.at(0);
+        parent_view.shelf = parent_view.makeShelf();
+        parent_view.$preview = parent_view.$(' > .widget > .preview ');
+        parent_view.$children = parent_view.$(' > .widget > .node_chidren ');
+
+        var templateAPI = function() {
+          return Q('<span><%title%></span>').then(function() {
+            node_array[1].component.View.prototype.renderPromise.restore();
+            parent_view.startDrag(app_view.node_view_list.at(1));
+            assert.strictEqual(parent_view.dragged_view, app_view.node_view_list.at(1));
+            assert.isNotNull(parent_view.drop_targets_list.at(0));
+
+            var callback = sinon.spy();
+
+            parent_view.stopDrag(callback);
+
+            assert.isTrue(callback.calledWith(app_view.node_view_list.at(1)));
+            assert.isUndefined(parent_view.dragged_view);
+            assert.isUndefined(parent_view.drop_targets_list.at(0));
+            test.destroy();
+          });
+        }
+        sinon.stub(node_array[1].component.View.prototype, 'renderPromise', templateAPI);
+
+        deferal.children.add(node_array[1]);
+      })
+      .done();
+    })
+    .done();
+  });
+
+  it('should getTemplate', function() {
+    return this.node.ready(function(node) {
+      var node_view = new nodes.NodeView({model: node});
+      assert.deepEqual(node_view.getTemplate(), '<span><%preview_template%></span>');
+    });
+  });
+
+  it('should rerender', function() {
+    test.create();
+    var nodes_promise = Q.all([this.node.ready(), this.node2.ready()]);
+    nodes_promise.then(function(node_array) {
+      var deferal = {};
+      _.extend(deferal, node_array[0]);
+      var myAPI = function() { return Q(deferal); };
+      sinon.stub(nodes.Node.prototype, 'getComponent', myAPI);
+      var app_view = new widgy.AppView({root_node: node_array[0], model: node_array[0]});
+      nodes.Node.prototype.getComponent.restore();
+
+      app_view.root_node_promise.then(function() {
+        node_array[1].component.View.prototype.title = 'Root Node';
+
+        var parent_view = app_view.node_view_list.at(0);
+        parent_view.shelf = parent_view.makeShelf();
+        parent_view.$preview = parent_view.$(' > .widget > .preview ');
+        parent_view.$children = parent_view.$(' > .widget > .node_chidren ');
+
+        var templateAPI = function() {
+          return Q('<span><%title%></span>').then(function() {
+            app_view.node_view_list.at(0).rerender();
+            test.destroy();
+            node_array[1].component.View.prototype.renderPromise.restore();
           });
         }
         sinon.stub(node_array[1].component.View.prototype, 'renderPromise', templateAPI);
