@@ -134,9 +134,14 @@ describe('CoreFunctions', function() {
         var templateAPI = function() {
           return Q('<span><%title%></span>').then(function() {
             node_array[1].component.View.prototype.renderPromise.restore();
-            app_view.setCompatibility('1'); // This can probably go
-            app_view.node_view_list.at(1).$el.height(100);
             app_view.node_view_list.at(0).startDrag(app_view.node_view_list.at(1));
+
+            var drop_targets_list = app_view.node_view_list.at(0).drop_targets_list;
+
+            assert.instanceOf(drop_targets_list.at(0), nodes.DropTargetView);
+            assert.isTrue(drop_targets_list.at(0).$el.hasClass('previous'));
+            assert.isFalse(drop_targets_list.at(1).$el.hasClass('previous'));
+            assert.deepEqual(drop_targets_list.at(1).$el.css('display'), 'none');
             test.destroy();
           });
         }
