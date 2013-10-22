@@ -136,8 +136,14 @@ describe('CoreFunctions', function() {
             assert.strictEqual(parent_view.dragged_view, app_view.node_view_list.at(1));
             assert.instanceOf(drop_targets_list.at(0), nodes.DropTargetView);
             assert.isTrue(drop_targets_list.at(0).$el.hasClass('previous'));
+            assert.isTrue(drop_targets_list.at(0).$el.hasClass('active'));
             assert.isFalse(drop_targets_list.at(1).$el.hasClass('previous'));
             assert.deepEqual(drop_targets_list.at(1).$el.css('display'), 'none');
+
+            // Could be seperate test - Tests DropTargetView.deactivate
+            drop_targets_list.at(0).deactivate('');
+            assert.isFalse(drop_targets_list.at(0).$el.hasClass('active'));
+
             test.destroy();
           });
         }
@@ -225,9 +231,54 @@ describe('CoreFunctions', function() {
       node_view.shelf = node_view.makeShelf();
       node_view.$preview = node_view.$(' > .widget > .preview ');
       node_view.$children = node_view.$(' > .widget > .node_chidren ');
-      var eve = $.Event();
-      eve.target =  {href: 'http://www.fusionbox.com'};
-      // node_view.popOut(eve);
+      var eve = $.Event('click', {target: {href: {foo: 'bar'}}});
+      sinon.stub(window, 'open', function(val) {return val;});
+
+      node_view.popOut(eve);
+
+      window.open.restore();
+
+      assert.strictEqual(node_view.subwindow.widgyCloseCallback, node_view.popIn);
+      assert.isTrue(node_view.$el.hasClass('poppedOut'));
+    });
+  });
+
+  it('should popIn', function() {
+    return this.node.ready(function(node) {
+      var node_view = new nodes.NodeView({model: node});
+      node_view.shelf = node_view.makeShelf();
+      node_view.$preview = node_view.$(' > .widget > .preview ');
+      node_view.$children = node_view.$(' > .widget > .node_chidren ');
+      var eve = $.Event('click', {target: {href: {foo: 'bar'}}});
+      sinon.stub(window, 'open', function(val) {return val;});
+      sinon.stub(node_view.node, 'fetch', function() {return;}); // stops rerender
+
+      node_view.popOut(eve);
+      node_view.popIn(eve);
+
+      window.open.restore();
+      node_view.node.fetch.restore();
+
+      assert.isFalse(node_view.$el.hasClass('poppedOut'));
+    });
+  });
+
+  it('should closeSubwindow', function() {
+    return this.node.ready(function(node) {
+      var node_view = new nodes.NodeView({model: node});
+      node_view.shelf = node_view.makeShelf();
+      node_view.$preview = node_view.$(' > .widget > .preview ');
+      node_view.$children = node_view.$(' > .widget > .node_chidren ');
+      var callback = sinon.spy();
+      var eve = $.Event('click', {target: {href: {foo: 'bar', close: callback}}});
+      sinon.stub(window, 'open', function(val) {return val;});
+
+      node_view.popOut(eve);
+      assert.isFalse(node_view.closeSubwindow());
+
+      window.open.restore();
+
+      assert.isTrue(callback.calledOnce);
     });
   });
 });
