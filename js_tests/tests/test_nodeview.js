@@ -200,38 +200,34 @@ describe('CoreFunctions', function() {
     });
   });
 
-  it('should rerender', function() {
-    test.create();
-    var nodes_promise = Q.all([this.node.ready(), this.node2.ready()]);
-    nodes_promise.then(function(node_array) {
-      var deferal = {};
-      _.extend(deferal, node_array[0]);
-      var myAPI = function() { return Q(deferal); };
-      sinon.stub(nodes.Node.prototype, 'getComponent', myAPI);
-      var app_view = new widgy.AppView({root_node: node_array[0], model: node_array[0]});
-      nodes.Node.prototype.getComponent.restore();
+  it('should cleanUp', function() {
+    return this.node.ready(function(node) {
+      var node_view = new nodes.NodeView({model: node});
+      node_view.shelf = node_view.makeShelf();
+      node_view.$preview = node_view.$(' > .widget > .preview ');
+      node_view.$children = node_view.$(' > .widget > .node_chidren ');
+      node_view.cleanUp();
+    });
+  });
 
-      app_view.root_node_promise.then(function() {
-        node_array[1].component.View.prototype.title = 'Root Node';
+  it('should throw error when calling render', function() {
+    return this.node.ready(function(node) {
+      var node_view = new nodes.NodeView({model: node});
+      try {
+        assert.throws(node_view.render());
+      } catch (node_view) {};
+    });
+  });
 
-        var parent_view = app_view.node_view_list.at(0);
-        parent_view.shelf = parent_view.makeShelf();
-        parent_view.$preview = parent_view.$(' > .widget > .preview ');
-        parent_view.$children = parent_view.$(' > .widget > .node_chidren ');
-
-        var templateAPI = function() {
-          return Q('<span><%title%></span>').then(function() {
-            app_view.node_view_list.at(0).rerender();
-            test.destroy();
-            node_array[1].component.View.prototype.renderPromise.restore();
-          });
-        }
-        sinon.stub(node_array[1].component.View.prototype, 'renderPromise', templateAPI);
-
-        deferal.children.add(node_array[1]);
-      })
-      .done();
-    })
-    .done();
+  it('should popOut', function() {
+    return this.node.ready(function(node) {
+      var node_view = new nodes.NodeView({model: node});
+      node_view.shelf = node_view.makeShelf();
+      node_view.$preview = node_view.$(' > .widget > .preview ');
+      node_view.$children = node_view.$(' > .widget > .node_chidren ');
+      var eve = $.Event();
+      eve.target =  {href: 'http://www.fusionbox.com'};
+      // node_view.popOut(eve);
+    });
   });
 });
