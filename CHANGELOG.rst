@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.1.2 (2013-10-23)
+------------------
+
+* Fix Widgy admin for static files hosted on a different domain
+
 0.1.1 (2013-10-21)
 ------------------
 
