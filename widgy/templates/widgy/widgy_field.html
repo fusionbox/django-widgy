@@ -45,6 +45,15 @@ the admin center.
       'backbone': './lib/backbone',
       'text': 'require/text'
     },
+    config: {
+      text: {
+        useXhr: function (url, protocol, hostname, port) {
+          // force XHR for all domains, requires CORS for cross-domain
+          // https://github.com/requirejs/text#xhr-restrictions
+          return true;
+        }
+      }
+    },
     {% comment %}
     This looks like it might not work on paths with quotes in them, but
     the output of staticfiles.static [static.static DOES NOT, fyi] does
