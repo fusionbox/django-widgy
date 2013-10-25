@@ -227,7 +227,7 @@ class Section(TitleDisplayNameMixin, Content):
 
 def validate_image(file_pk):
     file = File.objects.get(pk=file_pk)
-    iext = os.path.splitext(file.file.path)[1].lower()
+    iext = os.path.splitext(file.file.name)[1].lower()
     if not iext in ['.jpg', '.jpeg', '.png', '.gif']:
         raise forms.ValidationError('File type must be jpg, png, or gif')
     return file_pk
