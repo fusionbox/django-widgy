@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.1.3 (2013-10-25)
+------------------
+
+* Fix image widget validation with the S3 storage backend
+
 0.1.2 (2013-10-23)
 ------------------
 
