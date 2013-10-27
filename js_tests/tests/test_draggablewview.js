@@ -15,34 +15,28 @@ describe('DraggablewView', function() {
     initialize: function() {
       DraggableView.prototype.initialize.apply(this, arguments);
       _.bindAll(this,
-        'funcToTest'
+        'test_render'
       );
     },
-    funcToTest: function() {
+    test_render: function() {
       DraggableView.prototype.render.apply(this, arguments);
-    },
-
-    canAcceptParent: function() {
-      return true;
-    },
-
-    cssClasses: function() {
-      return {};
     }
   });
 
   beforeEach(function() {
     this.node = new nodes.Node({
       content: {
-        component: 'testcomponent',
-      }
+        component: 'testcomponent'
+      },
+      css_classes: {'foo': 'bar'}
     });
   });
 
-  it('should initialize a DraggablewView', function() {
+  it('should render', function() {
     return this.node.ready(function(node) {
       var test_view = new TestView({model: node});
-      test_view.funcToTest();
+      test_view.test_render();
+      assert.isTrue(test_view.$el.hasClass('bar'));
     });
   });
 });

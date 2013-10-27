@@ -30,7 +30,6 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
         'startBeingDragged',
         'followMouse',
         'stopBeingDragged',
-        'canAcceptParent',
         'bindDragEvents',
         'unbindDocument',
         'checkDistance',
@@ -165,12 +164,8 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
       this.trigger('stopDrag');
     },
 
-    canAcceptParent: function() {
-      throw new Error('You must override this method');
-    },
-
     cssClasses: function() {
-      throw new Error('You must override this method');
+      return this.model.get('css_classes') || {};
     },
 
     bumpAmount: function(clientY) {
