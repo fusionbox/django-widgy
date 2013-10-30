@@ -40,8 +40,15 @@ Design Philosophy
 Read about Widgy's data model at
 http://django-widgy.readthedocs.org/en/latest/design/data-model.html.
 
+
+Contributing
+------------
+
+There is a developers mailing list available at `widgy@fusionbox.com
+<https://groups.google.com/a/fusionbox.com/forum/#!forum/widgy>`_
+
 Running the Tests
------------------
+^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -51,7 +58,7 @@ Running the Tests
 or the other, use ``make test-js`` or ``make test-py``.
 
 Coverage
-^^^^^^^^
+********
 Once coverage_ is installed (``pip install coverage``), the Makefile
 has two commands to help report on code coverage. ::
 

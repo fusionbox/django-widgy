@@ -22,7 +22,9 @@ have many different uses.
 Development
 -----------
 
-You can follow and contribute to Widgy's development on GitHub_.
+You can follow and contribute to Widgy's development on GitHub_.  There is a
+developers mailing list available at `widgy@fusionbox.com
+<https://groups.google.com/a/fusionbox.com/forum/#!forum/widgy>`_
 
 
 .. image:: https://travis-ci.org/fusionbox/django-widgy.png
