@@ -116,6 +116,9 @@ class Html(Content):
 
     form = HtmlForm
     editable = True
+    tooltip = _("Easily add text to your page with this widget. You can have"
+                " certain styles like bold or italic, but they won't break your"
+                " design.")
 
     class Meta:
         verbose_name = _('HTML')
@@ -127,6 +130,9 @@ class UnsafeHtml(Content):
     content = models.TextField(null=False, default='')
 
     editable = True
+    tooltip = _("If you need to add some JavaScript or an embed code, you can"
+                " use this. Staff users should not have access to this"
+                " widget.")
 
     class Meta:
         verbose_name = _('unsafe HTML')
@@ -172,6 +178,8 @@ class CalloutWidget(Content):
                                 on_delete=models.PROTECT)
 
     editable = True
+    tooltip = _("Callouts are a way to call a user's attention to something."
+                " Callouts can be shared across pages.")
 
     objects = SelectRelatedManager(select_related=['callout__root_node'])
 
@@ -188,6 +196,9 @@ class CalloutWidget(Content):
 class Accordion(Bucket):
     draggable = True
     deletable = True
+    tooltip = _("Accordions are a good way to separate sections of content. A"
+                " good use for accordions is an FAQ page. Use the Section"
+                " widget to separate each section of content in the Accordion.")
 
     def valid_parent_of(self, cls, obj=None):
         return issubclass(cls, Section)
@@ -199,6 +210,9 @@ class Accordion(Bucket):
 
 @widgy.register
 class Tabs(TabbedContainer, Accordion):
+    tooltip = _("Tabs are another way to separate sections of content, but they"
+                " are separated horizontally instead of vertically. A good use"
+                " for the Tabs widget is a product detail page.")
 
     class Meta:
         proxy = True
@@ -212,6 +226,8 @@ class Section(TitleDisplayNameMixin, Content):
 
     editable = True
     accepting_children = True
+    tooltip = _("Use Section to split up your content into more consumable"
+                " chunks.")
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
@@ -290,6 +306,8 @@ class TableElement(Content):
 class TableRow(TableElement):
     tag_name = 'tr'
 
+    tooltip = _("Add a row to your table.")
+
     @classmethod
     def valid_child_of(cls, parent, obj=None):
         return isinstance(parent, TableBody)
@@ -313,6 +331,7 @@ class TableHeaderData(TableElement):
     accepting_children = True
     draggable = True
     deletable = True
+    tooltip = _("Add a column to your table.")
 
     class Meta:
         verbose_name = 'column'
@@ -443,6 +462,9 @@ class Table(StrictDefaultChildrenMixin, TableElement):
     component_name = 'table'
 
     shelf = True
+    tooltip = _("With this widget, you can add tables to your page. A good use"
+                " for tables is numerical data or comparing things side by"
+                " side.")
 
     default_children = [
         ('header', TableHeader, (), {}),
@@ -469,6 +491,8 @@ class Table(StrictDefaultChildrenMixin, TableElement):
 class Figure(Content):
     editable = True
     accepting_children = True
+    tooltip = _("A figure is a self-contained piece of content. It can be used"
+                " to add a caption to an image or a video for example.")
 
     position = models.CharField(default=lambda: ugettext('center'), verbose_name=_('position'), max_length=50, choices=[
         ('left', _('Float left')),
@@ -489,6 +513,8 @@ class Video(Content):
     video = VideoField(verbose_name=_('video'))
 
     editable = True
+    tooltip = _("Add a video to your page. Support YouTube, Vimeo, and"
+                " others.")
 
     class Meta:
         verbose_name = _('video')
@@ -508,6 +534,7 @@ class Button(Content):
     css_classes = ('page_builder', 'buttonwidget')
     form = ButtonForm
     editable = True
+    tooltip = _("Add a link to another page.")
 
     class Meta:
         verbose_name = _('button')
@@ -529,6 +556,8 @@ class GoogleMap(DisplayNameMixin(lambda x: truncatechars(x.address, 35)), Conten
                             default=MAP_CHOICES[0][0])
 
     editable = True
+    tooltip = _("This will output a map on your page with an address that you"
+                " specify.")
 
     zoom = 15
 
