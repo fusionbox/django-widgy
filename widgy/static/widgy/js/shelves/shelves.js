@@ -177,7 +177,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/base',
 
     render: function() {
       DraggableView.prototype.render.apply(this, arguments);
-      this.$el.attr('title', this.model.get('help_text'));
+      this.$el.attr('title', this.model.get('tooltip'));
       return this;
     }
 
