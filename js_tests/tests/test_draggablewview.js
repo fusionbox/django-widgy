@@ -18,8 +18,14 @@ describe('DraggablewView', function() {
         'test_render'
       );
     },
+
     test_render: function() {
       DraggableView.prototype.render.apply(this, arguments);
+    },
+
+
+    test_cssClasses: function() {
+      return DraggableView.prototype.cssClasses.apply(this, arguments);
     }
   });
 
@@ -37,6 +43,13 @@ describe('DraggablewView', function() {
       var test_view = new TestView({model: node});
       test_view.test_render();
       assert.isTrue(test_view.$el.hasClass('bar'));
+    });
+  });
+
+  it('should return cssClasses', function() {
+    return this.node.ready(function(node) {
+      var test_view = new TestView({model: node});
+      assert.deepEqual(test_view.test_cssClasses(), {'foo': 'bar'});
     });
   });
 });
