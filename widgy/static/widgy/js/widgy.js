@@ -29,6 +29,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'lib/q', 'nodes/n
       // instantiate node_view_list before creating the root node
       // please!
       this.node_view_list = new Backbone.ViewList();
+      this.visible_drop_targets = new Backbone.ViewList();
 
       var root_node = this.root_node = new nodes.Node(options.root_node),
           app = this;
@@ -84,7 +85,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'lib/q', 'nodes/n
         this.inflight.abort();
 
       this.inflight = $.ajax({
-        url: this.root_node.get('available_children_url'),
+        url: this.root_node.get('available_children_url')
       });
 
       return Q(this.inflight);
