@@ -216,15 +216,6 @@ describe('CoreFunctions', function() {
     });
   });
 
-  it('should throw error when calling render', function() {
-    return this.node.ready(function(node) {
-      var node_view = new nodes.NodeView({model: node});
-      try {
-        assert.throws(node_view.render());
-      } catch (node_view) {};
-    });
-  });
-
   it('should popOut', function() {
     return this.node.ready(function(node) {
       var node_view = new nodes.NodeView({model: node});

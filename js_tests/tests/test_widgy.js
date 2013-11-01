@@ -41,25 +41,6 @@ describe('AppView', function() {
     .done();
   });
 
-  it('should throw error with render', function() {
-    return this.node.ready(function(node) {
-      var deferal = {};
-      _.extend(deferal, node);
-      var myAPI = function() { return Q(deferal); };
-      sinon.stub(nodes.Node.prototype, 'getComponent', myAPI);
-      var app_view = new widgy.AppView({root_node: node});
-      nodes.Node.prototype.getComponent.restore();
-
-      app_view.root_node_promise.then(function() {
-        try {
-          assert.throws(app_view.render());
-        } catch (error) {};
-      })
-      .done();
-    })
-    .done();
-  });
-
   it('should renderPromise', function() {
     return this.node.ready(function(node) {
       var deferal = {};
