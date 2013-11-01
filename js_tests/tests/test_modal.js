@@ -39,6 +39,7 @@ describe('Modal Static Functions', function() {
   afterEach(function() {
     test.destroy();
   });
+
   it('should raiseError', function() {
     test.create();
     modal.raiseError('Test Message');
