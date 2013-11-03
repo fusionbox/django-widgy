@@ -68,6 +68,11 @@ urlpatterns = patterns("",
     # ``mezzanine.urls``.
     ("^", include("mezzanine.urls")),
 
+    # JAVASCRIPT INTERNATIONALIZATION
+    # -------------------------------
+    # This pattern produces a JavaScript library with functions that
+    # allow for internalization of JavaScript.
+    (r'^jsi18n/$', 'django.view.i18n.javascript_catalog'),
 )
 
 # Adds ``STATIC_URL`` to the context of error pages, so that error
