@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-from operator import attrgetter
 import urllib
 
 import csv
@@ -14,14 +13,15 @@ from django.shortcuts import redirect
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils.functional import cached_property
-from django.utils.encoding import smart_text
+from django.utils.encoding import python_2_unicode_compatible
+from django.template.defaultfilters import truncatechars
 
 from django_extensions.db.fields import UUIDField
 import html2text
 
 from widgy.models import Content, Node
 from widgy.signals import pre_delete_widget
-from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, DisplayNameMixin
+from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, StrDisplayNameMixin
 from widgy.utils import update_context, build_url, force_bytes, QuerySet
 from widgy.contrib.page_builder.models import Bucket, Html
 from widgy.contrib.page_builder.forms import MiniCKEditorField, CKEditorField
@@ -73,15 +73,15 @@ class SaveDataHandler(FormSuccessHandler):
     tooltip = _("Saves the data when the Form is filled out. This is enabled by"
                 " default.")
 
+    class Meta:
+        verbose_name = _('save data handler')
+        verbose_name_plural = _('save data handlers')
+
     def execute(self, request, form):
         FormSubmission.objects.submit(
             form=self.parent_form,
             data=form.cleaned_data
         )
-
-    class Meta:
-        verbose_name = _('save data handler')
-        verbose_name_plural = _('save data handlers')
 
 
 class BaseMappingHandler(FormSuccessHandler):
@@ -118,7 +118,7 @@ class RepostHandler(BaseMappingHandler):
         urllib.urlopen(self.url_to_post, query_string)
 
 
-class MappingValue(DisplayNameMixin(smart_text), FormElement):
+class MappingValue(FormElement):
     """
     Abstract class for creating a mapping value.
 
@@ -146,7 +146,8 @@ class FieldMappingValueForm(forms.ModelForm):
 
 
 @widgy.register
-class FieldMappingValue(DisplayNameMixin(smart_text), MappingValue):
+@python_2_unicode_compatible
+class FieldMappingValue(StrDisplayNameMixin, MappingValue):
     """
     MappingValue that maps a form field to another value.
     """
@@ -158,6 +159,14 @@ class FieldMappingValue(DisplayNameMixin(smart_text), MappingValue):
     class Meta:
         verbose_name = _('mapped field')
         verbose_name_plural = _('mapped field')
+
+    def __str__(self):
+        try:
+            label = self.fields_mapping[self.field_ident].label
+        except KeyError:
+            return u''
+        else:
+            return _('{0} to {1}').format(label, self.name)
 
     def get_fields(self):
         return [f for f in self.parent_form.depth_first_order()
@@ -178,14 +187,6 @@ class FieldMappingValue(DisplayNameMixin(smart_text), MappingValue):
             for field in self.parent_form.depth_first_order()
             if isinstance(field, FormField)
         )
-
-    def __unicode__(self):
-        try:
-            label = self.fields_mapping[self.field_ident].label
-        except KeyError:
-            return u''
-        else:
-            return _('{0} to {1}').format(label, self.name)
 
 
 @widgy.register
@@ -223,7 +224,8 @@ class EmailSuccessHandlerBaseForm(forms.ModelForm):
     content = CKEditorField()
 
 
-class EmailSuccessHandlerBase(FormSuccessHandler):
+@python_2_unicode_compatible
+class EmailSuccessHandlerBase(StrDisplayNameMixin, FormSuccessHandler):
     subject = models.CharField(max_length=255, verbose_name=_('subject'))
     content = models.TextField(blank=True, verbose_name=_('content'))
     include_form_data = models.BooleanField(
@@ -237,6 +239,9 @@ class EmailSuccessHandlerBase(FormSuccessHandler):
 
     class Meta:
         abstract = True
+
+    def __str__(self):
+        return truncatechars(self.subject, 35)
 
     def format_message(self, request, form):
         data = []
@@ -324,7 +329,8 @@ class EmailUserHandler(EmailSuccessHandlerBase):
 
 
 @widgy.register
-class SubmitButton(FormElement):
+@python_2_unicode_compatible
+class SubmitButton(StrDisplayNameMixin, FormElement):
     text = models.CharField(max_length=255, default=lambda: ugettext('submit'), verbose_name=_('text'))
 
     tooltip = _("The submit button for a form.")
@@ -336,6 +342,9 @@ class SubmitButton(FormElement):
     class Meta:
         verbose_name = _('submit button')
         verbose_name_plural = _('submit buttons')
+
+    def __str__(self):
+        return self.text
 
 
 def untitled_form():
@@ -417,7 +426,8 @@ class FormMeta(StrictDefaultChildrenMixin, Bucket):
 
 
 @widgy.register
-class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChildrenMixin, Content):
+@python_2_unicode_compatible
+class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Content):
     name = models.CharField(verbose_name=_('Name'),
                             max_length=255,
                             default=untitled_form,
@@ -434,10 +444,6 @@ class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChi
     ]
     tooltip = _("Use this widget to build a Form that your users can fill out.")
 
-    class Meta:
-        verbose_name = _('form')
-        verbose_name_plural = _('forms')
-
     class FormQuerySet(QuerySet):
         def annotate_submission_count(self):
             return self.extra(select={
@@ -448,7 +454,11 @@ class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChi
 
     objects = FormQuerySet.as_manager()
 
-    def __unicode__(self):
+    class Meta:
+        verbose_name = _('form')
+        verbose_name_plural = _('forms')
+
+    def __str__(self):
         return self.name
 
     @classmethod
@@ -605,7 +615,8 @@ class FormFieldForm(forms.ModelForm):
     help_text = MiniCKEditorField(label=_('help text'), required=False)
 
 
-class FormField(DisplayNameMixin(lambda x: x.label), BaseFormField):
+@python_2_unicode_compatible
+class FormField(StrDisplayNameMixin, BaseFormField):
     widget = None
 
     label = models.CharField(max_length=255, verbose_name=_('label'))
@@ -630,7 +641,7 @@ class FormField(DisplayNameMixin(lambda x: x.label), BaseFormField):
         })
         return kwargs
 
-    def __unicode__(self):
+    def __str__(self):
         return self.label
 
     def serialize_value(self, value):
@@ -681,6 +692,10 @@ class FormInput(FormField):
                 " input like text, number, or email. See a more complete list"
                 " inside the widget.")
 
+    class Meta:
+        verbose_name = _('form input')
+        verbose_name_plural = _('form inputs')
+
     @property
     def formfield_class(self):
         return self.FORMFIELD_CLASSES.get(self.type, forms.CharField)
@@ -700,10 +715,6 @@ class FormInput(FormField):
 
         return forms.TextInput(attrs=attrs)
 
-    class Meta:
-        verbose_name = _('form input')
-        verbose_name_plural = _('form inputs')
-
 
 @widgy.register
 class Textarea(FormField):
@@ -712,16 +723,16 @@ class Textarea(FormField):
     tooltip = _("Add this to your form to allow users to add large amounts of"
                 " text.")
 
+    class Meta:
+        verbose_name = _('text area')
+        verbose_name_plural = _('text areas')
+
     @property
     def widget(self):
         attrs = {}
         if self.required:
             attrs['required'] = 'required'
         return forms.Textarea(attrs=attrs)
-
-    class Meta:
-        verbose_name = _('text area')
-        verbose_name_plural = _('text areas')
 
 
 class BaseChoiceField(FormField):
@@ -939,15 +950,15 @@ class FormSubmission(models.Model):
 
     objects = FormSubmissionQuerySet.as_manager()
 
+    class Meta:
+        verbose_name = _('form submission')
+        verbose_name_plural = _('form submissions')
+
     def as_dict(self):
         ret = {'created_at': self.created_at}
         for value in self.values.all():
             ret[value.field_ident] = value.value
         return ret
-
-    class Meta:
-        verbose_name = _('form submission')
-        verbose_name_plural = _('form submissions')
 
 
 class FormValue(models.Model):
