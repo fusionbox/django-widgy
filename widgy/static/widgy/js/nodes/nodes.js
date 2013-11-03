@@ -386,6 +386,11 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         this.shelf.close();
     },
 
+    close: function() {
+      this.cleanUp();
+      DraggableView.prototype.close.apply(this, arguments);
+    },
+
     renderNode: function() {
       return DraggableView.prototype.renderPromise.apply(this, arguments).then(function(view) {
         view.$children = view.$(' > .widget > .node_children');
