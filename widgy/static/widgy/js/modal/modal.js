@@ -57,10 +57,10 @@ define([ 'widgy.backbone',
         message = data;
 
       if ( resp.status == 404 )
-        message = 'Try refreshing the page';
+        message = gettext('Try refreshing the page');
 
       if ( ! message )
-        message = 'Unknown error';
+        message = gettext('Unknown error');
 
       raiseError(message);
     } else {
