@@ -1,5 +1,5 @@
 {% if field.is_hidden %}{{ field }}{% else %}
-<div class="{{field.name}} {{field.html_name}}{% if field.field.required %} required{% endif %}{% if field.errors %} error{% endif %} formField">
+<div class="{% block formField_classes %}{{field.name}} {{field.html_name}}{% if field.field.required %} required{% endif %}{% if field.errors %} error{% endif %} formField{% endblock %}">
   {{field.label_tag}}
   {{field}}
   {% if field.help_text %}
