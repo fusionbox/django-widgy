@@ -73,15 +73,15 @@ class SaveDataHandler(FormSuccessHandler):
     tooltip = _("Saves the data when the Form is filled out. This is enabled by"
                 " default.")
 
+    class Meta:
+        verbose_name = _('save data handler')
+        verbose_name_plural = _('save data handlers')
+
     def execute(self, request, form):
         FormSubmission.objects.submit(
             form=self.parent_form,
             data=form.cleaned_data
         )
-
-    class Meta:
-        verbose_name = _('save data handler')
-        verbose_name_plural = _('save data handlers')
 
 
 class BaseMappingHandler(FormSuccessHandler):
@@ -434,10 +434,6 @@ class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChi
     ]
     tooltip = _("Use this widget to build a Form that your users can fill out.")
 
-    class Meta:
-        verbose_name = _('form')
-        verbose_name_plural = _('forms')
-
     class FormQuerySet(QuerySet):
         def annotate_submission_count(self):
             return self.extra(select={
@@ -447,6 +443,10 @@ class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChi
             })
 
     objects = FormQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _('form')
+        verbose_name_plural = _('forms')
 
     def __unicode__(self):
         return self.name
@@ -681,6 +681,10 @@ class FormInput(FormField):
                 " input like text, number, or email. See a more complete list"
                 " inside the widget.")
 
+    class Meta:
+        verbose_name = _('form input')
+        verbose_name_plural = _('form inputs')
+
     @property
     def formfield_class(self):
         return self.FORMFIELD_CLASSES.get(self.type, forms.CharField)
@@ -700,10 +704,6 @@ class FormInput(FormField):
 
         return forms.TextInput(attrs=attrs)
 
-    class Meta:
-        verbose_name = _('form input')
-        verbose_name_plural = _('form inputs')
-
 
 @widgy.register
 class Textarea(FormField):
@@ -712,16 +712,16 @@ class Textarea(FormField):
     tooltip = _("Add this to your form to allow users to add large amounts of"
                 " text.")
 
+    class Meta:
+        verbose_name = _('text area')
+        verbose_name_plural = _('text areas')
+
     @property
     def widget(self):
         attrs = {}
         if self.required:
             attrs['required'] = 'required'
         return forms.Textarea(attrs=attrs)
-
-    class Meta:
-        verbose_name = _('text area')
-        verbose_name_plural = _('text areas')
 
 
 class BaseChoiceField(FormField):
@@ -939,15 +939,15 @@ class FormSubmission(models.Model):
 
     objects = FormSubmissionQuerySet.as_manager()
 
+    class Meta:
+        verbose_name = _('form submission')
+        verbose_name_plural = _('form submissions')
+
     def as_dict(self):
         ret = {'created_at': self.created_at}
         for value in self.values.all():
             ret[value.field_ident] = value.value
         return ret
-
-    class Meta:
-        verbose_name = _('form submission')
-        verbose_name_plural = _('form submissions')
 
 
 class FormValue(models.Model):
