@@ -4,6 +4,7 @@ from django import forms
 from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.encoding import python_2_unicode_compatible
 from django.dispatch import receiver
 from django.template.defaultfilters import truncatechars
 
@@ -12,8 +13,8 @@ from filer.models.filemodels import File
 
 from widgy.models import Content
 from widgy.models.mixins import (
-    StrictDefaultChildrenMixin, InvisibleMixin, TitleDisplayNameMixin,
-    DisplayNameMixin, TabbedContainer
+    StrictDefaultChildrenMixin, InvisibleMixin, StrDisplayNameMixin,
+    TabbedContainer,
 )
 from widgy.models.links import LinkField, LinkFormField, LinkFormMixin
 from widgy.db.fields import WidgyField
@@ -153,6 +154,7 @@ class CalloutBucket(Bucket):
         verbose_name_plural = _('callout buckets')
 
 
+@python_2_unicode_compatible
 class Callout(models.Model):
     name = models.CharField(max_length=255, verbose_name=_('name'))
     root_node = WidgyField(
@@ -164,16 +166,17 @@ class Callout(models.Model):
             'CalloutBucket',
         ))
 
-    def __unicode__(self):
-        return self.name
-
     class Meta:
         verbose_name = _('callout')
         verbose_name_plural = _('callouts')
 
+    def __str__(self):
+        return self.name
+
 
 @widgy.register
-class CalloutWidget(Content):
+@python_2_unicode_compatible
+class CalloutWidget(StrDisplayNameMixin, Content):
     callout = models.ForeignKey(Callout, null=True, blank=True,
                                 on_delete=models.PROTECT)
 
@@ -183,13 +186,18 @@ class CalloutWidget(Content):
 
     objects = SelectRelatedManager(select_related=['callout__root_node'])
 
-    @classmethod
-    def valid_child_of(cls, parent, obj=None):
-        return isinstance(parent, Sidebar)
-
     class Meta:
         verbose_name = _('callout widget')
         verbose_name_plural = _('callout widgets')
+
+    def __str__(self):
+        if self.callout:
+            return self.callout.name
+        return ''
+
+    @classmethod
+    def valid_child_of(cls, parent, obj=None):
+        return isinstance(parent, Sidebar)
 
 
 @widgy.register
@@ -221,7 +229,8 @@ class Tabs(TabbedContainer, Accordion):
 
 
 @widgy.register
-class Section(TitleDisplayNameMixin, Content):
+@python_2_unicode_compatible
+class Section(StrDisplayNameMixin, Content):
     title = models.CharField(max_length=1023, verbose_name=_('title'))
 
     editable = True
@@ -237,7 +246,7 @@ class Section(TitleDisplayNameMixin, Content):
         verbose_name = _('section')
         verbose_name_plural = _('sections')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
 
@@ -488,7 +497,8 @@ class Table(StrictDefaultChildrenMixin, TableElement):
 
 
 @widgy.register
-class Figure(Content):
+@python_2_unicode_compatible
+class Figure(StrDisplayNameMixin, Content):
     editable = True
     accepting_children = True
     tooltip = _("A figure is a self-contained piece of content. It can be used"
@@ -507,9 +517,13 @@ class Figure(Content):
         verbose_name = _('figure')
         verbose_name_plural = _('figures')
 
+    def __str__(self):
+        return self.title
+
 
 @widgy.register
-class Video(Content):
+@python_2_unicode_compatible
+class Video(StrDisplayNameMixin, Content):
     video = VideoField(verbose_name=_('video'))
 
     editable = True
@@ -520,13 +534,17 @@ class Video(Content):
         verbose_name = _('video')
         verbose_name_plural = _('videos')
 
+    def __str__(self):
+        return self.video
+
 
 class ButtonForm(LinkFormMixin, forms.ModelForm):
     link = LinkFormField(label=_('Link'), required=False)
 
 
 @widgy.register
-class Button(Content):
+@python_2_unicode_compatible
+class Button(StrDisplayNameMixin, Content):
     text = models.CharField(max_length=255, verbose_name=_('text'), null=True, blank=True)
 
     link = LinkField(null=True)
@@ -540,9 +558,15 @@ class Button(Content):
         verbose_name = _('button')
         verbose_name_plural = _('buttons')
 
+    def __str__(self):
+        if self.text is not None:
+            return self.text
+        return ''
+
 
 @widgy.register
-class GoogleMap(DisplayNameMixin(lambda x: truncatechars(x.address, 35)), Content):
+@python_2_unicode_compatible
+class GoogleMap(StrDisplayNameMixin, Content):
     MAP_CHOICES = (
         ('roadmap', _('Road map')),
         ('satellite', _('Satellite')),
@@ -564,6 +588,9 @@ class GoogleMap(DisplayNameMixin(lambda x: truncatechars(x.address, 35)), Conten
     class Meta:
         verbose_name = _('Google map')
         verbose_name_plural = _('Google maps')
+
+    def __str__(self):
+        return truncatechars(self.address, 35)
 
     def get_maptype_short(self):
         return {

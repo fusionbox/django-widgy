@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-from operator import attrgetter
 import urllib
 
 import csv
@@ -14,14 +13,15 @@ from django.shortcuts import redirect
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils.functional import cached_property
-from django.utils.encoding import smart_text
+from django.utils.encoding import python_2_unicode_compatible
+from django.template.defaultfilters import truncatechars
 
 from django_extensions.db.fields import UUIDField
 import html2text
 
 from widgy.models import Content, Node
 from widgy.signals import pre_delete_widget
-from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, DisplayNameMixin
+from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, StrDisplayNameMixin
 from widgy.utils import update_context, build_url, force_bytes, QuerySet
 from widgy.contrib.page_builder.models import Bucket, Html
 from widgy.contrib.page_builder.forms import MiniCKEditorField, CKEditorField
@@ -118,7 +118,7 @@ class RepostHandler(BaseMappingHandler):
         urllib.urlopen(self.url_to_post, query_string)
 
 
-class MappingValue(DisplayNameMixin(smart_text), FormElement):
+class MappingValue(FormElement):
     """
     Abstract class for creating a mapping value.
 
@@ -146,7 +146,8 @@ class FieldMappingValueForm(forms.ModelForm):
 
 
 @widgy.register
-class FieldMappingValue(DisplayNameMixin(smart_text), MappingValue):
+@python_2_unicode_compatible
+class FieldMappingValue(StrDisplayNameMixin, MappingValue):
     """
     MappingValue that maps a form field to another value.
     """
@@ -158,6 +159,14 @@ class FieldMappingValue(DisplayNameMixin(smart_text), MappingValue):
     class Meta:
         verbose_name = _('mapped field')
         verbose_name_plural = _('mapped field')
+
+    def __str__(self):
+        try:
+            label = self.fields_mapping[self.field_ident].label
+        except KeyError:
+            return u''
+        else:
+            return _('{0} to {1}').format(label, self.name)
 
     def get_fields(self):
         return [f for f in self.parent_form.depth_first_order()
@@ -178,14 +187,6 @@ class FieldMappingValue(DisplayNameMixin(smart_text), MappingValue):
             for field in self.parent_form.depth_first_order()
             if isinstance(field, FormField)
         )
-
-    def __unicode__(self):
-        try:
-            label = self.fields_mapping[self.field_ident].label
-        except KeyError:
-            return u''
-        else:
-            return _('{0} to {1}').format(label, self.name)
 
 
 @widgy.register
@@ -223,7 +224,8 @@ class EmailSuccessHandlerBaseForm(forms.ModelForm):
     content = CKEditorField()
 
 
-class EmailSuccessHandlerBase(FormSuccessHandler):
+@python_2_unicode_compatible
+class EmailSuccessHandlerBase(StrDisplayNameMixin, FormSuccessHandler):
     subject = models.CharField(max_length=255, verbose_name=_('subject'))
     content = models.TextField(blank=True, verbose_name=_('content'))
     include_form_data = models.BooleanField(
@@ -237,6 +239,9 @@ class EmailSuccessHandlerBase(FormSuccessHandler):
 
     class Meta:
         abstract = True
+
+    def __str__(self):
+        return truncatechars(self.subject, 35)
 
     def format_message(self, request, form):
         data = []
@@ -324,7 +329,8 @@ class EmailUserHandler(EmailSuccessHandlerBase):
 
 
 @widgy.register
-class SubmitButton(FormElement):
+@python_2_unicode_compatible
+class SubmitButton(StrDisplayNameMixin, FormElement):
     text = models.CharField(max_length=255, default=lambda: ugettext('submit'), verbose_name=_('text'))
 
     tooltip = _("The submit button for a form.")
@@ -336,6 +342,9 @@ class SubmitButton(FormElement):
     class Meta:
         verbose_name = _('submit button')
         verbose_name_plural = _('submit buttons')
+
+    def __str__(self):
+        return self.text
 
 
 def untitled_form():
@@ -417,7 +426,8 @@ class FormMeta(StrictDefaultChildrenMixin, Bucket):
 
 
 @widgy.register
-class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChildrenMixin, Content):
+@python_2_unicode_compatible
+class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Content):
     name = models.CharField(verbose_name=_('Name'),
                             max_length=255,
                             default=untitled_form,
@@ -448,7 +458,7 @@ class Form(TabbedContainer, DisplayNameMixin(lambda x: x.name), StrictDefaultChi
         verbose_name = _('form')
         verbose_name_plural = _('forms')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @classmethod
@@ -605,7 +615,8 @@ class FormFieldForm(forms.ModelForm):
     help_text = MiniCKEditorField(label=_('help text'), required=False)
 
 
-class FormField(DisplayNameMixin(lambda x: x.label), BaseFormField):
+@python_2_unicode_compatible
+class FormField(StrDisplayNameMixin, BaseFormField):
     widget = None
 
     label = models.CharField(max_length=255, verbose_name=_('label'))
@@ -630,7 +641,7 @@ class FormField(DisplayNameMixin(lambda x: x.label), BaseFormField):
         })
         return kwargs
 
-    def __unicode__(self):
+    def __str__(self):
         return self.label
 
     def serialize_value(self, value):
