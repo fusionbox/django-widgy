@@ -2,6 +2,7 @@ from pprint import pprint
 import datetime
 import time
 import mock
+import contextlib
 
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -9,6 +10,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils import unittest, timezone
 from django.db.models.deletion import ProtectedError
+from django.db import transaction
 
 from widgy.models import Node, UnknownWidget, VersionTracker, Content, VersionCommit
 from widgy.exceptions import (
@@ -25,6 +27,14 @@ from modeltests.core_tests.models import (
 )
 from modeltests.core_tests.tests.base import (
     RootNodeTestCase, make_a_nice_tree, SwitchUserTestCase, refetch)
+
+
+try:
+    atomic_or_nop = transaction.atomic
+except AttributeError:
+    @contextlib.contextmanager
+    def atomic_or_nop():
+        yield
 
 
 class TestCore(RootNodeTestCase):
@@ -682,7 +692,8 @@ class TestVersioning(RootNodeTestCase):
 
         # the related object must not be able to be deleted
         with self.assertRaises((ProtectedError, InvalidOperation)):
-            related.delete()
+            with atomic_or_nop():
+                related.delete()
 
         # the related object must still exist
         Related.objects.get(pk=related.pk)
