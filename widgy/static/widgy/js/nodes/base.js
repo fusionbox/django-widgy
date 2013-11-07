@@ -3,7 +3,7 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
       ) {
 
   var bump = _.throttle(function(amount) {
-    document.body.scrollTop += amount;
+    window.scrollBy(0, amount);
   }, 100);
 
   var BACKTICK = 96;
