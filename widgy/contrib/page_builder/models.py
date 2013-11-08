@@ -518,7 +518,7 @@ class Figure(StrDisplayNameMixin, Content):
         verbose_name_plural = _('figures')
 
     def __str__(self):
-        return self.title
+        return self.title or ''
 
 
 @widgy.register
