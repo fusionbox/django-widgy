@@ -211,6 +211,10 @@ class ThingWithLink(models.Model):
     link = links.LinkField('linkable_content_type', 'linkable_object_id')
 
 
+class ChildThingWithLink(ThingWithLink):
+    pass
+
+
 class MyInvisibleBucket(InvisibleMixin, Content):
     """
     This is for testing template hierarchy
