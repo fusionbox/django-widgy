@@ -19,7 +19,6 @@ from widgy.forms import WidgyFormMixin
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.utils import fancy_import, format_html
 
-from widgy.contrib.review_queue.admin import VersionCommitAdminBase
 
 WidgyPage = get_widgypage_model()
 
@@ -122,14 +121,8 @@ class UndeletePage(WidgyPage):
         return super(UndeletePage, self).__init__(*args, **kwargs)
 
 
-class VersionCommitAdmin(VersionCommitAdminBase):
-    def get_site(self):
-        return fancy_import(settings.WIDGY_MEZZANINE_SITE)
-
-
 # Remove built in Mezzanine models from the admin center
 from mezzanine.pages.models import RichTextPage
-from widgy.contrib.review_queue.models import ReviewedVersionCommit
 
 admin.site.unregister(RichTextPage)
 
@@ -137,4 +130,11 @@ admin.site.register(WidgyPage, WidgyPageAdmin)
 admin.site.register(UndeletePage, UndeletePageAdmin)
 
 if 'widgy.contrib.review_queue' in settings.INSTALLED_APPS:
+    from widgy.contrib.review_queue.admin import VersionCommitAdminBase
+    from widgy.contrib.review_queue.models import ReviewedVersionCommit
+
+    class VersionCommitAdmin(VersionCommitAdminBase):
+        def get_site(self):
+            return fancy_import(settings.WIDGY_MEZZANINE_SITE)
+
     admin.site.register(ReviewedVersionCommit, VersionCommitAdmin)
