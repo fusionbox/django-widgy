@@ -1,7 +1,7 @@
 Widgy: Tree Editor for Django
 =============================
 
-.. image:: https://travis-ci.org/fusionbox/django-widgy.png
+.. image:: https://travis-ci.org/fusionbox/django-widgy.png?branch=master
    :target: http://travis-ci.org/fusionbox/django-widgy
    :alt: Build Status
 
