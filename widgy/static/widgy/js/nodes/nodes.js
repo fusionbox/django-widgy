@@ -184,7 +184,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       this.$el.addClass('deleting');
       modal.confirm(
         interpolate(gettext('Are you sure you want to delete this %s?'),
-          [this.content.get('display_name')]),
+                    [this.content.get('display_name')]),
         this.deleteSelf,
         _.bind(function() {
           this.$el.removeClass('deleting');
