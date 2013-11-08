@@ -449,7 +449,9 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
           // lower_bound is the lower the top of the shelf can be
           var upper_bound = self.el.offsetTop,
               lower_bound = upper_bound + self.el.offsetHeight - shelf.el.offsetHeight,
-              margin_top = Math.max(0, Math.min(window.scrollY, lower_bound) - upper_bound - mezzanine_fixed_toolbar_height - fix_overscrolling_pixels);
+              // window.scrollY for IE
+              scroll_y = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop,
+              margin_top = Math.max(0, Math.min(scroll_y, lower_bound) - upper_bound - mezzanine_fixed_toolbar_height - fix_overscrolling_pixels);
 
           shelf.el.style.marginTop = margin_top + 'px';
         });
