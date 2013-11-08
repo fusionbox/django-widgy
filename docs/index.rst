@@ -27,7 +27,7 @@ developers mailing list available at `widgy@fusionbox.com
 <https://groups.google.com/a/fusionbox.com/forum/#!forum/widgy>`_
 
 
-.. image:: https://travis-ci.org/fusionbox/django-widgy.png
+.. image:: https://travis-ci.org/fusionbox/django-widgy.png?branch=master
    :target: http://travis-ci.org/fusionbox/django-widgy
    :alt: Build Status
 
