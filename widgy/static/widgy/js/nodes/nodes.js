@@ -182,8 +182,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       // TODO: A better UI experience would be undo, but this is a stop gap.
       this.$el.addClass('deleting');
       modal.confirm(
-        gettext('Are you sure you want to delete this ') +
-          this.content.get('display_name') + '?',
+        interpolate('Are you sure you want to delete this %s?',
+          [this.content.get('display_name')]),
         this.deleteSelf,
         _.bind(function() {
           this.$el.removeClass('deleting');
