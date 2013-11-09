@@ -834,13 +834,16 @@ li.node_drop_target {
       margin: 10px;
       padding: 0px 0px 10px 0px;
       width: auto;
-      overflow-y: hidden;
+
+      .scroll {
+        overflow-y: hidden;
+      }
 
       p.title {
         display: none; // hide the form widgets label
       }
       
-      > ul.list.nodeChildren {
+      ul.list.nodeChildren {
         // inner shelfItem stacking
         
         li.shelfItem {
@@ -981,9 +984,12 @@ div.widgy {
           float: right;
           position: relative;
           width: 35%;
-          overflow-y: auto;
+          // line up the bottom of the shelf with the bottom of the last widget
+          margin-bottom: 8px;
 
-          p.title {}
+          & > .scroll {
+            overflow-y: auto;
+          }
           
           ul.nodeChildren {
             display: inline;

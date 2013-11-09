@@ -65,7 +65,8 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/base',
 
     render: function() {
       Backbone.View.prototype.render.apply(this, arguments);
-      var $list = this.$list = this.$el.children('.list');
+      this.$scroll = this.$el.find('> .scroll');
+      var $list = this.$list = this.$scroll.find('> .list');
       this.collection.on('sort', this.resort);
 
       this.list.on('push', function(view) {
@@ -79,7 +80,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/base',
 
     resizeShelf: function() {
       var mezzanine_correction = 125;
-      this.el.style.maxHeight = (document.documentElement.clientHeight - mezzanine_correction) + 'px';
+      this.$scroll.css({'max-height': document.documentElement.clientHeight - mezzanine_correction});
     },
 
     refresh: function() {
