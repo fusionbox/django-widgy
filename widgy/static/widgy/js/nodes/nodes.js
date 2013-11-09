@@ -1,9 +1,9 @@
-define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/shelves', 'modal/modal', 'geometry',
+define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/shelves', 'modal/modal', 'geometry', 'lib/fixto',
     'text!./drop_target.html',
     'text!./popped_out.html',
     'nodes/base',
     'nodes/models'
-    ], function(exports, $, _, Backbone, Q, shelves, modal, geometry,
+    ], function(exports, $, _, Backbone, Q, shelves, modal, geometry, fixto,
       drop_target_view_template,
       popped_out_template,
       DraggableView,
@@ -13,7 +13,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
   var debug = function(where) {
     console.log(where, this, _.rest(arguments));
   };
-
 
   /**
    * The NodeView provides an interface to the node.  It will also create a
@@ -439,6 +438,19 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       });
     },
 
+    makeSticky: function() {
+      // this must happen after shelf.$el is in the dom so fixto can
+      // find the .node element
+      if ( this.isRootNode() ) {
+        this.shelf.$el.fixTo('.node', {
+          // mezzanine header
+          mind: '#container > .breadcrumbs, #container > #header',
+          // XXX: move this to css
+          zIndex: 50
+        });
+      }
+    },
+
     render: function() {
       throw new Error("You may not use NodeView.render, please use NodeView.renderPromise.");
     },
@@ -463,27 +475,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       this.listenTo(shelf, 'startDrag', this.startDrag)
           .listenTo(shelf, 'stopDrag', this.stopDrag);
 
-      var self = this;
       this.$children.before(shelf.render().el);
-      // position sticky
-      if ( this.isRootNode() ) {
-        var mezzanine_fixed_toolbar_height = 60,
-            // TODO: figure out what is at the root of this.
-            fix_overscrolling_pixels = 4;
-
-        $(window).scroll(function() {
-          // upper_bound is the highest the top of the shelf can be
-          // lower_bound is the lower the top of the shelf can be
-          var upper_bound = self.el.offsetTop,
-              lower_bound = upper_bound + self.el.offsetHeight - shelf.el.offsetHeight,
-              // window.scrollY for IE
-              scroll_y = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop,
-              margin_top = Math.max(0, Math.min(scroll_y, lower_bound) - upper_bound - mezzanine_fixed_toolbar_height - fix_overscrolling_pixels);
-
-          shelf.el.style.marginTop = margin_top + 'px';
-        });
-      }
-
       return shelf;
     },
 
