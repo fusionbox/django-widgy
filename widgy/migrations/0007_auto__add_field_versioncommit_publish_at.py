@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime
+import django.utils.timezone
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'VersionCommit.publish_at'
         db.add_column(u'widgy_versioncommit', 'publish_at',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(year=1970, month=1, day=1), blank=True),
+                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=django.utils.timezone.now, blank=True),
                       keep_default=False)
 
 
