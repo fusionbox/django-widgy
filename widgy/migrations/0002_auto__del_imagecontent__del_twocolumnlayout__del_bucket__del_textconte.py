@@ -8,48 +8,11 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting model 'ImageContent'
-        db.delete_table('widgy_imagecontent')
-
-        # Deleting model 'TwoColumnLayout'
-        db.delete_table('widgy_twocolumnlayout')
-
-        # Deleting model 'Bucket'
-        db.delete_table('widgy_bucket')
-
-        # Deleting model 'TextContent'
-        db.delete_table('widgy_textcontent')
+        pass
 
 
     def backwards(self, orm):
-        # Adding model 'ImageContent'
-        db.create_table('widgy_imagecontent', (
-            ('image', self.gf('mezzanine.core.fields.FileField')(max_length=255)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal('widgy', ['ImageContent'])
-
-        # Adding model 'TwoColumnLayout'
-        db.create_table('widgy_twocolumnlayout', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal('widgy', ['TwoColumnLayout'])
-
-        # Adding model 'Bucket'
-        db.create_table('widgy_bucket', (
-            ('draggable', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('deletable', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal('widgy', ['Bucket'])
-
-        # Adding model 'TextContent'
-        db.create_table('widgy_textcontent', (
-            ('content', self.gf('django.db.models.fields.TextField')()),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal('widgy', ['TextContent'])
+        pass
 
 
     models = {
