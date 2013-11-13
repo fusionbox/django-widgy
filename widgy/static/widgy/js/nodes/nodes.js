@@ -3,7 +3,7 @@ define([ 'exports', 'jquery', 'underscore', 'i18n', 'widgy.backbone', 'lib/q', '
     'text!./popped_out.html',
     'nodes/base',
     'nodes/models'
-    ], function(exports, $, _, I18N, Backbone, Q, shelves, modal,
+    ], function(exports, $, _, i18n, Backbone, Q, shelves, modal,
       drop_target_view_template,
       popped_out_template,
       DraggableView,
@@ -181,9 +181,9 @@ define([ 'exports', 'jquery', 'underscore', 'i18n', 'widgy.backbone', 'lib/q', '
     'delete': function(event) {
       // TODO: A better UI experience would be undo, but this is a stop gap.
       this.$el.addClass('deleting');
-      alert(I18N);
+
       modal.confirm(
-        I18N.interpolate(I18N.gettext('Are you sure you want to delete this %s?'),
+        i18n.interpolate(i18n.gettext('Are you sure you want to delete this %s?'),
                     [this.content.get('display_name')]),
         this.deleteSelf,
         _.bind(function() {
