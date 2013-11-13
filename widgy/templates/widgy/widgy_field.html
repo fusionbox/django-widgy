@@ -73,7 +73,6 @@ the admin center.
 <script src="{% static 'widgy/js/widgy.admin.js' %}"></script>
 {% endcompress %}
 
-<!--<script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' packages='widgy' %}"></script>-->
 <script>
   require([ 'widgy' ], function(Widgy) {
     window.widgy = new Widgy('#' + {{ html_id|json }}, {{ node_dict|json }}, {{ api_url|json }});
