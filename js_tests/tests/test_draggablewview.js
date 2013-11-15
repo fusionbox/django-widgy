@@ -5,26 +5,23 @@ var test = require('./setup').test,
 
 var nodes = requirejs('nodes/nodes'),
     DraggableView = requirejs('nodes/base'),
-    widgy = requirejs('widgy'),
-    shelves = requirejs('shelves/shelves'),
-    _ = requirejs('underscore'),
-    Q = requirejs('lib/q');
+    _ = requirejs('underscore');
 
 describe('DraggablewView', function() {
   var TestView = DraggableView.extend({
     initialize: function() {
       DraggableView.prototype.initialize.apply(this, arguments);
       _.bindAll(this,
-        'test_render'
+        'testRender',
+        'testCssClasses'
       );
     },
 
-    test_render: function() {
+    testRender: function() {
       DraggableView.prototype.render.apply(this, arguments);
     },
 
-
-    test_cssClasses: function() {
+    testCssClasses: function() {
       return DraggableView.prototype.cssClasses.apply(this, arguments);
     }
   });
@@ -41,7 +38,7 @@ describe('DraggablewView', function() {
   it('should render', function() {
     return this.node.ready(function(node) {
       var test_view = new TestView({model: node});
-      test_view.test_render();
+      test_view.testRender();
       assert.isTrue(test_view.$el.hasClass('bar'));
     });
   });
@@ -49,7 +46,7 @@ describe('DraggablewView', function() {
   it('should return cssClasses', function() {
     return this.node.ready(function(node) {
       var test_view = new TestView({model: node});
-      assert.deepEqual(test_view.test_cssClasses(), {'foo': 'bar'});
+      assert.deepEqual(test_view.testCssClasses(), {'foo': 'bar'});
     });
   });
 });
