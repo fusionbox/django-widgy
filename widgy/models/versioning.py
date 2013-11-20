@@ -9,6 +9,12 @@ from widgy.db.fields import WidgyField
 from widgy.models.base import Node
 from widgy.utils import QuerySet
 
+try:
+    from django.contrib.auth import get_user_model
+except ImportError: # django < 1.5
+    from django.contrib.auth.models import User
+else:
+    User = get_user_model()
 
 class VersionCommit(models.Model):
     tracker = models.ForeignKey('VersionTracker', related_name='commits')

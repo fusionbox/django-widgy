@@ -7,6 +7,12 @@ from widgy.utils import QuerySet
 
 from widgy.models.versioning import VersionTracker, VersionCommit
 
+try:
+    from django.contrib.auth import get_user_model
+except ImportError: # django < 1.5
+    from django.contrib.auth.models import User
+else:
+    User = get_user_model()
 
 class ReviewedVersionCommit(VersionCommit):
     approved_by = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
