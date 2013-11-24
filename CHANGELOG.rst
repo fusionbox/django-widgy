@@ -5,6 +5,7 @@ Changelog
 ------------------------
 * Fix Widgy migrations without Mezzanine [Gavin Wahl]
 * Drop target collision detection [Gavin Wahl]
+* Fix Figure and StrDisplayNameMixin [Gavin Wahl]
 
 0.1.4 (2013-11-04)
 ------------------
