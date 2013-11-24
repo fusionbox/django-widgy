@@ -1,8 +1,9 @@
 Changelog
 =========
 
-0.1.5 (Not released yet)
+0.1.5 (2013-11-23)
 ------------------------
+
 * Fix Widgy migrations without Mezzanine [Gavin Wahl]
 * Drop target collision detection [Gavin Wahl]
 * Fix Figure and StrDisplayNameMixin [Gavin Wahl]
