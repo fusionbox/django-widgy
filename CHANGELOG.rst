@@ -3,6 +3,7 @@ Changelog
 
 0.1.5 (Not released yet)
 ------------------------
+* Fix Widgy migrations without Mezzanine [Gavin Wahl]
 
 0.1.4 (2013-11-04)
 ------------------
