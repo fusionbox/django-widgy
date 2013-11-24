@@ -18,7 +18,7 @@ js_tests/node_modules: js_tests/package.json
 test-js: js_tests/node_modules
 	./js_tests/node_modules/mocha/bin/mocha \
 		-s 5 \
-		--reporter nyan \
+		--reporter spec \
 		$(JS_FILES)
 
 widgy/locale/en/LC_MESSAGES/django.po: $(shell find . -type f -iregex '.*\.\(html\|py\|md\)$$' | grep -v .tox)

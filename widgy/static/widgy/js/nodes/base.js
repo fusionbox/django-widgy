@@ -1,5 +1,5 @@
-define(['jquery', 'underscore', 'widgy.backbone'], function(
-      $, _, Backbone
+define(['jquery', 'underscore', 'widgy.backbone', 'geometry'], function(
+      $, _, Backbone, geometry
       ) {
 
   var bump = _.throttle(function(amount) {
@@ -34,7 +34,8 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
         'bindDragEvents',
         'unbindDocument',
         'checkDistance',
-        'debugMode'
+        'debugMode',
+        'activateCollidingDropTargets'
       );
 
       this
@@ -162,6 +163,11 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
       this.$el.removeClass('being_dragged');
       clearInterval(this.bumpInterval);
 
+      this.app.visible_drop_targets.each(function(drop_target) {
+        if ( drop_target.active )
+          drop_target.trigger('dropped', drop_target);
+      });
+
       this.trigger('stopDrag');
     },
 
@@ -196,7 +202,22 @@ define(['jquery', 'underscore', 'widgy.backbone'], function(
           bump(amount);
         }, 15);
       }
-    }
+
+      this.activateCollidingDropTargets(mouse);
+    },
+
+    activateCollidingDropTargets: _.throttle(function(mouse) {
+      var overlapping = this.app.visible_drop_targets.filterByOverlappingEl(this.el);
+      var the_closest = _.min(overlapping, function(view) {
+        return geometry.calculateDistance(view.el.getBoundingClientRect(), mouse.clientX, mouse.clientY);
+      });
+      this.app.visible_drop_targets.each(function(view) {
+        if ( view !== the_closest )
+          view.deactivate();
+        else
+          view.activate();
+      });
+    }, 50)
   });
 
 

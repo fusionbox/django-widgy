@@ -1,4 +1,4 @@
-define([ 'jquery', 'underscore', 'backbone', 'lib/mustache', 'lib/q' ], function($, _, Backbone, Mustache, Q) {
+define([ 'jquery', 'underscore', 'backbone', 'lib/mustache', 'lib/q', 'geometry' ], function($, _, Backbone, Mustache, Q, geometry) {
 
   Mustache.tags = ['<%', '%>'];
 
@@ -212,6 +212,14 @@ define([ 'jquery', 'underscore', 'backbone', 'lib/mustache', 'lib/q' ], function
     findByModel: function(model) {
       return this.find(function(view) {
         return model === view.model;
+      });
+    },
+
+    filterByOverlappingEl: function(el) {
+      bb = el.getBoundingClientRect();
+      return _.filter(this.list, function(view) {
+        obb = view.el.getBoundingClientRect();
+        return geometry.rectanglesOverlap(bb, obb);
       });
     },
 
