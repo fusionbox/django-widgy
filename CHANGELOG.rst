@@ -6,6 +6,7 @@ Changelog
 * Fix Widgy migrations without Mezzanine [Gavin Wahl]
 * Drop target collision detection [Gavin Wahl]
 * Fix Figure and StrDisplayNameMixin [Gavin Wahl]
+* Avoid loading review_queue when it's not installed [Scott Clark]
 
 0.1.4 (2013-11-04)
 ------------------
