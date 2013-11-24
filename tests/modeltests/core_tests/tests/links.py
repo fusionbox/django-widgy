@@ -8,8 +8,17 @@ from widgy.models.links import (
 
 from modeltests.core_tests.models import (
     LinkableThing, ThingWithLink, AnotherLinkableThing, LinkableThing3,
-    Bucket, VersionPageThrough
+    Bucket, VersionPageThrough, ChildThingWithLink
 )
+
+
+class TestLinkField(TestCase):
+    def test_inheritance(self):
+        # the only field local to ChildThingWithLink is its pk. The link
+        # field is inherited, so it shouldn't be in local_fields.
+        self.assertFalse(any(
+            i.name == 'linkable_content_type' for i in ChildThingWithLink._meta.local_fields
+        ))
 
 
 class TestLinkRelations(TestCase):

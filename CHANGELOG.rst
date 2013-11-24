@@ -7,6 +7,7 @@ Changelog
 * Drop target collision detection [Gavin Wahl]
 * Fix Figure and StrDisplayNameMixin [Gavin Wahl]
 * Avoid loading review_queue when it's not installed [Scott Clark]
+* Fix multi-table inheritance with LinkFields [Gavin Wahl]
 
 0.1.4 (2013-11-04)
 ------------------
