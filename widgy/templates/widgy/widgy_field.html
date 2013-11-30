@@ -54,6 +54,11 @@ the admin center.
         }
       }
     },
+    shim: {
+      'i18n': {
+        exports: 'i18n'
+      }
+    },
     {% comment %}
     This looks like it might not work on paths with quotes in them, but
     the output of staticfiles.static [static.static DOES NOT, fyi] does
