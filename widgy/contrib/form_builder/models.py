@@ -276,7 +276,10 @@ class EmailSuccessHandler(EmailSuccessHandlerBase):
         verbose_name_plural = _('admin success emails')
 
     def get_to_emails(self, form):
-        return [self.to]
+        if self.to == '':
+            return []
+        else:
+            return [self.to]
 
 # This is the only way to change a field provided by a base class.
 EmailSuccessHandler._meta.get_field('include_form_data').default = True
