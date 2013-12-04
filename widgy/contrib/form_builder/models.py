@@ -276,6 +276,8 @@ class EmailSuccessHandler(EmailSuccessHandlerBase):
         verbose_name_plural = _('admin success emails')
 
     def get_to_emails(self, form):
+        assert self.to != '',
+            "EmailSuccessHandler requires at least one email address to send to."
         return [self.to]
 
 # This is the only way to change a field provided by a base class.
