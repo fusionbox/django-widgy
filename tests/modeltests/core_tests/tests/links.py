@@ -95,14 +95,14 @@ class TestLinkForm(TestCase):
         form = LinkForm()
 
         self.assertEqual(form.fields['link'].choices, [
-            (AnotherLinkableThing._meta.verbose_name_plural, [
+            ('Another linkable things', [
                 convert_linkable_to_choice(page3),
             ]),
-            (LinkableThing._meta.verbose_name_plural, [
+            ('Linkable things', [
                 convert_linkable_to_choice(page2),
                 convert_linkable_to_choice(page1),
             ]),
-            (LinkableThing3._meta.verbose_name_plural, [
+            ('ZZZZZ should be last', [
                 convert_linkable_to_choice(page4),
             ]),
         ])
