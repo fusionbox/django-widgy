@@ -554,6 +554,8 @@ class Button(StrDisplayNameMixin, Content):
     editable = True
     tooltip = _("Add a link to another page.")
 
+    objects = SelectRelatedManager(prefetch_related=['link'])
+
     class Meta:
         verbose_name = _('button')
         verbose_name_plural = _('buttons')
