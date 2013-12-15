@@ -181,7 +181,6 @@ define([ 'exports', 'jquery', 'underscore', 'i18n', 'widgy.backbone', 'lib/q', '
     'delete': function(event) {
       // TODO: A better UI experience would be undo, but this is a stop gap.
       this.$el.addClass('deleting');
-
       modal.confirm(
         interpolate(gettext('Are you sure you want to delete this %s?'),
                     [this.content.get('display_name')]),
