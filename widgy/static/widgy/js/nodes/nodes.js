@@ -1,9 +1,9 @@
-define([ 'exports', 'jquery', 'underscore', 'i18n', 'widgy.backbone', 'lib/q', 'shelves/shelves', 'modal/modal',
+define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/shelves', 'modal/modal',
     'text!./drop_target.html',
     'text!./popped_out.html',
     'nodes/base',
     'nodes/models'
-    ], function(exports, $, _, i18n, Backbone, Q, shelves, modal,
+    ], function(exports, $, _, Backbone, Q, shelves, modal,
       drop_target_view_template,
       popped_out_template,
       DraggableView,
@@ -181,7 +181,6 @@ define([ 'exports', 'jquery', 'underscore', 'i18n', 'widgy.backbone', 'lib/q', '
     'delete': function(event) {
       // TODO: A better UI experience would be undo, but this is a stop gap.
       this.$el.addClass('deleting');
-
       modal.confirm(
         interpolate(gettext('Are you sure you want to delete this %s?'),
                     [this.content.get('display_name')]),
