@@ -1,4 +1,4 @@
-define([ 'exports', 'jquery', 'underscore', 'i18n', 'widgy.backbone', 'lib/q', 'shelves/shelves', 'modal/modal', 'geometry'
+define([ 'exports', 'jquery', 'underscore', 'i18n', 'widgy.backbone', 'lib/q', 'shelves/shelves', 'modal/modal', 'geometry',
     'text!./drop_target.html',
     'text!./popped_out.html',
     'nodes/base',
