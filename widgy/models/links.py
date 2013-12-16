@@ -1,7 +1,9 @@
+import copy
 from operator import or_
 import itertools
 
 from django.db import models
+from django.db.models.fields import Field
 from django.contrib.contenttypes.models import ContentType
 from django.template.defaultfilters import capfirst
 from django import forms
@@ -86,6 +88,12 @@ class LinkField(WidgyGenericForeignKey):
             cls.add_to_class(self.fk_field, fk_field)
 
         super(LinkField, self).contribute_to_class(cls, name)
+
+    def __deepcopy__(self, memodict):
+        # Copied from Field.__deepcopy__ to avoid copying _link_registry
+        obj = copy.copy(self)
+        memodict[id(self)] = obj
+        return obj
 
 
 def get_composite_key(linkable):

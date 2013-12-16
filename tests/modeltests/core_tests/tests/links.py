@@ -1,9 +1,11 @@
+import copy
+
 from django import forms
 from django.test import TestCase
 
 from widgy.models.links import (
     link_registry, get_link_field_from_model, LinkFormMixin, LinkFormField,
-    get_composite_key, convert_linkable_to_choice,
+    get_composite_key, convert_linkable_to_choice, LinkRegistry, LinkField
 )
 
 from modeltests.core_tests.models import (
@@ -19,6 +21,15 @@ class TestLinkField(TestCase):
         self.assertFalse(any(
             i.name == 'linkable_content_type' for i in ChildThingWithLink._meta.local_fields
         ))
+
+    def test_copy(self):
+        # a LinkField has a reference to a LinkRegistry. Copying the LinkField
+        # shouldn't copy the registry. Copying the field happens with model
+        # inheritance.
+        registry = LinkRegistry()
+        f1 = LinkField(link_registry=registry)
+        f2 = copy.deepcopy(f1)
+        self.assertIs(f1._link_registry, f2._link_registry)
 
 
 class TestLinkRelations(TestCase):
