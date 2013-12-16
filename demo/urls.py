@@ -9,7 +9,7 @@ from demo.widgy import widgy_site
 admin.autodiscover()
 
 js_info_dict = {
-  'domain': 'django',
+  'packages': ('widgy', 'django',),
 }
 
 # Add the urlpatterns for any custom Django applications here.
@@ -76,8 +76,7 @@ urlpatterns = patterns("",
     # -------------------------------
     # This pattern produces a JavaScript library with functions that
     # allow for internalization of JavaScript.
-    (r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog', \
-        js_info_dict),
+    (r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 
 # Adds ``STATIC_URL`` to the context of error pages, so that error
