@@ -3,6 +3,7 @@ import itertools
 
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
+from django.template.defaultfilters import capfirst
 from django import forms
 
 from widgy.generic import WidgyGenericForeignKey
@@ -119,7 +120,7 @@ class LinkFormField(forms.ChoiceField):
     def populate_choices(self, choice_map):
         keyfn = lambda x: x[1].lower()
 
-        choices = [(Model._meta.verbose_name_plural,
+        choices = [(capfirst(Model._meta.verbose_name_plural),
                     sorted(map(convert_linkable_to_choice, choices), key=keyfn))
                    for Model, choices in choice_map
                    if len(choices)]
