@@ -27,7 +27,7 @@ class ReviewedVersionCommit(VersionCommit):
 
     @property
     def is_approved(self):
-        return bool(self.approved_by and self.approved_at)
+        return bool(self.approved_by_id and self.approved_at)
 
     def approve(self, user, commit=True):
         self.approved_at = timezone.now()
