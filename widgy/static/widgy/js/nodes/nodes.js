@@ -1,9 +1,9 @@
-define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/shelves', 'modal/modal', 'geometry',
+define([ 'exports', 'jquery', 'underscore', 'i18n', 'widgy.backbone', 'lib/q', 'shelves/shelves', 'modal/modal', 'geometry',
     'text!./drop_target.html',
     'text!./popped_out.html',
     'nodes/base',
     'nodes/models'
-    ], function(exports, $, _, Backbone, Q, shelves, modal, geometry,
+    ], function(exports, $, _, I18N, Backbone, Q, shelves, modal, geometry,
       drop_target_view_template,
       popped_out_template,
       DraggableView,
@@ -56,8 +56,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         'popOut',
         'popIn',
         'prepareChild',
-        'closeSubwindow',
-        'refreshDropTargetVisibility'
+        'closeSubwindow'
         );
 
       this.node = this.model;
@@ -183,7 +182,8 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       // TODO: A better UI experience would be undo, but this is a stop gap.
       this.$el.addClass('deleting');
       modal.confirm(
-        'Are you sure you want to delete this ' + this.content.get('display_name') + '?',
+        interpolate(gettext('Are you sure you want to delete this %s?'),
+                    [this.content.get('display_name')]),
         this.deleteSelf,
         _.bind(function() {
           this.$el.removeClass('deleting');
@@ -291,26 +291,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         this.list.each(function(node_view) {
           var drop_target = that.createDropTarget(view).$el.insertAfter(node_view.el);
         }, this);
-        this.refreshDropTargetVisibility();
-
-        $(window).on('scroll.' + this.cid, function() {
-          that.refreshDropTargetVisibility();
-        });
       }
-    },
-
-    refreshDropTargetVisibility: function() {
-      var that = this;
-      var visible = 0;
-      this.drop_targets_list.each(function(drop_target) {
-        that.app.visible_drop_targets.remove(drop_target);
-        if ( drop_target.isVisible() ) {
-          that.app.visible_drop_targets.push(drop_target);
-          visible++;
-        }
-      });
-
-      debug('refreshDropTargetVisibility', visible + ' of ' + this.drop_targets_list.size() + ' visible');
     },
 
     createDropTarget: function(view) {
@@ -336,8 +317,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
     },
 
     clearDropTargets: function() {
-      $(window).off('scroll.' + this.cid);
-
       this.drop_targets_list.closeAll();
 
       this.list.each(function(node_view) {
@@ -471,9 +450,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
           // lower_bound is the lower the top of the shelf can be
           var upper_bound = self.el.offsetTop,
               lower_bound = upper_bound + self.el.offsetHeight - shelf.el.offsetHeight,
-              // window.scrollY for IE
-              scroll_y = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop,
-              margin_top = Math.max(0, Math.min(scroll_y, lower_bound) - upper_bound - mezzanine_fixed_toolbar_height - fix_overscrolling_pixels);
+              margin_top = Math.max(0, Math.min(window.scrollY, lower_bound) - upper_bound - mezzanine_fixed_toolbar_height - fix_overscrolling_pixels);
 
           shelf.el.style.marginTop = margin_top + 'px';
         });
@@ -547,31 +524,62 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
   var DropTargetView = Backbone.View.extend({
     tagName: 'li',
     className: 'node_drop_target',
-    active: false,
     template: drop_target_view_template,
 
+    triggers: {
+      'mouseup': 'dropped'
+    },
+
+    events: Backbone.extendEvents(Backbone.View, {
+      'mouseenter': 'activate',
+      'mouseleave': 'deactivate'
+    }),
+
+    render: function() {
+      Backbone.View.prototype.render.apply(this, arguments);
+
+      // In a perfect world, the CSS pointer-events property would be supported
+      // by all browsers and every version of each browser and we would set
+      // pointer-events to none for .node.being_dragged.  But even since we
+      // can't use that, we are going to use this method to capture all of the
+      // events.
+      //
+      // Above the drop targets, we put an invisible div that has a z-index
+      // high enough to be above the dragged_node.  This allows us to catch the
+      // pointer events (mouseup, mouseenter, mouseleave) that we need drop
+      // targets to receive.
+      //
+      // Normally I don't like putting CSS in the JavaScript, but this CSS
+      // creates functionality and not prettiness, so I have to.
+      this.$el.css({
+        'position': 'relative'
+      });
+
+      var $pointerEventsCatcher = $('<div class="pointer_event_catcher">')
+        .css({
+          'z-index': 51,
+          'opacity': 0,
+          'width': '100%',
+          'height': '100%',
+          'padding': '20px 40px',
+          'position': 'absolute',
+          'top': '-20px',
+          'left': '-40px'
+        });
+      this.$el.prepend($pointerEventsCatcher);
+
+      return this;
+    },
+
     activate: function(event) {
-      this.active = true;
       this.$el.addClass('active');
       return this;
     },
 
     deactivate: function(event) {
-      this.active = false;
       this.$el.removeClass('active')
               .css('height', '');
       return this;
-    },
-
-    isVisible: function() {
-      var bounds = this.el.getBoundingClientRect();
-      var windowBounds = {
-        top: 0,
-        left: 0,
-        bottom: window.innerHeight || document.documentElement.clientHeight,
-        right: window.innerWidth || document.documentElement.clientWidth
-      };
-      return geometry.rectanglesOverlap(bounds, windowBounds);
     }
   });
 

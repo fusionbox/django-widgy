@@ -43,7 +43,9 @@ the admin center.
       'jquery': './lib/jquery',
       'underscore': './lib/underscore',
       'backbone': './lib/backbone',
-      'text': 'require/text'
+      'text': 'require/text',
+      'noext': 'require/noext',
+      'i18n': '/jsi18n?noext'
     },
     config: {
       text: {
@@ -52,6 +54,11 @@ the admin center.
           // https://github.com/requirejs/text#xhr-restrictions
           return true;
         }
+      }
+    },
+    shim: {
+      'i18n': {
+        exports: 'i18n'
       }
     },
     {% comment %}

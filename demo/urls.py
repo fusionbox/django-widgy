@@ -8,6 +8,10 @@ from demo.widgy import widgy_site
 
 admin.autodiscover()
 
+js_info_dict = {
+  'packages': ('widgy', 'django',),
+}
+
 # Add the urlpatterns for any custom Django applications here.
 # You can also change the ``home`` view to add your own functionality
 # to the project's homepage.
@@ -68,6 +72,11 @@ urlpatterns = patterns("",
     # ``mezzanine.urls``.
     ("^", include("mezzanine.urls")),
 
+    # JAVASCRIPT INTERNATIONALIZATION
+    # -------------------------------
+    # This pattern produces a JavaScript library with functions that
+    # allow for internalization of JavaScript.
+    (r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 
 # Adds ``STATIC_URL`` to the context of error pages, so that error
