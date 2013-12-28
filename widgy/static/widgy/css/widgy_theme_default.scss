@@ -1,0 +1,347 @@
+@import "widgy_common.scss";
+
+.widgy {
+  .editor {
+    background: $reallylightgrey;
+  }
+
+  .node {
+    @include rounded(4px);
+    @include shadow($black10,1px,1px,0px);
+    @include inset-shadow(transparent,0px,0px,0px);
+    list-style: none;
+    padding: 0px;
+
+    &.deleting {
+      @include shadow($black50,0px,5px,15px);
+      border-color: $red;
+
+      div.widget {
+        p.drag-row {
+          span.title {
+            color: $red;
+          }
+        }
+      }
+    }
+  }
+
+  .widget {
+  }
+
+  .preview {
+    padding: 0;
+
+    &:not(:empty) {
+      padding: 1em;
+    }
+  }
+
+  // Anything but the root node
+  .node:not(section) {
+    background: white;
+    border: 1px solid #E0E0E0;
+
+    .drag-row {
+      @include clearfix;
+      @include gradient(#eee,#fff);
+      // TODO: cursor only for draggable nodes.
+      cursor: pointer;
+      display: block;
+      float: none;
+      height: auto;
+      min-height: 20px;
+      margin: 0px;
+      padding: 2px;
+      position: relative;
+      width: auto;
+
+      span.title {
+        color: #666;
+        font-size: 13px;
+        font-weight: normal;
+        line-height: 20px;
+      }
+
+      button.edit,
+      button.delete {
+        float: right;
+        margin: 1px 1px 0px 3px;
+      }
+
+      .dragHandle {
+        left: 0px;
+        float: left;
+        font-size: 14px;
+        position: relative;
+        top: 3px;
+      }
+    }
+  }
+}
+
+// Root Node
+.widgy section.node {
+  > .widget > .drag-row > .title {
+    font-family: "Open Sans";
+    font-size: 2.4em;
+    padding: 5px 0;
+  }
+
+  > .widget > .nodeChildren {
+    padding-left: 1em;
+  }
+}
+
+// Dragging
+.widgy {
+  .node_drop_target {
+    @include rounded(3px);
+    @include transition;
+
+    border: none;
+    background: lighten($green, 25%);
+    font-size: 1.0em;
+    font-style: italic;
+    margin-left: 1em;
+    margin-right: 1em;
+    text-align: center;
+
+    &.active {
+      border: 1px dashed $green;
+      background: lighten($green, 40%);
+      color: darken($green, 10%);
+    }
+
+    &.previous {
+      background: $orange;
+    }
+  }
+}
+
+// Shelf
+.widgy {
+  .shelf {
+    > .title {
+      display: none;
+    }
+  }
+
+  .shelfItem {
+    @include gradient(#eeeeee,#ffffff);
+    @include rounded(4px);
+    @include shadow($black10,1px,1px,0px);
+    @include inset-shadow(#ffffff,-1px,1px,0px);
+    border: 1px solid #E0E0E0;
+    cursor: pointer;
+    margin: 0 4px 4px 0;
+    padding: 1px 1px 1px 1px;
+    vertical-align: top;
+    width: 210px !important;
+
+    span.title {
+      background-position: 5px 3px;
+      font-size: 11px;
+      max-width: 160px;
+      padding: 4px 0px 2px 26px;
+      text-transform: capitalize;
+      width: 160px;
+    }
+
+    span.icon-move {
+      float: right;
+      margin-top: 4px;
+    }
+  }
+
+  // Global Shelf
+  section.node > .widget > .shelf {
+    > .title {
+      display: block;
+    }
+
+    .shelfItem {
+      padding: 5px 10px 5px 5px;
+      width: 185px;
+    }
+
+    span.icon-move {
+      color: #999999;
+      font-size: 1.4em;
+      margin-top: 8px;
+    }
+
+    span.title {
+      background-position: 5px 9px;
+      display: inline;
+      float: left;
+      font-size: 1.2em;
+      line-height: 1.4em;
+      padding: 5px 0 5px 30px;
+      max-width: 130px;
+    }
+  }
+
+  // local shelf
+  .node:not(section) .shelf {
+    border-bottom: 2px solid $lightgrey;
+    padding-left: 1em;
+  }
+}
+
+// EditorView
+.widgy .widget_editor {
+  div {
+    @include clearfix;
+    padding: 0px;
+    position: relative;
+  }
+
+  .formField {
+    margin-bottom: 10px;
+
+    select {
+      width: 212px;
+    }
+
+    &.required {
+      label:after {
+        content: "*";
+        color: $red;
+      }
+    }
+
+    &.error {
+      #{$inputFields},
+      textarea {
+        border-color: $red;
+      }
+
+      ul.errorlist {
+        li.error {
+          padding-left: 115px;
+        }
+      }
+    }
+
+    p.datetime {
+      display: inline;
+      float: left;
+      width: 50%;
+
+      br {
+        display: inline;
+      }
+
+      input[type='text'] {
+        margin: 0px 5px;
+        width: 100px;
+      }
+    }
+  }
+
+  #{$inputFields},
+  button {
+    &:focus {
+      @include inset-shadow(lighten($purple,15%), 0px, 1px, 3px);
+      border-color: $purple;
+    }
+  }
+
+  #{$inputFields} {
+    @include rounded(3px);
+    @include inset-shadow($black10,0px,1px,2px);
+    border: 1px solid $lightgrey;
+    font-weight: normal !important;
+    height: auto;
+    padding: 6px 4px 5px;
+  }
+
+  input {
+    &[type='checkbox'],
+    &[type='radio'] {
+      margin-left: 0px;
+    }
+
+    &[type='submit'] {
+      @include button;
+      float: right;
+    }
+  }
+
+  input[type='submit'] {
+    float: right;
+  }
+
+  label {
+    clear: left;
+    padding: 0 10px 10px 0;
+  }
+
+  textarea {
+    max-width: 98.5%;
+    height: 120px;
+    width: 98.5%;
+  }
+
+  .cancel {
+    position: absolute;
+    right: 55px;
+    top: 0px;
+  }
+}
+
+// Element styles
+.widgy {
+  button,
+  input[type='submit'] {
+    @include button;
+    margin-left: 10px;
+  }
+
+  h1 {
+    color: #535353;
+    font-family: "Open Sans";
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 38px;
+  }
+
+  h2 {
+    color: #535353;
+    font-size: 22px;
+    line-height: 28px;
+  }
+
+  h3 {
+    color: #535353;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 20px;
+  }
+
+  h4 {
+    color: #535353;
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  h5{
+    color: #535353;
+    margin: 0px 0px 4px 0px;
+  }
+
+
+  p.title {
+    color: #353535;
+    font-family: "Open Sans";
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 28px;
+  }
+
+  span.title {
+    color: #353535;
+    font-family: "Open Sans";
+  }
+}

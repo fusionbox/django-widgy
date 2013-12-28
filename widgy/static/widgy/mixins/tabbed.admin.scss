@@ -1,106 +1,117 @@
 @import "widgy_common";
 
-/*
-div.widgy div.editor section.node div.widget > ul.nodeChildren {
-  width: 100% !important;
-}
-*/
+// Layout
+.widgy {
+  .tabbed {
+    > .widget > .nodeChildren {
+      @include box-sizing(border-box);
+      @include clearfix;
+      width: 100% !important;
 
-div.widgy div.editor .tabbed {
-  > .widget {
-    @include clearfix;
-  }
-}
+      > li {
+        display: inline-block;
+        float: left;
 
-div.widgy div.editor .tabbed > div.widget > ul.nodeChildren {
-  @include box-sizing(border-box);
-
-  > li {
-    @include rounded(4px 4px 0px 0px);
-    display: inline-block;
-    float: left;
-    margin: 0 0 0 .5em !important;
-    padding: 0px 5px !important;
-    position: relative;
-    top: 2px;
-
-    &.node {
-      background: #eeeeee !important;
-      border-color: #cccccc;
-      border-width: 1px 1px 0px 1px;
-      color: #999999;
-
-      &.active {
-        background-color: #fafafa !important;
-        border-bottom: 2px solid #fafafa;
-        color: #555555;
-
-        .edit, .delete {
-          display: inline;
-        }
-      }
-
-      .widget {
-        background: transparent !important;
-
-        .drag-row {
-          @include rounded(0px);
-          background: transparent !important;
-
-          span.title {
-            color: inherit;
-          }
-
-          .edit span, // functionality for editing the tab doesn't exist yet.
-          .delete span {
+        // Only show the buttons if we are on the current tab.
+        &:not(.active) {
+          .edit, .delete {
             display: none;
           }
+        }
 
-          button.edit,
-          button.delete {
-            position: static !important;
-          }
+        &.node_drop_target {
+          margin-bottom: 0;
+          width: 50px;
 
-          .preview {
-            background: transparent;
-            display: inline;
+          &.active {
+            width: 100px;
           }
         }
       }
-
-      .preview,
-      .nodeChildren {
-        display: none;
-      }
-
-      &:hover {
-        background-color: white !important;
-      }
-
-      .edit, .delete {
-        display: none;
-      }
     }
 
-    &.node_drop_target {
-      height: 24px !important;
-      width: 50px;
-
-      &.active {
-        width: 100px;
-
-        span {
-          display: none;
-        }
-      }
+    .current {
+      clear: both;
+      width: 100%;
     }
+  }
+
+  // if the tabs are at the root level make the current tab look
+  // like a root level node.
+  section.tabbed > .widget > .current {
+    float: left;
+    width: 63%;
   }
 }
 
-.widgy section.tabbed > .widget > .current {
-  border-top: 2px solid #cccccc;
-  clear: left;
-  float: left;
-  padding-top: 10px;
-  width: 63%;
+// Theme
+.widgy {
+  .tabbed {
+    > .widget > .nodeChildren {
+      margin-top: 1em;
+      padding-left: 1em;
+
+      > li {
+        margin: 0;
+
+        &.node {
+          background: #eeeeee !important;
+          border-color: #cccccc;
+          border-width: 1px 1px 0px 1px;
+          color: #999999;
+
+          &.active {
+            background-color: #fafafa !important;
+            border-bottom: 2px solid #fafafa;
+            color: #555555;
+          }
+
+          &:hover {
+            background-color: white !important;
+          }
+
+          .widget {
+            background: transparent !important;
+
+            .drag-row {
+              @include rounded(0px);
+              background: transparent !important;
+
+              span.title {
+                color: inherit;
+              }
+
+              .edit span, // functionality for editing the tab doesn't exist yet.
+              .delete span {
+                display: none;
+              }
+
+              .preview {
+                background: transparent;
+                display: inline;
+              }
+            }
+          }
+        }
+
+        &.node_drop_target {
+          height: 24px !important;
+          // don't let the drop here? text spill out
+          overflow: hidden;
+
+          &.active {
+            // we don't want the drop targets to grow taller.
+            padding: 0 1em;
+          }
+        }
+      }
+    }
+
+    > .widget > .current {
+      border-top: 2px solid #cccccc;
+      clear: left;
+      float: left;
+      padding-top: 10px;
+    }
+  }
 }

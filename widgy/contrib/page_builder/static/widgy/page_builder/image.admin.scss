@@ -1,0 +1,36 @@
+.widgy .node.image {
+  .widget_editor {
+    .formField {
+      position: relative;
+
+      label {
+        display: none;
+      }
+
+      a {
+        img {
+          float: left;
+          margin-right: 10px;
+        }
+      }
+
+      span {
+        float: left;
+
+      }
+
+      a.related-lookup {
+        position: absolute;
+        height: 10px;
+        left: 53px;
+        top: 25px;
+      }
+
+      input {
+        float: left;
+        margin-top: 6px;
+        width: 86%;
+      }
+    }
+  }
+}

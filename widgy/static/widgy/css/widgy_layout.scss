@@ -1,0 +1,174 @@
+@import "widgy_common.scss";
+
+.widgy {
+  @include clearfix;
+
+  // show a loading spinner if there's nothing inside the
+  // container.
+  &:empty, & > .editor:empty {
+    @extend %loading;
+    height: 100px;
+  }
+
+  .editor {
+    display: inline-block;
+    width: 100%;
+  }
+
+  .nodeChildren {
+    margin: 0;
+    padding: 0;
+
+    li {
+      list-style: none;
+    }
+  }
+
+
+  .node {
+    @include clearfix;
+    margin-left: 1em;
+    margin-right: 1em;
+    padding: 0px;
+
+    // invisible mixin, it provides a node with no chrome.
+    &.invisible {
+      background-color: inherit;
+      border: 0 none;
+      margin: inherit 0 !important;
+      padding: 0;
+
+      & > .widget > .nodeChildren:empty {
+        display: none;
+      }
+    }
+
+    &.being_dragged {
+      margin: 0;
+    }
+  }
+
+  .widget {
+    padding: 0px;
+
+    .drag-row {
+      display: block;
+      float: none;
+      height: auto;
+      position: relative;
+      width: auto;
+
+      button.edit,
+      button.delete {
+        float: right;
+      }
+
+      .dragHandle {
+        left: 0px;
+        float: left;
+        position: relative;
+        top: 3px;
+      }
+    }
+  }
+
+  .preview {
+    padding: 1em;
+
+    &:empty {
+      padding: 0;
+    }
+  }
+}
+
+// Dragging
+.widgy {
+  .being_dragged {
+    position: fixed;
+  }
+
+  .node {
+    margin-bottom: 1em;
+
+    &:first-child {
+      margin-top: 1em;
+    }
+  }
+
+  .node_drop_target {
+    height: 1em;
+    margin-bottom: 0;
+    margin-top: -1em;
+    padding: 0;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child,
+    &.previous.nm {
+      margin-bottom: 0;
+      margin-top: -1em;
+    }
+
+    &:only-child {
+      margin-bottom: 0;
+      margin-top: 0;
+    }
+
+    // Hide the drop here message if not active. (it's too tall)
+    &:not(.active) span {
+      display: none;
+    }
+
+    &.active {
+      height: 3em;
+      padding: 1em;
+    }
+  }
+}
+
+// Root Node
+.widgy {
+  section.node {
+    margin-left: 0;
+    margin-right: 0;
+
+    > .widget {
+      & > .nodeChildren {
+        clear: left;
+        float: left;
+        width: 63%;
+
+        // The first-level children shouldn't have side margins
+        > .node {
+          margin-left: 0;
+          margin-right: 0;
+        }
+      }
+
+      & > .shelf {
+        display: inline;
+        float: right;
+        position: relative;
+        width: 35%;
+      }
+    }
+  }
+}
+
+// Shelf
+.widgy {
+  .shelf {
+    display: block;
+    float: none;
+    width: auto;
+    overflow-y: hidden;
+  }
+
+  .shelfItem {
+    display: inline-block;
+    height: auto;
+    vertical-align: top;
+  }
+}
