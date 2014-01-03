@@ -1,4 +1,4 @@
-define([ 'underscore', 'widgy.backbone', 'components/widget/component' ], function(_, Backbone, widget) {
+define([ 'jquery', 'underscore', 'widgy.backbone', 'components/widget/component' ], function($, _, Backbone, widget) {
 
   var TabbedView = widget.View.extend({
     events: Backbone.extendEvents(widget.View, {
