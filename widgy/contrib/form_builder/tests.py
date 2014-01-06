@@ -63,6 +63,17 @@ class GetFormTest(TestCase):
         self.assertTrue(isinstance(field, forms.CharField))
         self.assertEqual(field.label, 'Test')
 
+    def test_widget(self):
+        self.form = Form.add_root(widgy_site)
+
+        field_widget = self.form.children['fields'].add_child(widgy_site, FormInput,
+                                                              type='checkbox',
+                                                              label='Test',
+                                                              )
+        field = field_widget.get_formfield()
+
+        self.assertTrue(isinstance(field.widget, forms.CheckboxInput))
+
     def test_with_uncaptcha(self):
         uncaptcha = self.form.children['fields'].add_child(widgy_site, Uncaptcha)
         form_class = self.form.build_form_class()

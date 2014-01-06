@@ -735,7 +735,7 @@ class FormInput(FormField):
             attrs['type'] = 'text'
             attrs['class'] = 'date auto-kal'
 
-        return forms.TextInput(attrs=attrs)
+        return self.formfield_class.widget(attrs=attrs)
 
 
 @widgy.register
