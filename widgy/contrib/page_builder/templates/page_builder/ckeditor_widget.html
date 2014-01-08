@@ -5,8 +5,13 @@
 <script>
   {# this tells CKEditor where to find its static assets #}
   CKEDITOR_BASEPATH = {{ ckeditor_path|json }};
-  {# we need to ensure that the ckeditor library is loaded before we try to use it #}
-  require(['lib/ckeditor/ckeditor'], function() {
+  (function (load) {
+    {# only require CKEDITOR if it hasn't already be loaded. This allows loading your own ckeditor. #}
+    if ( typeof CKEDITOR === 'object' )
+      load();
+    else
+      require(['lib/ckeditor/ckeditor'], load);
+  })(function() {
     CKEDITOR.replace({{ html_id|json }}, {{ config|json }});
   });
 </script>
