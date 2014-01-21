@@ -6,13 +6,13 @@ env:
   global:
     - SOUTH_TESTS_MIGRATE=1
   matrix:
-    - DATABASE_ENGINE=sqlite DJANGO_PACKAGE=Django==1.5.1
+    - DATABASE_ENGINE=sqlite DJANGO_PACKAGE=Django==1.5.5
     - DATABASE_ENGINE=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
     - DATABASE_ENGINE=sqlite DJANGO_PACKAGE=Django==1.4.5
-    - DATABASE_ENGINE=postgres DJANGO_PACKAGE=Django==1.5.1
+    - DATABASE_ENGINE=postgres DJANGO_PACKAGE=Django==1.5.5
     - DATABASE_ENGINE=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
     - DATABASE_ENGINE=postgres DJANGO_PACKAGE=Django==1.4.5
-    - DATABASE_ENGINE=mysql DJANGO_PACKAGE=Django==1.5.1
+    - DATABASE_ENGINE=mysql DJANGO_PACKAGE=Django==1.5.5
     - DATABASE_ENGINE=mysql DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
     - DATABASE_ENGINE=mysql DJANGO_PACKAGE=Django==1.4.5
 matrix:
