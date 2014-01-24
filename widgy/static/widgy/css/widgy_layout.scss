@@ -163,12 +163,34 @@
     display: block;
     float: none;
     width: auto;
-    overflow-y: hidden;
+    overflow-y: auto;
   }
 
   .shelfItem {
     display: inline-block;
     height: auto;
     vertical-align: top;
+  }
+}
+
+// Pop Out Layout
+.popOut {
+  .widgy {
+
+    section.node {
+      margin-left: 0;
+      margin-right: 0;
+
+      > .widget {
+        & > .nodeChildren {
+          padding-left: 0;
+          width: 63%;
+        }
+
+        & > .shelf {
+          width: 35%;
+        }
+      }
+    }
   }
 }

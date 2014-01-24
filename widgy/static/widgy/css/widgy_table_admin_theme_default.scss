@@ -1,0 +1,226 @@
+
+// Theme
+.widgy .table {
+  .invisible > .widget > .nodeChildren {
+    > .node_drop_target {
+      margin-left: 60px;
+      margin-right: 0;
+    }
+  }
+  .node.tablerow,
+  .node.tableheader {
+    border: 0px;
+    padding: 0px 0px 0px 60px;
+    overflow: visible;
+
+    > .widget > .nodeChildren {
+      border: 0px;
+
+      > .tabledata,
+      > .node.tableheaderdata {
+        @include rounded(0px);
+
+        > div.widget {
+          min-height: 20px;
+
+          > p.drag-row {
+            display: none;
+          }
+        }
+      }
+
+      // Regular editors within table cells
+      li {
+        div.widget {
+          p.drag-row {
+            span.dragHandle {
+              font-size: 13px;
+              left: 2px;
+              position: absolute;
+              top: 3px;
+            }
+
+            span.title {
+              display: none;
+            }
+
+            button {
+              font-size: 9px;
+              line-height: 9px;
+              height: 15px;
+              margin: 2px 3px 0px 0px;
+              padding: 0px;
+              width: 15px;
+
+              i {
+                width: 1em;
+              }
+
+              &.edit {
+                right: 22px;
+              }
+
+              span {
+                display: none;
+              }
+            }
+          }
+
+          textarea {
+            height: 40px;
+          }
+        }
+      }
+    }
+  }
+
+  .node.tablerow {
+    margin: 0px;
+
+    > div.widget {
+      > p.drag-row {
+        height: 0px;
+        min-height: 0px;
+        padding: 0px;
+
+        span.dragHandle {
+          font-size: 14px;
+          left: -20px;
+          position: absolute;
+          top: 3px;
+        }
+
+        button.delete {
+          font-size: 9px;
+          line-height: 9px;
+          height: 15px;
+          padding: 0px;
+          position: absolute;
+          top: 3px;
+          left: -40px;
+          width: 15px;
+          z-index: 10;
+
+          i {
+            width: 1em;
+          }
+
+          span {
+            display: none;
+          }
+        }
+
+        button.edit {
+          font-size: 9px;
+          line-height: 9px;
+          height: 15px;
+          padding: 0px;
+          position: absolute;
+          top: 3px;
+          left: -60px;
+          width: 15px;
+          z-index: 10;
+
+          i {
+            width: 1em;
+          }
+
+          span {
+            display: none;
+          }
+        }
+      }
+
+    }
+  }
+
+  .node.tableheader {
+    margin: 0 1em;
+
+    > div.widget {
+      > p.drag-row {
+        background: white;
+        padding: 0px;
+        position: relative;
+
+        span.dragHandle {
+          font-size: 15px;
+          left: 0px;
+          top: 2px;
+        }
+
+        span.title {
+          display: block;
+          font-size: 13px;
+          line-height: 22px;
+          padding: 0px;
+        }
+
+        button.delete {
+          font-size: 9px;
+          line-height: 1em;
+          padding: 1px;
+          position: absolute;
+          top: 4px;
+          right: 4px;
+          width: 15px;
+          z-index: 10;
+
+          i {
+            width: 1em;
+          }
+        }
+      }
+
+      .nodeChildren {
+        .tableheaderdata {
+          @include rounded(0px);
+          min-width: $table-cell-min-width;
+
+          > div.widget {
+            > p.drag-row {
+              background: white;
+              padding: 0px;
+              position: relative;
+
+              span.dragHandle {
+                font-size: 15px;
+                left: 0px;
+                top: 2px;
+              }
+
+              span.title {
+                color: $grey;
+                display: block;
+                font-size: 11px;
+                line-height: 22px;
+                padding: 0px;
+              }
+
+              button.delete {
+                font-size: 9px;
+                line-height: 9px;
+                padding: 0px;
+                position: absolute;
+                top: 3px;
+                right: 3px;
+                height: 15px;
+                width: 15px;
+                z-index: 10;
+
+                i {
+                  width: 1em;
+                }
+              }
+            }
+
+            // regular editors within table header cells
+            ul.nodeChildren {
+              width: auto !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
