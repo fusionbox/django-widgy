@@ -1,6 +1,9 @@
 @import "widgy_common.scss";
 
 .widgy {
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  
   .editor {
     background: $reallylightgrey;
   }
@@ -43,6 +46,7 @@
     border: 1px solid #E0E0E0;
 
     .drag-row {
+      @include rounded(4px 4px 0px 0px);
       @include clearfix;
       @include gradient(#eee,#fff);
       // TODO: cursor only for draggable nodes.
@@ -137,7 +141,7 @@
     margin: 0 4px 4px 0;
     padding: 1px 1px 1px 1px;
     vertical-align: top;
-    width: 210px !important;
+    width: 215px !important;
 
     span.title {
       background-position: 5px 3px;
@@ -158,25 +162,26 @@
   section.node > .widget > .shelf {
     > .title {
       display: block;
+      margin-bottom: 10px;
     }
 
     .shelfItem {
-      padding: 5px 10px 5px 5px;
-      width: 185px;
+      padding: 0px 5px 0px 5px;
+      width: 190px;
     }
 
     span.icon-move {
       color: #999999;
-      font-size: 1.4em;
-      margin-top: 8px;
+      font-size: 20px;
+      margin-top: 0px;
     }
 
     span.title {
       background-position: 5px 9px;
       display: inline;
       float: left;
-      font-size: 1.2em;
-      line-height: 1.4em;
+      font-size: 14px;
+      line-height: 22px;
       padding: 5px 0 5px 30px;
       max-width: 130px;
     }
@@ -185,7 +190,7 @@
   // local shelf
   .node:not(section) .shelf {
     border-bottom: 2px solid $lightgrey;
-    padding-left: 1em;
+    padding: 10px 0 5px 1em;
   }
 }
 
@@ -249,6 +254,7 @@
   }
 
   #{$inputFields} {
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
     @include rounded(3px);
     @include inset-shadow($black10,0px,1px,2px);
     border: 1px solid $lightgrey;
@@ -283,6 +289,10 @@
     height: 120px;
     width: 98.5%;
   }
+  
+  select {
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+  }
 
   .cancel {
     position: absolute;
@@ -294,9 +304,14 @@
 // Element styles
 .widgy {
   button,
-  input[type='submit'] {
+  input[type='submit'],
+  a.pop_out {
     @include button;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
     margin-left: 10px;
+    font-size: 11px;
+    text-decoration: none;
+    text-transform: capitalize;
   }
 
   h1 {
@@ -331,6 +346,9 @@
     margin: 0px 0px 4px 0px;
   }
 
+  p {
+    margin: 0;
+  }
 
   p.title {
     color: #353535;
