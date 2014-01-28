@@ -9,3 +9,9 @@ def setup(app):
         directivename="django-admin",
         rolename="djadmin",
     )
+
+    app.add_crossref_type(
+        directivename = "templatetag",
+        rolename      = "ttag",
+        indextemplate = "pair: %s; template tag"
+    )
