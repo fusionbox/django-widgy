@@ -1,5 +1,4 @@
 from django import template
-from django.core import urlresolvers
 from django.conf import settings
 from django.utils.safestring import mark_safe
 
@@ -101,14 +100,3 @@ def get_action_links(owner, root_node):
         return []
     else:
         return get_action_links(root_node)
-
-@register.filter
-def admin_edit_url(obj):
-    try:
-        name = 'admin:%s_%s_change' % (
-            obj._meta.app_label,
-            obj._meta.module_name,
-        )
-        return urlresolvers.reverse(name, args=[obj.pk])
-    except urlresolvers.NoReverseMatch:
-        return ''

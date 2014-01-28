@@ -1,7 +1,7 @@
 {% extends "admin/change_form.html" %}
 {% load url from future %}
 
-{% load i18n widgy_tags %}
+{% load i18n %}
 
 {% block content %}
 <div id="content-main">
@@ -10,11 +10,6 @@
     <li><a href="{% url 'admin:form_builder_form_download' object_id %}" download="{{ csv_file_name }}">{% trans 'Download as CSV' %}</a></li>
   </ul>
   {% endblock %}
-  {% for owner in owners %}
-    {% if owner|admin_edit_url %}
-      <a href="{{ owner|admin_edit_url }}">&laquo; {{ owner }}</a>
-    {% endif %}
-  {% endfor %}
 
   <table>
     <thead>

@@ -1,3 +1,5 @@
+import csv
+
 from django.contrib import admin
 from django.contrib.admin.util import unquote
 from django.http import HttpResponse
@@ -5,11 +7,9 @@ from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
 from django.conf.urls import patterns, url
 from django.template.defaultfilters import slugify
-from django.db.models import Q
 
 from widgy.utils import force_text
 
-from widgy.contrib.review_queue.models import ReviewedVersionTracker
 from .models import Form
 
 
@@ -37,14 +37,6 @@ class FormAdmin(admin.ModelAdmin):
 
         headers = obj.submissions.get_formfield_labels()
         rows = obj.submissions.as_ordered_dictionaries(headers.keys())
-
-        owners = []
-        root_node = obj.node.get_root()
-        # XXX: we need a site here to call get_version_tracker_model
-        for vt in ReviewedVersionTracker.objects.filter(
-            Q(commits__root_node=root_node) | Q(working_copy=root_node)).distinct():
-            owners.extend(vt.owners)
-
         return render(request, 'admin/form_builder/form/change_form.html', {
             'title': _('View %s submissions') % force_text(opts.verbose_name),
             'object_id': object_id,
@@ -54,7 +46,6 @@ class FormAdmin(admin.ModelAdmin):
             'headers': headers,
             'rows': rows,
             'csv_file_name': self.csv_file_name(obj),
-            'owners': owners,
         })
 
     def csv_file_name(self, obj):

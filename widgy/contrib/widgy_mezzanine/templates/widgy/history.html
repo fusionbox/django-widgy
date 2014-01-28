@@ -20,11 +20,6 @@
 {% block content %}
 <section class="main">
   <h1>{% trans "Page History" %}</h1>
-  {% for owner in object.owners %}
-    {% if owner|admin_edit_url %}
-      <a href="{{ owner|admin_edit_url }}">&laquo; {{ owner }}</a>
-    {% endif %}
-  {% endfor %}
 <ol class="history">
     {% for commit in commits %}
     <li>
