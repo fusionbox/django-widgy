@@ -225,10 +225,12 @@ class NodeEditView(NodeSingleObjectMixin, AuthorizedMixin, DetailView):
         if not self.site.has_change_permission(self.request, self.object):
             raise PermissionDenied(_("You don't have permission to edit this widget."))
         kwargs = super(NodeEditView, self).get_context_data(**kwargs)
+        self.object.prefetch_tree()
         kwargs.update(
             html_id='node_%s' % (self.object.pk),
             node_dict=self.object.to_json(self.site),
             api_url=reverse(self.site.node_view),
+            site=self.site,
         )
         return kwargs
 

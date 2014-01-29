@@ -1,32 +1,30 @@
-%horizontalChildren {
-  & > .widget > .drag-row {
-    span.title {
-      display: none;
+@import "widgy_common.scss";
+
+$table-cell-min-width: 120px;
+
+// Layout
+.widgy {
+  .table {
+    overflow: visible;
+
+    > .widget > .nodeChildren {
+      overflow-x: auto;
+      overflow-y: hidden;
     }
   }
 
-  & > .widget > .nodeChildren {
-    display: table;
-    width: 100%;
+  .node.tableheader, .node.tablerow {
+    @extend %horizontalChildren;
+  }
 
-    & > li {
-      display: table-cell;
-      width: auto;
+  .tableheaderdata, .tabledata {
+    min-width: $table-cell-min-width;
 
-      & > .widget > .drag-row {
-        span.title,
-        .delete span {
-          display: none;
-        }
-      }
+    .nodeChildren {
+      width: auto !important;
     }
   }
 }
 
-.tableheader {
-  @extend %horizontalChildren;
-}
+@import "widgy_table_admin_theme_default.scss";
 
-.tablerow {
-  @extend %horizontalChildren;
-}
