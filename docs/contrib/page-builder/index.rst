@@ -92,3 +92,15 @@ Tables
 
 
 .. _bleach: https://pypi.python.org/pypi/bleach
+
+
+Database Fields
+---------------
+
+.. currentmodule:: widgy.contrib.page_builder.db.fields
+
+.. class:: ImageField
+
+    A :filer:ref:`FilerFileField <usage>` that only accepts
+    images. Includes sensible defaults for use in Widgy --- ``null=True``,
+    ``related_name='+'`` and ``on_delete=PROTECT``.

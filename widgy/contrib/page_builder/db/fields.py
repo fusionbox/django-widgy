@@ -1,10 +1,14 @@
 from __future__ import unicode_literals
 
+import os
 import re
 
 from django import forms
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
+from filer.fields.file import FilerFileField
+from filer.models.filemodels import File
 
 from widgy.contrib.page_builder.forms import MarkdownField as MarkdownFormField, MarkdownWidget
 
@@ -12,6 +16,7 @@ from south.modelsinspector import add_introspection_rules
 
 add_introspection_rules([], ["^widgy\.contrib\.page_builder\.db\.fields\.MarkdownField"])
 add_introspection_rules([], ["^widgy\.contrib\.page_builder\.db\.fields\.VideoField"])
+add_introspection_rules([], ["^widgy\.contrib\.page_builder\.db\.fields\.ImageField"])
 
 
 class MarkdownField(models.TextField):
@@ -92,3 +97,22 @@ class VideoField(models.URLField):
                 UrlClass = VIDEO_URL_CLASSES[pattern]
                 return UrlClass(match)
         return value
+
+
+class ImageField(FilerFileField):
+    def __init__(self, *args, **kwargs):
+        defaults = {
+            'null': True,
+            'related_name': '+',
+            # What should happen on_delete.  Set to models.PROTECT so this is harder to
+            # ignore and forget about.
+            'on_delete': models.PROTECT,
+        }
+        defaults.update(kwargs)
+        super(ImageField, self).__init__(*args, **defaults)
+
+    def validate(self, value, model_instance):
+        file_obj = File.objects.get(pk=value)
+        iext = os.path.splitext(file_obj.file.path)[1].lower()
+        if not iext in ['.jpg', '.jpeg', '.png', '.gif']:
+            raise forms.ValidationError('File type must be jpg, png, or gif')
