@@ -53,6 +53,7 @@ container and a ``Slide`` model that represents the individual images. ::
     from django.db import models
     import widgy
     from widgy.models import Content
+    from widgy.contrib.page_builder.db.fields import ImageField
 
     @widgy.register
     class Slideshow(Content):
@@ -64,7 +65,7 @@ container and a ``Slide`` model that represents the individual images. ::
 
     @widgy.register
     class Slide(Content):
-        image = models.ImageField(upload_to='slides/', null=True)
+        image = ImageField(null=True)
         caption = models.CharField(max_length=255)
 
         editable = True
