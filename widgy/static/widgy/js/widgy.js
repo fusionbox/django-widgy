@@ -67,6 +67,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'lib/q', 'nodes/n
           app.$editor = app.$el.children('.editor');
           return view.renderPromise().then(function(view) {
             app.$editor.append(view.el);
+            view.makeSticky();
           }).thenResolve(app);
         });
 
