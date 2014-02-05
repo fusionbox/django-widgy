@@ -1,6 +1,10 @@
 from django import forms
+from django.utils.translation import ugettext_lazy as _
+
+from widgy.contrib.page_builder.forms import MiniCKEditorField, CKEditorField
 
 import phonenumbers
+
 
 class PhoneNumberField(forms.CharField):
     """
@@ -39,3 +43,32 @@ class PhoneNumberField(forms.CharField):
             return phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.NATIONAL)
         else:
             return phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
+
+
+class FormFieldForm(forms.ModelForm):
+    help_text = MiniCKEditorField(label=_('help text'), required=False)
+
+
+class EmailSuccessHandlerBaseForm(forms.ModelForm):
+    content = CKEditorField()
+
+
+class EmailUserHandlerForm(EmailSuccessHandlerBaseForm):
+    to_ident = forms.ChoiceField(label=_('To'), choices=[])
+
+    class Meta:
+        fields = ('to_ident', 'subject', 'content', 'include_form_data')
+
+    def __init__(self, *args, **kwargs):
+        super(EmailUserHandlerForm, self).__init__(*args, **kwargs)
+        self.fields['to_ident'].choices = [('', _('------'))] + [(i.ident, i) for i in self.instance.get_email_fields()]
+
+
+class FormInputForm(FormFieldForm):
+    class Meta:
+        fields = (
+            'type',
+            'required',
+            'label',
+            'help_text',
+        )

@@ -26,8 +26,6 @@ from widgy.signals import pre_delete_widget
 from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, StrDisplayNameMixin
 from widgy.utils import update_context, build_url, force_bytes, QuerySet
 from widgy.contrib.page_builder.models import Bucket, Html
-from widgy.contrib.page_builder.forms import MiniCKEditorField, CKEditorField
-from .forms import PhoneNumberField
 import widgy
 
 
@@ -222,10 +220,6 @@ def send_html_mail(subject, content, from_email, to):
     msg.send()
 
 
-class EmailSuccessHandlerBaseForm(forms.ModelForm):
-    content = CKEditorField()
-
-
 @python_2_unicode_compatible
 class EmailSuccessHandlerBase(StrDisplayNameMixin, FormSuccessHandler):
     subject = models.CharField(max_length=255, verbose_name=_('subject'))
@@ -237,7 +231,10 @@ class EmailSuccessHandlerBase(StrDisplayNameMixin, FormSuccessHandler):
         default=False,
     )
 
-    form = EmailSuccessHandlerBaseForm
+    @property
+    def form(self):
+        from widgy.contrib.form_builder.forms import EmailSuccessHandlerBaseForm
+        return EmailSuccessHandlerBaseForm
 
     class Meta:
         abstract = True
@@ -284,23 +281,16 @@ class EmailSuccessHandler(EmailSuccessHandlerBase):
 EmailSuccessHandler._meta.get_field('include_form_data').default = True
 
 
-class EmailUserHandlerForm(EmailSuccessHandlerBaseForm):
-    to_ident = forms.ChoiceField(label=_('To'), choices=[])
-
-    class Meta:
-        fields = ('to_ident', 'subject', 'content', 'include_form_data')
-
-    def __init__(self, *args, **kwargs):
-        super(EmailUserHandlerForm, self).__init__(*args, **kwargs)
-        self.fields['to_ident'].choices = [('', _('------'))] + [(i.ident, i) for i in self.instance.get_email_fields()]
-
-
 @widgy.register
 class EmailUserHandler(EmailSuccessHandlerBase):
     editable = True
-    form = EmailUserHandlerForm
     tooltip = _("This widget can be used to send the user an email when they"
                 " fill out a form. You can customize the body of the email.")
+
+    @property
+    def form(self):
+        from widgy.contrib.form_builder.forms import EmailUserHandlerForm
+        return EmailUserHandlerForm
 
     # an input in our form
     to_ident = models.CharField(_('to'), max_length=36)
@@ -633,10 +623,6 @@ class BaseFormField(FormElement):
         return []
 
 
-class FormFieldForm(forms.ModelForm):
-    help_text = MiniCKEditorField(label=_('help text'), required=False)
-
-
 @python_2_unicode_compatible
 class FormField(StrDisplayNameMixin, BaseFormField):
     widget = None
@@ -648,7 +634,10 @@ class FormField(StrDisplayNameMixin, BaseFormField):
     # associates instances of the same logical field across versions
     ident = UUIDField()
 
-    form = FormFieldForm
+    @property
+    def form(self):
+        from widgy.contrib.form_builder.forms import FormFieldForm
+        return FormFieldForm
 
     class Meta:
         abstract = True
@@ -675,26 +664,18 @@ class FormField(StrDisplayNameMixin, BaseFormField):
         return unicode(value)
 
 
-class FormInputForm(FormFieldForm):
-    class Meta:
-        fields = (
-            'type',
-            'required',
-            'label',
-            'help_text',
-        )
-
-
 @widgy.register
 class FormInput(FormField):
-    FORMFIELD_CLASSES = {
-        'text': forms.CharField,
-        'number': forms.IntegerField,
-        'email': forms.EmailField,
-        'tel': PhoneNumberField,
-        'checkbox': forms.BooleanField,
-        'date': forms.DateField,
-    }
+    def FORMFIELD_CLASSES(self):
+        from .forms import PhoneNumberField
+        return {
+            'text': forms.CharField,
+            'number': forms.IntegerField,
+            'email': forms.EmailField,
+            'tel': PhoneNumberField,
+            'checkbox': forms.BooleanField,
+            'date': forms.DateField,
+        }
 
     FORM_INPUT_TYPES = (
         ('text', _('Text')),
@@ -706,7 +687,12 @@ class FormInput(FormField):
     )
 
     formfield_class = forms.CharField
-    form = FormInputForm
+
+    @property
+    def form(self):
+        from widgy.contrib.form_builder.forms import FormInputForm
+        return FormInputForm
+
 
     type = models.CharField(choices=FORM_INPUT_TYPES, max_length=255, verbose_name=_('type'))
 

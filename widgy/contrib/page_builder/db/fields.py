@@ -10,8 +10,6 @@ from django.utils.translation import ugettext_lazy as _
 from filer.fields.file import FilerFileField
 from filer.models.filemodels import File
 
-from widgy.contrib.page_builder.forms import MarkdownField as MarkdownFormField, MarkdownWidget
-
 from south.modelsinspector import add_introspection_rules
 
 add_introspection_rules([], ["^widgy\.contrib\.page_builder\.db\.fields\.MarkdownField"])
@@ -21,6 +19,7 @@ add_introspection_rules([], ["^widgy\.contrib\.page_builder\.db\.fields\.ImageFi
 
 class MarkdownField(models.TextField):
     def formfield(self, **kwargs):
+        from widgy.contrib.page_builder.forms import MarkdownField as MarkdownFormField, MarkdownWidget
         defaults = {
             'form_class': MarkdownFormField,
             'widget': MarkdownWidget,
@@ -41,6 +40,7 @@ class VideoUrl(unicode):
     @property
     def video_id(self):
         return self.regex.group('id')
+
 
 class YoutubeUrl(VideoUrl):
     @property

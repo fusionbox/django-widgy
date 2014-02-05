@@ -6,6 +6,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.contrib.staticfiles import finders
 from django.template.loader import render_to_string
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
 import bleach
 from scss import Scss
@@ -156,3 +157,7 @@ class MiniCKEditorWidget(CKEditorWidget):
 
 class MiniCKEditorField(forms.CharField):
     widget = MiniCKEditorWidget
+
+
+class HtmlForm(forms.ModelForm):
+    content = CKEditorField(required=False, label=_('Content'))
