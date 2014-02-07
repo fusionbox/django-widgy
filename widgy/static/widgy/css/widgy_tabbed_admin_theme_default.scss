@@ -1,0 +1,91 @@
+
+// Theme
+.widgy {
+  .tabbed {
+    > .widget > .nodeChildren {
+      margin-top: 1em;
+      padding-left: 1em;
+
+      > li {
+        margin: 0;
+
+        &.node {
+          @include rounded(4px 4px 0px 0px);
+          background: #dddddd !important;
+          border-color: #cccccc;
+          border-width: 1px 1px 0px 1px;
+          color: #999999;
+          margin-right: -1px;
+          padding: 0 5px;
+
+          &.active {
+            background-color: #f8f8f8 !important;
+            color: #555555;
+            
+    
+            &.section > .widget > .drag-row {
+              padding: 2px 60px 2px 2px;
+      
+               button {
+                position: absolute;
+                top: 3px;
+        
+                &.delete {
+                  right: 3px;
+                }
+        
+                &.edit {
+                  right: 29px;
+                }
+              }
+            }
+          }
+
+          &:hover {
+            background-color: white !important;
+          }
+
+          .widget {
+            background: transparent !important;
+
+            .drag-row {
+              @include rounded(0px);
+              background: transparent !important;
+
+              span.title {
+                color: inherit;
+              }
+
+              .edit span, // functionality for editing the tab doesn't exist yet.
+              .delete span {
+                display: none;
+              }
+
+              .preview {
+                background: transparent;
+                display: inline;
+              }
+            }
+          }
+        }
+
+        &.node_drop_target {
+          height: 24px !important;
+          // don't let the drop here? text spill out
+          overflow: hidden;
+
+          &.active {
+            // we don't want the drop targets to grow taller.
+            padding: 0 1em;
+          }
+        }
+      }
+    }
+
+    > .widget > .current {
+      border-top: 2px solid #cccccc;
+      clear: left;
+      float: left;
+    }
+  }
+}

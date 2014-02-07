@@ -47,6 +47,8 @@ define([
    * EditorView will close if that element is clicked.
    */
   var EditorView = form.FormView.extend({
+    className: 'widget_editor',
+
     events: Backbone.extendEvents(form.FormView, {
       'click .cancel': 'close'
     }),
