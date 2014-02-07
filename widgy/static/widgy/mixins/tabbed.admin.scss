@@ -1,4 +1,4 @@
-@import "widgy_common";
+@import "/widgy/css/widgy_common";
 
 // Layout
 .widgy {
@@ -44,5 +44,5 @@
   }
 }
 
-@import "widgy_tabbed_admin_theme_default.scss";
+@import "tabbed-theme.admin.scss";
 

@@ -152,21 +152,9 @@ TEMPLATE_DIRS = (
 
 WIDGY_ROOT = imp.find_module('widgy')[1]
 
-SCSS_IMPORTS = STATICFILES_DIRS + (
-    os.path.join(WIDGY_ROOT, 'static', 'widgy', 'css'),
-)
-
 COMPRESS_ENABLED = True
 COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', 'python -mscss.tool --no-compress'
-                    ' --assets-root={assets_path}'
-                    ' --static-root={static_path}'
-                    ' --load-path={load_paths}'.format(
-                        load_paths=','.join(['"%s"' % d for d in SCSS_IMPORTS]),
-                        assets_path=os.path.join(BASE_DIR, 'static', 'assets'),
-                        static_path='widgy/static/',
-                        )
-                    ),
+    ('text/x-scss', 'django_pyscss.compressor.DjangoScssFilter'),
 )
 
 INTERNAL_IPS = (
