@@ -1,0 +1,8 @@
+{% load widgy_tags %}
+<div class="homeBox">
+  <p class="title">{{ self.title }}</p>
+
+  {% for child in self.get_children %}
+  {% render child %}
+  {% endfor %}
+</div>

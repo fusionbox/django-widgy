@@ -1,0 +1,6 @@
+{% load widgy_tags %}
+<section class="homeBoxes">
+  {% for child in self.get_children %}
+  {% render child %}
+  {% endfor %}
+</section>
