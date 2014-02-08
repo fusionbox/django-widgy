@@ -6,9 +6,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+
+  {% block metadata %}
+  <title>{% block title %}Project name{% endblock %}</title>
   <meta name="description" content="{% block seo_description %}{% endblock %}" />
   <meta name="keywords" content="{% block seo_keywords %}{% endblock %}" />
-  <title>{% block title %}Project name{% endblock %}</title>
+  {% endblock %}
 
   <link href='//fonts.googleapis.com/css?family=Roboto:400,400italic,700italic,700,300,300italic' rel='stylesheet' type='text/css'>
 
