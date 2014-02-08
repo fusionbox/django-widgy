@@ -42,7 +42,7 @@
     <div>
       <a class="title" href="/">Widgy Demo</a>
       <nav>
-        {% page_menu 'pages/menus/top_nav.html' %}
+        {% page_menu 'pages/menus/dropdown.html' %}
       </nav>
     </div>
   </header>
@@ -50,14 +50,12 @@
   <section class="content">
     <div class="inner">
 
-      <nav>
-        <div class="panel tree">{% page_menu "pages/menus/tree.html" %}</div>
-      </nav>
+      {% block leftnav %}
+      {% page_menu "pages/menus/leftnav.html" %}
+      {% endblock %}
 
       <article>
         {% block content %}
-          {% block leftnav %}
-          {% endblock %}
         {% endblock %}
       </article>
 

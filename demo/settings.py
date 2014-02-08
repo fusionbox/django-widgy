@@ -168,6 +168,12 @@ INTERNAL_IPS = (
     '208.186.142.130',
 )
 
+PAGE_MENU_TEMPLATES = (
+    (1, "Top Nav", "pages/menus/dropdown.html"),
+    (2, "Left Nav", "pages/menus/leftnav.html"),
+    (3, "Footer", "pages/menus/footer.html"),
+)
+
 ADMIN_MENU_ORDER = [
     ('Widgy', (
         'pages.Page',
