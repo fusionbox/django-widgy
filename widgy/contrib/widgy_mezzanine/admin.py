@@ -24,9 +24,6 @@ WidgyPage = get_widgypage_model()
 
 
 class WidgyPageAdminForm(WidgyFormMixin, PageAdminForm):
-    class Meta:
-        model = WidgyPage
-
     def __init__(self, *args, **kwargs):
         super(WidgyPageAdminForm, self).__init__(*args, **kwargs)
         self.fields['publish_date'].help_text = _(
