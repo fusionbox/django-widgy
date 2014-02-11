@@ -666,6 +666,7 @@ class FormField(StrDisplayNameMixin, BaseFormField):
 
 @widgy.register
 class FormInput(FormField):
+    @property
     def FORMFIELD_CLASSES(self):
         from .forms import PhoneNumberField
         return {
