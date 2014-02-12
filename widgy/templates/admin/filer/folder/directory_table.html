@@ -15,7 +15,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for item in paginated_items.object_list %}
+        {% for item, item_perm in paginated_items.object_list %}
             {% if item.file_type == 'Folder' or item.file_type == 'DummyFolder' %}{% with item as subfolder%}
             <tr class="{% cycle rowcolors %}">
                 <td>{% if select_folder and item.file_type == 'Folder' %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.pretty_logical_path }}'); return false;" >&nbsp;</a>{% else %}{% if action_form and item.pk and not is_popup %}<input type="checkbox" class="action-select" value="folder-{{ item.pk }}" name="_selected_action" />{% endif %}{% endif %}</td>
