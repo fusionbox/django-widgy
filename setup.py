@@ -56,7 +56,7 @@ setup(
     author_email='programmers@fusionbox.com',
     description=__doc__,
     long_description=read('README.rst') + '\n\n' + read('CHANGELOG.rst'),
-    url='https://django-widgy.readthedocs.org/',
+    url='http://docs.wid.gy/',
     license='BSD',
     packages=[package for package in find_packages() if package.startswith('widgy')],
     install_requires=install_requires,

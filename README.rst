@@ -17,7 +17,7 @@ Widgy is available under the 2-clause BSD license. Contribute on github.
 Documentation
 -------------
 
-Read Widgy's documentation at http://django-widgy.readthedocs.org.
+Read Widgy's documentation at http://docs.wid.gy.
 
 Installation
 ------------
@@ -38,7 +38,7 @@ Design Philosophy
 -----------------
 
 Read about Widgy's data model at
-http://django-widgy.readthedocs.org/en/latest/design/data-model.html.
+http://docs.wid.gy/en/latest/design/data-model.html.
 
 
 Contributing
