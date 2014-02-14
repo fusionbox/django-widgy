@@ -3,6 +3,7 @@ Changelog
 
 0.1.6 (Not released yet)
 ------------------------
+* Fix migrations containing unsupported KeywordsField from mezzanine [Scott Clark]
 
 
 0.1.5 (2013-11-23)

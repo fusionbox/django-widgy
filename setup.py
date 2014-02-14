@@ -36,7 +36,7 @@ install_requires = [
 
 STAGE = 'final'
 
-version = (0, 1, 5, STAGE)
+version = (0, 1, 6, STAGE)
 
 
 def get_version():
