@@ -127,6 +127,16 @@ for ``text/x-scss``.
 
 syncdb; migrate
 
+With Django 1.6 you might get the following error::
+
+    django.core.exceptions.ImproperlyConfigured: COMPRESS_ROOT setting must be set
+
+This means that ``STATIC_ROOT`` is not set. In order to fix that, set
+``STATIC_ROOT`` in your ``settings.py``.
+It could be something like::
+
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 add urls::
 
     from django.conf.urls import patterns, include, url
