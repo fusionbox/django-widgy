@@ -1,6 +1,8 @@
-define([ 'widgy.backbone',
+define([ 'jquery',
+    'widgy.backbone',
     'text!./modal.html'
-    ], function(Backbone,
+    ], function($,
+      Backbone,
       modal_template
       ) {
 
