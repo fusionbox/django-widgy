@@ -14,6 +14,7 @@ from django.db import models
 from django.db.models import query
 from django.utils.http import urlencode
 from django.utils.functional import memoize
+from django.conf import settings
 
 try:
     from django.contrib.auth import get_user_model
@@ -168,13 +169,14 @@ class SelectRelatedManager(models.Manager):
 
 
 # Pending https://code.djangoproject.com/ticket/20806, Widgy's use of
-# select_template is very slow (calling it many times with a long list
-# of templates to choose from). Until it's fixed in Django, memoizing
-# select_template has the same effect. It's OK to do this always,
-# including DEBUG=False, because `memoize` doesn't cache exceptions. If
-# memoize did cache exceptions, new templates wouldn't be discovered
-# without restarting the server.
-select_template = memoize(select_template, {}, 1)
+# select_template is very slow (calling it many times with a long list of
+# templates to choose from). Until it's fixed in Django, memoizing
+# select_template has the same effect. This is only done when DEBUG=False,
+# because it requires restarting the server in order to reload the templates.
+# When developping, we want to be able to update the templates and see the
+# result right away.
+if not settings.DEBUG:
+    select_template = memoize(select_template, {}, 1)
 def render_to_string(template_name, dictionary=None, context_instance=None):
     """
     Loads the given template_name and renders it with the given dictionary as
