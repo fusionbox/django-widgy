@@ -16,7 +16,8 @@
   }
 
   .nodeChildren {
-    margin: 0;
+    clear: both;
+    margin: 0 !important; // mezzanine puts style on UL
     padding: 0;
 
     li {

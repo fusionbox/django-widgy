@@ -1,7 +1,8 @@
 @import "widgy_common.scss";
+$font-default: "Open Sans", Arial, Helvetica, sans-serif;
 
 .widgy {
-  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  font-family: $font-default;
   font-size: 12px;
   
   .editor {
@@ -87,7 +88,7 @@
 // Root Node
 .widgy section.node {
   > .widget > .drag-row > .title {
-    font-family: "Open Sans";
+    font-family: $font-default;
     font-size: 2.4em;
     padding: 5px 0;
   }
@@ -173,7 +174,7 @@
     span.icon-move {
       color: #999999;
       font-size: 20px;
-      margin-top: 0px;
+      margin-top: 8px;
     }
 
     span.title {
@@ -196,17 +197,40 @@
 
 // EditorView
 .widgy .widget_editor {
-  div {
+  @include clearfix;
+  @include default;
+  padding-bottom: 15px;
+  
+  form > div,
+  > div {
     @include clearfix;
+    @include default;
+    clear: both;
     padding: 0px;
     position: relative;
   }
 
   .formField {
     margin-bottom: 10px;
+    
+    > div {
+      @include clearfix;
+      @include default;
+      clear: both;
+      
+      &.pagedown-buttonbar {
+        padding: 0px 0px 10px 0px;
+      }
+      
+      &.pagedown-preview {
+        border-top: 1px dotted $lightgrey;
+        margin-top: 15px;
+        padding: 10px 0px 0px 0px;
+      }
+    }
 
     select {
-      width: 212px;
+      width: 50%;
     }
 
     &.required {
@@ -254,13 +278,15 @@
   }
 
   #{$inputFields} {
-    font-family: "Open Sans", Helvetica, Arial, sans-serif;
     @include rounded(3px);
     @include inset-shadow($black10,0px,1px,2px);
     border: 1px solid $lightgrey;
+    font-family: $font-default;
+    font-size: 13px;
     font-weight: normal !important;
     height: auto;
-    padding: 6px 4px 5px;
+    padding: 5px 1%;
+    width: 48%;
   }
 
   input {
@@ -285,13 +311,16 @@
   }
 
   textarea {
+    clear: both;
     max-width: 98.5%;
     height: 120px;
     width: 98.5%;
   }
   
   select {
-    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+    font-family: $font-default;
+    font-size: 13px;
+    font-weight: normal;
   }
 
   .cancel {
@@ -307,7 +336,7 @@
   input[type='submit'],
   a.pop_out {
     @include button;
-    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+    font-family: $font-default;
     margin-left: 10px;
     font-size: 11px;
     text-decoration: none;
@@ -316,7 +345,7 @@
 
   h1 {
     color: #535353;
-    font-family: "Open Sans";
+    font-family: $font-default;
     font-size: 32px;
     font-weight: 400;
     line-height: 38px;
@@ -352,7 +381,7 @@
 
   p.title {
     color: #353535;
-    font-family: "Open Sans";
+    font-family: $font-default;
     font-size: 22px;
     font-weight: 300;
     line-height: 28px;
@@ -360,6 +389,6 @@
 
   span.title {
     color: #353535;
-    font-family: "Open Sans";
+    font-family: $font-default;
   }
 }
