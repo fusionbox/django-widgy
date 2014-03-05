@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url
 from django.utils.functional import cached_property
 
 from widgy.site import WidgySite
-from widgy.views import HistoryView
+from widgy.views import HistoryView, RevertView
 
 from .views import (
     ApproveView,
@@ -47,3 +47,8 @@ class ReviewedWidgySite(WidgySite):
     def history_view(self):
         return HistoryView.as_view(
             site=self, template_name='review_queue/history.html')
+
+    @cached_property
+    def revert_view(self):
+        return RevertView.as_view(
+            site=self, template_name='review_queue/revert.html')
