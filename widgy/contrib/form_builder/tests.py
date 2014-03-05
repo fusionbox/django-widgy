@@ -337,6 +337,13 @@ class TestFormHandler(TestCase):
         from django.db.models import ProtectedError
         self.assertRaises(ProtectedError, self.to_field.delete)
 
+    def test_email_success_handler_handles_blank_to_attr(self):
+        email_handler = self.form.children['meta'].children['handlers'].add_child(widgy_site, EmailSuccessHandler)
+        email_handler.to = ''
+        email_handler.save()
+
+        self.assertEquals(email_handler.get_to_emails(self.form), [])
+
     def get_execute_args(self, form, data):
         request_factory = RequestFactory()
         request = request_factory.post(build_url('/', **{'from': '/'}), data)
