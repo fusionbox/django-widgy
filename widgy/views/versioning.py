@@ -200,6 +200,7 @@ class RevertView(PopupView, AuthorizedMixin, VersionTrackerMixin, FormView):
         kwargs['title'] = _('Revert Commit')
         kwargs['commit'] = self.object
         kwargs['tracker'] = self.object.tracker
+        kwargs['site'] = self.site
         kwargs = super(RevertView, self).get_context_data(**kwargs)
         kwargs['revert_url'] = self.site.reverse(
             self.site.revert_view,

@@ -1,0 +1,5 @@
+{% extends "widgy/revert.html" %}
+
+{% block popup-content %}
+  {% include "review_queue/_commit_form.html" with commit=object.working_copy action_url=revert_url %}
+{% endblock %}
