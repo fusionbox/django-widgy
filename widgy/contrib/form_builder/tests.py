@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.core import mail
 from django.utils import unittest
 from django.db import connection
+from django.core.files.base import ContentFile
 
 import mock
 
@@ -318,6 +319,22 @@ class TestFormHandler(TestCase):
 
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].to, ['2@example.com'])
+
+    def test_email_success_handler_include_attachments(self):
+        email_handler = self.form.children['meta'].children['handlers'].add_child(widgy_site, EmailSuccessHandler)
+        email_handler.to = '2@example.com'
+        email_handler.save()
+
+        request, form_obj = self.get_execute_args(self.form, {
+            self.to_field.get_formfield_name(): 'ignored@example.com',
+        })
+        form_obj.cleaned_data['file'] = ContentFile('foobar', name='asdf.txt')
+        email_handler.execute(request, form_obj)
+
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].attachments, [
+            ('asdf.txt', 'foobar', None),
+        ])
 
     def test_email_success_handler_to_pointer_works_after_being_committed(self):
         tracker = VersionTracker.objects.create(working_copy=self.form.node)

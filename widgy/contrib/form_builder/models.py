@@ -4,6 +4,7 @@ import csv
 import urllib
 import base64
 import hashlib
+import os.path
 
 from django.db import models
 from django import forms
@@ -17,6 +18,8 @@ from django.template.loader import render_to_string
 from django.utils.functional import cached_property
 from django.utils.encoding import python_2_unicode_compatible
 from django.template.defaultfilters import truncatechars
+from django.core.files import File
+from django.core.files.storage import default_storage
 
 from django_extensions.db.fields import UUIDField
 import html2text
@@ -212,16 +215,6 @@ class WebToLeadMapperHandler(RepostHandler):
         return issubclass(cls, FieldMappingValue)
 
 
-def send_html_mail(subject, content, from_email, to):
-    msg = EmailMultiAlternatives(
-        subject=subject,
-        body=html2text.html2text(content),
-        from_email=from_email,
-        to=to)
-    msg.attach_alternative(content, 'text/html')
-    msg.send()
-
-
 class EmailSuccessHandlerBaseForm(forms.ModelForm):
     content = CKEditorField()
 
@@ -258,8 +251,21 @@ class EmailSuccessHandlerBase(StrDisplayNameMixin, FormSuccessHandler):
         })
 
     def execute(self, request, form):
-        message = self.format_message(request, form)
-        send_html_mail(self.subject, message, settings.SERVER_EMAIL, self.get_to_emails(form))
+        message_text = self.format_message(request, form)
+        msg = EmailMultiAlternatives(
+            subject=self.subject,
+            body=html2text.html2text(message_text),
+            from_email=settings.SERVER_EMAIL,
+            to=self.get_to_emails(form),
+        )
+        msg.attach_alternative(message_text, 'text/html')
+
+        if self.include_form_data:
+            for value in form.cleaned_data.values():
+                if isinstance(value, File):
+                    msg.attach(value.name, value.read(), getattr(value, 'content_type', None))
+
+        msg.send()
 
     def get_to_emails(self, form):
         raise NotImplemented
@@ -896,6 +902,31 @@ class Uncaptcha(BaseFormField):
     class Meta:
         verbose_name = _('uncaptcha')
         verbose_name_plural = _('uncaptchas')
+
+
+@widgy.register
+class FileUpload(FormField):
+    formfield_class = forms.FileField
+    storage = default_storage
+
+    def generate_filename(self, filename):
+        return os.path.join(
+            'form-uploads',
+            self.storage.get_valid_name(os.path.basename(filename))
+        )
+
+    def serialize_value(self, value):
+        filename = self.generate_filename(value.name)
+        filename = self.storage.save(filename, value)
+        return self.storage.url(filename)
+
+
+@widgy.register
+class ImageUpload(FileUpload):
+    formfield_class = forms.ImageField
+
+    class Meta:
+        proxy = True
 
 
 class FormSubmission(models.Model):
