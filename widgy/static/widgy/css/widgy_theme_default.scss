@@ -200,7 +200,7 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
   @include clearfix;
   @include default;
   padding-bottom: 15px;
-  
+
   form > div,
   > div {
     @include clearfix;
@@ -222,6 +222,22 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
         padding: 0px 0px 10px 0px;
       }
       
+      &.pagedown-preview {
+        border-top: 1px dotted $lightgrey;
+        margin-top: 15px;
+        padding: 10px 0px 0px 0px;
+      }
+    }
+
+    > div {
+      @include clearfix;
+      @include default;
+      clear: both;
+
+      &.pagedown-buttonbar {
+        padding: 0px 0px 10px 0px;
+      }
+
       &.pagedown-preview {
         border-top: 1px dotted $lightgrey;
         margin-top: 15px;
@@ -317,6 +333,12 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
     width: 98.5%;
   }
   
+  select {
+    font-family: $font-default;
+    font-size: 13px;
+    font-weight: normal;
+  }
+
   select {
     font-family: $font-default;
     font-size: 13px;
