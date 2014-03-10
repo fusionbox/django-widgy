@@ -25,7 +25,10 @@ class ParentChildRejection(InvalidTreeMovement):
     General exception for when a child rejects a parent or vice versa.
     """
     def __init__(self):
-        super(ParentChildRejection, self).__init__({'message': self.message})
+        # self.message gets passed within a list here because Django 1.6 doesn't
+        # support single strings being passed as error messages to ValidationError
+        # constructor. Once widgy stops supporting Django 1.6, this can be reverted.
+        super(ParentChildRejection, self).__init__({'message': [self.message]})
 
 
 class ParentWasRejected(ParentChildRejection):
