@@ -3,7 +3,7 @@
 .widgy {
   .tabbed {
     > .widget > .nodeChildren {
-      margin-top: 1em;
+      margin-top: 1em !important;
       padding-left: 1em;
 
       > li {
@@ -21,19 +21,18 @@
           &.active {
             background-color: #f8f8f8 !important;
             color: #555555;
-            
-    
+
             &.section > .widget > .drag-row {
               padding: 2px 60px 2px 2px;
-      
+
                button {
                 position: absolute;
                 top: 3px;
-        
+
                 &.delete {
                   right: 3px;
                 }
-        
+
                 &.edit {
                   right: 29px;
                 }
