@@ -1,5 +1,6 @@
 define([
     'underscore',
+    'jquery',
     'widgy.backbone',
     'lib/q',
     'nodes/nodes',
@@ -8,6 +9,7 @@ define([
     'templates'
     ], function(
       _,
+      $,
       Backbone,
       Q,
       nodes,

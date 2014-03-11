@@ -1,4 +1,4 @@
-define([ 'underscore', 'components/widget/component' ], function(_, widget) {
+define([ 'underscore', 'jquery', 'components/widget/component' ], function(_, $, widget) {
 
   var TableView = widget.View.extend({
     initialize: function() {
