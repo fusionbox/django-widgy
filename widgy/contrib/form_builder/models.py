@@ -574,7 +574,7 @@ class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Con
         """
         A dictionary of formfield name -> FormField widget
         """
-        ret = {}
+        ret = SortedDict()
         for child in self.depth_first_order():
             if isinstance(child, FormField):
                 ret[child.get_formfield_name()] = child
