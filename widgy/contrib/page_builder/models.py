@@ -14,7 +14,6 @@ from widgy.models.mixins import (
 from widgy.models.links import LinkField, LinkFormField, LinkFormMixin
 from widgy.db.fields import WidgyField
 from widgy.contrib.page_builder.db.fields import MarkdownField, VideoField, ImageField
-from widgy.contrib.page_builder.forms import CKEditorField
 from widgy.signals import pre_delete_widget
 from widgy.utils import build_url, SelectRelatedManager
 import widgy
@@ -102,15 +101,10 @@ class Markdown(Content):
         verbose_name_plural = _('markdowns')
 
 
-class HtmlForm(forms.ModelForm):
-    content = CKEditorField(required=False, label=_('Content'))
-
-
 @widgy.register
 class Html(Content):
     content = models.TextField(null=False, default='')
 
-    form = HtmlForm
     editable = True
     tooltip = _("Easily add text to your page with this widget. You can have"
                 " certain styles like bold or italic, but they won't break your"
@@ -119,6 +113,11 @@ class Html(Content):
     class Meta:
         verbose_name = _('HTML')
         verbose_name_plural = _('HTML editors')
+
+    @property
+    def form(self):
+        from widgy.contrib.page_builder.forms import HtmlForm
+        return HtmlForm
 
 
 @widgy.register
