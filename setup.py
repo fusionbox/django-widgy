@@ -21,7 +21,7 @@ install_requires = [
     # 1.6.
     'django_polymorphic==0.5.1',
     'South',
-    'PyScss == 1.1.5',
+    'django-pyscss',
     'six',
     'markdown',
     'bleach',
@@ -61,7 +61,6 @@ setup(
     packages=[package for package in find_packages() if package.startswith('widgy')],
     install_requires=install_requires,
     dependency_links=[
-        'http://github.com/fusionbox/pyScss/tarball/master#egg=pyscss-1.1.5',
         'http://github.com/chrisglass/django_polymorphic/tarball/master#egg=django_polymorphic-0.5.1',
     ],
     zip_safe=False,

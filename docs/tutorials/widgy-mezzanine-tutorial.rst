@@ -104,26 +104,18 @@ Configure django-compressor::
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     )
+
     COMPRESS_ENABLED = True
 
-add Widgy scss includes::
-
-    import imp
-    WIDGY_ROOT = imp.find_module('widgy')[1]
-    SCSS_IMPORTS = (
-        os.path.join(WIDGY_ROOT, 'static', 'widgy', 'css'),
-    )
-
-**Note:** Please put this before you define the ``COMPRESS_PRECOMPILERS``::
-
     COMPRESS_PRECOMPILERS = (
-        ('text/x-scss', 'python -mscss.tool -C %s' %
-         ' '.join(['-I "%s"' % d for d in SCSS_IMPORTS])
-         ),
+        ('text/x-scss', 'django_pyscss.compressor.DjangoScssFilter'),
     )
 
-Widgy requires that django-compressor be configured with a precompiler
-for ``text/x-scss``.
+.. note::
+
+    Widgy requires that django-compressor be configured with a precompiler
+    for ``text/x-scss``.  Widgy uses the django-pyscss_ package for easily
+    integrating the pyScss_ library with Django.
 
 syncdb; migrate
 
@@ -205,3 +197,7 @@ then set ``URLCONF_INCLUDE_CHOICES`` to a list of allowed urlpatterns. For examp
     URLCONF_INCLUDE_CHOICES = (
         ('blog.urls', 'Blog'),
     )
+
+
+.. _django-pyscss: https://github.com/fusionbox/django-pyscss
+.. _pyScss: https://github.com/Kronuz/pyScss
