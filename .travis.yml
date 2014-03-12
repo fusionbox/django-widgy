@@ -36,11 +36,6 @@ install: |
       pip install -q --use-mirrors psycopg2
     fi
     pip install --use-mirrors .
-
-    if echo "$DJANGO_PACKAGE" | grep -q '1.6.x'
-    then
-      pip install --use-mirrors -e git://github.com/fusionbox/mezzanine@69acbfd#egg=mezzanine
-    fi
     pip freeze
   fi
 before_script:
