@@ -96,6 +96,13 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
   > .widget > .nodeChildren {
     padding-left: 1em;
   }
+  
+
+  &:first-child > .widget > p.drag-row button {
+    float: none;
+    position: relative;
+    top: -5px;
+  }
 }
 
 // Dragging
@@ -331,6 +338,10 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
     max-width: 98.5%;
     height: 120px;
     width: 98.5%;
+    
+    + span.cke {
+      clear: both !important;
+    }
   }
 
   select {
@@ -413,4 +424,10 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
     color: #353535;
     font-family: $font-default;
   }
+}
+
+
+// Ckeditor Fix
+input.cke_dialog_ui_input_text, input.cke_dialog_ui_input_password, textarea.cke_dialog_ui_input_textarea {
+  height: auto !important; // fixes the tiny URL window in ckeditor link popup
 }
