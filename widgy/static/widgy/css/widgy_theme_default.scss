@@ -427,7 +427,10 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
 }
 
 
-// Ckeditor Fix
 input.cke_dialog_ui_input_text, input.cke_dialog_ui_input_password, textarea.cke_dialog_ui_input_textarea {
   height: auto !important; // fixes the tiny URL window in ckeditor link popup
+}
+
+.change-form div.submit-row {
+  z-index: 100; // fixes the mezzanine action bar floating under the widgy shelf
 }
