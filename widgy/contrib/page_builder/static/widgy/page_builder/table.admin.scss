@@ -1,4 +1,4 @@
-@import "widgy_common.scss";
+@import "/widgy/css/widgy_common.scss";
 
 $table-cell-min-width: 120px;
 
@@ -26,5 +26,5 @@ $table-cell-min-width: 120px;
   }
 }
 
-@import "widgy_table_admin_theme_default.scss";
+@import "table-theme.admin.scss";
 
