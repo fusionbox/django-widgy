@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "dependencies": {
-    "jsdom": "~0.3.4",
+    "jsdom": "~0.10.3",
     "requirejs": "~2.1.4",
     "chai": "~1.4.2",
     "sinon": "~1.7.1"
