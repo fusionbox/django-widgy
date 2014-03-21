@@ -6,15 +6,15 @@ env:
   global:
     - SOUTH_TESTS_MIGRATE=1
   matrix:
-    - DATABASE_ENGINE=sqlite DJANGO_PACKAGE=Django==1.5.1
+    - DATABASE_ENGINE=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.5.x.zip
     - DATABASE_ENGINE=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
-    - DATABASE_ENGINE=sqlite DJANGO_PACKAGE=Django==1.4.5
-    - DATABASE_ENGINE=postgres DJANGO_PACKAGE=Django==1.5.1
+    - DATABASE_ENGINE=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.4.x.zip
+    - DATABASE_ENGINE=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.5.x.zip
     - DATABASE_ENGINE=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
-    - DATABASE_ENGINE=postgres DJANGO_PACKAGE=Django==1.4.5
-    - DATABASE_ENGINE=mysql DJANGO_PACKAGE=Django==1.5.1
+    - DATABASE_ENGINE=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.4.x.zip
+    - DATABASE_ENGINE=mysql DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.5.x.zip
     - DATABASE_ENGINE=mysql DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
-    - DATABASE_ENGINE=mysql DJANGO_PACKAGE=Django==1.4.5
+    - DATABASE_ENGINE=mysql DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.4.x.zip
 matrix:
   include:
     - python: "2.7"
@@ -36,10 +36,9 @@ install: |
       pip install -q --use-mirrors psycopg2
     fi
     pip install --use-mirrors .
-
-    if echo "$DJANGO_PACKAGE" | grep -q '1.6.x'
+    if echo "$DJANGO_PACKAGE" | grep -q '1.4.x'
     then
-      pip install --use-mirrors -e git://github.com/fusionbox/mezzanine@69acbfd#egg=mezzanine
+      pip install --use-mirrors -e git://github.com/stephenmcd/mezzanine@5dde99cd68b3ce5118b68#egg=mezzanine
     fi
     pip freeze
   fi

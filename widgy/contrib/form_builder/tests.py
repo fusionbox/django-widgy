@@ -328,12 +328,12 @@ class TestFormHandler(TestCase):
         request, form_obj = self.get_execute_args(self.form, {
             self.to_field.get_formfield_name(): 'ignored@example.com',
         })
-        form_obj.cleaned_data['file'] = ContentFile('foobar', name='asdf.txt')
+        form_obj.cleaned_data['file'] = ContentFile(b'foobar', name='asdf.txt')
         email_handler.execute(request, form_obj)
 
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].attachments, [
-            ('asdf.txt', 'foobar', None),
+            ('asdf.txt', b'foobar', None),
         ])
 
     def test_email_success_handler_to_pointer_works_after_being_committed(self):
