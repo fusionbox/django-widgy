@@ -127,11 +127,11 @@ define(['jquery'], function($) {
     }());
 
     // Dirty business
-    var ie = navigator.appName === 'Microsoft Internet Explorer';
+    var ie = window.navigator.appName === 'Microsoft Internet Explorer';
     var ieversion;
 
     if(ie){
-        ieversion = parseFloat(navigator.appVersion.split("MSIE")[1]);
+        ieversion = parseFloat(window.navigator.appVersion.split("MSIE")[1]);
     }
 
     // Class FixToContainer
