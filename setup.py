@@ -25,7 +25,7 @@ install_requires = [
     'six',
     'markdown',
     'bleach',
-    'django-compressor',
+    'django-compressor>=1.3',
     'django-extensions',
     'beautifulsoup4',
     'sorl-thumbnail==11.12',
