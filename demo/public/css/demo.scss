@@ -16,21 +16,21 @@ $black30: rgba(0,0,0,0.3);
 $black20: rgba(0,0,0,0.2);
 $black10: rgba(0,0,0,0.1);
 
-$darkblue: #001a2e;
-$blue: #005596;
-$lightblue: #1c9ad6;
-$green: #82c054;
-$orange: #f26522;
-$purple: #662d91;
+$darkblue: #152030;
+$blue: #243854;
+$lightblue: #184C88;
+$green: #78E3C6;
+$orange: #F26304;
 $red: #b8292f;
 $yellow: #faa61a;
 
-$darkgrey: #423a3a;
+$darkgrey: #424242;
 $grey: #7a7b7b;
 $lightgrey: #babbbb;
+$reallylightgrey: #ededed;
 $almostwhite: #e5e5e5;
 
-$font-primary: "Roboto", Helvetica, Arial, sans-serif;
+$font-primary: "Lato", "Arial Black", Helvetica, Arial, sans-serif;
 $font-default: "Roboto", Helvetica, Arial, sans-serif;
 $font-mono: monospace;
 
@@ -44,28 +44,46 @@ $inputFields: "input[type='text'], input[type='password'], input[type='email'], 
 ------------------------------------------------------*/
 
 @mixin button {
-  @include gradient(darken($green,10%),darken($green,5%));
-  @include rounded(3px);
-  @include shadow($black30,0px,3px,5px);
+  @include gradient($lightgrey,$almostwhite);
+  @include rounded(5px);
+  @include shadow($black30,0px,2px,1px);
+  @include text-shadow(white,0px,1px,0px);
   @include transition;
   border: 0px;
-  color: white;
-  cursor: pointer;
+  border-top: 1px solid white;
+  border-bottom: 1px solid darken($grey,10%);
+  color: black;
   display: inline-block;
-  font-size: 16px;
-  font-weight: bold;
-  line-height: 16px;
+  font-family: $font-primary;
+  font-size: 20px;
+  line-height: 20px;
+  height: auto;
+  letter-spacing: 2px;
   margin: 0px;
-  padding: 5px 12px;
+  outline: 0px;
+  padding: 12px 18px;
   position: relative;
-  text-decoration: none;
   top: 0px;
-
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  width: auto;
+  
   &:hover {
-    @include gradient(darken($green,5%),$green);
-    @include shadow($black30,0px,1px,2px);
+    @include shadow($black10,0px,6px,8px);
+    background: $almostwhite;
     position: relative;
-    top: 2px;
+    top: -3px;
+  }
+  
+  &.block {
+    display: block;
+  }
+  
+  &.big {
+    font-size: 24px;
+    line-height: 24px;
+    padding: 18px 24px;
   }
 }
 
@@ -207,6 +225,31 @@ html, body {
   line-height: 18px;
 }
 
+body {
+  padding-top: 98px;
+  
+  &.bop-it {
+    header {
+      a.logo {
+        height: 33px;
+        top: 13px;
+        width: 91px;
+      }
+      
+      nav {
+        ul {
+          li {
+            a {
+              padding-bottom: 20px;
+              padding-top: 20px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 div.adapt {
   transition: all 0.25s ease 0s;
     -o-transition: all 0.25s ease 0s;
@@ -246,43 +289,106 @@ section.mobile {
 header {
   @include clearfix;
   @include shadow($black30,0px,1px,3px);
+  @include transition(all 0.5s ease 0s);
   @include wrapper;
   background: $green url('../img/bg.jpg');
-  padding: 30px 0px;
-
+  left: 0px;
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  z-index: 3000;
+  
+  a.logo {
+    @include transition(all 0.5s ease 0s);
+    background: $orange;
+    color: white;
+    display: inline-block;
+    float: none;
+    font-family: $font-primary;
+    font-weight: bold;
+    font-size: 30px;
+    height: 67px;
+    left: 0px;
+    letter-spacing: 7px;
+    line-height: 30px;
+    margin: 0;
+    overflow: hidden;
+    position: absolute;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    top: 15px;
+    width: 184px;
+    z-index: 3000;
+  
+    > img {
+      @include transition(all 0.5s ease 0s);
+      display: block;
+      height: auto;
+      left: 0px;
+      position: absolute;
+      top: 0px;
+      width: 100%;
+    
+      &.logo {
+        z-index: 20;
+      }
+    
+      &.frame {
+        z-index: 15;
+      }
+    
+      &.fill {
+        z-index: 10;
+      }
+    }
+  }
+  
   > div {
     @include clearfix;
     @include inner;
     color: white;
-
-    span.title {
-      @include text-shadow($black10,0px,-1px,0px);
-      float: left;
-      font-size: 30px;
-      line-height: 40px;
-      font-weight: bold;
-    }
+    display: block;
+    height: auto;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
+    max-width: $width;
 
     nav {
+      display: inline;
       float: right;
-      width: 70%;
-
+      position: relative;
+      right: 0px;
+      text-align: right;
+    
       ul {
+        display: block;
         list-style: none;
-        margin: 0px;
-        padding: 0px;
+        margin: 0;
+        padding: 0;
         text-align: right;
-
+        
         li {
-          display: inline-block;
-          width: auto;
-
+          display: inline;
+    
           a {
-            color: white;
-            font-size: 14px;
+            @include transition(all 0.5s ease 0s);
+            color: $darkblue;
+            display: inline;
+            font-family: $font-primary;
             font-weight: bold;
-            line-height: 40px;
+            float: right;
+            padding: 40px 30px;
+            text-decoration: none;
             text-transform: uppercase;
+      
+            &:hover,
+            &.here {
+              background: $black10;
+              padding-left: 40px;
+              padding-right: 40px;
+            }
           }
         }
       }
@@ -309,6 +415,23 @@ section.content {
     float: left;
     margin-top: 15px;
     width: 160px;
+    
+    p.title {
+      color: $darkgrey;
+      font-size: 18px;
+      line-height: 26px;
+      margin-bottom: 15px;
+      
+      a {
+        @include transition;
+        color: $blue;
+        text-decoration: none;
+        
+        &:hover {
+          color: lighten($blue,15%);
+        }
+      }
+    }
 
     ul {
       border-top: 1px dotted $lightgrey;
@@ -373,8 +496,7 @@ section.content {
       div.callout {
         @include rounded(2px);
         @include inset-shadow($black10,0px,2px,2px);
-        background: lighten($almostwhite,7%);
-        border: 1px solid $lightgrey;
+        background: lighten($almostwhite,3%);
         margin: 0px 0px 15px 0px;
         padding: 15px;
 
@@ -414,6 +536,111 @@ section.content {
     }
   }
 }
+
+/* Homepage Content
+------------------------------------------------------*/
+
+body.home {
+  section.content {
+    padding: 0 0 50px 0;
+    
+    .inner {
+      width: 100%;
+      
+      article {
+        @include shadow(transparent,0,0,0);
+        @include rounded(0px);
+        background: transparent;
+        padding: 0;
+        width: 100%;
+        
+        div.cycle-slideshow {
+          height: 400px;
+          margin: 0 0 25px 0;
+          overflow: hidden;
+          position: relative;
+          width: 100%;
+          
+          div.slide {
+            @include html;
+            @include text-shadow();
+            background-size: cover !important;
+            color: white;
+            height: 400px;
+            text-align: center;
+            width: 100%;
+            
+            h1 {
+              font-family: $font-primary;
+              font-size: 50px;
+              font-weight: bold;
+              line-height: 60px;
+              margin: 75px auto 15px auto !important;
+              padding-bottom: 15px;
+              max-width: $width;
+            }
+            
+            p {
+              font-size: 18px;
+              line-height: 24px;
+            }
+          }
+        }
+        
+        section.homeBoxes {
+          @include clearfix;
+          @include inner;
+          width: $width;
+          
+          div.homeBox {
+            @include rounded(3px);
+            @include shadow($black30,0px,1px,3px);
+            background: white;
+            display: inline;
+            height: auto;
+            margin: 0 0 0 30px;
+            float: left;
+            padding: 25px;
+            width: 250px;
+            
+            p.title {
+              border-bottom: 2px solid $orange;
+              font-size: 24px;
+              padding-bottom: 15px;
+            }
+            
+            &:first-child,
+            &:nth-child(3n+1) {
+              margin-left: 0;
+            }
+            
+            a.button {
+              clear: both;
+              display: block;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+}
+
+/* Footer
+------------------------------------------------------*/
+
+footer {
+  @include inset-shadow($black10,0px,2px,4px);
+  padding: 30px 0px;
+  text-align: center;
+  
+  a {
+    color: $grey;
+    margin: 0 10px;
+    text-decoration: none;
+  }
+}
+
 
 /* Accordion
 ------------------------------------------------------*/
@@ -473,20 +700,22 @@ div.tabify {
 
       a {
         @include rounded(3px 3px 0px 0px);
-        background: darken($orange,15%);
+        background: $blue;
         color: white;
         display: block;
-        font-size: 15px;
+        font-family: $font-primary;
+        font-size: 13px;
         line-height: 20px;
         padding: 8px 10px;
         text-decoration: none;
+        text-transform: uppercase;
 
         &:hover {
-          background: lighten($orange,10%);
+          background: lighten($blue,15%);
         }
 
         &.active {
-          background: $orange;
+          background: $lightblue;
         }
       }
     }
@@ -496,9 +725,13 @@ div.tabify {
     @include html;
     @include rounded(3px);
     border: dashed 1px $lightgrey;
-    border-top: 3px solid $orange;
+    border-top: 3px solid $lightblue;
     clear: both;
     padding: 15px;
+    
+    > p.title {
+      display: none !important;
+    }
   }
 }
 
@@ -533,7 +766,7 @@ figure {
     }
 
     figcaption {
-      color: white;
+      color: $darkblue;
       display: block;
       font-size: 12px;
       font-style: italic;
@@ -621,6 +854,24 @@ table {
 
     > div {
       width: 90%
+    }
+  }
+  
+  header {
+    nav {
+      ul {
+        li {
+          a {
+            padding-left: 20px;
+            padding-right: 20px;
+            
+            &:hover {
+              padding-left: 30px;
+              padding-right: 30px;
+            }
+          }
+        }
+      }
     }
   }
 

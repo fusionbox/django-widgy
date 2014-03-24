@@ -13,7 +13,7 @@
   <meta name="keywords" content="{% block seo_keywords %}{% endblock %}" />
   {% endblock %}
 
-  <link href='//fonts.googleapis.com/css?family=Roboto:400,400italic,700italic,700,300,300italic' rel='stylesheet' type='text/css'>
+  <link href='//fonts.googleapis.com/css?family=Roboto:400italic,700italic,400,700|Lato:400,900,400italic,900italic' rel='stylesheet' type='text/css'>
 
   {% compress css %}
     {% block css %}
@@ -28,6 +28,7 @@
     {% block js %}
       <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
       <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+      <script type="text/javascript" src="{% static 'js/underscore-min.js' %}"></script>
       <script type="text/javascript" src="{% static 'js/demo.js' %}"></script>
       {% for js_file in 'WIDGY_MEZZANINE_SITE'|js_files %}
       <script src="{% static js_file %}"></script>
@@ -35,7 +36,7 @@
     {% endblock %}
   {% endcompress %}
 </head>
-<body>
+<body class="{% block bodyClass %}{% endblock %}">
   <div class="adapt">
   {% block body %}
 
@@ -43,7 +44,10 @@
 
   <header>
     <div>
-      <a class="title" href="/">Widgy Demo</a>
+      <a class="logo" href="#top">
+        <img class="logo" src="{% static 'img/logo-white.png' %}" alt="Widgy" />
+        <img class="frame" src="{% static 'img/logo-frame.png' %}" alt="" />
+      </a>
       <nav>
         {% page_menu 'pages/menus/dropdown.html' %}
       </nav>
