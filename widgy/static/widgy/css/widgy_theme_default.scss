@@ -1,4 +1,12 @@
 @import "widgy_common.scss";
+
+@mixin cursor($cursor, $fallback) {
+  cursor: $fallback;
+  cursor: $cursor;
+  cursor: -moz-#{$cursor};
+  cursor: -webkit-#{$cursor};
+}
+
 $font-default: "Open Sans", Arial, Helvetica, sans-serif;
 
 .widgy {
@@ -46,12 +54,17 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
     background: white;
     border: 1px solid #E0E0E0;
 
+    .draggable > .drag-row {
+      @include cursor(grab, pointer);
+    }
+    .being_dragged .drag-row {
+      @include cursor(grabbing, pointer);
+    }
+
     .drag-row {
       @include rounded(4px 4px 0px 0px);
       @include clearfix;
       @include gradient(#eee,#fff);
-      // TODO: cursor only for draggable nodes.
-      cursor: pointer;
       display: block;
       float: none;
       height: auto;
@@ -144,8 +157,8 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
     @include rounded(4px);
     @include shadow($black10,1px,1px,0px);
     @include inset-shadow(#ffffff,-1px,1px,0px);
+    @include cursor(grab, pointer);
     border: 1px solid #E0E0E0;
-    cursor: pointer;
     margin: 0 4px 4px 0;
     padding: 1px 1px 1px 1px;
     vertical-align: top;
@@ -163,6 +176,10 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
     span.icon-move {
       float: right;
       margin-top: 4px;
+    }
+
+    &.being_dragged {
+      @include cursor(grabbing, pointer);
     }
   }
 
