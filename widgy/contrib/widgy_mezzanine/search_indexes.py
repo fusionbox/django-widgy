@@ -14,6 +14,7 @@ class PageIndex(indexes.SearchIndex, indexes.Indexable):
     date = indexes.DateTimeField(model_attr='publish_date')
     description = indexes.CharField(model_attr='description')
     keywords = indexes.MultiValueField()
+    get_absolute_url = indexes.CharField(model_attr='get_absolute_url')
     text = indexes.CharField(document=True)
 
     def full_prepare(self, *args, **kwargs):
