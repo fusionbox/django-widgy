@@ -14,6 +14,7 @@
   {% endblock %}
 
   <link href='//fonts.googleapis.com/css?family=Roboto:400italic,700italic,400,700|Lato:400,900,400italic,900italic' rel='stylesheet' type='text/css'>
+  <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
   {% compress css %}
     {% block css %}
@@ -35,12 +36,15 @@
       {% endfor %}
     {% endblock %}
   {% endcompress %}
+
+  <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+  <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
 </head>
 <body class="{% block bodyClass %}{% endblock %}">
   <div class="adapt">
   {% block body %}
 
-  <section class="mobile"><a href="#">Menu</a></section>
+  <section class="mobile"><a href="#"><i class="fa fa-arrow-left"></i> Menu</a></section>
 
   <header>
     <div>
