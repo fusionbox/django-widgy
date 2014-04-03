@@ -220,6 +220,12 @@ class TestCore(RootNodeTestCase):
             self.assertEqual(widget.get_attributes(),
                              attributes)
 
+    def test_interesting_fields(self):
+        self.assertFalse(Bucket.has_interesting_fields())
+        # tricky -- multi-table inheritance
+        self.assertTrue(PickyBucket.has_interesting_fields())
+        self.assertTrue(RawTextWidget.has_interesting_fields())
+
 
 class TestRegistry(RootNodeTestCase):
     def setUp(self):
@@ -948,12 +954,13 @@ class TestPrefetchTree(RootNodeTestCase):
         with self.assertNumQueries(1):
             root_node = Node.objects.get(pk=self.root_node.pk)
 
-        # 4 queries:
+        # 2 queries:
         #  - get descendants of root_node
-        #  - get bucket contents
-        #  - get layout contents
         #  - get text contents
-        with self.assertNumQueries(4):
+        # Skipped because boring:
+        #  - # get bucket contents
+        #  - # get layout contents
+        with self.assertNumQueries(2):
             root_node.prefetch_tree()
 
         # maybe_prefetch_tree shouldn't prefetch the tree again
@@ -1019,11 +1026,12 @@ class TestPrefetchTree(RootNodeTestCase):
     def test_works_on_not_root_node(self):
         left_node = self.root_node.get_first_child()
 
-        # 3 queries:
+        # 2 queries:
         #  - get descendants
-        #  - get bucket contents
         #  - get text contents
-        with self.assertNumQueries(3):
+        # Not interesting:
+        #  - # get bucket contents
+        with self.assertNumQueries(2):
             left_node.prefetch_tree()
 
         with self.assertNumQueries(0):
@@ -1057,8 +1065,8 @@ class TestPrefetchTree(RootNodeTestCase):
         b = Node.objects.get(pk=self.root_node.pk)
 
         # a.get_descendants, b.get_descendants
-        # 3 contents
-        with self.assertNumQueries(5):
+        # 1 interesting content, 2 uninteresting
+        with self.assertNumQueries(3):
             Node.prefetch_trees(a, b)
 
         root_node_dfo = self.root_node.depth_first_order()
@@ -1069,6 +1077,19 @@ class TestPrefetchTree(RootNodeTestCase):
                              a.depth_first_order())
             self.assertEqual(a.depth_first_order(),
                              b.depth_first_order())
+
+    def test_prefetched_state_is_correct(self):
+        # optimization in attach_content_instances messes with _state
+        # for boring widgets, make sure that it works.
+        self.assertFalse(Bucket.has_interesting_fields())
+
+        bucket = Bucket.add_root(widgy_site)
+
+        node = Node.objects.get(pk=bucket.node.pk)
+        node.prefetch_tree()
+
+        # raises an exception on failure
+        node.content.validate_unique()
 
     def test_attach_content_instances(self):
         nodes = self.root_node.depth_first_order()

@@ -177,17 +177,30 @@ class Node(MP_Node):
         for content_type_id, content_ids in contents.iteritems():
             try:
                 ct = ContentType.objects.get_for_id(content_type_id)
-                model_class = ct.model_class()
+                ModelClass = ct.model_class()
             except AttributeError:
                 # get_for_id raises AttributeError when there's no model_class in django < 1.6.
-                model_class = None
-            if model_class:
-                contents[content_type_id] = ct.model_class().objects.in_bulk(content_ids)
-            else:
                 ct = ContentType.objects.get(id=content_type_id)
-                contents[content_type_id] = dict((id, UnknownWidget(ct, id)) for id in content_ids)
+                ModelClass = None
+
+            if ModelClass:
+                if not ModelClass.has_interesting_fields():
+                    # If ModelClass has no interesting fields (only a pk), we
+                    # can instantiate it directly
+                    instances = {}
+                    for pk in content_ids:
+                        instance = ModelClass(pk=pk)
+                        instance._state.adding = False
+                        instances[pk] = instance
+                else:
+                    instances = ModelClass.objects.in_bulk(content_ids)
+            else:
+                instances = dict((id, UnknownWidget(ct, id)) for id in content_ids)
                 # Warn about using an UnknownWidget. It doesn't matter which instance we use.
-                next(contents[content_type_id].itervalues(), UnknownWidget(ct, None)).warn()
+                next(instances.itervalues(), UnknownWidget(ct, None)).warn()
+
+            contents[content_type_id] = instances
+
         return contents
 
     @classmethod
@@ -823,6 +836,14 @@ class Content(models.Model):
 
     def equal(self, other):
         return self.get_attributes() == other.get_attributes()
+
+    @classmethod
+    def has_interesting_fields(cls):
+        """
+        False if our only field is our pk. This means if we already have
+        a pk value, we don't need to go to the db to make an instance.
+        """
+        return cls._meta.fields != [cls._meta.pk]
 
 
 class UnknownWidget(Content):

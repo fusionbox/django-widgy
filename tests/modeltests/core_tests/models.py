@@ -60,6 +60,9 @@ class CantGoAnywhereWidget(Content):
         return False
 
 
+# this intentially uses multi-table inheritance instead of proxying, see
+# TestCore.test_to_json_works_for_multi_table_inheritance and
+# TestCore.test_interesting_fields.
 class PickyBucket(Bucket):
     def valid_parent_of(self, cls, obj=None):
         if obj:
