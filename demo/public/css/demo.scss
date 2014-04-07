@@ -136,6 +136,55 @@ p {
   margin: 0px 0px 15px 0px;
 }
 
+ol, ul {
+  padding-left: 20px;
+}
+
+blockquote {
+  background: transparent;
+  padding: 5px 10px;
+  position: relative;
+  
+  p {
+    color: $grey;
+    quotes: "\201c" "\201d" "\2018" "\2019";
+    margin: 0 !important;
+    font-style: italic;
+    
+    &:before {
+      color: $orange;
+      content: open-quote;
+      font-family: serif;
+      font-size: 30px;
+      left: -10px;
+      position: absolute;
+      top: 5px;
+    }
+    
+    &:after {
+      color: $orange;
+      content: close-quote;
+      font-family: serif;
+      font-size: 30px;
+      position: absolute;
+      bottom: -5px;
+      right: -5px;
+    }
+  }
+}
+
+.align-right {
+  text-align: right;
+}
+
+.align-center {
+  text-align: center;
+}
+
+.align-justify {
+  text-align: justify;
+}
+
 /* Forms
 ------------------------------------------------------*/
 
@@ -145,7 +194,7 @@ form {
   border: 1px dashed $almostwhite;
   clear: both;
   margin-bottom: 20px;
-  padding: 20px;
+  padding: 20px
 
   div.formField {
     @include clearfix;
@@ -187,6 +236,13 @@ form {
       padding: 5px;
       width: 97.5%;
     }
+    
+    select {
+      @include rounded(2px);
+      @include inset-shadow($black10,0px,1px,3px);
+      padding: 5px;
+      width: 100%;
+    }
 
     ul, ol {
       list-style: none;
@@ -207,6 +263,10 @@ form {
         margin: 0 !important;
       }
     }
+  }
+  
+  input[type='submit'] {
+    margin-bottom: 0 !important;
   }
 }
 
@@ -579,12 +639,6 @@ section.content {
       float: left;
       height: auto;
       width: 525px;
-
-      th, td {
-        p {
-          margin: 0 !important;
-        }
-      }
     }
 
     section.sidebar {
@@ -633,6 +687,39 @@ section.content {
           margin-top: 10px;
           text-align: center;
         }
+      }
+    }
+    
+    /* HTML Fixes */
+    section.main,
+    section.sidebar {
+
+      th, td {
+        h1, h2, h3, h4, ul, p {
+          margin: 0 !important;
+        }
+      }
+      
+      blockquote {
+        p {
+          margin: 0 !important;
+        }
+      }
+      
+      iframe {
+        margin: 0 0 15px 0;
+        max-width: 100%;
+      }
+      
+      img {
+        height: auto;
+        max-width: 100%;
+      }
+      
+      > a.button {
+        @include clearfix;
+        float: right;
+        margin: 0 0 15px 15px;
       }
     }
   }
@@ -831,6 +918,7 @@ div.tabify {
     border: dashed 1px $lightgrey;
     border-top: 3px solid $lightblue;
     clear: both;
+    overflow: auto;
     padding: 15px;
     
     > p.title {
@@ -852,7 +940,6 @@ figure {
     @include rounded(3px);
     display: block;
     height: auto;
-    max-height: 150px;
     width: 100%;
   }
 
@@ -904,12 +991,14 @@ table {
   @include rounded(3px);
   border: 0px;
   overflow: hidden;
+  margin: 0 0 15px 0;
+  width: 100%;
 
   thead {
     th, td {
       background: $green;
       border: 0px;
-      color: white;
+      color: $darkblue;
       font-weight: bold;
       padding: 10px;
 
@@ -926,6 +1015,7 @@ table {
       color: $grey;
       font-weight: normal;
       padding: 5px 10px;
+      vertical-align: top;
 
       p {
         margin: 0 !important;
@@ -939,6 +1029,19 @@ table {
     }
   }
 }
+
+/* HTML
+------------------------------------------------------*/
+
+.htmlOutput {  
+  blockquote {
+    p {
+      margin: 0 !important;
+    }
+  }
+}
+
+
 /*------------------------------------------------------
 
   Responsive
