@@ -22,10 +22,9 @@ Read Widgy's documentation at http://docs.wid.gy.
 Installation
 ------------
 
-Widgy does not yet have a stable release, so it should be installed from
-source. ::
+Install with pip. ::
 
-    pip install -e git://github.com/fusionbox/django-widgy#egg=widgy
+    pip install django-widgy
 
 When developing Widgy, it might be handy to clone the repository then install
 it. ::
