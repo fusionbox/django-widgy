@@ -50,7 +50,7 @@ def get_version():
         return number + '-' + stdout.strip()[:8]
 
 setup(
-    name='widgy',
+    name='django-widgy',
     version=get_version(),
     author='Fusionbox, Inc.',
     author_email='programmers@fusionbox.com',
