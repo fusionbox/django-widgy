@@ -1,9 +1,10 @@
 Changelog
 =========
 
-0.1.6 (Not released yet)
+0.1.6 (2014-09-09)
 ------------------------
 * Fix migrations containing unsupported KeywordsField from mezzanine [Scott Clark]
+* Rename package to django-widgy
 
 
 0.1.5 (2013-11-23)
