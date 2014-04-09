@@ -18,6 +18,31 @@ Changelog
 
 .. _django-pyscss: https://github.com/fusionbox/django-pyscss
 
+0.1.6 (2014-09-09)
+------------------------
+* Fix migrations containing unsupported KeywordsField from mezzanine [Scott Clark]
+* Rename package to django-widgy
+
+
+0.1.5 (2013-11-23)
+------------------------
+
+* Fix Widgy migrations without Mezzanine [Gavin Wahl]
+* Drop target collision detection [Gavin Wahl]
+* Fix Figure and StrDisplayNameMixin [Gavin Wahl]
+* Avoid loading review_queue when it's not installed [Scott Clark]
+* Fix multi-table inheritance with LinkFields [Gavin Wahl]
+
+0.1.4 (2013-11-04)
+------------------
+
+* Add StrDisplayNameMixin
+
+0.1.3 (2013-10-25)
+------------------
+
+* Fix image widget validation with the S3 storage backend
+
 0.1.2 (2013-10-23)
 ------------------
 
