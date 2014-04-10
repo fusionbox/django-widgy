@@ -12,7 +12,7 @@ page and those parts know how to render themselves. Whereas a WYSIWYG
 stores its data in HTML, Widgy stores it in a Tree where each node can
 render itself.
 
-Widgy is available under the 2-clause BSD license. Contribute on github.
+Widgy is available under the Apache Version 2.0 license. Contribute on github.
 
 Documentation
 -------------

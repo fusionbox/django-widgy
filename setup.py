@@ -57,7 +57,6 @@ setup(
     description=__doc__,
     long_description=read('README.rst') + '\n\n' + read('CHANGELOG.rst'),
     url='http://docs.wid.gy/',
-    license='BSD',
     packages=[package for package in find_packages() if package.startswith('widgy')],
     install_requires=install_requires,
     dependency_links=[
@@ -70,7 +69,7 @@ setup(
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: Apache Software License',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Internet :: WWW/HTTP :: Site Management',
         'Natural Language :: English',
