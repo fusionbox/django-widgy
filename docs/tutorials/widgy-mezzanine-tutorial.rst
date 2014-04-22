@@ -201,3 +201,31 @@ then set ``URLCONF_INCLUDE_CHOICES`` to a list of allowed urlpatterns. For examp
 
 .. _django-pyscss: https://github.com/fusionbox/django-pyscss
 .. _pyScss: https://github.com/Kronuz/pyScss
+
+Adding Widgy to Mezzanine
+-------------------------
+If you are adding widgy to an existing mezzanine site, there are
+some additional considerations.
+
+If you have existing mezzanine RichTextPages, you will need
+to reregister it. Simply create an admin.py file in your directory
+and add this code::
+
+    from django.contrib import admin
+
+    from mezzanine.pages.admin import PageAdmin
+    from mezzanine.pages.models import RichTextPage
+
+    admin.site.register(RichTextPage, PageAdmin)
+
+If you have not done so already, add the root directory of your mezzanine
+install to INSTALLED_APPS.
+
+Also, take care when setting the WIDGY_MEZZANINE_SITE variable in your
+settings.py file. Because mezzanine is using an old Django directory structure,
+it uses your root directory as your project file::
+
+    # Use:
+    WIDGY_MEZZANINE_SITE = 'myproject.demo.widgy_site.site'
+    # Not:
+    WIDGY_MEZZANINE_SITE = 'demo.widgy_site.site'
