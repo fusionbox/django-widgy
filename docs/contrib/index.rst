@@ -11,3 +11,4 @@ functionality or widgets to Widgy.
     form-builder/index
     widgy-mezzanine/index
     review-queue/index
+    widgy-i18n/index
