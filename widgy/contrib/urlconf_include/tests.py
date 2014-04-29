@@ -141,3 +141,18 @@ class TestMiddleware(TestCase):
         r = self.get_request('/foo/nonexistentasdf/')
         resp = view_not_found(r)
         self.assertEqual(resp.status_code, 404)
+
+    def test_login_required_legit_404_shouldnt_redirect(self):
+        """
+        We should only redirect to login if there was no urlpattern that
+        matched, not for other types of 404s.
+        """
+        UrlconfIncludePage.objects.create(
+            slug='foo',
+            urlconf_name='django.contrib.auth.urls',
+            login_required=False,
+        )
+
+        r = self.get_request('/foo/login/')
+        resp = view_not_found(r)
+        self.assertEqual(resp.status_code, 404)

@@ -68,28 +68,36 @@ class PatchUrlconfMiddleware(object):
         # Our process_request may not have been called if another middleware's
         # process_request short circuited, so check first. This could still
         # leak if another middleware's process_response raises an exception.
-        if hasattr(request, 'urlconf'):
-            uncache_urlconf(request.urlconf)
-        if hasattr(request, '_patch_urlconf_middleware_urlconf'):
-            uncache_urlconf(request._patch_urlconf_middleware_urlconf)
         if response.status_code == 404 and not request.user.is_authenticated():
             # This 404 response might be because we never installed the
             # login_required urlpatterns. To be sure, try to resolve
             # the request's URL using just UrlconfIncludePages. If it
             # resolves, we know we need to redirect_to_login instead of
             # 404ing.
-            empty_urlconf = imp.new_module('urlconf')
-            empty_urlconf.urlpatterns = patterns('')
-            urlconf = self.get_urlconf(empty_urlconf, self.get_pages(logged_in=True))
             try:
-                urlresolvers.resolve(request.get_full_path(), urlconf)
+                # Only do something if it's a resolver 404 (the path doesn't
+                # resolve originally). BBB In django >= 1.5 we can use
+                # request.resolver_match.
+                urlresolvers.resolve(request.get_full_path(), request.urlconf)
             except urlresolvers.Resolver404:
-                pass
-            else:
-                from django.contrib.auth.views import redirect_to_login
-                return redirect_to_login(request.get_full_path())
-            finally:
-                uncache_urlconf(urlconf)
+                empty_urlconf = imp.new_module('urlconf')
+                empty_urlconf.urlpatterns = patterns('')
+                urlconf = self.get_urlconf(empty_urlconf, self.get_pages(logged_in=True))
+                try:
+                    urlresolvers.resolve(request.get_full_path(), urlconf)
+                except urlresolvers.Resolver404:
+                    pass
+                else:
+                    from django.contrib.auth.views import redirect_to_login
+                    response = redirect_to_login(request.get_full_path())
+                finally:
+                    uncache_urlconf(urlconf)
+
+        if hasattr(request, 'urlconf'):
+            uncache_urlconf(request.urlconf)
+        if hasattr(request, '_patch_urlconf_middleware_urlconf'):
+            uncache_urlconf(request._patch_urlconf_middleware_urlconf)
+
         return response
 
 
