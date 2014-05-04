@@ -47,6 +47,29 @@ class PageViewMixin(object):
                 content_model='widgypage',
             )
 
+    def page_view(self, request, page, context):
+        # Before Mezzanine==3.1.2, the page view would check extra_context for
+        # the page object, so we would pass it in then, starting with 3.1.2 and
+        # the introduction of mezzanine.pages.context_processors.page,
+        # Mezzanine expects the PageMiddleware to set page on the request. The
+        # context_processor will add the page and _current_page values to the
+        # context for us, but we are still passing it in for Mezzanine<=3.1.1.
+        if hasattr(page, 'page_ptr'):
+            # mezzanine.pages.middleware.PageMiddleware sticks a Page object,
+            # not a WidgyPage object, to the request so we also need to get the
+            # raw Page object.
+            page = page.page_ptr
+
+        request.page = page
+
+        extra_context = {
+            'page': page,
+            '_current_page': page,
+        }
+        extra_context.update(context)
+
+        return page_view(request, page.slug, extra_context=extra_context)
+
 
 class HandleFormView(HandleFormMixin, PageViewMixin, View):
     def get(self, request, *args, **kwargs):
@@ -61,11 +84,12 @@ class HandleFormView(HandleFormMixin, PageViewMixin, View):
         root_node = self.form_node.get_root()
         page = self.get_page()
 
-        return page_view(self.request, page.slug, extra_context=self.get_context_data(
+        context = self.get_context_data(
             form=form,
-            page=page,
             root_node_override=root_node,
-        ))
+        )
+
+        return self.page_view(self.request, page, context)
 
 handle_form = HandleFormView.as_view()
 
@@ -79,12 +103,10 @@ class PreviewView(AuthorizedMixin, SingleObjectMixin, PageViewMixin, View):
         page = self.get_page()
 
         context = {
-            'page': page,
             'root_node_override': node,
-            '_current_page': page,
         }
 
-        return page_view(request, page.slug, extra_context=context)
+        return self.page_view(request, page, context)
 
 preview = PreviewView.as_view(
     site=fancy_import(settings.WIDGY_MEZZANINE_SITE),
