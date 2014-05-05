@@ -137,6 +137,14 @@ def setup(verbosity, test_labels):
     test_labels_set = set([label.split('.')[0] for label in test_labels])
     test_modules = get_test_modules()
 
+    # easy_thumbnails changes how it does migrations
+    import easy_thumbnails
+
+    if easy_thumbnails.VERSION >= 2:
+        SOUTH_MIGRATION_MODULES = {
+            'easy_thumbnails': 'easy_thumbnails.south_migrations',
+        }
+
     for module_dir, module_name in test_modules:
         module_label = '.'.join([module_dir, module_name])
         # if the module was named on the command line, or

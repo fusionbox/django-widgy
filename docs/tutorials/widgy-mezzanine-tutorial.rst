@@ -117,6 +117,14 @@ Configure django-compressor::
     for ``text/x-scss``.  Widgy uses the django-pyscss_ package for easily
     integrating the pyScss_ library with Django.
 
+.. note::
+
+    With easy_thumbnails version 2.0+, an additional setting is required::
+
+    SOUTH_MIGRATION_MODULES = {
+        'easy_thumbnails': 'easy_thumbnails.south_migrations',
+    }
+
 syncdb; migrate
 
 add urls::
