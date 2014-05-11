@@ -63,7 +63,8 @@ class InvisibleMixin(object):
     Provides a preview template that accepts children, but is otherwise
     invisible.
     """
-    css_classes = ('invisible',)
+    def get_css_classes(self):
+        return super(InvisibleMixin, self).get_css_classes() + ('invisible',)
 
     @classmethod
     def get_template_kwargs(cls, **kwargs):
@@ -77,8 +78,10 @@ class InvisibleMixin(object):
 
 
 class TabbedContainer(object):
-    css_classes = ('tabbed',)
     component_name = 'tabbed'
+
+    def get_css_classes(self):
+        return super(TabbedContainer, self).get_css_classes() + ('tabbed',)
 
     @classmethod
     def get_template_kwargs(cls, **kwargs):

@@ -23,7 +23,8 @@ from modeltests.core_tests.models import (
     Layout, Bucket, RawTextWidget, CantGoAnywhereWidget, PickyBucket,
     ImmovableBucket, AnotherLayout, VowelBucket, VersionedPage, VersionedPage2,
     VersionedPage3, VersionedPage4, VersionPageThrough, Related,
-    ForeignKeyWidget, WeirdPkBucket, UnnestableWidget
+    ForeignKeyWidget, WeirdPkBucket, UnnestableWidget,
+    CssClassesWidget, CssClassesWidgetSubclass, CssClassesWidgetProperty,
 )
 from modeltests.core_tests.tests.base import (
     RootNodeTestCase, make_a_nice_tree, SwitchUserTestCase, refetch)
@@ -127,6 +128,45 @@ class TestCore(RootNodeTestCase):
         picky_bucket = self.root_node.content.add_child(self.widgy_site,
                                                         PickyBucket)
         picky_bucket.to_json(self.widgy_site)
+
+    def test_css_classes_available_on_class(self):
+        classes = self.root_node.content.to_json(self.widgy_site)['css_classes']
+        self.assertEqual(classes, ('core_tests', 'layout'))
+        classes = Layout.class_to_json(self.widgy_site)['css_classes']
+        self.assertEqual(classes, ('core_tests', 'layout'))
+
+    def test_css_classes_defined_as_class_attribute(self):
+        css_classes_widget = CssClassesWidget.add_root(self.widgy_site)
+
+        classes = css_classes_widget.to_json(self.widgy_site)['css_classes']
+        self.assertEqual(classes, ('foo', 'bar'))
+        classes = CssClassesWidget.class_to_json(self.widgy_site)['css_classes']
+        self.assertEqual(classes, ('foo', 'bar'))
+
+    def test_css_classes_defined_as_class_attribute_are_inherited(self):
+        css_classes_widget = CssClassesWidgetSubclass.add_root(self.widgy_site)
+
+        classes = css_classes_widget.to_json(self.widgy_site)['css_classes']
+        self.assertEqual(classes, ('foo', 'bar'))
+        classes = CssClassesWidgetSubclass.class_to_json(self.widgy_site)['css_classes']
+        self.assertEqual(classes, ('foo', 'bar'))
+
+    def test_css_classes_defined_as_property_method(self):
+        css_classes_widget = CssClassesWidgetProperty.add_root(self.widgy_site)
+
+        classes = css_classes_widget.to_json(self.widgy_site)['css_classes']
+        self.assertEqual(classes, ('baz', 'qux'))
+
+        # we don't test the class because property methods don't
+        # work on classes.
+
+    def test_css_classes_defined_on_the_instance(self):
+        widget = self.root_node.content
+        classes = widget.to_json(self.widgy_site)['css_classes']
+        self.assertEqual(classes, ('core_tests', 'layout'))
+        widget.css_classes = ('other',)
+        classes = widget.to_json(self.widgy_site)['css_classes']
+        self.assertEqual(classes, ('other',))
 
     def test_reposition(self):
         left, right = make_a_nice_tree(self.root_node)
