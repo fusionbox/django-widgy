@@ -3,7 +3,7 @@
 li.node,
 li.shelfItem {
   @include node-icon("page_builder.accordion", "../image/widget-accordion.png");
-  @include node-icon("page_builder.button", "../image/widget-button.png");
+  @include node-icon("page_builder.buttonwidget", "../image/widget-button.png");
   @include node-icon("page_builder.calloutwidget", "../image/widget-callout.png");
   @include node-icon("page_builder.figure", "../image/widget-figure.png");
   @include node-icon("page_builder.googlemap", "../image/widget-google-map.png");
