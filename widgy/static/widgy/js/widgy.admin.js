@@ -1,4 +1,4 @@
-jQuery(function($) {
+/*jQuery(function($) {
   $('a.widgy-fancybox').fancybox({
     width: 700,
     type: 'iframe',
@@ -10,7 +10,8 @@ jQuery(function($) {
     }
   });
   window.closeFancybox = $.fancybox.close;
-});
+});*/
+
 
 if ( typeof window.console == 'undefined' )
 {
