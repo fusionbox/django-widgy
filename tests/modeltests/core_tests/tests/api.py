@@ -399,13 +399,15 @@ class PermissionsTest(SwitchUserTestCase, RootNodeTestCase, HttpTestCase):
         left = self.root_node.content.add_child(self.widgy_site, Bucket)
         right = self.root_node.content.add_child(self.widgy_site, PickyBucket)
 
+        data = {
+            '__class__': 'core_tests.bucket',
+            'right_id': left.node.get_api_url(self.widgy_site),
+            'parent_id': self.root_node.get_api_url(self.widgy_site),
+        }
+
         def doit():
             url = right.node.get_api_url(self.widgy_site)
-            return self.put(url, {
-                '__class__': 'core_tests.bucket',
-                'right_id': left.node.get_api_url(self.widgy_site),
-                'parent_id': self.root_node.get_api_url(self.widgy_site),
-            })
+            return self.put(url, data)
 
         def fail():
             resp = doit()
@@ -418,6 +420,10 @@ class PermissionsTest(SwitchUserTestCase, RootNodeTestCase, HttpTestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(list(Layout.objects.get().get_children()),
                              [right, left])
+
+            node_data = json.loads(resp.content)['node']
+            self.assertEqual(node_data['right_id'], data['right_id'])
+            self.assertEqual(node_data['parent_id'], data['parent_id'])
 
             # reset
             PickyBucket.objects.get().reposition(self.widgy_site, parent=self.root_node.content)

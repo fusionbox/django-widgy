@@ -147,7 +147,13 @@ class NodeView(WidgyView):
             except Node.DoesNotExist:
                 raise Http404
 
-        return self.render_as_node(None, status=200)
+        # We have to refetch before returning because treebeard doesn't
+        # update the in-memory instance, only the database, see
+        # <https://tabo.pe/projects/django-treebeard/docs/tip/caveats.html#raw-queries>
+        node = Node.objects.get(pk=node.pk)
+        node.prefetch_tree()
+
+        return self.render_as_node(node.to_json(self.site), status=200)
 
     def delete(self, request, node_pk):
         node = get_object_or_404(Node, pk=node_pk)
