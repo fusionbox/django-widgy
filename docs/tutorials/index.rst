@@ -8,4 +8,5 @@ Tutorials
     widgy-mezzanine-tutorial
     require-optimizer
     first-widget
+    proxy-widget
     custom-owner

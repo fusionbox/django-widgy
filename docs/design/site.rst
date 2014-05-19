@@ -27,22 +27,6 @@ Proxying a Widget
 Widgy uses a special subclass of
 :class:`~django.contrib.contenttypes.generic.GenericForeignKey` that supports
 retrieving proxy models.  Subclassing a model as a proxy is a lightweight method
-for providing custom behavior for widgets that you don't control.  For example,
-if you wanted to override the compatibility and ``verbose_name`` for Page
-Builder's :class:`~widgy.contrib.page_builder.models.CalloutBucket`, you could
-do the following::
-
-    import widgy
-    from widgy.contrib.page_builder.models import CalloutBucket
-
-    widgy.unregister(CalloutBucket)
-
-    @widgy.register
-    class MyCalloutBucket(CalloutBucket):
-        class Meta:
-            proxy = True
-            verbose_name = 'Awesome Callout'
-
-        def valid_parent_of(self, cls, obj=None):
-            return issubclass(cls, (MyWidget)) or \
-                super(MyCalloutBucket, self).valid_parent_of(self, cls, obj)
+for providing custom behavior for widgets that you don't control.
+A more in-depth tutorial on proxying widgets can be found at the
+:doc:`../tutorials/proxy-widget`.
