@@ -226,7 +226,8 @@ class Tabs(TabbedContainer, Accordion):
 @widgy.register
 @python_2_unicode_compatible
 class Section(StrDisplayNameMixin, Content):
-    title = models.CharField(max_length=1023, verbose_name=_('title'))
+    title = models.CharField(max_length=1023, verbose_name=_('title'),
+                             help_text=_("Use a unique title for each section."))
 
     editable = True
     accepting_children = True
