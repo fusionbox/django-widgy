@@ -203,7 +203,6 @@ class ReviewQueueViewsTest(SwitchUserTestCase, RootNodeTestCase):
                                  '/view/?param=https://example.com',
                                  '/view?param=ftp://exampel.com',
                                  'view/?param=//example.com',
-                                 'https:///',
                                  '//testserver/',
                                  '/url%20with%20spaces/'):
                     response = self.client.post(url, {
