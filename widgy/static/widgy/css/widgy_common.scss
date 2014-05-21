@@ -248,3 +248,10 @@ $inputFields: "input[type='text'], input[type='password'], input[type='email'], 
     }
   }
 }
+
+@mixin cursor($cursor, $fallback: '') {
+  @if $fallback != '' {  cursor: $fallback; }
+  cursor: $cursor;
+  cursor: -moz-#{$cursor};
+  cursor: -webkit-#{$cursor};
+}

@@ -1,12 +1,5 @@
 @import "widgy_common.scss";
 
-@mixin cursor($cursor, $fallback) {
-  cursor: $fallback;
-  cursor: $cursor;
-  cursor: -moz-#{$cursor};
-  cursor: -webkit-#{$cursor};
-}
-
 $font-default: "Open Sans", Arial, Helvetica, sans-serif;
 
 .widgy {
