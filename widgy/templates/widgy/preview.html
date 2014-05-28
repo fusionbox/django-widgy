@@ -1,5 +1,5 @@
 {% load i18n %}
-<div class="widget">
+<div class="widget{% if self.draggable %} draggable{% endif %}">
   {% block drag-row %}
   <p class="drag-row">
     {% if self.draggable %}

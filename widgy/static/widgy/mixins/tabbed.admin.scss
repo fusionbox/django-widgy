@@ -27,6 +27,16 @@
             width: 100px;
           }
         }
+
+        .drag-row {
+          @include cursor(pointer);
+        }
+        .draggable > .drag-row {
+          @include cursor(grab, pointer);
+        }
+        &.being_dragged .drag-row {
+          @include cursor(grabbing, pointer);
+        }
       }
     }
 
@@ -45,4 +55,3 @@
 }
 
 @import "tabbed-theme.admin.scss";
-
