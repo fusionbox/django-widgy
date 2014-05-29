@@ -90,17 +90,30 @@ GRAPPELLI_INSTALLED = True
 ADMIN_MEDIA_PREFIX = STATIC_URL + "grappelli/"
 SITE_ID = 1
 
-DEBUG_TOOLBAR_PANELS = (
-    'debug_toolbar.panels.version.VersionDebugPanel',
-    'debug_toolbar.panels.timer.TimerDebugPanel',
-    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
-    'debug_toolbar.panels.headers.HeaderDebugPanel',
-    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
-    'debug_toolbar.panels.template.TemplateDebugPanel',
-    'debug_toolbar.panels.sql.SQLDebugPanel',
-    'debug_toolbar.panels.signals.SignalDebugPanel',
-    'debug_toolbar.panels.logger.LoggingPanel',
-    'widgy.debugtoolbar.templates.TemplatePanel',
+import debug_toolbar
+
+if debug_toolbar.VERSION < 1:
+    DEBUG_TOOLBAR_PANELS = (
+        'debug_toolbar.panels.version.VersionDebugPanel',
+        'debug_toolbar.panels.timer.TimerDebugPanel',
+        'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+        'debug_toolbar.panels.headers.HeaderDebugPanel',
+        'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+        'debug_toolbar.panels.template.TemplateDebugPanel',
+        'debug_toolbar.panels.sql.SQLDebugPanel',
+        'debug_toolbar.panels.signals.SignalDebugPanel',
+        'debug_toolbar.panels.logger.LoggingPanel',
+        'widgy.debugtoolbar.templates.TemplatePanel',
+    )
+elif debug_toolbar.VERSION > '1.2.0':
+    DEBUG_TOOLBAR_PATCH_SETTINGS = False
+else:
+    raise ImportError('Your version of django_debug_toolbar is not supported.')
+
+INTERNAL_IPS = (
+    '127.0.0.1',
+    '208.186.116.206',
+    '208.186.142.130',
 )
 
 ROOT_URLCONF = 'demo.urls'
@@ -159,12 +172,6 @@ COMPRESS_PRECOMPILERS = (
     ('text/x-scss', 'django_pyscss.compressor.DjangoScssFilter'),
 )
 
-INTERNAL_IPS = (
-    '127.0.0.1',
-    '208.186.116.206',
-    '208.186.142.130',
-)
-
 ADMIN_MENU_ORDER = [
     ('Widgy', (
         'pages.Page',
@@ -173,6 +180,10 @@ ADMIN_MENU_ORDER = [
         ('Review queue', 'review_queue.ReviewedVersionCommit'),
     )),
 ]
+
+ADD_PAGE_ORDER = (
+    'widgy_mezzanine.WidgyPage',
+)
 
 URLCONF_INCLUDE_CHOICES = (
     ('demo.demo_url.urls', 'Demo url'),
