@@ -26,7 +26,9 @@ from widgy.exceptions import (
 )
 from widgy.signals import pre_delete_widget
 from widgy.generic import WidgyGenericForeignKey, ProxyGenericRelation
-from widgy.utils import exception_to_bool, update_context, render_to_string, force_text
+from widgy.utils import (
+    exception_to_bool, update_context, render_to_string, force_text,
+)
 from widgy.widgets import DateTimeWidget, DateWidget, TimeWidget
 
 logger = logging.getLogger(__name__)
@@ -440,7 +442,7 @@ class Content(models.Model):
         data = {
             'url': self.get_api_url(site),
             '__class__': self.class_name,
-            'css_classes': self.css_classes,
+            'css_classes': self.get_css_classes(),
             'component': self.component_name,
             'model': self._meta.module_name,
             'object_name': self._meta.object_name,
@@ -474,7 +476,7 @@ class Content(models.Model):
         return {
             '__class__': "%s.%s" % (cls._meta.app_label, cls._meta.module_name),
             'title': capfirst(cls._meta.verbose_name),
-            'css_classes': (cls._meta.app_label, cls._meta.module_name),
+            'css_classes': cls.get_class_css_classes(),
             'tooltip': cls.tooltip and force_text(cls.tooltip),
         }
 
@@ -489,9 +491,16 @@ class Content(models.Model):
         """
         return "%s.%s" % (self._meta.app_label, self._meta.module_name)
 
-    @property
-    def css_classes(self):
-        return (self._meta.app_label, self._meta.module_name)
+    @classmethod
+    def get_class_css_classes(cls):
+        if hasattr(cls, 'css_classes'):
+            return cls.css_classes
+        return (cls._meta.app_label, cls._meta.module_name)
+
+    def get_css_classes(self):
+        if hasattr(self, 'css_classes'):
+            return self.css_classes
+        return self.get_class_css_classes()
 
     @property
     def node(self):

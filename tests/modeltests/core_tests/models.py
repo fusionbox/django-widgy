@@ -68,6 +68,21 @@ class PickyBucket(Bucket):
         return issubclass(cls, RawTextWidget)
 
 
+class CssClassesWidget(Content):
+    css_classes = ('foo', 'bar')
+
+
+class CssClassesWidgetSubclass(CssClassesWidget):
+    class Meta:
+        proxy = True
+
+
+class CssClassesWidgetProperty(CssClassesWidget):
+    @property
+    def css_classes(self):
+        return ('baz', 'qux')
+
+
 class WeirdPkBase(Content):
     bubble = models.AutoField(primary_key=True)
 
