@@ -683,6 +683,13 @@ class FormField(StrDisplayNameMixin, BaseFormField):
         """
         return unicode(value)
 
+    @property
+    def widget_attrs(self):
+        attrs = {}
+        if self.required:
+            attrs.update(required='required')
+        return attrs
+
 
 class FormInputForm(FormFieldForm):
     class Meta:
@@ -728,23 +735,23 @@ class FormInput(FormField):
         verbose_name_plural = _('form inputs')
 
     @property
-    def formfield_class(self):
-        return self.FORMFIELD_CLASSES.get(self.type, forms.CharField)
-
-    @property
-    def widget(self):
-        attrs = {
-            'type': self.type,
-        }
-        if self.required:
-            attrs['required'] = 'required'
+    def widget_attrs(self):
+        attrs = super(FormInput, self).widget_attrs
+        attrs['type'] = self.type
 
         if self.type == 'date':
             # Use type text because Kalendae doesn't play well with type=date
             attrs['type'] = 'text'
             attrs['class'] = 'date auto-kal'
+        return attrs
 
-        return self.formfield_class.widget(attrs=attrs)
+    @property
+    def formfield_class(self):
+        return self.FORMFIELD_CLASSES.get(self.type, forms.CharField)
+
+    @property
+    def widget(self):
+        return self.formfield_class.widget(attrs=self.widget_attrs)
 
 
 @widgy.register
@@ -760,10 +767,7 @@ class Textarea(FormField):
 
     @property
     def widget(self):
-        attrs = {}
-        if self.required:
-            attrs['required'] = 'required'
-        return forms.Textarea(attrs=attrs)
+        return forms.Textarea(attrs=self.widget_attrs)
 
 
 class BaseChoiceField(FormField):
@@ -783,15 +787,7 @@ class BaseChoiceField(FormField):
 
     @property
     def widget(self):
-        attrs = self.widget_attrs
-        return self.widget_class(attrs=attrs)
-
-    @property
-    def widget_attrs(self):
-        attrs = {}
-        if self.required:
-            attrs.update(required='required')
-        return attrs
+        return self.widget_class(attrs=self.widget_attrs)
 
 
 @widgy.register
