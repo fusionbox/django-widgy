@@ -49,7 +49,8 @@ define([ 'jquery',
   }
 
   function ajaxError(model, resp, options) {
-    if ( resp.getResponseHeader('content-type').indexOf('application/json') !== -1 ) {
+    if ( resp.getResponseHeader('content-type') &&
+         resp.getResponseHeader('content-type').indexOf('application/json') !== -1 ) {
       var data = JSON.parse(resp.responseText);
       var message;
 
