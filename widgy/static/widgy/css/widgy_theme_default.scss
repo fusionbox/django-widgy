@@ -2,6 +2,10 @@
 
 $font-default: "Open Sans", Arial, Helvetica, sans-serif;
 
+.ajax-loading * {
+  cursor: progress !important;
+}
+
 .widgy {
   font-family: $font-default;
   font-size: 12px;
