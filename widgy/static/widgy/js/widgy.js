@@ -125,6 +125,12 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'lib/q', 'nodes/n
     }
   });
 
+  $(document).ajaxStart(function() {
+    $(this.body).addClass('ajax-loading');
+  }).ajaxComplete(function() {
+    $(this.body).removeClass('ajax-loading');
+  });
+
 
   /**
    * Wrapper class to create a new instance of a Widgy editor.  The constructor
