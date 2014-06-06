@@ -181,6 +181,9 @@ class VersionedWidgyField(WidgyField):
     def get_render_node(self, model_instance, context):
         version_tracker = getattr(model_instance, self.name)
         if version_tracker:
-            return version_tracker.get_published_node(context and context.get('request'))
+            node = version_tracker.get_published_node(context and context.get('request'))
+            if node is None:
+                node = version_tracker.working_copy
+            return node
         else:
             return None
