@@ -7,7 +7,6 @@ from django.conf import settings
 from widgy.models import Content
 from widgy.contrib.page_builder.models import Layout
 from widgy.models.mixins import TabbedContainer, StrictDefaultChildrenMixin
-from widgy import register
 
 
 class I18NChild(models.Model):
@@ -52,7 +51,9 @@ class I18NTabbedContainer(TabbedContainer, Content):
         return [child for child in self.get_children() if child.language_code == code][0]
 
 
-@register
+# The following two classes are not to be used any more.  They are only here
+# for backwards compatibility purposes.
+
 class I18NLayout(I18NChild, Layout):
     """
     This is a layout for a specific language that lives inside a
@@ -63,7 +64,6 @@ class I18NLayout(I18NChild, Layout):
         return isinstance(content, I18NLayoutContainer)
 
 
-@register
 class I18NLayoutContainer(StrictDefaultChildrenMixin, I18NTabbedContainer):
     """
     A root node that holds different language versions of the same page.
