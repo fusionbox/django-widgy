@@ -18,7 +18,7 @@ from modeltests.core_tests.widgy_config import widgy_site
 from widgy.contrib.form_builder.forms import PhoneNumberField
 from widgy.contrib.form_builder.models import (
     Form, FormInput, Textarea, FormSubmission, FormField, Uncaptcha,
-    EmailUserHandler, EmailSuccessHandler
+    EmailUserHandler, EmailSuccessHandler, FileUpload,
 )
 from widgy.exceptions import ParentChildRejection
 from widgy.utils import build_url
@@ -270,6 +270,26 @@ class TestForm(TestCase):
         serialize.assert_called_with('3')
 
         self.assertEqual(submission.as_dict()[self.fields[2].ident], serialize.return_value)
+
+    def test_serialize_file_field(self):
+        form = Form.add_root(widgy_site)
+        file_field = form.children['fields'].add_child(widgy_site, FileUpload,
+                                                       required=False)
+
+        FormSubmission.objects.submit(form=form, data={
+            file_field.get_formfield_name(): ContentFile(b'foobar', name='asdf.txt'),
+        })
+
+        FormSubmission.objects.submit(form=form, data={
+            file_field.get_formfield_name(): None,
+        })
+
+        serialized_values = [s[file_field.ident] for s in form.submissions.as_dictionaries()]
+
+        self.assertEqual(serialized_values, [
+            '/media/form-uploads/asdf.txt',
+            '',
+        ])
 
     def test_csv_unicode(self):
         f = self.fields[0]
