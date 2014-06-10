@@ -912,9 +912,12 @@ class FileUpload(FormField):
         )
 
     def serialize_value(self, value):
-        filename = self.generate_filename(value.name)
-        filename = self.storage.save(filename, value)
-        return self.storage.url(filename)
+        if value:
+            filename = self.generate_filename(value.name)
+            filename = self.storage.save(filename, value)
+            return self.storage.url(filename)
+        else:
+            return ''
 
 
 @widgy.register
