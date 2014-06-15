@@ -13,21 +13,30 @@ def read(fname):
 
 
 install_requires = [
-    'mezzanine >= 1.3.0',
     'django-treebeard',
-    'django-filer>=0.9.6',
     'django-pyscss',
     'six',
-    'markdown',
-    'bleach',
     'django-compressor>=1.3',
-    'django-extensions',
     'beautifulsoup4',
-    'sorl-thumbnail>=11.12',
-    'html2text>=3.200.3',
-    'phonenumbers>=5',
     'django-argonauts>=1.0.0',
 ]
+
+extras_require = {
+    'widgy_mezzanine': [
+        'mezzanine>=1.3.0',
+    ],
+    'page_builder': [
+        'django-filer>=0.9.6',
+        'markdown',
+        'bleach',
+        'sorl-thumbnail>=11.12',
+    ],
+    'form_builder': [
+        'django-extensions',
+        'html2text>=3.200.3',
+        'phonenumbers>=5',
+    ],
+}
 
 STAGE = 'alpha'
 
@@ -54,6 +63,7 @@ setup(
     url='http://docs.wid.gy/',
     packages=[package for package in find_packages() if package.startswith('widgy')],
     install_requires=install_requires,
+    extras_require=extras_require,
     zip_safe=False,
     include_package_data=True,
     classifiers=[
