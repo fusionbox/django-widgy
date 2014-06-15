@@ -12,11 +12,14 @@ from filer.models.filemodels import File
 
 from widgy.contrib.page_builder.forms import MarkdownField as MarkdownFormField, MarkdownWidget
 
-from south.modelsinspector import add_introspection_rules
-
-add_introspection_rules([], ["^widgy\.contrib\.page_builder\.db\.fields\.MarkdownField"])
-add_introspection_rules([], ["^widgy\.contrib\.page_builder\.db\.fields\.VideoField"])
-add_introspection_rules([], ["^widgy\.contrib\.page_builder\.db\.fields\.ImageField"])
+try:
+    from south.modelsinspector import add_introspection_rules
+except ImportError:  # South not installed
+    pass
+else:
+    add_introspection_rules([], ["^widgy\.contrib\.page_builder\.db\.fields\.MarkdownField"])
+    add_introspection_rules([], ["^widgy\.contrib\.page_builder\.db\.fields\.VideoField"])
+    add_introspection_rules([], ["^widgy\.contrib\.page_builder\.db\.fields\.ImageField"])
 
 
 class MarkdownField(models.TextField):
