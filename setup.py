@@ -17,7 +17,6 @@ install_requires = [
     'mezzanine >= 3.1.10',
     'django-treebeard',
     'django-filer>=0.9.6',
-    'South',
     'django-pyscss',
     'six',
     'bleach',
