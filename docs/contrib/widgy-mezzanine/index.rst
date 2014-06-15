@@ -7,6 +7,16 @@ providing a subclass of Mezzanine's Page model called
 :class:`~widgy.contrib.widgy_mezzanine.models.WidgyPage` which delegates to
 Page Builder for all content.
 
+The dependencies for Widgy Mezzanine (Mezzanine and Widgy's Page Builder app)
+are not installed by default when you install widgy, you can install them
+yourself::
+
+    $ pip install Mezzanine django-widgy[page_builder]
+
+or you can install them using through the widgy package::
+
+    $ pip install django-widgy[page_builder,widgy_mezzanine]
+
 In order to use Widgy Mezzanine, you must provide ``WIDGY_MEZZANINE_SITE`` in
 your settings.  This is a fully-qualified import path to an instance of
 :class:`~widgy.site.WidgySite`.  You also need to install the URLs. ::

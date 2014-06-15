@@ -5,6 +5,25 @@ Page Builder
 
 Page builder is a collection of widgets for the purpose of creating HTML pages.
 
+Installation
+------------
+
+Page builder depends on the following packages:
+
+* django-filer
+* markdown
+* bleach
+* sorl-thumbnail
+
+You can install them manually, or you can install them using the django-widgy
+package::
+
+    $ pip install django-widgy[page_builder]
+
+
+Widgets
+-------
+
 
 .. class:: DefaultLayout
 
