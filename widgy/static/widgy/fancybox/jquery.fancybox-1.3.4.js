@@ -26,7 +26,8 @@
 
 		titleHeight = 0, titleStr = '', start_pos, final_pos, busy = false, fx = $.extend($('<div/>')[0], { prop: 0 }),
 
-		isIE6 = $.browser.msie && $.browser.version < 7 && !window.XMLHttpRequest,
+                isMSIE = navigator.userAgent.match(/msie/i),
+                isIE6 = isMSIE && navigator.userAgent.match(/6/) && !window.XMLHttpRequest,
 
 		/*
 		 * Private methods 
@@ -612,7 +613,7 @@
 			}
 
 			if (currentOpts.type == 'iframe') {
-				$('<iframe id="fancybox-frame" name="fancybox-frame' + new Date().getTime() + '" frameborder="0" hspace="0" ' + ($.browser.msie ? 'allowtransparency="true""' : '') + ' scrolling="' + selectedOpts.scrolling + '" src="' + currentOpts.href + '"></iframe>').appendTo(content);
+				$('<iframe id="fancybox-frame" name="fancybox-frame' + new Date().getTime() + '" frameborder="0" hspace="0" ' + (isMSIE ? 'allowtransparency="true""' : '') + ' scrolling="' + selectedOpts.scrolling + '" src="' + currentOpts.href + '"></iframe>').appendTo(content);
 			}
 
 			wrap.show();
