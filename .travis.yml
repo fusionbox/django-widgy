@@ -20,6 +20,7 @@ matrix:
     - python: "2.7"
       env: JAVASCRIPT=1
 install: |
+  set -e
   if [ -z "$JAVASCRIPT" ]
   then
     pip install --upgrade pip
