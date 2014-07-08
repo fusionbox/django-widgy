@@ -59,9 +59,6 @@ setup(
     url='http://docs.wid.gy/',
     packages=[package for package in find_packages() if package.startswith('widgy')],
     install_requires=install_requires,
-    dependency_links=[
-        'http://github.com/chrisglass/django_polymorphic/tarball/master#egg=django_polymorphic-0.5.1',
-    ],
     zip_safe=False,
     include_package_data=True,
     classifiers=[
