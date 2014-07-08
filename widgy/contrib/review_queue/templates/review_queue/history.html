@@ -35,7 +35,7 @@
 {% block commit_actions %}
   {{ block.super }}
   {% has_change_permission site commit.reviewedversioncommit as can_change %}
-  {% if can_change %}
+  {% if can_change and commit.is_interesting_to_approve_or_unapprove %}
     {% if not commit.reviewedversioncommit.is_approved %}
       <form method="post" action="{% reverse_site_url site 'approve_view' pk=commit.tracker.pk commit_pk=commit.pk %}">
         <input class="button approve" type="submit" value="{% trans "Approve this Commit" %}">

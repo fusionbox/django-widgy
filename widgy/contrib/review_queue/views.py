@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied
 
 from widgy.utils import format_html
 from widgy.views.base import AuthorizedMixin
-from widgy.views.versioning import VersionTrackerMixin, CommitView
+from widgy.views.versioning import VersionTrackerMixin, CommitView, HistoryView as OldHistoryView
 
 from .forms import UndoApprovalsForm, ReviewedCommitForm
 from .models import ReviewedVersionCommit
@@ -112,3 +112,16 @@ class UndoApprovalsView(AuthorizedMixin, FormView):
 
     def form_invalid(self, form):
         return redirect('/')
+
+
+class HistoryView(OldHistoryView):
+    def get_context_data(self, **kwargs):
+        kwargs = super(HistoryView, self).get_context_data(**kwargs)
+        # it's not useful to approve/unapprove commits past the latest approved
+        # commit
+        interesting = True
+        for commit in kwargs['commits']:
+            commit.is_interesting_to_approve_or_unapprove = interesting
+            if commit.reviewedversioncommit.is_approved:
+                interesting = False
+        return kwargs

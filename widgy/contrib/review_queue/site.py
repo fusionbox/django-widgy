@@ -2,13 +2,14 @@ from django.conf.urls import patterns, url
 from django.utils.functional import cached_property
 
 from widgy.site import WidgySite
-from widgy.views import HistoryView, RevertView
+from widgy.views import RevertView
 
 from .views import (
     ApproveView,
     ReviewedCommitView,
     UnapproveView,
     UndoApprovalsView,
+    HistoryView,
 )
 
 
