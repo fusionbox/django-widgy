@@ -15,11 +15,11 @@ def read(fname):
 install_requires = [
     'mezzanine >= 1.3.0',
     'django-treebeard',
-    'django-filer==0.9.5',
+    'django-filer>=0.9.5',
     # We don't actually require polymorphic -- filer does. we do need to
     # increase the minimum version though, to one that supports django
     # 1.6.
-    'django_polymorphic==0.5.1',
+    'django_polymorphic>=0.5.1',
     'South',
     'django-pyscss',
     'six',
@@ -28,10 +28,10 @@ install_requires = [
     'django-compressor>=1.3',
     'django-extensions',
     'beautifulsoup4',
-    'sorl-thumbnail==11.12',
-    'html2text==3.200.3',
+    'sorl-thumbnail>=11.12',
+    'html2text>=3.200.3',
     'phonenumbers>=5',
-    'django-argonauts==1.0.0',
+    'django-argonauts>=1.0.0',
 ]
 
 STAGE = 'alpha'
