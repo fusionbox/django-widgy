@@ -68,12 +68,6 @@ class WidgySite(object):
         """
         return reverse(*args, **kwargs)
 
-    def get_view_instance(self, view):
-        try:
-            return view.view_instance
-        except AttributeError:
-            raise ValueError("View does not inherit from WidgyViewMixin")
-
     def authorize_view(self, request, view):
         if not request.user.is_authenticated():
             raise PermissionDenied

@@ -34,10 +34,6 @@ Widgy Site
 
       .. todo:: explain reverse
 
-    ..
-        Should this be public?
-        .. method:: get_view_instance(self, view)
-
     .. method:: authorize_view(self, request, view)
 
     Every Widgy view will call this before doing anything. It can
