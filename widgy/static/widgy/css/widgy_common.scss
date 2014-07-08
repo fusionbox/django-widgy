@@ -204,22 +204,19 @@ $orange:      #FF9900;
 $inputFields: "input[type='text'], input[type='password'], input[type='email'], input[type='search'], input[type='number'], textarea";
 
 
-
-@mixin node-icon-base ($class, $bg) {
-  &.#{$class} > span.title {
-    background-image: $bg;
-    background-repeat: no-repeat;
-  }
-}
-
 $widget_icon_sprite: sprite-map("widgy/image/widget-*");
 
 @mixin node-icon-sprite ($class, $icon, $sprite: $widget_icon_sprite) {
-  @include node-icon-base($class, sprite($sprite, $icon));
+  &.#{$class} > span.title:before {
+    background-image: sprite-url($sprite, $icon);
+    background-position: sprite-position($sprite, $icon);
+  }
 }
 
 @mixin node-icon ($class, $img) {
-  @include node-icon-base($class, url($img));
+  &.#{$class} > span.title:before {
+    background-image: url($img);
+  }
 }
 
 %loading {
