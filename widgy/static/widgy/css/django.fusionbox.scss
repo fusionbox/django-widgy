@@ -1,111 +1,7 @@
+@import '/widgy/css/widgy_common.scss';
 
-/* Variables
------------------------------------------------*/
-
-$black10: rgba(0,0,0,0.1);
-$black30: rgba(0,0,0,0.3);
-$white20: rgba(255,255,255,0.2);
-$lightgrey:   #bbbbbb;
-$grey:        #999999;
-$darkgrey:    #666666;
-$red:         #BF3030;
-$blue:        #309BBF;
-$green:       #559911;
-
-/* SASS Mixins
---------------------------------------------------*/
-
-@mixin default {
-  display: inline;
-  float: left;
-  height: auto;
-  width: 100%;
-}
-
-@mixin shadow($color: rgba(0,0,0,0.3), $left: 0px, $top: 0px, $blur: 8px) {
-  box-shadow: $left $top $blur $color;
-    -o-box-shadow: $left $top $blur $color;
-    -ms-box-shadow: $left $top $blur $color;
-    -moz-box-shadow: $left $top $blur $color;
-    -webkit-box-shadow: $left $top $blur $color;
-}
-
-@mixin inset-shadow($color: rgba(0,0,0,0.3), $left: 0px, $top: 0px, $blur: 8px) {
-  box-shadow: inset $left $top $blur $color;
-    -o-box-shadow: inset $left $top $blur $color;
-    -ms-box-shadow: inset $left $top $blur $color;
-    -moz-box-shadow: inset $left $top $blur $color;
-    -webkit-box-shadow: inset $left $top $blur $color;
-}
-
-
-@mixin text-shadow($color: rgba(0,0,0,0.3), $left: 0px, $top: 0px, $blur: 8px) {
-  text-shadow: $left $top $blur $color;
-    -o-text-shadow: $left $top $blur $color;
-    -moz-text-shadow: $left $top $blur $color;
-    -webkit-text-shadow: $left $top $blur $color;
-}
-
-@mixin rounded($radius) {
-  border-radius: $radius;
-    -o-border-radius: $radius;
-    -ms-border-radius: $radius;
-    -moz-border-radius: $radius;
-    -webkit-border-radius: $radius;
-}
-
-@mixin gradient($bottom,$top) {
-  background-color: $bottom;
-    background-image: -o-linear-gradient(center bottom, $bottom 1%, $top 100%);
-    background-image: -ms-linear-gradient(center bottom, $bottom 1%, $top 100%);
-    background-image: -moz-linear-gradient(center bottom, $bottom 1%, $top 100%);
-    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, $bottom), color-stop(1.00, $top));
-}
-
-
-@mixin inner {
-  display: block;
-  margin: 0 auto;
-  padding: 0px;
-  text-align: left;
-  width: 960px;
-}
-
-@mixin clearfix {
-  &:after {
-    content: ".";
-    display: block;
-    height: 0;
-    clear: both;
-    visibility: hidden;
-  }
-  * html & { height: 1px }
-}
-
-@mixin wrapper {
-  display: block;
-  height: auto;
-  min-width: 960px;
-  position: relative;
-  width: 100%;
-  z-index: 1;
-}
-
-@mixin html {
-  h1, h2, h3, h4, h5, h6, p, blockquote, ol, ul, hgroup, hr {
-    display: block !important;
-    float: none !important;
-    margin: 0px 0px 15px 0px !important;
-    width: auto !important;
-  }
-  ol, ul { padding-left: 30px; }
-  .fl { float: left; margin: 0px 25px 15px 0px; }
-  .fr { float: right; margin: 0px 0px 15px 25px; }
-  img { @include rounded(2px); &.left { float: left; margin: 5px 20px 15px 0px; } &.right { float: right; margin: 5px 0px 15px 20px; }}
-  table { display: table; width: 100% !important; }
-}
-
-@mixin button {
+@mixin outside-button {
+  // This button style is for buttons that exist outside of the widgy editor.
   @include rounded(3px);
   background: transparent;
   border: 1px solid $blue;
@@ -163,7 +59,7 @@ $green:       #559911;
 }
 
 a.button {
-  @include button;
+  @include outside-button;
 }
 
 /* Widgy Tools Buttons
@@ -179,7 +75,7 @@ ul.widgy-tools {
     margin-right: 5px;
     
     a {
-      @include button;
+      @include outside-button;
       font-size: 13px;
       font-weight: bold;
       padding: 2px 8px !important;
@@ -244,7 +140,7 @@ section.main {
         display: inline;
 
         input.button[type='submit'] {
-          @include button;
+          @include outside-button;
           
           &.unapprove {
             border-color: $red;
