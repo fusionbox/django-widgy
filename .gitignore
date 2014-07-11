@@ -2,6 +2,7 @@ sqlite_database
 *.pyc
 src/
 static/*
+demo/static/*
 media/*
 demo/media/*
 !.gitkeep

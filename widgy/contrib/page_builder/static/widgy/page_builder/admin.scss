@@ -2,19 +2,19 @@
 
 li.node,
 li.shelfItem {
-  @include node-icon("page_builder.accordion", "../image/widget-accordion.png");
-  @include node-icon("page_builder.buttonwidget", "../image/widget-button.png");
-  @include node-icon("page_builder.calloutwidget", "../image/widget-callout.png");
-  @include node-icon("page_builder.figure", "../image/widget-figure.png");
-  @include node-icon("page_builder.googlemap", "../image/widget-google-map.png");
-  @include node-icon("page_builder.html", "../image/widget-html.png");
-  @include node-icon("page_builder.image", "../image/widget-image.gif");
-  @include node-icon("page_builder.markdown", "../image/widget-code.gif");
-  @include node-icon("page_builder.section", "../image/widget-section.png");
-  @include node-icon("page_builder.tableheaderdata", "../image/widget-tablecolumn.png");
-  @include node-icon("page_builder.table", "../image/widget-table.gif");
-  @include node-icon("page_builder.tablerow", "../image/widget-tablerow.png");
-  @include node-icon("page_builder.tabs", "../image/widget-tab.png");
-  @include node-icon("page_builder.video", "../image/widget-video.gif");
-  @include node-icon("page_builder.unsafehtml", "../image/widget-skull-and-crossbones.png");
+  @include node-icon-sprite("page_builder.accordion", "widget-accordion");
+  @include node-icon-sprite("page_builder.buttonwidget", "widget-button");
+  @include node-icon-sprite("page_builder.calloutwidget", "widget-callout");
+  @include node-icon-sprite("page_builder.figure", "widget-figure");
+  @include node-icon-sprite("page_builder.googlemap", "widget-google-map");
+  @include node-icon-sprite("page_builder.html", "widget-html");
+  @include node-icon-sprite("page_builder.image", "widget-image");
+  @include node-icon-sprite("page_builder.markdown", "widget-code");
+  @include node-icon-sprite("page_builder.section", "widget-section");
+  @include node-icon-sprite("page_builder.tableheaderdata", "widget-tablecolumn");
+  @include node-icon-sprite("page_builder.table", "widget-table");
+  @include node-icon-sprite("page_builder.tablerow", "widget-tablerow");
+  @include node-icon-sprite("page_builder.tabs", "widget-tab");
+  @include node-icon-sprite("page_builder.video", "widget-video");
+  @include node-icon-sprite("page_builder.unsafehtml", "widget-skull-and-crossbones");
 }

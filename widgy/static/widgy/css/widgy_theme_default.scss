@@ -162,12 +162,28 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
     width: 215px !important;
 
     span.title {
-      background-position: 5px 3px;
       font-size: 11px;
       max-width: 160px;
-      padding: 4px 0px 2px 26px;
+      padding: 4px 0 2px 0;
       text-transform: capitalize;
       width: 160px;
+
+      &:before {
+        // These are all of the common properties for the shelfItem icons.  We
+        // put the icon in a pseudo-element so that we can control the size of
+        // the background-image without affecting the size of the actual
+        // span.title.
+        // TODO: This code assumes that each icon is exactly 16x16.
+        background-repeat: no-repeat;
+        content: "";
+        float: left;
+        height: 16px;
+        // The margin-top and margin-bottom need to be the same as the
+        // padding-top/padding-bottom of the span.title.  We use margin here
+        // instead of padding because we MUST NOT be bigger than 16x16.
+        margin: 4px 5px 2px 5px;
+        width: 16px;
+      }
     }
 
     span.icon-move {
@@ -199,13 +215,16 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
     }
 
     span.title {
-      background-position: 5px 9px;
       display: inline;
       float: left;
       font-size: 14px;
       line-height: 22px;
-      padding: 5px 0 5px 30px;
+      padding: 5px 0 5px 0;
       max-width: 130px;
+
+      &:before {
+        margin: 5px 6px;
+      }
     }
   }
 
