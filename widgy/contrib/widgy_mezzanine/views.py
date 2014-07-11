@@ -33,6 +33,7 @@ def get_page_from_node(node):
         return WidgyPage(
             titles='restoring page',
             content_model='widgypage',
+            slug='restoring-page',
         )
 
 
@@ -45,6 +46,7 @@ class PageViewMixin(object):
             return WidgyPage(
                 titles='restoring page',
                 content_model='widgypage',
+                slug='restoring-page',
             )
 
     def page_view(self, request, page, context):

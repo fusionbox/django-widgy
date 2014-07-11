@@ -116,24 +116,28 @@ class TestFormHandler(TestCase):
 class TestPreviewView(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
+        self.preview_view = PreviewView.as_view(site=widgy_site)
+        self.request = self.factory.get('/')
+        self.request.user = User(is_superuser=True)
 
     def test_preview(self):
-        preview_view = PreviewView.as_view(site=widgy_site)
-
         page = WidgyPage.objects.create(title='Test')
         root_node1 = Button.add_root(widgy_site, text='Test 1')
         root_node2 = Button.add_root(widgy_site, text='Test 2')
 
-        req = self.factory.get('/')
-        req.user = User(is_superuser=True)
-
-        resp1 = preview_view(req, node_pk=root_node1.node.pk, slug=page.slug)
+        resp1 = self.preview_view(self.request, node_pk=root_node1.node.pk, slug=page.slug)
 
         self.assertEqual(resp1.status_code, 200)
         self.assertIn('Test 1', resp1.rendered_content)
         self.assertEqual(resp1.context_data['page'].get_content_model(), page)
 
-        resp2 = preview_view(req, node_pk=root_node2.node.pk, slug=page.slug)
+        resp2 = self.preview_view(self.request, node_pk=root_node2.node.pk, slug=page.slug)
 
         self.assertEqual(resp2.status_code, 200)
         self.assertIn('Test 2', resp2.rendered_content)
+
+    def test_preview_without_page(self):
+        button = Button.add_root(widgy_site, text='Button text')
+
+        resp = self.preview_view(self.request, node_pk=button.node.pk)
+        self.assertIn(button.text, resp.rendered_content)
