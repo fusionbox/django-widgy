@@ -16,10 +16,6 @@ install_requires = [
     'mezzanine >= 1.3.0',
     'django-treebeard',
     'django-filer>=0.9.5',
-    # We don't actually require polymorphic -- filer does. we do need to
-    # increase the minimum version though, to one that supports django
-    # 1.6.
-    'django_polymorphic>=0.5.1',
     'South',
     'django-pyscss',
     'six',
