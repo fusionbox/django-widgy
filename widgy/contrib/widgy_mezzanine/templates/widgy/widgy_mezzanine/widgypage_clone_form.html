@@ -1,0 +1,15 @@
+{% extends "widgy/popup_base.html" %}
+
+{% block popup-content %}
+<h1>Cloning <strong>{{ object }}</strong></h1>
+
+<form method="post">
+  {% csrf_token %}
+  {% for field in form %}
+    {% include "widgy/field_as_div.html" %}
+  {% endfor %}
+  <p class="submitRow">
+    <input type="submit" value="Clone">
+  </p>
+</form>
+{% endblock %}

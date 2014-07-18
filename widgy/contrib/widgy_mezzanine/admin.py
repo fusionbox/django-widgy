@@ -2,10 +2,12 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 from django.conf import settings
+from django.conf.urls import url
 from django import forms
 from django.core.urlresolvers import reverse
 from django.contrib.admin.util import quote
 from django.utils.translation import ugettext_lazy as _, ugettext
+
 from mezzanine.pages.admin import PageAdmin
 try:
     from mezzanine.pages.admin import PageAdminForm
@@ -17,6 +19,7 @@ from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
 
 from widgy.forms import WidgyFormMixin
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
+from widgy.contrib.widgy_mezzanine.views import ClonePageView
 from widgy.utils import fancy_import, format_html
 
 
@@ -48,6 +51,12 @@ class WidgyPageAdminForm(WidgyFormMixin, PageAdminForm):
 class WidgyPageAdmin(PageAdmin):
     change_form_template = 'widgy/page_builder/widgypage_change_form.html'
     form = WidgyPageAdminForm
+
+    def get_urls(self):
+        clone_view = ClonePageView.as_view(has_permission=self.has_add_permission)
+        return [
+            url('^(.+)/clone/$', self.admin_site.admin_view(clone_view)),
+        ] + super(WidgyPageAdmin, self).get_urls()
 
 
 class UndeleteField(forms.ModelChoiceField):

@@ -71,3 +71,9 @@ class ReviewedVersionTracker(VersionTracker):
         # https://code.djangoproject.com/ticket/16855
         return super(ReviewedVersionTracker, self).commits \
             .select_related('reviewedversioncommit')
+
+    def _commits_to_clone(self):
+        for c in super(ReviewedVersionTracker, self)._commits_to_clone():
+            c = c.reviewedversioncommit
+            c.pk = c.id = None
+            yield c

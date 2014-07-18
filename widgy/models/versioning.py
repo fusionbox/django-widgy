@@ -1,3 +1,5 @@
+import copy
+
 from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -184,3 +186,23 @@ class VersionTracker(models.Model):
         return list(owner
                     for attr in self.get_owner_related_names()
                     for owner in getattr(self, attr).all())
+
+    def clone(self):
+        vt = copy.copy(self)
+        vt.working_copy = vt.working_copy.clone_tree(freeze=False)
+        commits = list(self._commits_to_clone())
+        vt.pk = None
+        vt.head = None
+        vt.save()
+        for commit in commits:
+            commit.tracker = vt
+            commit.parent = vt.head
+            commit.save()
+            vt.head = commit
+        vt.save()
+        return vt
+
+    def _commits_to_clone(self):
+        for c in self.commits.order_by('id'):
+            c.id = None
+            yield c

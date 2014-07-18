@@ -6,10 +6,12 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django import forms
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 
 from widgy.site import WidgySite
 from widgy.utils import get_user_model
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
+from widgy.contrib.widgy_mezzanine.views import ClonePageView
 
 User = get_user_model()
 widgy_site = WidgySite()
@@ -141,3 +143,54 @@ class TestPreviewView(TestCase):
 
         resp = self.preview_view(self.request, node_pk=button.node.pk)
         self.assertIn(button.text, resp.rendered_content)
+
+
+@skipUnless(PAGE_BUILDER_INSTALLED, 'page_builder is not installed')
+class TestClonePage(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+        self.page = WidgyPage.objects.create(
+            root_node=widgy_site.get_version_tracker_model().objects.create(
+                working_copy=Button.add_root(widgy_site, text='buttontext').node,
+            ),
+            title='titleabc',
+            slug='slugabc',
+        )
+
+    def as_view(self, **kwargs):
+        kwargs.setdefault('has_permission', lambda req: True)
+        return ClonePageView.as_view(**kwargs)
+
+    def test_permissions(self):
+        with self.assertRaises(PermissionDenied):
+            forbid_everything = lambda req: False
+            req = self.factory.get('/')
+            self.as_view(has_permission=forbid_everything)(req, str(self.page.pk))
+
+    def test_get(self):
+        view = self.as_view()
+
+        resp = view(self.factory.get('/'), str(self.page.pk))
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(self.page.title, resp.rendered_content)
+        self.assertNotIn(self.page.slug, resp.rendered_content)
+
+    def test_post(self):
+        view = self.as_view()
+        with mock.patch('django.contrib.messages.success') as success_mock:
+            req = self.factory.post('/', {'title': 'new title'})
+
+            view(req, str(self.page.pk))
+
+        new_page = WidgyPage.objects.exclude(pk=self.page.pk).get()
+
+        success_mock.assert_called_with(req, mock.ANY)
+        success_message = success_mock.call_args[0][1]
+        self.assertIn(self.page.title, success_message)
+        self.assertIn(new_page.title, success_message)
+
+        self.assertNotEqual(new_page.slug, self.page.slug)
+        self.assertEqual(new_page.title, 'new title')
+
+        self.assertEqual(new_page.root_node.working_copy.content.text, 'buttontext')
