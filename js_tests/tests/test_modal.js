@@ -10,85 +10,91 @@ describe('ModalView', function() {
   it('should return the message with toJSON', function() {
     var modal_view = new modal.ModalView();
     modal_view.message = 'Test Complete';
-    assert.deepEqual(modal_view.toJSON(), {message: 'Test Complete'});
+    assert.deepEqual(modal_view.toJSON(), { message: 'Test Complete' });
   });
+
 
   it('should open a window', function() {
     test.create();
     var modal_view = new modal.ModalView();
+    assert.isFalse($('div').hasClass('modal'));
     modal_view.open();
-    assert.isTrue($('div:[1]').hasClass('modal'));
+    assert.isTrue($('div').hasClass('modal'));
     assert.deepEqual($('div').css('position'), 'fixed');
     $(document.body).children().remove();
     test.destroy();
   });
 });
 
+
 describe('ErrorView', function() {
   it('should construct a new ErrorView', function() {
-    var error_view = new modal.ErrorView({message: 'Test Message'});
+    var error_view = new modal.ErrorView({ message: 'Test Message' });
     assert.deepEqual(error_view.message, 'Test Message');
   });
 });
+
 
 describe('Modal Static Functions', function() {
   beforeEach(function() {
     test.create();
   });
 
+
   afterEach(function() {
     test.destroy();
   });
 
+
   it('should raiseError', function() {
-    test.create();
+    assert.isFalse($('div').hasClass('modal'));
     modal.raiseError('Test Message');
-    assert.isTrue($('div:[1]').hasClass('modal'));
+    assert.isTrue($('div').hasClass('modal'));
     assert.deepEqual($('div').css('position'), 'fixed');
     assert.deepEqual($('.serverResponse').html(), 'Test Message');
-    $(document.body).children().remove();
   });
 
-  it('should handle an ajaxError', function() {
+
+  describe('should handle an ajaxError', function() {
     var model = new Object(),
         resp = {
-          getResponseHeader: function() {return ['application/json'];},
+          getResponseHeader: function() { return ['application/json']; },
           responseText: '"Data Test"',
           status: 200
         },
         options = {};
 
-    modal.ajaxError(model, resp, options);
-    assert.deepEqual($('.serverResponse').html(), 'Data Test');
-    $(document.body).children().remove();
+    it('with responseText', function() {
+      modal.ajaxError(model, resp, options);
+      assert.deepEqual($('.serverResponse').html(), 'Data Test');
+    });
 
-    resp.responseText = new Object('{"message": "Object Test"}');
-    modal.ajaxError(model, resp, options);
-    assert.deepEqual($('.serverResponse').html(), 'Object Test');
-    $(document.body).children().remove();
+    it('with responseText Object', function() {
+      resp.responseText = new Object('{ "message": "Object Test" }');
+      modal.ajaxError(model, resp, options);
+      assert.deepEqual($('.serverResponse').html(), 'Object Test');
+    });
 
-    resp.responseText = '{}';
-    modal.ajaxError(model, resp, options);
-    assert.deepEqual($('.serverResponse').html(), 'Unknown error');
-    $(document.body).children().remove();
+    it('with undefined responseText', function() {
+      resp.responseText = '{}';
+      modal.ajaxError(model, resp, options);
+      assert.deepEqual($('.serverResponse').html(), 'Unknown error');
+    });
 
-    resp.status = 404;
-    modal.ajaxError(model, resp, options);
-    assert.deepEqual($('.serverResponse').html(), 'Try refreshing the page');
-    $(document.body).children().remove();
+    it('with 404 status', function() {
+      resp.status = 404;
+      modal.ajaxError(model, resp, options);
+      assert.deepEqual($('.serverResponse').html(), 'Try refreshing the page');
+    });
+
+    it('with a non-json response', function() {
+      resp.getResponseHeader = function() { return ['app/not/json']; };
+      resp.responseText = 'Test Failure';
+      modal.ajaxError(model, resp, options);
+      assert.deepEqual($('.serverResponse').html(), 'Test Failure');
+    });
   });
 
-  it('should handle an ajaxError with a non-json response', function(){
-    var model = new Object(),
-        resp = {
-          getResponseHeader: function() {return ['app/not/json'];},
-          responseText: 'Test Failure'
-        },
-        options = {};
-    modal.ajaxError(model, resp, options);
-    assert.deepEqual($('.serverResponse').html(), 'Test Failure');
-    $(document.body).children().remove();
-  });
 
   it('should confirm success', function() {
     var message = 'Are you sure you want to delete?',
@@ -101,6 +107,7 @@ describe('Modal Static Functions', function() {
     assert.isFalse(failure.calledOnce);
     stub.restore();
   });
+
 
   it('should confirm failure', function() {
     var message = 'Are you sure you want to delete?',

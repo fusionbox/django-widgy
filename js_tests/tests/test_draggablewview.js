@@ -26,27 +26,36 @@ describe('DraggablewView', function() {
     }
   });
 
+
   beforeEach(function() {
     this.node = new nodes.Node({
       content: {
         component: 'testcomponent'
       },
-      css_classes: {'foo': 'bar'}
+      css_classes: { 'foo': 'bar' }
     });
   });
 
-  it('should render', function() {
+
+  it('should render', function(done) {
     return this.node.ready(function(node) {
-      var test_view = new TestView({model: node});
+      var spy = sinon.spy(DraggableView.prototype, 'render');
+      var test_view = new TestView({ model: node });
       test_view.testRender();
       assert.isTrue(test_view.$el.hasClass('bar'));
+      assert(DraggableView.prototype.render.calledOnce);
+      done();
     });
   });
 
-  it('should return cssClasses', function() {
+
+  it('should return cssClasses', function(done) {
     return this.node.ready(function(node) {
-      var test_view = new TestView({model: node});
-      assert.deepEqual(test_view.testCssClasses(), {'foo': 'bar'});
+      var spy = sinon.spy(DraggableView.prototype, 'cssClasses');
+      var test_view = new TestView({ model: node });
+      assert.deepEqual(test_view.testCssClasses(), { 'foo': 'bar' });
+      assert(DraggableView.prototype.cssClasses.calledOnce);
+      done();
     });
   });
 });

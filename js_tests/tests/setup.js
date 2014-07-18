@@ -2,8 +2,6 @@ var path = require('path'),
     requirejs = require('requirejs'),
     jsdom = require('jsdom').jsdom;
 
-require('mocha-as-promised')();
-
 global.document = global.document || jsdom();
 global.window = global.window = global.document.createWindow();
 

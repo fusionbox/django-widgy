@@ -12,7 +12,7 @@ describe('getTemplate', function() {
 
   // AJAX/Promise strategy from  http://martinfowler.com/articles/asyncJS.html
 
-  it('should getTemplate', function() {
+  it('should getTemplate', function(done) {
     var compareModel = new Backbone.Model({
       url: '1',
       template: '<span><%title%></span>'
@@ -20,15 +20,14 @@ describe('getTemplate', function() {
     var simulatedAjaxResponse = {
       template: '<span><%title%></span>'
     };
-    var myAPI = function() { return Q(simulatedAjaxResponse); };
-    var stub = sinon.stub($, 'ajax', myAPI);
+    var stub = sinon.stub($, 'ajax', function() { return Q(simulatedAjaxResponse); });
     var templatePromise = templates.getTemplate('1');
 
     templatePromise.then(function(temp) {
       assert.deepEqual(temp.attributes, compareModel.attributes);
       assert.strictEqual(temp.render('template', {title: 'test'}), '<span>test</span>');
-    })
-    .done();
-    $.ajax.restore();
+      stub.restore();
+      done();
+    });
   });
 });

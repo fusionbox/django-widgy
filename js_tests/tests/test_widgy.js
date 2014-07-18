@@ -9,7 +9,8 @@ var widgy = requirejs('widgy'),
     Q = requirejs('lib/q'),
     $ = requirejs('jquery');
 
-describe.skip('AppView', function() {
+
+describe('AppView', function() {
   beforeEach(function() {
     this.node = new nodes.Node({
       content: {
@@ -20,36 +21,34 @@ describe.skip('AppView', function() {
     });
   });
 
-  it('should initialize an AppView', function() {
+
+  it('should initialize an AppView', function(done) {
     return this.node.ready(function(node) {
       // getComponent is stubbed because testcomponent is inaccessable from AppView
-      var deferal = {};
-      _.extend(deferal, node); // copies node to prevent Backbone from making child
-      var myAPI = function() { return Q(deferal); };
-      sinon.stub(nodes.Node.prototype, 'getComponent', myAPI);
+      var node_object = {};
+      _.extend(node_object, node); // copies node to prevent Backbone from making child
+      var getComponentStub = sinon.stub(nodes.Node.prototype, 'getComponent',
+                                        function() { return Q(node_object); });
 
-      var app_view = new widgy.AppView({root_node: node});
-
-      nodes.Node.prototype.getComponent.restore();
+      var app_view = new widgy.AppView({ root_node: node });
 
       app_view.root_node_promise.then(function() {
         assert.strictEqual(app_view.node_view_list.at(0).content,
-                            deferal.content);
-      })
-      .done();
-    })
-    .done();
+                            node_object.content);
+        getComponentStub.restore();
+        done();
+      });
+    });
   });
 
-  it('should renderPromise', function() {
-    return this.node.ready(function(node) {
-      var deferal = {};
-      _.extend(deferal, node);
-      var myAPI = function() { return Q(deferal); };
-      sinon.stub(nodes.Node.prototype, 'getComponent', myAPI);
-      var app_view = new widgy.AppView({root_node: node, model: node});
-      nodes.Node.prototype.getComponent.restore();
 
+  it('should renderPromise', function(done) {
+    return this.node.ready(function(node) {
+      var node_object = {};
+      _.extend(node_object, node);
+      var getComponentStub = sinon.stub(nodes.Node.prototype, 'getComponent',
+                                        function() { return Q(node_object); });
+      var app_view = new widgy.AppView({ root_node: node, model: node });
 
       app_view.root_node_promise.then(function() {
         app_view.root_node.available_children_url = '1';
@@ -61,13 +60,14 @@ describe.skip('AppView', function() {
         root_view.shelf = root_view.makeShelf();
 
         // setup fetchCompatibility
-        var testObject = [{model: {id: '1'}, __class__: '0'}];
-        var myAPI = function() { return testObject; };
-        sinon.stub($, 'ajax', myAPI);
+        var testObject = [{ model: { id: '1' }, __class__: '0' }];
+        sinon.stub($, 'ajax', function() { return testObject; });
 
         // stubbed to reduce complexity
-        var templateAPI = function() { return '<div><%author%></div>'; }
-        sinon.stub(root_view, 'getTemplate', templateAPI);
+        var getTemplateStub = sinon.stub(root_view, 'getTemplate', function()
+                                         { return '<div><%author%></div>'; });
+        var makeStickyStub = sinon.stub(root_view, 'makeSticky',
+                                        function () { return });
 
         test.create();
 
@@ -78,55 +78,54 @@ describe.skip('AppView', function() {
           assert.strictEqual(root_view.$el.html(), '<div>Test Author</div>');
           assert.strictEqual(app_view.compatibility_data, testObject);
           test.destroy();
+          getComponentStub.restore();
+          getTemplateStub.restore();
+          makeStickyStub.restore();
+          $.ajax.restore();
+          done();
         });
-
-        $.ajax.restore();
-      })
-      .done();
-    })
-    .done();
+      });
+    });
   });
 
-  it('should fetchCompatibility', function() {
+
+  it('should fetchCompatibility', function(done) {
     return this.node.ready(function(node) {
-      var deferal = {};
-      _.extend(deferal, node);
-      var myAPI = function() { return Q(deferal); };
-      sinon.stub(nodes.Node.prototype, 'getComponent', myAPI);
-      var app_view = new widgy.AppView({root_node: node});
-      nodes.Node.prototype.getComponent.restore();
+      var node_object = {};
+      _.extend(node_object, node);
+      var getComponentStub = sinon.stub(nodes.Node.prototype, 'getComponent',
+                                        function() { return Q(node_object); });
+      var app_view = new widgy.AppView({ root_node: node });
 
       app_view.root_node_promise.then(function() {
         var callback = sinon.spy();
-        app_view.inflight = new Object({abort: callback});
+        app_view.inflight = new Object({ abort: callback });
         app_view.root_node.available_children_url = '1';
 
         var testObject = new Object();
-        var myAPI = function() { return testObject; };
-        sinon.stub($, 'ajax', myAPI);
+        sinon.stub($, 'ajax', function() { return testObject; });
 
         var promise = app_view.fetchCompatibility();
-
-        $.ajax.restore();
 
         promise.then(function(inflight) {
           assert.strictEqual(inflight, testObject);
           assert.isTrue(callback.calledOnce);
+          getComponentStub.restore();
+          $.ajax.restore();
+          done();
         });
-      })
-      .done();
-    })
-    .done();
+      });
+    });
   });
 
-  it('should refreshCompatibility', function() {
+
+  it('should refreshCompatibility', function(done) {
     return this.node.ready(function(node) {
-      var deferal = {};
-      _.extend(deferal, node);
-      var myAPI = function() { return Q(deferal); };
-      sinon.stub(nodes.Node.prototype, 'getComponent', myAPI);
-      var app_view = new widgy.AppView({root_node: node});
-      nodes.Node.prototype.getComponent.restore();
+      var node_object = {};
+      _.extend(node_object, node);
+      var getComponentStub = sinon.stub(nodes.Node.prototype, 'getComponent',
+                                        function() { return Q(node_object); });
+      var app_view = new widgy.AppView({ root_node: node });
 
       app_view.root_node_promise.then(function() {
         app_view.root_node.available_children_url = '1';
@@ -135,34 +134,32 @@ describe.skip('AppView', function() {
         root_view.content.shelf = true;
         root_view.shelf = root_view.makeShelf();
 
-        var testObject = [{model: {id: '1'}, __class__: '0'}];
-        var myAPI = function() { return testObject; };
-        sinon.stub($, 'ajax', myAPI);
+        var testObject = [{ model: { id: '1' }, __class__: '0' }];
+        sinon.stub($, 'ajax', function() { return testObject; });
 
         var promise = Q(app_view.refreshCompatibility());
 
-        $.ajax.restore();
-
         promise.then(function() {
           assert.strictEqual(app_view.compatibility_data, testObject);
+          getComponentStub.restore();
+          $.ajax.restore();
+          done();
         });
-      })
-      .done();
-    })
-    .done();
+      });
+    });
   });
 
-  it('should setCompatibility and updateCompatibility', function() {
+
+  it('should setCompatibility and updateCompatibility', function(done) {
     return this.node.ready(function(node) {
-      var deferal = {};
-      _.extend(deferal, node);
-      var myAPI = function() { return Q(deferal); };
-      sinon.stub(nodes.Node.prototype, 'getComponent', myAPI);
-      var app_view = new widgy.AppView({root_node: node});
-      nodes.Node.prototype.getComponent.restore();
+      var node_object = {};
+      _.extend(node_object, node);
+      var getComponentStub = sinon.stub(nodes.Node.prototype, 'getComponent',
+                                        function() { return Q(node_object); });
+      var app_view = new widgy.AppView({ root_node: node });
 
       app_view.root_node_promise.then(function() {
-        var data = [{model: {id: '1'}, __class__: '0'}];
+        var data = [{ model: { id: '1' }, __class__: '0' }];
         var root_view = app_view.node_view_list.at(0);
         root_view.content.shelf = true;
         root_view.shelf = root_view.makeShelf();
@@ -177,34 +174,34 @@ describe.skip('AppView', function() {
 
         callback_add.restore();
         callback_filter.restore();
-      })
-      .done();
-    })
-    .done();
+        getComponentStub.restore();
+        done();
+      });
+    });
   });
 
-  it('should return if ready or not', function() {
+
+  it('should return if ready or not', function(done) {
     return this.node.ready(function(node) {
-      var deferal = {};
-      _.extend(deferal, node);
-      var myAPI = function() { return Q(deferal); };
-      sinon.stub(nodes.Node.prototype, 'getComponent', myAPI);
-      var app_view = new widgy.AppView({root_node: node});
-      nodes.Node.prototype.getComponent.restore();
+      var node_object = {};
+      _.extend(node_object, node);
+      var getComponentStub = sinon.stub(nodes.Node.prototype, 'getComponent',
+                                        function() { return Q(node_object); });
+      var app_view = new widgy.AppView({ root_node: node });
 
       app_view.root_node_promise.then(function() {
         assert.isFalse(app_view.ready());
 
-        var data = [{model: {id: '1'}, __class__: '0'}];
+        var data = [{ model: { id: '1' }, __class__: '0' }];
         var root_view = app_view.node_view_list.at(0);
         root_view.content.shelf = true;
         root_view.shelf = root_view.makeShelf();
         app_view.setCompatibility(data);
 
         assert.isTrue(app_view.ready());
-      })
-      .done();
-    })
-    .done();
+        getComponentStub.restore();
+        done();
+      });
+    });
   });
 });

@@ -250,12 +250,12 @@ describe('View template and render', function(){
     assert.strictEqual(this.view.$el.html(), '<span>test</span>');
   });
 
-  it('should render a promise with renderPromise', function(){
+  it('should render a promise with renderPromise', function(done){
     var promise = this.view.renderPromise()
     promise.then(function(temp) {
       assert.strictEqual(temp.$el.html(), '<span>test</span>')
+      done();
     })
-    .done();
   });
 });
 
