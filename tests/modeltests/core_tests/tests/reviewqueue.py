@@ -118,6 +118,9 @@ class ReviewQueueViewsTest(SwitchUserTestCase, RootNodeTestCase):
             'commit_pk': commit.pk,
         })
 
+        commit.message = u'\N{SNOWMAN}'
+        commit.save()
+
         with self.as_staffuser() as user:
             resp = self.client.post(url)
 
