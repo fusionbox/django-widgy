@@ -2,7 +2,10 @@ from itertools import izip_longest
 
 from django.test import TestCase
 
-from widgy.utils import html_to_plaintext
+from widgy.utils import html_to_plaintext, unset_pks
+
+from .models import Child
+
 
 class HtmlToText(TestCase):
 
@@ -104,3 +107,10 @@ class HtmlToText(TestCase):
             html_to_plaintext('<span lang="en" onclick="javascript:void(0)">content</span>'),
             'content'
         )
+
+class TestUnsetPks(TestCase):
+    def test_unset_pks(self):
+        obj = Child.objects.create()
+        unset_pks(obj)
+        self.assertIsNone(obj.foo)
+        self.assertIsNone(obj.base_ptr_id)

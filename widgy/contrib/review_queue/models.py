@@ -74,6 +74,4 @@ class ReviewedVersionTracker(VersionTracker):
 
     def _commits_to_clone(self):
         for c in super(ReviewedVersionTracker, self)._commits_to_clone():
-            c = c.reviewedversioncommit
-            c.pk = c.id = None
-            yield c
+            yield c.reviewedversioncommit

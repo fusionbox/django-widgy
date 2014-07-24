@@ -9,7 +9,7 @@ from django.template.defaultfilters import date as date_format
 
 from widgy.db.fields import WidgyField
 from widgy.models.base import Node
-from widgy.utils import QuerySet
+from widgy.utils import QuerySet, unset_pks
 
 
 class VersionCommit(models.Model):
@@ -191,18 +191,17 @@ class VersionTracker(models.Model):
         vt = copy.copy(self)
         vt.working_copy = vt.working_copy.clone_tree(freeze=False)
         commits = list(self._commits_to_clone())
-        vt.pk = None
+        unset_pks(vt)
         vt.head = None
         vt.save()
         for commit in commits:
             commit.tracker = vt
             commit.parent = vt.head
+            unset_pks(commit)
             commit.save()
             vt.head = commit
         vt.save()
         return vt
 
     def _commits_to_clone(self):
-        for c in self.commits.order_by('id'):
-            c.id = None
-            yield c
+        return self.commits.order_by('id')

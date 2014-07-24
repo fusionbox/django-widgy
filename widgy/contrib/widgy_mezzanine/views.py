@@ -23,7 +23,7 @@ from widgy.contrib.form_builder.views import HandleFormMixin
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.models import Node
 from widgy.views.base import AuthorizedMixin
-from widgy.utils import fancy_import
+from widgy.utils import fancy_import, unset_pks
 
 WidgyPage = get_widgypage_model()
 
@@ -156,7 +156,7 @@ class ClonePageView(UpdateView):
 
     def form_valid(self, form):
         page = form.instance
-        page.id = page.pk = None
+        unset_pks(page)
         page.root_node = page.root_node.clone()
         form.save()
 
