@@ -63,9 +63,9 @@ class WidgyField(models.ForeignKey):
         super(WidgyField, self).contribute_to_class(cls, name)
         setattr(cls, self.name, WidgyFieldObjectDescriptor(self))
 
-    def add_root(self, model_instance, root_content_kwargs={}):
+    def add_root(self, model_instance, attrs={}):
         value = getattr(model_instance, self.name)
-        return value._ct.model_class().add_root(self.site, **root_content_kwargs).node
+        return value._ct.model_class().add_root(self.site, attrs).node
 
     def pre_save(self, model_instance, add):
         """

@@ -55,11 +55,11 @@ class TestFormHandler(TestCase):
         self.assertIs(resp, form_execute.return_value)
 
     def test_post_rerender(self):
-        self.form.children['fields'].add_child(widgy_site, FormInput,
-                                               label='foo',
-                                               required=True,
-                                               type='text',
-                                               )
+        self.form.children['fields'].add_child(widgy_site, FormInput, {
+            'label': 'foo',
+            'required': True,
+            'type': 'text',
+        })
 
         req = self.factory.post('/?from=/foo/')
         req.user = User(is_superuser=True)
@@ -95,11 +95,11 @@ class TestFormHandler(TestCase):
         from widgy.contrib.widgy_mezzanine.models import WidgyPage
         page = WidgyPage.objects.create(title='Test')
 
-        self.form.children['fields'].add_child(widgy_site, FormInput,
-                                               label='foo',
-                                               required=True,
-                                               type='text',
-                                               )
+        self.form.children['fields'].add_child(widgy_site, FormInput, {
+            'label': 'foo',
+            'required': True,
+            'type': 'text',
+        })
 
         req = self.factory.post('/?from=/foo/')
         req.user = User(is_superuser=True)
@@ -122,8 +122,8 @@ class TestPreviewView(TestCase):
 
     def test_preview(self):
         page = WidgyPage.objects.create(title='Test')
-        root_node1 = Button.add_root(widgy_site, text='Test 1')
-        root_node2 = Button.add_root(widgy_site, text='Test 2')
+        root_node1 = Button.add_root(widgy_site, {'text': 'Test 1'})
+        root_node2 = Button.add_root(widgy_site, {'text': 'Test 2'})
 
         resp1 = self.preview_view(self.request, node_pk=root_node1.node.pk, slug=page.slug)
 
@@ -137,7 +137,7 @@ class TestPreviewView(TestCase):
         self.assertIn('Test 2', resp2.rendered_content)
 
     def test_preview_without_page(self):
-        button = Button.add_root(widgy_site, text='Button text')
+        button = Button.add_root(widgy_site, {'text': 'Button text'})
 
         resp = self.preview_view(self.request, node_pk=button.node.pk)
         self.assertIn(button.text, resp.rendered_content)

@@ -45,16 +45,16 @@ Base Models
         # move the sidebar to the left of the main content.
         >>> sidebar.reposition(widgy_site, right=main)
 
-    .. classmethod:: add_root(cls, site, **kwargs)
+    .. classmethod:: add_root(cls, site, attrs={})
 
-        Creates a root node widget.  Any kwargs will be passed to the Content
+        Creates a root node widget.  Any attrs will be passed to the Content
         class's initialize method. ::
 
-    .. method:: add_child(self, site, cls, **kwargs)
+    .. method:: add_child(self, site, cls, attrs={})
 
         Adds a new instance of ``cls`` as the last child of the current widget.
 
-    .. method:: add_sibling(self, site, cls, **kwargs)
+    .. method:: add_sibling(self, site, cls, attrs={})
 
         Adds a new instance of ``cls`` to the right of the current widget.
 

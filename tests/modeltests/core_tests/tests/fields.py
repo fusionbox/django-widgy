@@ -279,7 +279,7 @@ class TestRender(TestCase):
         self.widgied = HasAWidgy()
         self.widgied.widgy = Layout.add_root(widgy_site).node
         self.widgied.save()
-        self.widgied.widgy.get_children()[1].content.add_child(widgy_site, RawTextWidget, text='asdf')
+        self.widgied.widgy.get_children()[1].content.add_child(widgy_site, RawTextWidget, {'text': 'asdf'})
 
         self.widgy_field = HasAWidgy._meta.get_field_by_name('widgy')[0]
 

@@ -21,7 +21,7 @@ from modeltests.core_tests.widgy_config import widgy_site
 
 
 def make_tracker(site, vt_class=ReviewedVersionTracker):
-    root_node = RawTextWidget.add_root(site, text='first').node
+    root_node = RawTextWidget.add_root(site, {'text': 'first'}).node
     tracker = vt_class.objects.create(working_copy=root_node)
     return tracker
 

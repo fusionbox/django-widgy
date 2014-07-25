@@ -30,8 +30,9 @@ class TestTemplate(TestCase):
         return t.render(c)
 
     def plain_model(self):
-        node = RawTextWidget.add_root(widgy_site,
-                                      text=self.string_to_look_for).node
+        node = RawTextWidget.add_root(widgy_site, {
+            'text': self.string_to_look_for,
+        }).node
         return HasAWidgy.objects.create(
             widgy=node,
         )
@@ -45,7 +46,7 @@ class TestTemplate(TestCase):
         owner = self.plain_model()
 
         override_string = uuid.uuid4().hex
-        override = RawTextWidget.add_root(widgy_site, text=override_string).node
+        override = RawTextWidget.add_root(widgy_site, {'text': override_string}).node
 
         rendered = self.render({'owner': owner, 'field_name': 'widgy', 'root_node_override': override})
 
@@ -53,8 +54,9 @@ class TestTemplate(TestCase):
         self.assertIn(override_string, rendered)
 
     def versioned_model(self):
-        node = RawTextWidget.add_root(widgy_site,
-                                      text=self.string_to_look_for).node
+        node = RawTextWidget.add_root(widgy_site, {
+            'text': self.string_to_look_for,
+        }).node
         vt = VersionTracker.objects.create(working_copy=node)
         vt.commit()
 
@@ -71,7 +73,7 @@ class TestTemplate(TestCase):
         owner = self.versioned_model()
 
         override_string = uuid.uuid4().hex
-        override = RawTextWidget.add_root(widgy_site, text=override_string).node
+        override = RawTextWidget.add_root(widgy_site, {'text': override_string}).node
 
         rendered = self.render({'owner': owner, 'field_name': 'version_tracker', 'root_node_override': override})
 

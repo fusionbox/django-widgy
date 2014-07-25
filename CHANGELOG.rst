@@ -18,6 +18,10 @@ Changelog
 
 .. _django-pyscss: https://github.com/fusionbox/django-pyscss
 
+* ``Content.add_root``, ``add_child``, and ``add_sibling`` take an attrs
+  dictionary instead of `**kwargs`. Passing kwargs is deprecated but still
+  supported.
+
 0.1.6 (2014-09-09)
 ------------------------
 * Fix migrations containing unsupported KeywordsField from mezzanine [Scott Clark]

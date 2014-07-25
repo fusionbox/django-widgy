@@ -67,10 +67,10 @@ class GetFormTest(TestCase):
     def test_widget(self):
         self.form = Form.add_root(widgy_site)
 
-        field_widget = self.form.children['fields'].add_child(widgy_site, FormInput,
-                                                              type='checkbox',
-                                                              label='Test',
-                                                              )
+        field_widget = self.form.children['fields'].add_child(widgy_site, FormInput, {
+            'type': 'checkbox',
+            'label': 'Test',
+        })
         field = field_widget.get_formfield()
 
         self.assertTrue(isinstance(field.widget, forms.CheckboxInput))
@@ -93,14 +93,17 @@ class TestForm(TestCase):
     def make_form(self):
         form = Form.add_root(widgy_site)
         fields = []
-        fields.append(form.children['fields'].add_child(widgy_site, FormInput,
-                                                        label='field 1',
-                                                        type='text'))
-        fields.append(form.children['fields'].add_child(widgy_site, FormInput,
-                                                        label='field 2',
-                                                        type='text'))
-        fields.append(form.children['fields'].add_child(widgy_site, Textarea,
-                                                        label='field 3',))
+        fields.append(form.children['fields'].add_child(widgy_site, FormInput, {
+            'label': 'field 1',
+            'type': 'text'
+        }))
+        fields.append(form.children['fields'].add_child(widgy_site, FormInput, {
+            'label': 'field 2',
+            'type': 'text',
+        }))
+        fields.append(form.children['fields'].add_child(widgy_site, Textarea, {
+            'label': 'field 3',
+        }))
         return form, fields
 
     def setUp(self):
@@ -273,8 +276,9 @@ class TestForm(TestCase):
 
     def test_serialize_file_field(self):
         form = Form.add_root(widgy_site)
-        file_field = form.children['fields'].add_child(widgy_site, FileUpload,
-                                                       required=False)
+        file_field = form.children['fields'].add_child(widgy_site, FileUpload, {
+        'required': False,
+        })
 
         FormSubmission.objects.submit(form=form, data={
             file_field.get_formfield_name(): ContentFile(b'foobar', name='asdf.txt'),

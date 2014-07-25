@@ -22,8 +22,8 @@ class DefaultChildrenMixin(object):
     default_children = tuple()
 
     def post_create(self, site):
-        for cls, args, kwargs in self.default_children:
-            self.add_child(site, cls, *args, **kwargs)
+        for cls, args, attrs in self.default_children:
+            self.add_child(site, cls, attrs, *args)
 
 
 class StrictDefaultChildrenMixin(DefaultChildrenMixin):
@@ -41,8 +41,8 @@ class StrictDefaultChildrenMixin(DefaultChildrenMixin):
         ]
     """
     def post_create(self, site):
-        for name, cls, args, kwargs in self.default_children:
-            self.add_child(site, cls, *args, **kwargs)
+        for name, cls, args, attrs in self.default_children:
+            self.add_child(site, cls, attrs, *args)
 
     @property
     def children(self):

@@ -229,8 +229,9 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         doit('delete')
 
     def test_delete_undeletable(self):
-        node = UndeletableRawTextWidget.add_root(self.widgy_site,
-                                                 text='asdf').node
+        node = UndeletableRawTextWidget.add_root(self.widgy_site, {
+            'text': 'asdf',
+        }).node
 
         resp = self.delete(node.get_api_url(self.widgy_site))
         self.assertEqual(resp.status_code, 409)

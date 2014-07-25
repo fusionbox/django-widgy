@@ -121,28 +121,28 @@ def display_node(node):
 
 def make_a_nice_tree(root_node, widgy_site=widgy_site):
     left, right = root_node.content.get_children()
-    left.add_child(widgy_site,
-                   RawTextWidget,
-                   text='left_1')
-    left.add_child(widgy_site,
-                   RawTextWidget,
-                   text='left_2')
+    left.add_child(widgy_site, RawTextWidget, {
+        'text': 'left_1',
+    })
+    left.add_child(widgy_site, RawTextWidget, {
+        'text': 'left_2',
+    })
 
     subbucket = left.add_child(widgy_site,
                                Bucket)
-    subbucket.add_child(widgy_site,
-                        RawTextWidget,
-                        text='subbucket_1')
-    subbucket.add_child(widgy_site,
-                        RawTextWidget,
-                        text='subbucket_2')
+    subbucket.add_child(widgy_site, RawTextWidget, {
+        'text': 'subbucket_1',
+    })
+    subbucket.add_child(widgy_site, RawTextWidget, {
+        'text': 'subbucket_2',
+    })
 
-    right.add_child(widgy_site,
-                    RawTextWidget,
-                    text='right_1')
-    right.add_child(widgy_site,
-                    RawTextWidget,
-                    text='right_2')
+    right.add_child(widgy_site, RawTextWidget, {
+        'text': 'right_1',
+    })
+    right.add_child(widgy_site, RawTextWidget, {
+        'text': 'right_2',
+    })
 
     return left.node, right.node
 

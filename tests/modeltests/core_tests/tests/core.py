@@ -53,8 +53,7 @@ class TestCore(RootNodeTestCase):
         """
         content = self.root_node.content
         for i in range(50):
-            content = content.add_child(self.widgy_site,
-                                        Bucket)
+            content = content.add_child(self.widgy_site, Bucket)
 
         # + 2 -- original buckets
         self.assertEqual(len(self.root_node.get_descendants()), 50 + 2)
@@ -75,17 +74,16 @@ class TestCore(RootNodeTestCase):
                                                         PickyBucket)
 
         with self.assertRaises(ChildWasRejected):
-            picky_bucket.add_child(self.widgy_site,
-                                   RawTextWidget,
-                                   text='aasdf')
+            picky_bucket.add_child(self.widgy_site, RawTextWidget, {
+                'text': 'aasdf',
+            })
 
-        picky_bucket.add_child(self.widgy_site,
-                               RawTextWidget,
-                               text='hello')
+        picky_bucket.add_child(self.widgy_site, RawTextWidget, {
+            'text': 'hello',
+        })
 
         with self.assertRaises(ChildWasRejected):
-            picky_bucket.add_child(self.widgy_site,
-                                   Layout)
+            picky_bucket.add_child(self.widgy_site, Layout)
 
     def test_reposition_rechecks_deep_deep_compatibility(self):
         a = self.root_node.content.add_child(widgy_site, UnnestableWidget)
@@ -255,8 +253,8 @@ class TestCore(RootNodeTestCase):
             (ForeignKeyWidget, {'foo': r}, {'foo_id': r.pk}),
         ]
 
-        for cls, kwargs, attributes in tests:
-            widget = cls.add_root(self.widgy_site, **kwargs)
+        for cls, attrs, attributes in tests:
+            widget = cls.add_root(self.widgy_site, attrs)
             self.assertEqual(widget.get_attributes(),
                              attributes)
 
@@ -309,41 +307,41 @@ class TestTreesEqual(RootNodeTestCase):
 
     def test_trees_unequal_content_type(self):
         a = CantGoAnywhereWidget.add_root(self.widgy_site)
-        b = RawTextWidget.add_root(self.widgy_site, text='a')
+        b = RawTextWidget.add_root(self.widgy_site, {'text': 'a'})
 
         self.assertFalse(a.node.trees_equal(b.node))
 
     def test_trees_unequal_children(self):
         a = Bucket.add_root(self.widgy_site)
-        a.add_child(self.widgy_site, RawTextWidget, text='a')
-        a.add_child(self.widgy_site, RawTextWidget, text='b')
+        a.add_child(self.widgy_site, RawTextWidget, {'text': 'a'})
+        a.add_child(self.widgy_site, RawTextWidget, {'text': 'b'})
 
         b = Bucket.add_root(self.widgy_site)
-        b.add_child(self.widgy_site, RawTextWidget, text='a')
+        b.add_child(self.widgy_site, RawTextWidget, {'text': 'a'})
 
         self.assertFalse(a.node.trees_equal(b.node))
 
     def test_trees_unequal_depth(self):
-        a = Bucket.add_root(self.widgy_site).add_child(self.widgy_site, RawTextWidget, text='a')
-        b = RawTextWidget.add_root(self.widgy_site, text='a')
+        a = Bucket.add_root(self.widgy_site).add_child(self.widgy_site, RawTextWidget, {'text': 'a'})
+        b = RawTextWidget.add_root(self.widgy_site, {'text': 'a'})
 
         self.assertFalse(a.node.trees_equal(b.node))
 
     def test_trees_unequal_content(self):
-        a = RawTextWidget.add_root(self.widgy_site, text='b')
-        b = RawTextWidget.add_root(self.widgy_site, text='a')
+        a = RawTextWidget.add_root(self.widgy_site, {'text': 'b'})
+        b = RawTextWidget.add_root(self.widgy_site, {'text': 'a'})
 
         self.assertFalse(a.node.trees_equal(b.node))
 
     def test_trees_equal_equal(self):
-        a = RawTextWidget.add_root(self.widgy_site, text='a')
-        b = RawTextWidget.add_root(self.widgy_site, text='a')
+        a = RawTextWidget.add_root(self.widgy_site, {'text': 'a'})
+        b = RawTextWidget.add_root(self.widgy_site, {'text': 'a'})
 
         self.assertTrue(a.node.trees_equal(b.node))
 
 
 def make_tracker(site, vt_class=VersionTracker):
-    root_node = RawTextWidget.add_root(widgy_site, text='first').node
+    root_node = RawTextWidget.add_root(widgy_site, {'text': 'first'}).node
     tracker = vt_class.objects.create(working_copy=root_node)
     return tracker
 
@@ -379,8 +377,8 @@ class TestVersioning(RootNodeTestCase):
 
     def test_clone_tree_uses_prefetch(self):
         root = Bucket.add_root(self.widgy_site)
-        root.add_child(self.widgy_site, RawTextWidget, text='a')
-        root.add_child(self.widgy_site, RawTextWidget, text='b')
+        root.add_child(self.widgy_site, RawTextWidget, {'text': 'a'})
+        root.add_child(self.widgy_site, RawTextWidget, {'text': 'b'})
 
         root_node = root.node
         root_node.prefetch_tree()
@@ -393,8 +391,8 @@ class TestVersioning(RootNodeTestCase):
             root_node.clone_tree()
 
     def test_content_equal(self):
-        a = RawTextWidget.add_root(self.widgy_site, text='a')
-        b = RawTextWidget.add_root(self.widgy_site, text='b')
+        a = RawTextWidget.add_root(self.widgy_site, {'text': 'a'})
+        b = RawTextWidget.add_root(self.widgy_site, {'text': 'b'})
         self.assertFalse(a.equal(b))
         b.text = 'a'
         b.save()
@@ -406,7 +404,7 @@ class TestVersioning(RootNodeTestCase):
         self.assertTrue(a.equal(b))
 
     def test_commit(self):
-        root_node = RawTextWidget.add_root(self.widgy_site, text='first').node
+        root_node = RawTextWidget.add_root(self.widgy_site, {'text': 'first'}).node
         tracker = VersionTracker.objects.create(working_copy=root_node)
         commit1 = tracker.commit()
 
@@ -425,14 +423,12 @@ class TestVersioning(RootNodeTestCase):
 
     def test_tree_structure_versioned(self):
         root_node = Bucket.add_root(self.widgy_site).node
-        root_node.content.add_child(
-            self.widgy_site,
-            RawTextWidget,
-            text='a')
-        root_node.content.add_child(
-            self.widgy_site,
-            RawTextWidget,
-            text='b')
+        root_node.content.add_child(self.widgy_site, RawTextWidget, {
+            'text': 'a',
+        })
+        root_node.content.add_child(self.widgy_site, RawTextWidget, {
+            'text': 'b',
+        })
 
         # if the root_node isn't refetched, get_children is somehow empty. I
         # don't know why
@@ -450,7 +446,7 @@ class TestVersioning(RootNodeTestCase):
                          [i.content.text for i in commit2.root_node.get_children()])
 
     def test_revert(self):
-        root_node = RawTextWidget.add_root(self.widgy_site, text='first').node
+        root_node = RawTextWidget.add_root(self.widgy_site, {'text': 'first'}).node
         tracker = VersionTracker.objects.create(working_copy=root_node)
         commit1 = tracker.commit()
 
@@ -473,7 +469,7 @@ class TestVersioning(RootNodeTestCase):
                          [i.root_node.content.text for i in tracker.get_history()])
 
     def test_get_history(self):
-        root_node = RawTextWidget.add_root(self.widgy_site, text='first').node
+        root_node = RawTextWidget.add_root(self.widgy_site, {'text': 'first'}).node
         tracker = VersionTracker.objects.create(working_copy=root_node)
 
         commits = reversed([tracker.commit() for i in range(6)])
@@ -481,7 +477,7 @@ class TestVersioning(RootNodeTestCase):
         self.assertSequenceEqual(list(tracker.get_history()), list(commits))
 
     def test_old_contents_cant_change(self):
-        root_node = RawTextWidget.add_root(self.widgy_site, text='first').node
+        root_node = RawTextWidget.add_root(self.widgy_site, {'text': 'first'}).node
         tracker = VersionTracker.objects.create(working_copy=root_node)
         commit = tracker.commit()
 
@@ -497,8 +493,12 @@ class TestVersioning(RootNodeTestCase):
 
     def test_old_structure_cant_change(self):
         root_node = Bucket.add_root(self.widgy_site).node
-        root_node.content.add_child(self.widgy_site, RawTextWidget, text='a')
-        root_node.content.add_child(self.widgy_site, RawTextWidget, text='b')
+        root_node.content.add_child(self.widgy_site, RawTextWidget, {
+            'text': 'a',
+        })
+        root_node.content.add_child(self.widgy_site, RawTextWidget, {
+            'text': 'b',
+        })
         root_node = Node.objects.get(pk=root_node.pk)
         tracker = VersionTracker.objects.create(working_copy=root_node)
         commit = tracker.commit()
@@ -508,7 +508,9 @@ class TestVersioning(RootNodeTestCase):
             b.reposition(self.widgy_site, right=a)
 
         with self.assertRaises(InvalidOperation):
-            commit.root_node.content.add_child(self.widgy_site, RawTextWidget, text='c')
+            commit.root_node.content.add_child(self.widgy_site, RawTextWidget, {
+                'text': 'c',
+            })
 
         self.assertEqual([i.content.text for i in commit.root_node.get_children()],
                          ['a', 'b'])
@@ -572,10 +574,14 @@ class TestVersioning(RootNodeTestCase):
             right.content.reposition(self.widgy_site, right=left.content)
 
         with self.assertRaises(InvalidOperation):
-            right.content.add_child(self.widgy_site, RawTextWidget, text='asdf')
+            right.content.add_child(self.widgy_site, RawTextWidget, {
+                'text': 'asdf',
+            })
 
         with self.assertRaises(InvalidOperation):
-            right.content.get_children()[0].add_sibling(self.widgy_site, RawTextWidget, text='asdf')
+            right.content.get_children()[0].add_sibling(self.widgy_site, RawTextWidget, {
+                'text': 'asdf',
+            })
 
         root_node = Node.objects.get(pk=self.root_node.id)
         self.assertEqual([i.id for i in root_node.depth_first_order()],
@@ -606,7 +612,7 @@ class TestVersioning(RootNodeTestCase):
             b.delete()
 
     def test_prefetch_commits(self):
-        root_node = RawTextWidget.add_root(self.widgy_site, text='first').node
+        root_node = RawTextWidget.add_root(self.widgy_site, {'text': 'first'}).node
         tracker = VersionTracker.objects.create(working_copy=root_node)
         user = User.objects.create()
         commits = reversed([tracker.commit(user=user) for i in range(6)])
@@ -706,7 +712,7 @@ class TestVersioning(RootNodeTestCase):
         """
 
         related = Related.objects.create()
-        root_node = ForeignKeyWidget.add_root(self.widgy_site, foo=related).node
+        root_node = ForeignKeyWidget.add_root(self.widgy_site, {'foo': related}).node
         tracker = VersionTracker.objects.create(working_copy=root_node)
         commit = tracker.commit()
 
@@ -725,7 +731,9 @@ class TestVersioning(RootNodeTestCase):
         # do the deletion on something other than the root node
         related = Related.objects.create()
         root_node = Bucket.add_root(self.widgy_site).node
-        root_node.content.add_child(self.widgy_site, ForeignKeyWidget, foo=related)
+        root_node.content.add_child(self.widgy_site, ForeignKeyWidget, {
+            'foo': related,
+        })
         root_node = Node.objects.get(pk=root_node.pk)
         tracker = VersionTracker.objects.create(working_copy=root_node)
         commit = tracker.commit()
@@ -755,7 +763,9 @@ class TestVersioning(RootNodeTestCase):
         self.assertTrue(vt.has_changes())
         vt.commit()
         self.assertFalse(vt.has_changes())
-        left.content.add_child(self.widgy_site, RawTextWidget, text='foo')
+        left.content.add_child(self.widgy_site, RawTextWidget, {
+            'text': 'foo',
+        })
         vt = VersionTracker.objects.get(pk=vt.pk)
         self.assertTrue(vt.has_changes())
 
@@ -787,7 +797,7 @@ class TestVersioning(RootNodeTestCase):
         self.assertIn(b, diff)
 
     def test_reset(self):
-        root_node = RawTextWidget.add_root(self.widgy_site, text='first').node
+        root_node = RawTextWidget.add_root(self.widgy_site, {'text': 'first'}).node
         tracker = VersionTracker.objects.create(working_copy=root_node)
         commit1 = tracker.commit()
 
@@ -849,7 +859,7 @@ class TestVersioning(RootNodeTestCase):
         self.assertNotEqual(new_root.pk, root.pk)
 
     def test_cloning_multi_table_inheritance_fancy(self):
-        root = WeirdPkBucket.add_root(self.widgy_site, bubble=2)
+        root = WeirdPkBucket.add_root(self.widgy_site, {'bubble': 2})
         new_root = root.clone()
         self.assertNotEqual(new_root.pk, root.pk)
 

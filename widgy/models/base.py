@@ -7,6 +7,7 @@ from functools import partial
 import logging
 import itertools
 import copy
+import warnings
 
 from django.db import models
 from django import forms
@@ -580,20 +581,31 @@ class Content(models.Model):
         """
         return True
 
+    @staticmethod
+    def _deprecate_kwargs(attrs, kwargs):
+        if kwargs:
+            warnings.warn("Don't use kwargs", DeprecationWarning, stacklevel=3)
+            assert not attrs
+            return kwargs
+        else:
+            return attrs
+
     @classmethod
-    def add_root(cls, site, **kwargs):
+    def add_root(cls, site, attrs={}, **kwargs):
         """
         Creates a new Content instance, stores it in the database, and calls
         ``Node.add_root``
         """
-        obj = cls.objects.create(**kwargs)
+        attrs = cls._deprecate_kwargs(attrs, kwargs)
+        obj = cls.objects.create(**attrs)
         Node.add_root(content=obj)
         obj.post_create(site)
         return obj
 
-    def add_child(self, site, cls, **kwargs):
+    def add_child(self, site, cls, attrs={}, **kwargs):
+        attrs = cls._deprecate_kwargs(attrs, kwargs)
         self.check_frozen()
-        obj = cls.objects.create(**kwargs)
+        obj = cls.objects.create(**attrs)
         self.node.add_child(content=obj)
 
         try:
@@ -605,12 +617,13 @@ class Content(models.Model):
         obj.post_create(site)
         return obj
 
-    def add_sibling(self, site, cls, **kwargs):
+    def add_sibling(self, site, cls, attrs={}, **kwargs):
+        attrs = cls._deprecate_kwargs(attrs, kwargs)
         self.check_frozen()
         if self.node.is_root():
             raise RootDisplacementError({'message': 'You can\'t put things next to me'})
 
-        obj = cls.objects.create(**kwargs)
+        obj = cls.objects.create(**attrs)
         self.node.add_sibling(content=obj, pos='left')
         parent = self.node.get_parent().content
 
