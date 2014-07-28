@@ -1,3 +1,5 @@
+import debug_toolbar
+
 from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
@@ -55,19 +57,6 @@ urlpatterns = patterns("",
     # page tree in the admin if it was installed.
 
     # url("^$", "mezzanine.blog.views.blog_post_list", name="home"),
-
-    # MEZZANINE'S URLS
-    # ----------------
-    # Note: ADD YOUR OWN URLPATTERNS *ABOVE* THE LINE BELOW.
-    # ``mezzanine.urls`` INCLUDES A *CATCH ALL* PATTERN
-    # FOR PAGES, SO URLPATTERNS ADDED BELOW ``mezzanine.urls``
-    # WILL NEVER BE MATCHED!
-    # If you'd like more granular control over the patterns in
-    # ``mezzanine.urls``, go right ahead and take the parts you want
-    # from it, and use them directly below instead of using
-    # ``mezzanine.urls``.
-    ("^", include("mezzanine.urls")),
-
 )
 
 # Adds ``STATIC_URL`` to the context of error pages, so that error
@@ -80,3 +69,25 @@ if settings.DEBUG:
             'document_root': settings.MEDIA_ROOT,
         }),
     )
+
+    if debug_toolbar.VERSION > '1.2.0':
+        urlpatterns += patterns('',
+            url(r'^__debug__/', include(debug_toolbar.urls)),
+        )
+
+urlpatterns += patterns('',
+    # MEZZANINE'S URLS
+    # ----------------
+    # Note: ADD YOUR OWN URLPATTERNS *ABOVE* THE LINE BELOW.
+    # ``mezzanine.urls`` INCLUDES A *CATCH ALL* PATTERN
+    # FOR PAGES, SO URLPATTERNS ADDED BELOW ``mezzanine.urls``
+    # WILL NEVER BE MATCHED!
+    # If you'd like more granular control over the patterns in
+    # ``mezzanine.urls``, go right ahead and take the parts you want
+    # from it, and use them directly below instead of using
+    # ``mezzanine.urls``.
+
+    # Moved Mezzanine's URLS below Debug Toolbar because the catch-all
+    # interferes with Django Debug Toolbar's __debug__ url
+    ("^", include("mezzanine.urls")),
+)
