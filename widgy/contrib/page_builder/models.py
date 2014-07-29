@@ -9,7 +9,7 @@ from django.template.defaultfilters import truncatechars
 from widgy.models import Content
 from widgy.models.mixins import (
     StrictDefaultChildrenMixin, InvisibleMixin, StrDisplayNameMixin,
-    TabbedContainer,
+    TabbedContainer, DefaultChildrenMixin,
 )
 from widgy.models.links import LinkField, LinkFormField, LinkFormMixin
 from widgy.db.fields import WidgyField
@@ -196,7 +196,7 @@ class CalloutWidget(StrDisplayNameMixin, Content):
 
 
 @widgy.register
-class Accordion(Bucket):
+class Accordion(DefaultChildrenMixin, Bucket):
     draggable = True
     deletable = True
     tooltip = _("Accordions are a good way to separate sections of content. A"
@@ -209,6 +209,20 @@ class Accordion(Bucket):
     class Meta:
         verbose_name = _('accordion')
         verbose_name_plural = _('accordions')
+
+    @property
+    def default_children(self):
+        """
+        Adds 2 Sections as children because you would only ever use an
+        Accordion if you had 2 or more Sections.  This increases usability as
+        users now don't have to figure out what child Accordion accepts, they
+        can follow an example now.  Also, add default titles to the Sections to
+        let the user know that Sections need titles.
+        """
+        return [
+            (Section, (), {'title': _('Title 1')}),
+            (Section, (), {'title': _('Title 2')}),
+        ]
 
 
 @widgy.register

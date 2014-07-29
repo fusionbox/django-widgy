@@ -5,8 +5,10 @@ from widgy.site import WidgySite
 from widgy.models import Node
 from widgy.exceptions import ParentChildRejection
 
-from widgy.contrib.page_builder.models import (Table, TableRow,
-        TableHeaderData, TableHeader, TableBody)
+from widgy.contrib.page_builder.models import (
+    Table, TableRow, TableHeaderData, TableHeader, TableBody,
+    Accordion,
+)
 from widgy.contrib.page_builder.forms import CKEditorField
 
 
@@ -217,3 +219,11 @@ class TestHtmlCleaning(TestCase):
         for html, must_not_occur in test_cases:
             cleaned = CKEditorField().clean(html)
             self.assertNotIn(must_not_occur, cleaned)
+
+
+class TestAccordionAutomaticallyAdds2Sections(TestCase):
+    def test_adding_new_accordion_is_user_friendly(self):
+        tabs = Accordion.add_root(widgy_site)
+        self.assertEqual(len(tabs.get_children()), 2)
+        self.assertEqual(tabs.get_children()[0].title, 'Title 1')
+        self.assertEqual(tabs.get_children()[1].title, 'Title 2')
