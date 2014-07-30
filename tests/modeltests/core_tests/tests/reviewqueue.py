@@ -83,6 +83,14 @@ class ReviewQueueTest(RootNodeTestCase):
         self.assertIsInstance(page.version_tracker, ReviewedVersionTracker)
         self.assertEqual(page.version_tracker, tracker)
 
+    def test_clone_tracker(self):
+        tracker, _ = make_commit(self.widgy_site, vt_class=ReviewedVersionTracker)
+
+        new_tracker = tracker.clone()
+
+        self.assertNotEqual(new_tracker.head.reviewedversioncommit.pk,
+                            tracker.head.reviewedversioncommit.pk)
+
 
 class ReviewQueueViewsTest(SwitchUserTestCase, RootNodeTestCase):
     widgy_site = ReviewedWidgySite()

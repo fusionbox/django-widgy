@@ -2,6 +2,9 @@
 {% load i18n %}
 {% block object-tools %}
     <ul class="object-tools">
+      {% if has_add_permission %}
+      <li><a class="widgy-fancybox" href="clone/">Clone</a></li>
+      {% endif %}
     {% if has_absolute_url %}
         <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>
     {% endif%}

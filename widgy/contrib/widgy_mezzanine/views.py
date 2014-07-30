@@ -1,5 +1,5 @@
 from django.db.models import Q
-from django.views.generic import View
+from django.views.generic import View, UpdateView
 from django.views.generic.detail import SingleObjectMixin
 from django.conf import settings
 from django.http import (
@@ -8,6 +8,13 @@ from django.http import (
     HttpResponsePermanentRedirect,
 )
 from django.utils.http import is_safe_url
+from django.contrib.admin.util import unquote
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, render
+from django.core.exceptions import PermissionDenied
+from django.core import urlresolvers
+from django import forms
+from django.utils.translation import ugettext as _
 
 from mezzanine.pages.views import page as page_view
 from mezzanine.pages.models import Page
@@ -16,7 +23,7 @@ from widgy.contrib.form_builder.views import HandleFormMixin
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.models import Node
 from widgy.views.base import AuthorizedMixin
-from widgy.utils import fancy_import
+from widgy.utils import fancy_import, unset_pks
 
 WidgyPage = get_widgypage_model()
 
@@ -113,3 +120,64 @@ class PreviewView(AuthorizedMixin, SingleObjectMixin, PageViewMixin, View):
 preview = PreviewView.as_view(
     site=fancy_import(settings.WIDGY_MEZZANINE_SITE),
 )
+
+
+class CloneForm(forms.ModelForm):
+    class Meta:
+        model = WidgyPage
+        fields = ['title', 'slug']
+
+    def __init__(self, *args, **kwargs):
+        super(CloneForm, self).__init__(*args, **kwargs)
+        self.fields['title'].label = _('New title')
+        self.fields['slug'].label = _('New URL')
+
+
+class ClonePageView(UpdateView):
+    form_class = CloneForm
+    model = WidgyPage
+    template_name = 'widgy/widgy_mezzanine/widgypage_clone_form.html'
+    has_permission = None
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.has_permission(request):
+            raise PermissionDenied
+        return super(ClonePageView, self).dispatch(request, *args, **kwargs)
+
+    def get_object(self):
+        obj = get_object_or_404(self.model, pk=unquote(self.args[0]))
+        self.original_title = obj.title
+        return obj
+
+    def get_initial(self):
+        initial = super(ClonePageView, self).get_initial()
+        initial['slug'] = None
+        return initial
+
+    def form_valid(self, form):
+        page = form.instance
+        unset_pks(page)
+        page.root_node = page.root_node.clone()
+        form.save()
+
+        messages.success(
+            self.request,
+            _("'{old_title}' successfully cloned as '{new_title}'.").format(
+                old_title=self.original_title,
+                new_title=page.title,
+            )
+        )
+        # We can't do a normal HTTP redirect because the form is in a modal
+        # window.
+        return render(self.request, 'widgy/widgy_mezzanine/clone_success.html', {
+            'success_url': self.get_success_url(),
+        })
+
+    def get_success_url(self):
+        return urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change',
+                                    args=(self.object.pk,))
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ClonePageView, self).get_context_data(**kwargs)
+        kwargs['is_popup'] = True
+        return kwargs

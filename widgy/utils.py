@@ -233,3 +233,19 @@ else:
         @classmethod
         def as_manager(cls):
             return Manager.from_queryset(cls)()
+
+
+def unset_pks(obj):
+    """
+    Unsets the pk field of a model, including its parent's pks during
+    multi-table inheritance. Normally we would say
+
+       obj.pk = None
+       obj.id = None
+
+    but we can't know for sure what the name of the actually primary key field
+    is called.  So we do this to set all the primary keys to None.
+    """
+    for field in obj._meta.fields:
+        if field.primary_key:
+            setattr(obj, field.attname, None)

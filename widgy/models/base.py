@@ -27,7 +27,7 @@ from widgy.exceptions import (
 from widgy.signals import pre_delete_widget
 from widgy.generic import WidgyGenericForeignKey, ProxyGenericRelation
 from widgy.utils import (
-    exception_to_bool, update_context, render_to_string, force_text,
+    exception_to_bool, update_context, render_to_string, force_text, unset_pks,
 )
 from widgy.widgets import DateTimeWidget, DateWidget, TimeWidget
 
@@ -803,17 +803,7 @@ class Content(models.Model):
         # document that you should provide your own clone()
         # See https://code.djangoproject.com/ticket/4027
         new = copy.copy(self)
-        new.pk = None
-        # This adds support for multi-table inheritance.  Normally we would say
-        #
-        #     new.pk = None
-        #     new.id = None
-        #
-        # but we can't know for sure what the name of the actually primary key
-        # field is called.  So we do this to set all the primary keys to None.
-        for field, _ in new._meta.get_fields_with_model():
-            if field.primary_key:
-                setattr(new, field.attname, None)
+        unset_pks(new)
         new.save()
         return new
 

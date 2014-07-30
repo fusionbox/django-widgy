@@ -888,6 +888,24 @@ class TestVersioning(RootNodeTestCase):
         tracker.revert_to(commit)
         tracker.delete()
 
+    def test_clone_tracker(self):
+        tracker, _ = make_commit(self.widgy_site)
+        tracker.commit()
+
+        new_tracker = tracker.clone()
+
+        self.assertNotEqual(tracker.pk, new_tracker.pk)
+        self.assertNotEqual(tracker.working_copy, new_tracker.working_copy)
+        self.assertEqual(len(tracker.get_history_list()),
+                         len(new_tracker.get_history_list()))
+        self.assertFalse(new_tracker.working_copy.is_frozen)
+
+        for (commit, new_commit) in zip(tracker.commits.order_by('-id'), new_tracker.commits.order_by('-id')):
+            self.assertNotEqual(commit.pk, new_commit.pk)
+            self.assertEqual(new_commit.tracker, new_tracker)
+        # the last commit
+        self.assertEqual(new_commit.parent, None)
+
 
 class VersioningViewsTest(SwitchUserTestCase, RootNodeTestCase):
     widgy_site = widgy_site
