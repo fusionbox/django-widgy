@@ -1,0 +1,15 @@
+{% extends widgy.owner.base_template|default:"layout_base.html" %}
+{% load widgy_tags %}
+
+{% block content %}
+<section class="main">
+  {# I had to overwrite the h1 #}
+  <h1>{{ widgy.owner.title }}</h1>
+
+  {% render self.get_children.0 %}
+</section>
+
+<section class="sidebar">
+  {% render self.get_children.1 %}
+</section>
+{% endblock %}

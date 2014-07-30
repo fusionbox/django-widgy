@@ -1,0 +1,17 @@
+{% extends "widgy/page_builder/defaultlayout/render.html" %}
+
+{% load widgy_tags %}
+
+{% block bodyClass %}home{% endblock %}
+
+{% block leftnav %}
+{% endblock %}
+
+{% block content %}
+{% for child in self.get_children %}
+{% render child %}
+{% endfor %}
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}

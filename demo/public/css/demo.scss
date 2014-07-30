@@ -1,0 +1,1273 @@
+@import "common.scss";
+
+/* Fonts & Colors
+------------------------------------------------------*/
+
+$white10: rgba(255,255,255,0.1);
+$white20: rgba(255,255,255,0.2);
+$white30: rgba(255,255,255,0.3);
+$white50: rgba(255,255,255,0.5);
+$white70: rgba(255,255,255,0.7);
+$white90: rgba(255,255,255,0.9);
+
+$black70: rgba(0,0,0,0.7);
+$black50: rgba(0,0,0,0.5);
+$black30: rgba(0,0,0,0.3);
+$black20: rgba(0,0,0,0.2);
+$black10: rgba(0,0,0,0.1);
+
+$darkblue: #152030;
+$blue: #243854;
+$lightblue: #184C88;
+$green: #78E3C6;
+$orange: #F26304;
+$red: #b8292f;
+$yellow: #faa61a;
+
+$darkgrey: #424242;
+$grey: #7a7b7b;
+$lightgrey: #babbbb;
+$reallylightgrey: #ededed;
+$almostwhite: #e5e5e5;
+
+$font-primary: "Lato", "Arial Black", Helvetica, Arial, sans-serif;
+$font-default: "Roboto", Helvetica, Arial, sans-serif;
+$font-mono: monospace;
+
+$width: 960px;
+
+$inputFields: "input[type='text'], input[type='password'], input[type='email'], input[type='tel'], input[type='number'], textarea";
+
+
+
+/* Mixins
+------------------------------------------------------*/
+
+@mixin button {
+  @include gradient($lightgrey,$almostwhite);
+  @include rounded(5px);
+  @include shadow($black30,0px,2px,1px);
+  @include text-shadow(white,0px,1px,0px);
+  @include transition;
+  border: 0px;
+  border-top: 1px solid white;
+  border-bottom: 1px solid darken($grey,10%);
+  color: black;
+  display: inline-block;
+  font-family: $font-primary;
+  font-size: 20px;
+  line-height: 20px;
+  height: auto;
+  letter-spacing: 2px;
+  margin: 0px;
+  outline: 0px;
+  padding: 12px 18px;
+  position: relative;
+  top: 0px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  width: auto;
+  
+  &:hover {
+    @include shadow($black10,0px,6px,8px);
+    background: $almostwhite;
+    position: relative;
+    top: -3px;
+  }
+  
+  &.block {
+    display: block;
+  }
+  
+  &.big {
+    font-size: 24px;
+    line-height: 24px;
+    padding: 18px 24px;
+  }
+}
+
+
+/* Tags
+------------------------------------------------------*/
+
+p, h1, h2, h3, h4, h5, h6 {
+  @include default;
+}
+
+h1 {
+  border-bottom: 2px solid $orange;
+  font-size: 40px;
+  font-weight: 200;
+  line-height: 42px;
+  letter-spacing: -1px;
+  margin: 0px 0px 15px 0px;
+  padding: 0px 0px 5px 0px;
+}
+
+h2 {
+  color: $darkgrey;
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: bold;
+  letter-spacing: -1px;
+  margin: 0px 0px 5px 0px;
+}
+
+h3 {
+  border-bottom: 1px dotted $lightgrey;
+  color: $orange;
+  font-size: 16px;
+  font-weight: normal;
+  line-height: 22px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0px 0px 5px 0px;
+  padding: 0px 0px 3px 0px;
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0px 0px 5px 0px;
+}
+
+p {
+  margin: 0px 0px 15px 0px;
+}
+
+ol, ul {
+  padding-left: 20px;
+}
+
+blockquote {
+  background: transparent;
+  padding: 5px 10px;
+  position: relative;
+  
+  p {
+    color: $grey;
+    quotes: "\201c" "\201d" "\2018" "\2019";
+    margin: 0 !important;
+    font-style: italic;
+    
+    &:before {
+      color: $orange;
+      content: open-quote;
+      font-family: serif;
+      font-size: 30px;
+      left: -10px;
+      position: absolute;
+      top: 5px;
+    }
+    
+    &:after {
+      color: $orange;
+      content: close-quote;
+      font-family: serif;
+      font-size: 30px;
+      position: absolute;
+      bottom: -5px;
+      right: -5px;
+    }
+  }
+}
+
+.align-right {
+  text-align: right;
+}
+
+.align-center {
+  text-align: center;
+}
+
+.align-justify {
+  text-align: justify;
+}
+
+/* Forms
+------------------------------------------------------*/
+
+form {
+  @include clearfix;
+  @include rounded(3px);
+  border: 1px dashed $almostwhite;
+  clear: both;
+  margin-bottom: 20px;
+  padding: 20px
+
+  div.formField {
+    @include clearfix;
+    clear: both;
+    margin-bottom: 15px;
+
+    &.required {
+      label {
+        font-weight: bold;
+
+        &:after {
+          color: $red;
+          content: "*";
+        }
+      }
+
+      ul {
+        label {
+          font-weight: normal;
+
+          &:after {
+            content: "";
+          }
+        }
+      }
+    }
+
+    label {
+      clear: both;
+      display: inline-block;
+      margin: 0px 0px 4px 0px;
+    }
+
+    #{$inputFields} {
+      @include rounded(2px);
+      @include inset-shadow($black10,0px,1px,3px);
+      border: 1px solid $lightgrey;
+      margin: 0px;
+      padding: 5px;
+      width: 97.5%;
+    }
+    
+    select {
+      @include rounded(2px);
+      @include inset-shadow($black10,0px,1px,3px);
+      padding: 5px;
+      width: 100%;
+    }
+
+    ul, ol {
+      list-style: none;
+      padding: 0px;
+
+      li {
+        input {
+          float: left;
+          margin: 3px 4px 0px 0px;
+        }
+      }
+    }
+
+    div.help_text {
+      p {
+        color: $grey;
+        font-size: 11px;
+        margin: 0 !important;
+      }
+    }
+  }
+  
+  input[type='submit'] {
+    margin-bottom: 0 !important;
+  }
+}
+
+a.button, button, input[type='submit'], input[type='button'] {
+  @include button;
+}
+
+/* Body
+------------------------------------------------------*/
+
+html, body {
+  background: $almostwhite url('../img/grunge.jpg');
+  color: $darkgrey;
+  font-size: 13px;
+  font-family: $font-default;
+  line-height: 18px;
+}
+
+body {
+  padding-top: 98px;
+  
+  &.bop-it {
+    header {
+      a.logo {
+        height: 33px;
+        top: 13px;
+        width: 91px;
+      }
+      
+      nav {
+        > ul {
+          > li {
+            > a {
+              padding-bottom: 20px;
+              padding-top: 20px;
+            }
+            
+            ul {
+              top: 68px;
+            }
+            
+            &:hover {
+              ul {
+                top: 58px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+div.adapt {
+  transition: all 0.25s ease 0s;
+    -o-transition: all 0.25s ease 0s;
+    -ms-transition: all 0.25s ease 0s;
+    -moz-transition: all 0.25s ease 0s;
+    -webkit-transition: all 0.25s ease 0s;
+  left: 0px;
+  position: relative;
+  top: 0px;
+}
+
+/* Mobile Menu
+------------------------------------------------------*/
+
+section.mobile {
+  display: none;
+  height: auto;
+  width: auto;
+
+  a {
+    @include transition();
+    background: $green url('../img/bg.jpg');
+    color: $darkblue;
+    display: block;
+    padding: 10px 3%;
+    font-weight: bold;
+    text-align: left;
+    text-decoration: none;
+
+    &:hover {
+      background: $green;
+    }
+  }
+}
+
+/* Header
+------------------------------------------------------*/
+
+header {
+  @include clearfix;
+  @include shadow($black30,0px,1px,3px);
+  @include transition(all 0.5s ease 0s);
+  @include wrapper;
+  background: $green url('../img/bg.jpg');
+  left: 0px;
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  z-index: 3000;
+  
+  a.logo {
+    @include transition(all 0.5s ease 0s);
+    background: $orange;
+    color: white;
+    display: inline-block;
+    float: none;
+    font-family: $font-primary;
+    font-weight: bold;
+    font-size: 30px;
+    height: 67px;
+    left: 0px;
+    letter-spacing: 7px;
+    line-height: 30px;
+    margin: 0;
+    overflow: hidden;
+    position: absolute;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    top: 15px;
+    width: 184px;
+    z-index: 3000;
+  
+    > img {
+      @include transition(all 0.5s ease 0s);
+      display: block;
+      height: auto;
+      left: 0px;
+      position: absolute;
+      top: 0px;
+      width: 100%;
+    
+      &.logo {
+        z-index: 20;
+      }
+    
+      &.frame {
+        z-index: 15;
+      }
+    
+      &.fill {
+        z-index: 10;
+      }
+    }
+  }
+  
+  > div {
+    @include clearfix;
+    @include inner;
+    color: white;
+    display: block;
+    height: auto;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
+    max-width: $width;
+
+    nav {
+      display: inline;
+      float: right;
+      position: relative;
+      right: 0px;
+      text-align: right;
+    
+      ul {
+        display: block;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        text-align: right;
+        
+        li {
+          display: inline;
+    
+          a {
+            @include transition(all 0.5s ease 0s);
+            color: $darkblue;
+            display: inline;
+            font-family: $font-primary;
+            font-weight: bold;
+            float: right;
+            padding: 40px 30px;
+            text-decoration: none;
+            text-transform: uppercase;
+      
+            &:hover,
+            &.here {
+              background: $black10;
+              padding-left: 40px;
+              padding-right: 40px;
+            }
+          }
+          
+          &:hover {
+            > a {
+              background: $black10;
+              padding-left: 40px;
+              padding-right: 40px;
+            }
+            
+            > ul {
+              display: block;
+              max-height: 1000px;
+              opacity: 1;
+              overflow: visible;
+              top: 98px;
+            }
+          }
+          
+          ul {
+            @include transition(all 0.25s ease 0.35s);
+            background: $orange;
+            display: block;
+            height: auto;
+            list-style: none;
+            margin: 0;
+            max-height: 0;
+            left: 0px;
+            opacity: 0;
+            overflow: hidden;
+            padding: 0;
+            position: absolute;
+            text-align: left;
+            top: 108px;
+            width: 100%;
+            
+            li {
+              display: block;
+              margin: 0;
+              padding: 0;
+              width: auto;
+              
+              a {
+                color: white;
+                display: block;
+                float: none;
+                font-size: 11px;
+                line-height: 16px;
+                padding: 8px 12px;
+                text-align: left;
+                
+                &:hover {
+                  padding: 12px 12px;
+                }
+              }
+              
+              ul {
+                display: none !important;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Content
+------------------------------------------------------*/
+
+section.content {
+  @include clearfix;
+  @include wrapper;
+  padding: 30px 0px;
+
+  > div {
+    @include clearfix;
+    @include inner;
+  }
+
+  nav {
+    display: inline;
+    height: auto;
+    float: left;
+    margin-top: 15px;
+    width: 160px;
+    
+    p.title {
+      color: $darkgrey;
+      font-size: 18px;
+      line-height: 26px;
+      margin-bottom: 15px;
+      
+      a {
+        @include transition;
+        color: $blue;
+        text-decoration: none;
+        
+        &:hover {
+          color: lighten($blue,15%);
+        }
+      }
+    }
+
+    ul {
+      border-top: 1px dotted $lightgrey;
+      clear: both;
+      list-style: none;
+      padding: 0px;
+
+      li {
+        border-bottom: 1px dotted $lightgrey;
+        padding: 8px 0px;
+
+        a {
+          color: $darkgrey;
+          display: inline;
+          font-size: 12px;
+          font-weight: bold;
+          letter-spacing: 2px;
+          line-height: 14px;
+          padding: 1px 2px;
+          text-decoration: none;
+          text-transform: uppercase;
+
+          &:hover {
+            background: $orange;
+            color: white;
+          }
+        }
+          
+        ul {
+          border-top: 0px;
+          padding: 0 0 0 15px;
+          
+          li {
+            border-bottom: 0px;
+            padding: 0;
+            
+            a {
+              font-size: 11px;
+              letter-spacing: 0px;
+            }
+            
+            ul {
+              padding: 0 0 0 30px;
+              
+              li {
+                padding: 0;
+                
+                a {
+                  font-size: 10px;
+                  letter-spacing: 0px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  article {
+    @include rounded(3px);
+    @include shadow($black30,0px,1px,3px);
+    background: white;
+    display: inline;
+    height: auto;
+    float: right;
+    min-height: 300px;
+    padding: 25px;
+    width: 750px;
+
+    section.main {
+      @include html;
+      display: inline;
+      float: left;
+      height: auto;
+      width: 525px;
+    }
+
+    section.sidebar {
+      @include html;
+      display: inline;
+      float: right;
+      height: auto;
+      width: 200px;
+
+      div.callout {
+        @include rounded(2px);
+        @include inset-shadow($black10,0px,2px,2px);
+        background: lighten($almostwhite,3%);
+        margin: 0px 0px 15px 0px;
+        padding: 15px;
+
+        h1 {
+          border: 0px;
+          color: $darkgrey;
+          font-size: 1.4em;
+          letter-spacing: 0px;
+          line-height: 24px;
+          margin: 0px 0px 5px 0px !important;
+          font-weight: bold;
+          padding: 0px;
+        }
+
+        h2 {
+          font-size: 1.3em;
+        }
+
+        h3 {
+          font-size: 1.2em;
+        }
+
+        h4 {
+          font-size: 1.1em;
+        }
+
+        p:last-child {
+          margin-bottom: 0 !important;
+        }
+
+        a.button {
+          display: block;
+          margin-top: 10px;
+          text-align: center;
+        }
+      }
+    }
+    
+    /* HTML Fixes */
+    section.main,
+    section.sidebar {
+
+      th, td {
+        h1, h2, h3, h4, ul, p {
+          margin: 0 !important;
+        }
+      }
+      
+      blockquote {
+        p {
+          margin: 0 !important;
+        }
+      }
+      
+      iframe {
+        margin: 0 0 15px 0;
+        max-width: 100%;
+      }
+      
+      img {
+        height: auto;
+        max-width: 100%;
+      }
+      
+      > a.button {
+        @include clearfix;
+        float: right;
+        margin: 0 0 15px 15px;
+      }
+    }
+  }
+}
+
+/* Homepage Content
+------------------------------------------------------*/
+
+body.home {
+  padding-top: 0;
+  
+  section.content {
+    padding: 0 0 50px 0;
+    
+    .inner {
+      width: 100%;
+      
+      article {
+        @include shadow(transparent,0,0,0);
+        @include rounded(0px);
+        background: transparent;
+        padding: 0;
+        width: 100%;
+        
+        div.cycle-slideshow {
+          height: 498px;
+          margin: 0 0 25px 0;
+          overflow: hidden;
+          position: relative;
+          width: 100%;
+          
+          div.slide {
+            @include html;
+            @include text-shadow();
+            background-size: cover !important;
+            color: white;
+            height: 400px;
+            padding-top: 98px;
+            text-align: center;
+            width: 100%;
+            
+            h1 {
+              font-family: $font-primary;
+              font-size: 50px;
+              font-weight: bold;
+              line-height: 60px;
+              margin: 75px auto 15px auto !important;
+              padding-bottom: 15px;
+              max-width: $width;
+            }
+            
+            p {
+              font-size: 18px;
+              line-height: 24px;
+            }
+          }
+        }
+        
+        section.homeBoxes {
+          @include clearfix;
+          @include inner;
+          width: $width;
+          
+          div.homeBox {
+            @include rounded(3px);
+            @include shadow($black30,0px,1px,3px);
+            background: white;
+            display: inline;
+            height: auto;
+            margin: 0 0 0 30px;
+            float: left;
+            padding: 25px;
+            width: 250px;
+            
+            p.title {
+              border-bottom: 2px solid $orange;
+              font-size: 24px;
+              padding-bottom: 15px;
+            }
+            
+            &:first-child,
+            &:nth-child(3n+1) {
+              margin-left: 0;
+            }
+            
+            a.button {
+              clear: both;
+              display: block;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+}
+
+/* Footer
+------------------------------------------------------*/
+
+footer {
+  @include inset-shadow($black10,0px,2px,4px);
+  padding: 30px 0px;
+  text-align: center;
+  
+  a {
+    color: $grey;
+    margin: 0 10px;
+    text-decoration: none;
+  }
+}
+
+
+/* Accordion
+------------------------------------------------------*/
+
+div.accordion {
+  clear: both;
+
+  details {
+    clear: both;
+    margin: 0px 0px 10px 0px;
+
+    summary {
+      @include rounded(3px);
+      @include shadow($black10,0px,1px,3px);
+      background: $orange;
+      color: white;
+      cursor: pointer;
+      font-size: 15px;
+      line-height: 20px;
+      margin-bottom: 3px;
+      padding: 8px 10px;
+
+      &:hover {
+        background: lighten($orange,10%);
+        @include shadow($black30,0px,2px,5px);
+      }
+    }
+
+    div.accordionContent {
+      @include clearfix;
+      @include html;
+      @include rounded(3px);
+      @include inset-shadow($black10,0px,1px,3px);
+      border: 1px solid lighten($orange,30%);
+      padding: 8px 10px;
+    }
+  }
+}
+
+/* Tabify
+------------------------------------------------------*/
+
+div.tabify {
+  @include clearfix;
+  clear: both;
+  margin: 0px 0px 10px 0px;
+
+  ul.tabs {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+
+    li {
+      display: inline;
+      float: left;
+      margin: 0px 0px 0px 5px;
+
+      a {
+        @include rounded(3px 3px 0px 0px);
+        background: $blue;
+        color: white;
+        display: block;
+        font-family: $font-primary;
+        font-size: 13px;
+        line-height: 20px;
+        padding: 8px 10px;
+        text-decoration: none;
+        text-transform: uppercase;
+
+        &:hover {
+          background: lighten($blue,15%);
+        }
+
+        &.active {
+          background: $lightblue;
+        }
+      }
+    }
+  }
+
+  div.tabContent {
+    @include html;
+    @include rounded(3px);
+    border: dashed 1px $lightgrey;
+    border-top: 3px solid $lightblue;
+    clear: both;
+    overflow: auto;
+    padding: 15px;
+    
+    > p.title {
+      display: none !important;
+    }
+  }
+}
+
+/* Figure
+------------------------------------------------------*/
+
+figure {
+  @include rounded(3px);
+  @include shadow($black30,0px,1px,3px);
+  margin-bottom: 20px !important;
+  overflow: hidden;
+
+  img {
+    @include rounded(3px);
+    display: block;
+    height: auto;
+    width: 100%;
+  }
+
+  &.center,
+  &.left,
+  &.right {
+    background: $green;
+    width: 200px;
+
+    img {
+      @include rounded(3px 3px 0px 0px);
+      height: auto;
+      margin: 0px;
+      width: 100%;
+    }
+
+    figcaption {
+      color: $darkblue;
+      display: block;
+      font-size: 12px;
+      font-style: italic;
+      line-height: 16px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    &.center {
+      display: block;
+      margin: 10px auto 25px auto;
+    }
+
+    &.left {
+      float: left;
+      margin: 10px 25px 25px 0px;
+    }
+
+    &.right {
+      float: right;
+      margin: 10px 0px 25px 25px;
+    }
+  }
+}
+
+/* Tables
+------------------------------------------------------*/
+
+table {
+  @include shadow($black30,0px,1px,3px);
+  @include rounded(3px);
+  border: 0px;
+  overflow: hidden;
+  margin: 0 0 15px 0;
+  width: 100%;
+
+  thead {
+    th, td {
+      background: $green;
+      border: 0px;
+      color: $darkblue;
+      font-weight: bold;
+      padding: 10px;
+
+      p {
+        margin: 0 !important;
+      }
+    }
+  }
+
+  tbody {
+    th, td {
+      background: white;
+      border: 0px;
+      color: $grey;
+      font-weight: normal;
+      padding: 5px 10px;
+      vertical-align: top;
+
+      p {
+        margin: 0 !important;
+      }
+    }
+
+    tr:nth-child(2n) {
+      th, td {
+        background: lighten($almostwhite,5%);
+      }
+    }
+  }
+}
+
+/* HTML
+------------------------------------------------------*/
+
+.htmlOutput {  
+  blockquote {
+    p {
+      margin: 0 !important;
+    }
+  }
+}
+
+
+/*------------------------------------------------------
+
+  Responsive
+
+--------------------------------------------------------*/
+
+
+/* Fluid Responsive Designs
+--------------------------------------------------------*/
+
+
+@media screen and (min-width: 601px) and (max-width: 1020px) {
+
+  header,
+  section.content {
+    min-width: 580px;
+
+    > div {
+      width: 90%
+    }
+  }
+  
+  header {
+    nav {
+      ul {
+        li {
+          a {
+            padding-left: 20px;
+            padding-right: 20px;
+            
+            &:hover {
+              padding-left: 30px;
+              padding-right: 30px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  section.content {
+    nav {
+      width: 20%;
+    }
+
+    article {
+      padding: 15px 3%;
+      width: 74%;
+
+      section.main {
+        width: 60%;
+      }
+
+      section.sidebar {
+        width: 35%;
+      }
+    }
+  }
+
+}
+
+
+/* Mobile Responsive Designs
+--------------------------------------------------------*/
+
+@media screen and (max-width: 600px) {
+
+  body {
+    overflow-x: hidden;
+  }
+
+  body.shift {
+    .adapt {
+      left: 200px;
+      top: 0px;
+    }
+  }
+
+  section.mobile {
+    display: block;
+  }
+
+  header,
+  section.content {
+    min-width: 280px;
+
+    > div {
+      width: 90%
+    }
+  }
+
+  body.bop-it header,
+  header {
+    position: static;
+    
+    > div {
+      position: static;
+      
+      a.logo {
+        height: 67px !important;
+        left: auto;
+        right: 15px;
+        width: 184px !important;
+      }
+      
+      nav {
+        float: none;
+        left: -200px;
+        position: absolute;
+        right: auto;
+        text-align: left;
+        top: 0px;
+        width: 200px;
+        z-index: 100;
+
+        ul {
+          border-top: 1px dotted $lightgrey;
+          float: none;
+          list-style: none;
+          padding: 0px;
+          display: block;
+          text-align: left;
+          width: 200px;
+
+          li {
+            border-bottom: 1px dotted $lightgrey;
+            display: block;
+            float: none;
+            margin: 0px;
+            padding: 0;
+            width: 200px;
+
+            a {
+              color: $darkgrey;
+              display: block;
+              float: none;
+              font-size: 12px;
+              font-weight: bold;
+              letter-spacing: 2px;
+              line-height: 14px;
+              padding: 8px;
+              text-align: left;
+              text-decoration: none;
+              text-transform: uppercase;
+              width: auto;
+
+              &:hover {
+                background: $orange;
+                color: white;
+                padding: 12px 8px;
+              }
+            }
+            
+            ul {
+              background: transparent;
+              border-top: 0px;
+              display: block;
+              max-height: 1000px;
+              position: static;
+              opacity: 1;
+              top: 0;
+              
+              li {
+                border-bottom: 0px;
+                a {
+                  padding-left: 20px !important;
+                }
+                
+                ul {
+                  display: block !important;
+                  
+                  li {
+                    a {
+                      padding-left: 40px !important;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  section.content {
+    .inner {
+      nav {
+        display: none;
+      }
+
+      article {
+        padding: 15px 3%;
+        width: 94%;
+
+        section.main {
+          width: 100%;
+        }
+
+        section.sidebar {
+          width: 100%;
+        }
+      }
+    }
+  }
+  
+  body.home {
+    section.content {
+      .inner {
+        article {
+        
+          section.homeBoxes {
+            padding: 0 5%;
+            width: 90%;
+          
+            div.homeBox {
+              @include clearfix;
+              clear: both;
+              display: block;
+              float: none;
+              margin: 0;
+              width: auto;
+            }
+          }
+        }
+      }
+    }
+  }
+}

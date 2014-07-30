@@ -6,18 +6,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+
+  {% block metadata %}
+  <title>{% block title %}Project name{% endblock %}</title>
   <meta name="description" content="{% block seo_description %}{% endblock %}" />
   <meta name="keywords" content="{% block seo_keywords %}{% endblock %}" />
-  <title>{% block title %}Project name{% endblock %}</title>
+  {% endblock %}
+
+  <link href='//fonts.googleapis.com/css?family=Roboto:400italic,700italic,400,700|Lato:400,900,400italic,900italic' rel='stylesheet' type='text/css'>
+  <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
   {% compress css %}
     {% block css %}
-    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}" />
-     <style>
-      body {
-        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-      }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/reset.css' %}">
+    <link rel="stylesheet" href="{% static 'css/demo.scss' %}" type="text/x-scss">
     {% for scss_file in 'WIDGY_MEZZANINE_SITE'|scss_files %}
     <link rel="stylesheet" href="{% static scss_file %}" type="text/x-scss">
     {% endfor %}
@@ -27,35 +29,54 @@
     {% block js %}
       <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
       <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+      <script type="text/javascript" src="{% static 'js/underscore-min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'js/demo.js' %}"></script>
       {% for js_file in 'WIDGY_MEZZANINE_SITE'|js_files %}
       <script src="{% static js_file %}"></script>
       {% endfor %}
     {% endblock %}
   {% endcompress %}
-</head>
-<body>
-  {% block body %}
-  {% page_menu 'pages/menus/top_nav.html' %}
-  <style>
-    .left_nav {
-      float: left;
-      width: 20%;
-    }
-    .container {
-      float: right;
-      width: 80%;
-    }
-  </style>
-  <div class="left_nav">
-      <div class="panel tree">{% page_menu "pages/menus/tree.html" %}</div>
-  </div>
 
-  <div class="container">
-    {% block content %}
+  <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+  <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+</head>
+<body class="{% block bodyClass %}{% endblock %}">
+  <div class="adapt">
+  {% block body %}
+
+  <section class="mobile"><a href="#"><i class="fa fa-arrow-left"></i> Menu</a></section>
+
+  <header>
+    <div>
+      <a class="logo" href="/">
+        <img class="logo" src="{% static 'img/logo-white.png' %}" alt="Widgy" />
+        <img class="frame" src="{% static 'img/logo-frame.png' %}" alt="" />
+      </a>
+      <nav>
+        {% page_menu 'pages/menus/dropdown.html' %}
+      </nav>
+    </div>
+  </header>
+
+  <section class="content">
+    <div class="inner">
+
       {% block leftnav %}
+      {% page_menu "pages/menus/leftnav.html" %}
       {% endblock %}
-    {% endblock %}
-  </div>
+
+      <article>
+        {% block content %}
+        {% endblock %}
+      </article>
+
+    </div>
+  </section>
+
+  <footer>
+    {% page_menu "pages/menus/footer.html" %}
+  </footer>
   {% endblock %}
+  </div>
 </body>
 </html>

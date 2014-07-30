@@ -1,0 +1,11 @@
+{% load thumbnail_libs %}
+{% load widgy_tags %}
+
+<div class="slide" {% sorl_thumbnail self.background_image.file "640x300" as im %} style="background-image: url('{{ im.url }}')" {% endthumbnail %}>
+
+  <h1>{{ self.tagline }}</h1>
+
+  {% for child in self.get_children %}
+  {% render child %}
+  {% endfor %}
+</div>

@@ -1,0 +1,8 @@
+{% load pages_tags %}
+
+{% for page in page_branch %}
+  {% if page.in_menu %}
+    <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+  {% endif %}
+  {% page_menu page %}
+{% endfor %}
