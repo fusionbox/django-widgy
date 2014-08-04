@@ -1,11 +1,16 @@
 Changelog
 =========
 
-0.2.0
------
+0.2.0 (2014-08-04)
+------------------
 
-* Use django-pyscss_ for SCSS compilation. Requires an update to the
-  COMPRESS_PRECOMPILERS setting::
+Changes
+^^^^^^^
+
+* Widgy is now Apache Licensed
+* **Breaking Change** Use django-pyscss_ for SCSS compilation. [Rocky Meza, #175]
+
+  Requires an update to the ``COMPRESS_PRECOMPILERS`` setting::
 
     COMPRESS_PRECOMPILERS = (
         ('text/x-scss', 'django_pyscss.compressor.DjangoScssFilter'),
@@ -15,17 +20,49 @@ Changelog
   django-pyscss uses a different (more consistent) rule for path resolution.
   For example, ``@import 'widgy_common'`` should be changed to ``@import
   '/widgy/css/widgy_common'``
+* Added help_text to Section to help user avoid bug [Zach Metcalf, #135]
+* Allow UI to updated based on new data after reposition [Gavin Wahl, #199]
+* Changed Button's css_classes in shelf [Rocky Meza, #203]
+* Added loading cursor while ajax is in flight [Gavin Wahl, #215, #208]
+* Get rid of "no content" [Gavin Wahl, #206]
+* Use sprites for the widget icons [Gavin Wahl and Rocky Meza, #89, #227]
+* Only show approve/unapprove buttons for interesting commits [Gavin Wahl, #228]
+* Updated demo app to have new design and new widgets [Justin Stollsteimer, Gavin Wahl, Antoine Catton and Rocky Meza, #129, #176]
+* Added cloning for WidgyPages [Gavin Wahl, #235]
+* Use a more realistic context to render pages for search [Gavin Wahl, #166]
+* Add default children to Accordion and Tabs [Rocky Meza, #238]
+
+Bugfixes
+^^^^^^^^
+
+* Fix cursors related to dragging [Gavin Wahl, #155]
+* Update safe urls [Gavin Wahl, #212]
+* Fix widgy_mezzanine preview for Mezzanine==3.1.2 [Rocky Meza, #201]
+* Allow RichTextPage in the admin [Zach Metcalf, #197]
+* Don't assume the response has a content-type header [Gavin Wahl, #216]
+* Fix bug with FileUpload having empty values [Rocky Meza, #217]
+* Fix urlconf_include login_required handling [Gavin Wahl, #200]
+* Patch fancybox to work with jQuery 1.9 [Gavin Wahl, #222]
+* Fix some import errors in SCSS [Rocky Meza, #230]
+* Fix restore page in newer versions of Mezzanine [Gavin Wahl, #232]
+* Use unicode format strings in review queue [Gavin Wahl, #236]
+
+Documentation
+^^^^^^^^^^^^^
+
+* Updated quickstart to cover south migrations with easy_thumbnails [Zach Metcalf, #202]
+* Added Proxy Widgy Model Tutorial [Zach Metcalf, #210]
 
 .. _django-pyscss: https://github.com/fusionbox/django-pyscss
 
 0.1.6 (2014-09-09)
-------------------------
+------------------
 * Fix migrations containing unsupported KeywordsField from mezzanine [Scott Clark]
 * Rename package to django-widgy
 
 
 0.1.5 (2013-11-23)
-------------------------
+------------------
 
 * Fix Widgy migrations without Mezzanine [Gavin Wahl]
 * Drop target collision detection [Gavin Wahl]
