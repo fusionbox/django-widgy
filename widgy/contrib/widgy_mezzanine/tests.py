@@ -1,4 +1,5 @@
 import mock
+import datetime
 
 from django.test import TestCase
 from django.utils.unittest import skipUnless
@@ -7,6 +8,10 @@ from django.test.utils import override_settings
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.utils import timezone
+
+from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
+                                   CONTENT_STATUS_DRAFT)
 
 from widgy.site import WidgySite
 from widgy.utils import get_user_model
@@ -146,10 +151,9 @@ class TestPreviewView(TestCase):
 
 
 @skipUnless(PAGE_BUILDER_INSTALLED, 'page_builder is not installed')
-class TestClonePage(TestCase):
+class PageTestCase(TestCase):
     def setUp(self):
-        self.factory = RequestFactory()
-
+        super(PageTestCase, self).setUp()
         self.page = WidgyPage.objects.create(
             root_node=widgy_site.get_version_tracker_model().objects.create(
                 working_copy=Button.add_root(widgy_site, text='buttontext').node,
@@ -157,6 +161,12 @@ class TestClonePage(TestCase):
             title='titleabc',
             slug='slugabc',
         )
+
+
+class TestClonePage(PageTestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        super(TestClonePage, self).setUp()
 
     def as_view(self, **kwargs):
         kwargs.setdefault('has_permission', lambda req: True)
@@ -194,3 +204,21 @@ class TestClonePage(TestCase):
         self.assertEqual(new_page.title, 'new title')
 
         self.assertEqual(new_page.root_node.working_copy.content.text, 'buttontext')
+
+
+class TestCommitPublishing(PageTestCase):
+    def test_commiting_publishes(self):
+        self.page.status = CONTENT_STATUS_DRAFT
+        self.page.save()
+
+        publish_at = timezone.now()
+        self.page.root_node.commit(publish_at=publish_at)
+
+        page = WidgyPage.objects.get(pk=self.page.pk)
+        self.assertEqual(page.status, CONTENT_STATUS_PUBLISHED)
+        self.assertEqual(page.publish_date, publish_at)
+
+        # committing again shouldn't advance the publish_date of the page
+        page = WidgyPage.objects.get(pk=self.page.pk)
+        self.page.root_node.commit(publish_at=publish_at + datetime.timedelta(days=1))
+        self.assertEqual(page.publish_date, publish_at)

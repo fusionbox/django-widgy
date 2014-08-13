@@ -30,27 +30,11 @@ class WidgyPageAdminForm(WidgyFormMixin, PageAdminForm):
     class Meta:
         model = WidgyPage
 
-    def __init__(self, *args, **kwargs):
-        super(WidgyPageAdminForm, self).__init__(*args, **kwargs)
-        self.fields['publish_date'].help_text = _(
-            "If you enter a date here, the page will not be viewable on the site until then"
-        )
-        self.fields['expiry_date'].help_text = _(
-            "If you enter a date here, the page will not be viewable after this time"
-        )
-        self.fields['status'].initial = CONTENT_STATUS_DRAFT
-
-    def clean_status(self):
-        status = self.cleaned_data.get('status')
-        if (status == CONTENT_STATUS_PUBLISHED and (not self.instance.root_node or
-                                                    not self.instance.root_node.head)):
-            raise forms.ValidationError(_('You must commit before you can publish'))
-        return status
-
 
 class WidgyPageAdmin(PageAdmin):
     change_form_template = 'widgy/page_builder/widgypage_change_form.html'
     form = WidgyPageAdminForm
+    exclude = ['status', 'publish_date']
 
     def get_urls(self):
         clone_view = ClonePageView.as_view(has_permission=self.has_add_permission)

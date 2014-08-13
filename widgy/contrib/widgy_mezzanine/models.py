@@ -2,12 +2,16 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core import urlresolvers
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from mezzanine.pages.managers import PageManager
 from mezzanine.pages.models import Link
+from mezzanine.core.models import CONTENT_STATUS_PUBLISHED, CONTENT_STATUS_DRAFT
 
 from widgy.utils import SelectRelatedManager
 from widgy.models import links
+from widgy.db.fields import get_site
 
 
 class WidgyPageMixin(object):
@@ -54,6 +58,15 @@ class WidgyPageMixin(object):
         """
         return self
 
+    def clean_status(self):
+        status = self.status
+        if (status == CONTENT_STATUS_PUBLISHED and (not self.root_node or
+                                                    not self.root_node.head)):
+            from django import forms
+            raise forms.ValidationError(_('You must commit before you can publish'))
+        return status
+
+
 
 class PageSelectRelatedManager(SelectRelatedManager, PageManager):
     """
@@ -92,3 +105,13 @@ if getattr(settings, 'WIDGY_MEZZANINE_PAGE_MODEL', None) is None:
             # probably will.
             'root_node__head__root_node',
         ])
+
+
+site = get_site(settings.WIDGY_MEZZANINE_SITE)
+
+@receiver(post_save, sender=site.get_version_tracker_model().commit_model)
+def publish_page_on_commit(sender, instance, created, **kwargs):
+    instance.tracker.widgypage_set.filter(status=CONTENT_STATUS_DRAFT).update(
+        status=CONTENT_STATUS_PUBLISHED,
+        publish_date=instance.publish_at,
+    )
