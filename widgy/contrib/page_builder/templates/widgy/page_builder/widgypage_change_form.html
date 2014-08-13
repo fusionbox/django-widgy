@@ -1,12 +1,18 @@
 {% extends "admin/change_form.html" %}
-{% load i18n %}
+{% load i18n widgy_tags %}
 {% block object-tools %}
+  {% if change %}
     <ul class="object-tools">
-      {% if has_add_permission %}
+    {% get_action_links original original.root_node.working_copy as links %}
+    {% for link in links %}
+      <li><a class="{{ link.type }}" target="_blank" href="{{ link.url }}">{{ link.text }}</a></li>
+    {% endfor %}
+    {% if has_add_permission %}
       <li><a class="widgy-fancybox" href="clone/">Clone</a></li>
-      {% endif %}
+    {% endif %}
     {% if has_absolute_url %}
-        <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>
+        <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View live version" %}</a></li>
     {% endif%}
     </ul>
+  {% endif %}
 {% endblock %}
