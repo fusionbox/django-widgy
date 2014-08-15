@@ -50,10 +50,14 @@ class ReviewedVersionTracker(VersionTracker):
 
     class ReviewedVersionTrackerQuerySet(VersionTracker.VersionTrackerQuerySet):
         def published(self):
-            commits = super(ReviewedVersionTracker.ReviewedVersionTrackerQuerySet, self).published()
-            return commits.filter(commits__reviewedversioncommit__approved_by__isnull=False,
-                                  commits__reviewedversioncommit__approved_at__isnull=False)\
-                    .distinct()
+            return self.filter(
+                commits__reviewedversioncommit__approved_by__isnull=False,
+                commits__reviewedversioncommit__approved_at__isnull=False,
+                # we must put this condition here instead of calling
+                # super().published, because all of the conditions must be in
+                # the same call to filter().
+                commits__publish_at__lte=timezone.now(),
+            ).distinct()
 
     objects = ReviewedVersionTrackerQuerySet.as_manager()
 

@@ -251,3 +251,16 @@ class ReviewQueueViewsTest(SwitchUserTestCase, RootNodeTestCase):
         commit2.approve(self.user)
         self.assertIn(tracker, vt_class.objects.published())
         self.assertIn(tracker2, vt_class.objects.published())
+
+    def test_published_stickiness(self):
+        vt_class = self.widgy_site.get_version_tracker_model()
+        tracker = make_tracker(self.widgy_site, vt_class)
+
+        # One commit is published, the other is approved. Since the same commit
+        # is not both published and approved, the tracker is not published.
+
+        c1 = tracker.commit(publish_at=timezone.now() + datetime.timedelta(days=1))
+        c1.approve(self.user)
+
+        tracker.commit(publish_at=timezone.now())
+        self.assertNotIn(tracker, vt_class.objects.published())
