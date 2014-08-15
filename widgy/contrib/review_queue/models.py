@@ -23,6 +23,10 @@ class ReviewedVersionCommit(VersionCommit):
             return self.filter(approved_at__isnull=True,
                                approved_by__isnull=True)
 
+        def approved(self):
+            return self.exclude(approved_at__isnull=True,
+                                approved_by__isnull=True)
+
     objects = ReviewedVersionCommitQuerySet.as_manager()
 
     @property
