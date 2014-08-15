@@ -5,6 +5,10 @@ Changelog
 ------------------------
 
 
+0.2.1 (not yet released)
+------------------------
+* Updated overridden directory_table template for django-filer>=0.9.6 [Scott Clark, #179]
+
 
 0.2.0 (2014-08-04)
 ------------------
