@@ -1,0 +1,13 @@
+{% extends "widgy/popup_base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{% blocktrans with page_title=object.title %}Unpublishing {{ page_title }}{% endblocktrans %}</h1>
+<form method="post">
+  {% csrf_token %}
+  <div class="submit-row">
+    <p class="cancellink-box"><a href="../" class="cancellink">{% trans "Cancel" %}</a></p>
+    <input type="submit" value="{% trans "Yes, I'm sure" %}" class="default" />
+ </div>
+</form>
+{% endblock %}

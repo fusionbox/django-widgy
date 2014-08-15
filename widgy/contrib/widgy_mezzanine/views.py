@@ -1,11 +1,12 @@
 from django.db.models import Q
-from django.views.generic import View, UpdateView
+from django.views.generic import View, UpdateView, FormView, DetailView
 from django.views.generic.detail import SingleObjectMixin
 from django.conf import settings
 from django.http import (
     HttpResponseBadRequest,
     HttpResponseForbidden,
     HttpResponsePermanentRedirect,
+    HttpResponseRedirect,
 )
 from django.utils.http import is_safe_url
 from django.contrib.admin.util import unquote
@@ -18,6 +19,7 @@ from django.utils.translation import ugettext as _
 
 from mezzanine.pages.views import page as page_view
 from mezzanine.pages.models import Page
+from mezzanine.core.models import CONTENT_STATUS_DRAFT
 
 from widgy.contrib.form_builder.views import HandleFormMixin
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
@@ -133,19 +135,27 @@ class CloneForm(forms.ModelForm):
         self.fields['slug'].label = _('New URL')
 
 
-class ClonePageView(UpdateView):
-    form_class = CloneForm
+
+class AdminViewMixin(object):
     model = WidgyPage
-    template_name = 'widgy/widgy_mezzanine/widgypage_clone_form.html'
-    has_permission = None
+
+    def get_object(self):
+        obj = get_object_or_404(self.model, pk=unquote(self.args[0]))
+        return obj
 
     def dispatch(self, request, *args, **kwargs):
         if not self.has_permission(request):
             raise PermissionDenied
-        return super(ClonePageView, self).dispatch(request, *args, **kwargs)
+        return super(AdminViewMixin, self).dispatch(request, *args, **kwargs)
+
+
+class ClonePageView(AdminViewMixin, UpdateView):
+    form_class = CloneForm
+    template_name = 'widgy/widgy_mezzanine/widgypage_clone_form.html'
+    has_permission = None
 
     def get_object(self):
-        obj = get_object_or_404(self.model, pk=unquote(self.args[0]))
+        obj = super(ClonePageView, self).get_object()
         self.original_title = obj.title
         return obj
 
@@ -181,3 +191,28 @@ class ClonePageView(UpdateView):
         kwargs = super(ClonePageView, self).get_context_data(**kwargs)
         kwargs['is_popup'] = True
         return kwargs
+
+
+class UnpublishView(AdminViewMixin, DetailView):
+    template_name = 'widgy/widgy_mezzanine/unpublish.html'
+    has_change_permission = None
+
+    def dispatch(self, request, *args, **kwargs):
+        # BBB django 1.4 sets args/kwargs in dispatch not as_view like later
+        # versions
+        self.args = args
+        self.object = self.get_object()
+        return super(UnpublishView, self).dispatch(request, *args, **kwargs)
+
+    def has_permission(self, request):
+        return self.has_change_permission(request, self.object)
+
+    def post(self, *args, **kwargs):
+        self.object.status = CONTENT_STATUS_DRAFT
+        self.object.save()
+        messages.success(self.request, "Page unpublished.")
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change',
+                                    args=(self.object.pk,))
