@@ -6,7 +6,7 @@ from django.conf.urls import url
 from django import forms
 from django.core.urlresolvers import reverse
 from django.contrib.admin.util import quote
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import ugettext_lazy as _, ugettext, ungettext
 from django.utils import timezone
 from django.contrib import messages
 from django.db.models.signals import post_save
@@ -123,6 +123,32 @@ class WidgyPageAdmin(PageAdmin):
         super(WidgyPageAdmin, self).save_model(request, obj, form, change)
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None, *args, **kwargs):
+        if not add:
+            unapproved = 0
+            future = 0
+            for commit in obj.root_node.get_history_list():
+                # this condition is suspiciously similiar to is_interesting_to_approve_or_unapprove
+                if commit.is_published and (not self.has_review_queue or commit.reviewedversioncommit.is_approved):
+                    # got to the currently-published commit
+                    break
+                # XXX: duplication with ReviewedVersionTracker
+                if self.has_review_queue and not commit.reviewedversioncommit.is_approved:
+                    unapproved += 1
+                if commit.publish_at > timezone.now():
+                    future += 1
+            if unapproved:
+                messages.warning(request, ungettext(
+                    "There is one pending commit for this page.",
+                    "There are {count} pending commits for this page.",
+                    unapproved
+                ).format(count=unapproved))
+            if future:
+                messages.warning(request, ungettext(
+                    "There is one future-scheduled commit.",
+                    "There are {count} future-scheduled commits.",
+                    future
+                ).format(count=future))
+
         if add:
             status = CONTENT_STATUS_EMBRYO
         else:
