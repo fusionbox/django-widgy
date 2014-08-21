@@ -1,5 +1,5 @@
 -e git://github.com/fusionbox/django-filer.git@cc90284c#egg=django_filer-dev
-Django==1.4.4
+Django>=1.4.0,<1.5.0
 South
 Werkzeug
 django-cachebuster
