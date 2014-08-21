@@ -51,7 +51,7 @@ class WidgyPageAdminForm(WidgyFormMixin, PageAdminForm):
 CONTENT_STATUS_EMBRYO = 0
 
 class WidgyPageAdmin(PageAdmin):
-    change_form_template = 'widgy/page_builder/widgypage_change_form.html'
+    change_form_template = 'widgy/widgy_mezzanine/widgypage_change_form.html'
     form = WidgyPageAdminForm
     readonly_fields = ['status']
 
