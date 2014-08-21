@@ -15,7 +15,7 @@ def read(fname):
 install_requires = [
     'mezzanine >= 1.3.0',
     'django-treebeard',
-    'django-filer>=0.9.5',
+    'django-filer>=0.9.6',
     'South',
     'django-pyscss',
     'six',
