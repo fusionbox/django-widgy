@@ -192,3 +192,5 @@ if easy_thumbnails.VERSION >= 2:
     SOUTH_MIGRATION_MODULES = {
         'easy_thumbnails': 'easy_thumbnails.south_migrations',
     }
+
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
