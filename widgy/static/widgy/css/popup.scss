@@ -41,8 +41,18 @@ $label_width: 150px;
     }
 
     textarea {
-      width: 500px;
+      width: 76%;
       height: 100px;
+    }
+    
+    #{$inputFields} {
+      width: 76%;
+    }
+    
+    p.help_text {
+      font-size: 11px;
+      margin-top: 10px;
+      font-style: italic;
     }
 
     &.publish_at {
