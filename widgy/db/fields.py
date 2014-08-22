@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from django.db.models.loading import get_app
 from django.contrib.contenttypes.models import ContentType
+from django.utils.functional import SimpleLazyObject
 
 # WidgyContentType has a patched get_for_models that doesn't ignore proxy
 # models
@@ -87,9 +88,10 @@ class WidgyField(models.ForeignKey):
 
     def formfield(self, **kwargs):
         from widgy.forms import WidgyFormField
+
         defaults = {
             'form_class': WidgyFormField,
-            'queryset': self.get_layout_contenttypes(self.root_choices),
+            'queryset': SimpleLazyObject(lambda: self.get_layout_contenttypes(self.root_choices)),
             'site': self.site,
         }
         defaults.update(kwargs)

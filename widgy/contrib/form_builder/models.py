@@ -935,7 +935,7 @@ class FormSubmission(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     form_node = models.ForeignKey(Node, on_delete=models.PROTECT, related_name='form_submissions')
-    form_ident = models.CharField(max_length=Form._meta.get_field_by_name('ident')[0].max_length)
+    form_ident = models.CharField(max_length=Form._meta.get_field('ident', False).max_length)
 
     class FormSubmissionQuerySet(QuerySet):
         def get_formfield_labels(self):
@@ -1030,7 +1030,7 @@ class FormValue(models.Model):
     field_node = models.ForeignKey(Node, on_delete=models.SET_NULL, null=True)
     field_name = models.CharField(max_length=255)
     field_ident = models.CharField(
-        max_length=FormField._meta.get_field_by_name('ident')[0].max_length)
+        max_length=FormField._meta.get_field('ident', False).max_length)
 
     value = models.TextField()
 
