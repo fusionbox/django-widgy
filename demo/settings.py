@@ -201,7 +201,7 @@ DATABASE_ENGINE = DATABASES['default']['ENGINE']
 # easy_thumbnails' versions 2.0+ changed their migrations
 import easy_thumbnails
 
-if easy_thumbnails.VERSION >= 2:
+if easy_thumbnails.VERSION >= (2,):
     SOUTH_MIGRATION_MODULES = {
         'easy_thumbnails': 'easy_thumbnails.south_migrations',
     }
