@@ -18,4 +18,9 @@
             ],
         }
     ],
+    map: {
+      // http://requirejs.org/docs/jquery.html#noconflictmap
+      '*': { 'jquery': 'jquery-private' },
+      'jquery-private': { 'jquery': 'jquery' }
+    }
 })
