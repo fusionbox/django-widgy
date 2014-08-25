@@ -21,6 +21,9 @@ $label_width: 150px;
 }
 
 .popUp {
+  background: white;
+  display: block;
+  
   .loading {
     @extend %loading;
   }
