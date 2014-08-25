@@ -18,13 +18,29 @@ p.file-upload {
 
 }
 
-#content-related {
-  float: right;
-  margin-right: 0;
-  position: absolute;
-  right: 15px;
-  top: 0;
-  width: 18em;
+body.popup {
+  #container {
+    position: relative;
+
+    #content-main {
+      display: block;
+      float: none;
+      min-width: 44em;
+      width: auto;
+      
+      .object-tools {
+        float: left;
+      }
+    }
+
+    #content-related {
+      position: absolute;
+      margin-right: 0;
+      top: 15px;
+      right: 15px;
+      width: 18em;
+    }
+  }
 }
 
 #changelist-search input[type="submit"] {
