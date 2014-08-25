@@ -40,19 +40,33 @@ $label_width: 150px;
       width: $label_width;
     }
 
+    #{$inputFields},
     textarea {
-      width: 76%;
+      width: 500px;
+    }
+    
+    textarea {
       height: 100px;
     }
     
-    #{$inputFields} {
-      width: 76%;
+    p.help_text {
+      color: $grey;
+      font-size: 11px;
+      font-style: italic;
+      margin-top: 10px;
     }
     
-    p.help_text {
-      font-size: 11px;
-      margin-top: 10px;
-      font-style: italic;
+    ul {
+      li {
+        label {
+          margin: 0 10px;
+          width: auto;
+          
+          input {
+            margin: 0;
+          }
+        }
+      }
     }
 
     &.publish_at {
@@ -74,15 +88,29 @@ $label_width: 150px;
   }
 
   .submitRow {
-    input[type=submit], a.button {
       margin-left: 5px;
       float: right;
+      font-size: 11px;
       text-transform: capitalize;
+      line-height: 13px;
+      padding: 6px 10px !important;
     }
-    a.button {
-      @include button;
-      line-height: 21px;
-      padding: 2px 10px;
+    
+    input[type=submit] {
+      @include rounded(3px);
+      background: $blue;
+      border: 0px;
+      margin-left: 5px;
+      float: right;
+      font-size: 11px;
+      text-transform: capitalize;
+      line-height: 13px;
+      padding: 6px 10px !important;
+
+      &:hover {
+        background: lighten($blue,10%);
+        color: white;
+      }
     }
   }
 }
