@@ -43,6 +43,31 @@ body.popup {
   }
 }
 
+body.filebrowser {
+  #content {
+    margin-top: 100px;
+
+    #content-main {
+      display: block;
+      float: none;
+      min-width: 44em;
+      width: auto;
+      
+      .object-tools {
+        float: left;
+      }
+    }
+
+    #content-related {
+      position: absolute;
+      margin-right: 0;
+      top: 115px;
+      right: 15px;
+      width: 18em;
+    }
+  }
+}
+
 #changelist-search input[type="submit"] {
   background-image: none;
   background: #309BBF;
