@@ -82,13 +82,6 @@ describe('FormView', function() {
     assert.isFalse(form_view.handleClick(evt));
   });
 
-  it('should handleKeypress', function() {
-    var form_view = new form.FormView(),
-        evt = $.Event();
-    evt.which = 13;
-    assert.isFalse(form_view.handleKeypress(evt)); // prevent default
-  });
-
   it('should close CKEDITOR', function() {
     test.create();
     var callback = sinon.spy();
