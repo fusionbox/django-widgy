@@ -12,14 +12,6 @@ var widgy = requirejs('widgy'),
 
 describe('AppView', function() {
   beforeEach(function() {
-    this.node = new nodes.Node({
-      content: {
-        component: 'testcomponent'
-      },
-      title: 'Test Title',
-      author: 'Test Author'
-    });
-
     test.create();
 
     this.root_node = {
@@ -62,118 +54,72 @@ describe('AppView', function() {
 
 
   it('should fetchCompatibility', function(done) {
-    return this.node.ready(function(node) {
-      var node_object = {};
-      _.extend(node_object, node);
-      var getComponentStub = sinon.stub(nodes.Node.prototype, 'getComponent',
-                                        function() { return Q(node_object); });
-      var app_view = new widgy.AppView({ root_node: node });
+    var app_view = new widgy.AppView({ root_node: this.root_node });
 
-      app_view.root_node_promise.then(function() {
-        var callback = sinon.spy();
-        app_view.inflight = new Object({ abort: callback });
-        app_view.root_node.available_children_url = '1';
+    app_view.root_node_promise.then(function() {
+      var callback = sinon.spy();
+      app_view.inflight = new Object({ abort: callback });
 
-        var testObject = new Object();
-        sinon.stub($, 'ajax', function() { return testObject; });
+      var testObject = new Object();
+      sinon.stub($, 'ajax', function() { return testObject; });
 
-        var promise = app_view.fetchCompatibility();
+      var promise = app_view.fetchCompatibility();
 
-        promise.then(function(inflight) {
-          assert.strictEqual(inflight, testObject);
-          assert.isTrue(callback.calledOnce);
-          getComponentStub.restore();
-          $.ajax.restore();
-          done();
-        });
+      promise.then(function(inflight) {
+        assert.strictEqual(inflight, testObject);
+        assert.isTrue(callback.calledOnce);
+        $.ajax.restore();
+        done();
       });
     });
   });
 
 
   it('should refreshCompatibility', function(done) {
-    return this.node.ready(function(node) {
-      var node_object = {};
-      _.extend(node_object, node);
-      var getComponentStub = sinon.stub(nodes.Node.prototype, 'getComponent',
-                                        function() { return Q(node_object); });
-      var app_view = new widgy.AppView({ root_node: node });
+    var app_view = new widgy.AppView({ root_node: this.root_node });
 
-      app_view.root_node_promise.then(function() {
-        app_view.root_node.available_children_url = '1';
+    app_view.root_node_promise.then(function() {
 
-        var root_view = app_view.node_view_list.at(0);
-        root_view.content.shelf = true;
-        root_view.shelf = root_view.makeShelf();
+      var testObject = [{ model: { id: '1' }, __class__: '0' }];
+      sinon.stub($, 'ajax', function() { return testObject; });
 
-        var testObject = [{ model: { id: '1' }, __class__: '0' }];
-        sinon.stub($, 'ajax', function() { return testObject; });
+      var promise = Q(app_view.refreshCompatibility());
 
-        var promise = Q(app_view.refreshCompatibility());
-
-        promise.then(function() {
-          assert.strictEqual(app_view.compatibility_data, testObject);
-          getComponentStub.restore();
-          $.ajax.restore();
-          done();
-        });
+      promise.then(function() {
+        assert.strictEqual(app_view.compatibility_data, testObject);
+        $.ajax.restore();
+        done();
       });
     });
   });
 
 
   it('should setCompatibility and updateCompatibility', function(done) {
-    return this.node.ready(function(node) {
-      var node_object = {};
-      _.extend(node_object, node);
-      var getComponentStub = sinon.stub(nodes.Node.prototype, 'getComponent',
-                                        function() { return Q(node_object); });
-      var app_view = new widgy.AppView({ root_node: node });
+    var app_view = new widgy.AppView({ root_node: this.root_node });
 
-      app_view.root_node_promise.then(function() {
-        var data = [{ model: { id: '1' }, __class__: '0' }];
-        var root_view = app_view.node_view_list.at(0);
-        root_view.content.shelf = true;
-        root_view.shelf = root_view.makeShelf();
+    app_view.root_node_promise.then(function() {
+      var data = [{ model: { id: '1' }, __class__: '0' }];
 
-        var callback_add = sinon.spy(root_view.shelf, 'addOptions');
-        var callback_filter = sinon.spy(root_view.shelf, 'filterDuplicates');
+      app_view.setCompatibility(data);
+      assert.strictEqual(app_view.compatibility_data, data);
 
-        app_view.setCompatibility(data);
-        assert.strictEqual(app_view.compatibility_data, data);
-        assert.isTrue(callback_add.calledOnce);
-        assert.isTrue(callback_filter.calledOnce);
-
-        callback_add.restore();
-        callback_filter.restore();
-        getComponentStub.restore();
-        done();
-      });
+      done();
     });
   });
 
 
   it('should return if ready or not', function(done) {
-    return this.node.ready(function(node) {
-      var node_object = {};
-      _.extend(node_object, node);
-      var getComponentStub = sinon.stub(nodes.Node.prototype, 'getComponent',
-                                        function() { return Q(node_object); });
-      var app_view = new widgy.AppView({ root_node: node });
+    var app_view = new widgy.AppView({ root_node: this.root_node });
 
-      app_view.root_node_promise.then(function() {
-        assert.isFalse(app_view.ready());
+    app_view.root_node_promise.then(function() {
+      assert.isFalse(app_view.ready());
 
-        var data = [{ model: { id: '1' }, __class__: '0' }];
-        var root_view = app_view.node_view_list.at(0);
-        root_view.content.shelf = true;
-        root_view.shelf = root_view.makeShelf();
-        app_view.setCompatibility(data);
+      var data = [{ model: { id: '1' }, __class__: '0' }];
 
-        assert.isTrue(app_view.ready());
-        getComponentStub.restore();
-        done();
-      });
+      app_view.setCompatibility(data);
+
+      assert.isTrue(app_view.ready());
+      done();
     });
   });
 });
