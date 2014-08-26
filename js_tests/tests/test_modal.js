@@ -37,9 +37,9 @@ describe('Modal Static Functions', function() {
 
 
   it('should raiseError', function() {
-    assert.isFalse($('div').hasClass('modal'));
+    assert.equal($('div.modal').length, 0);
     modal.raiseError('Test Message');
-    assert.isTrue($('div').hasClass('modal'));
+    assert.equal($('div.modal').length, 1);
     assert.equal($('.serverResponse').html(), 'Test Message');
   });
 
