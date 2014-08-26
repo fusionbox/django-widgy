@@ -1,6 +1,19 @@
 {% load i18n %}
 {% load widgy_tags %}
 {% load url from future %}
+
+<ul class="object-tools">
+  {% for owner in tracker.owners %}
+    {% get_action_links owner tracker.working_copy as links %}
+    {% for link in links %}
+      <li><a class="button {{ link.type }}" target="_blank" href="{{ link.url }}">{{ link.text }}</a></li>
+    {% endfor %}
+  {% endfor %}
+  {% for diff_url in diff_urls %}
+    <li><a class="button diff" target="_blank" href="{{ diff_url }}">{% trans "View Diff" %}</a></li>
+  {% endfor %}
+</ul>
+
 <form method="post" class="commit_form" action="{{ action_url }}">
   {% csrf_token %}
   {{ form.media }}
@@ -24,15 +37,6 @@
   <p class="submitRow">
     {% block submit_row %}
       <input type="submit" value="{% trans 'Commit' %}">
-      {% for owner in tracker.owners %}
-        {% get_action_links owner tracker.working_copy as links %}
-        {% for link in links %}
-          <a class="button {{ link.type }}" target="_blank" href="{{ link.url }}">{{ link.text }}</a>
-        {% endfor %}
-      {% endfor %}
-      {% for diff_url in diff_urls %}
-        <a class="button diff" target="_blank" href="{{ diff_url }}">{% trans "Diff" %}</a>
-      {% endfor %}
     {% endblock %}
   </p>
 </form>
