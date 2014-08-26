@@ -66,21 +66,20 @@ describe('FormView', function() {
     });
   });
 
-  it('should handleClicks', function() {
+  it('should only submit if left clicked', function() {
     var form_view = new form.FormView(),
         evt = $.Event();
-    evt.target = {disabled: true}; // prevents default if disabled
-    assert.isFalse(form_view.handleClick(evt));
-
-    evt.target = {disabled: false};
-    evt.which = 0; // falls through to prevent default
-    assert.isFalse(form_view.handleClick(evt));
-
-    evt.which = 2; // prevent default
-    assert.isFalse(form_view.handleClick(evt));
-
-    evt.which = 3; // right click to continue as normal
+    evt.target = { disabled: false };
+    evt.which = 3;
     assert.isTrue(form_view.handleClick(evt));
+  });
+
+  it('should not submit if the submit button is disabled', function() {
+    var form_view = new form.FormView(),
+        evt = $.Event();
+    evt.target = { disabled: true };
+    evt.which = 3;
+    assert.isFalse(form_view.handleClick(evt));
   });
 
   it('should handleKeypress', function() {
