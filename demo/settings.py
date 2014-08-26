@@ -184,6 +184,10 @@ ADMIN_MENU_ORDER = [
     )),
 ]
 
+ADD_PAGE_ORDER = (
+    'widgy_mezzanine.WidgyPage',
+)
+
 URLCONF_INCLUDE_CHOICES = (
     ('demo.demo_url.urls', 'Demo url'),
 )
