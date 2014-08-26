@@ -20,13 +20,20 @@ describe('AppView', function() {
       author: 'Test Author'
     });
 
+    test.create();
+
     this.root_node = {
       content: {
-        component: 'testcomponent'
+        preview_template: '<span><%author%><span>',
+        component: 'testcomponent',
       },
       title: 'Test Title',
       author: 'Test Author',
     };
+  });
+
+  afterEach(function() {
+    test.destroy();
   });
 
 
@@ -42,34 +49,11 @@ describe('AppView', function() {
   it('should renderPromise', function(done) {
     var app_view = new widgy.AppView({ root_node: this.root_node });
     app_view.root_node_promise.then(function() {
-      /*app_view.root_node.available_children_url = '1';
-      app_view.template = '<span><%title%></span>';
-
-      // setup setCompatibility
-      var root_view = app_view.node_view_list.at(0);
-      root_view.content.shelf = true;
-      root_view.shelf = root_view.makeShelf();
-
-      // setup fetchCompatibility
       var testObject = [{ model: { id: '1' }, __class__: '0' }];
       sinon.stub($, 'ajax', function() { return testObject; });
 
-      // stubbed to reduce complexity
-      var getTemplateStub = sinon.stub(root_view, 'getTemplate', function()
-                                       { return '<div><%author%></div>'; });
-      var makeStickyStub = sinon.stub(root_view, 'makeSticky',
-                                      function () { return });
-*/
-      test.create();
-
       app_view.renderPromise().then(function() {
-        assert.strictEqual(app_view.$el.html(), '<span>Test Title</span>');
-        assert.strictEqual(root_view.$el.html(), '<div>Test Author</div>');
         assert.strictEqual(app_view.compatibility_data, testObject);
-        test.destroy();
-        getComponentStub.restore();
-        getTemplateStub.restore();
-        makeStickyStub.restore();
         $.ajax.restore();
         done();
       });
