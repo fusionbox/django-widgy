@@ -19,71 +19,59 @@ describe('AppView', function() {
       title: 'Test Title',
       author: 'Test Author'
     });
+
+    this.root_node = {
+      content: {
+        component: 'testcomponent'
+      },
+      title: 'Test Title',
+      author: 'Test Author',
+    };
   });
 
 
   it('should initialize an AppView', function(done) {
-    return this.node.ready(function(node) {
-      // getComponent is stubbed because testcomponent is inaccessable from AppView
-      var node_object = {};
-      _.extend(node_object, node); // copies node to prevent Backbone from making child
-      var getComponentStub = sinon.stub(nodes.Node.prototype, 'getComponent',
-                                        function() { return Q(node_object); });
-
-      var app_view = new widgy.AppView({ root_node: node });
-
-      app_view.root_node_promise.then(function() {
-        assert.strictEqual(app_view.node_view_list.at(0).content,
-                            node_object.content);
-        getComponentStub.restore();
-        done();
-      });
+    var app_view = new widgy.AppView({ root_node: this.root_node });
+    app_view.root_node_promise.then(function(root_node_view) {
+      assert.equal(root_node_view.model.attributes.title, 'Test Title');
+      done();
     });
   });
 
 
   it('should renderPromise', function(done) {
-    return this.node.ready(function(node) {
-      var node_object = {};
-      _.extend(node_object, node);
-      var getComponentStub = sinon.stub(nodes.Node.prototype, 'getComponent',
-                                        function() { return Q(node_object); });
-      var app_view = new widgy.AppView({ root_node: node, model: node });
+    var app_view = new widgy.AppView({ root_node: this.root_node });
+    app_view.root_node_promise.then(function() {
+      /*app_view.root_node.available_children_url = '1';
+      app_view.template = '<span><%title%></span>';
 
-      app_view.root_node_promise.then(function() {
-        app_view.root_node.available_children_url = '1';
-        app_view.template = '<span><%title%></span>';
+      // setup setCompatibility
+      var root_view = app_view.node_view_list.at(0);
+      root_view.content.shelf = true;
+      root_view.shelf = root_view.makeShelf();
 
-        // setup setCompatibility
-        var root_view = app_view.node_view_list.at(0);
-        root_view.content.shelf = true;
-        root_view.shelf = root_view.makeShelf();
+      // setup fetchCompatibility
+      var testObject = [{ model: { id: '1' }, __class__: '0' }];
+      sinon.stub($, 'ajax', function() { return testObject; });
 
-        // setup fetchCompatibility
-        var testObject = [{ model: { id: '1' }, __class__: '0' }];
-        sinon.stub($, 'ajax', function() { return testObject; });
+      // stubbed to reduce complexity
+      var getTemplateStub = sinon.stub(root_view, 'getTemplate', function()
+                                       { return '<div><%author%></div>'; });
+      var makeStickyStub = sinon.stub(root_view, 'makeSticky',
+                                      function () { return });
+*/
+      test.create();
 
-        // stubbed to reduce complexity
-        var getTemplateStub = sinon.stub(root_view, 'getTemplate', function()
-                                         { return '<div><%author%></div>'; });
-        var makeStickyStub = sinon.stub(root_view, 'makeSticky',
-                                        function () { return });
-
-        test.create();
-
-        var promise = app_view.renderPromise();
-
-        promise.then(function() {
-          assert.strictEqual(app_view.$el.html(), '<span>Test Title</span>');
-          assert.strictEqual(root_view.$el.html(), '<div>Test Author</div>');
-          assert.strictEqual(app_view.compatibility_data, testObject);
-          test.destroy();
-          getComponentStub.restore();
-          getTemplateStub.restore();
-          makeStickyStub.restore();
-          $.ajax.restore();
-          done();
-        });
+      app_view.renderPromise().then(function() {
+        assert.strictEqual(app_view.$el.html(), '<span>Test Title</span>');
+        assert.strictEqual(root_view.$el.html(), '<div>Test Author</div>');
+        assert.strictEqual(app_view.compatibility_data, testObject);
+        test.destroy();
+        getComponentStub.restore();
+        getTemplateStub.restore();
+        makeStickyStub.restore();
+        $.ajax.restore();
+        done();
       });
     });
   });
