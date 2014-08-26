@@ -17,23 +17,13 @@ describe('ModalView', function() {
   it('should open a window', function() {
     test.create();
     var modal_view = new modal.ModalView();
-    assert.isFalse($('div').hasClass('modal'));
+    assert.equal($('div.modal').length, 0);
     modal_view.open();
-    assert.isTrue($('div').hasClass('modal'));
-    assert.deepEqual($('div').css('position'), 'fixed');
+    assert.equal($('div.modal').length, 1);
     $(document.body).children().remove();
     test.destroy();
   });
 });
-
-
-describe('ErrorView', function() {
-  it('should construct a new ErrorView', function() {
-    var error_view = new modal.ErrorView({ message: 'Test Message' });
-    assert.deepEqual(error_view.message, 'Test Message');
-  });
-});
-
 
 describe('Modal Static Functions', function() {
   beforeEach(function() {
@@ -50,8 +40,7 @@ describe('Modal Static Functions', function() {
     assert.isFalse($('div').hasClass('modal'));
     modal.raiseError('Test Message');
     assert.isTrue($('div').hasClass('modal'));
-    assert.deepEqual($('div').css('position'), 'fixed');
-    assert.deepEqual($('.serverResponse').html(), 'Test Message');
+    assert.equal($('.serverResponse').html(), 'Test Message');
   });
 
 
@@ -66,32 +55,31 @@ describe('Modal Static Functions', function() {
 
     it('with responseText', function() {
       modal.ajaxError(model, resp, options);
-      assert.deepEqual($('.serverResponse').html(), 'Data Test');
+      assert.equal($('.serverResponse').html(), 'Data Test');
     });
 
     it('with responseText Object', function() {
       resp.responseText = new Object('{ "message": "Object Test" }');
       modal.ajaxError(model, resp, options);
-      assert.deepEqual($('.serverResponse').html(), 'Object Test');
+      assert.equal($('.serverResponse').html(), 'Object Test');
     });
 
     it('with undefined responseText', function() {
       resp.responseText = '{}';
       modal.ajaxError(model, resp, options);
-      assert.deepEqual($('.serverResponse').html(), 'Unknown error');
+      assert.equal($('.serverResponse').html(), 'Unknown error');
     });
 
     it('with 404 status', function() {
       resp.status = 404;
       modal.ajaxError(model, resp, options);
-      assert.deepEqual($('.serverResponse').html(), 'Try refreshing the page');
+      assert.equal($('.serverResponse').html(), 'Try refreshing the page');
     });
 
-    it('with a non-json response', function() {
+    it("does not eploade with a non-json response", function() {
       resp.getResponseHeader = function() { return ['app/not/json']; };
-      resp.responseText = 'Test Failure';
       modal.ajaxError(model, resp, options);
-      assert.deepEqual($('.serverResponse').html(), 'Test Failure');
+      assert.equal($('.serverResponse').html(), '{}');
     });
   });
 
