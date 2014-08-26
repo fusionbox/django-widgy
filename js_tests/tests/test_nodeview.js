@@ -192,14 +192,6 @@ describe('NodeView', function() {
       return node_view;
     };
 
-    it('should getTemplate', function(done) {
-      return this.node.ready(function(node) {
-        var node_view = new nodes.NodeView({model: node});
-        assert.deepEqual(node_view.getTemplate(), '<span>preview_template</span>');
-        done();
-      });
-    });
-
     it('should deleteSelf', function(done) {
       return this.node.ready(function(node) {
         var node_view = create_node_view(node);
@@ -217,40 +209,6 @@ describe('NodeView', function() {
         node_view.node.destroy.restore();
         node_view.list.closeAll.restore();
         node_view.shelf.close.restore();
-        done();
-      });
-    });
-
-    it('should popOut', function(done) {
-      return this.node.ready(function(node) {
-        var node_view = create_node_view(node);
-        var eve = $.Event('click', {target: {href: {foo: 'bar'}}});
-        sinon.stub(window, 'open', function(val) {return val;});
-
-        node_view.popOut(eve);
-
-        window.open.restore();
-
-        assert.strictEqual(node_view.subwindow.widgyCloseCallback, node_view.popIn);
-        assert.isTrue(node_view.$el.hasClass('poppedOut'));
-        done();
-      });
-    });
-
-    it('should popIn', function(done) {
-      return this.node.ready(function(node) {
-        var node_view = create_node_view(node);
-        var eve = $.Event('click', {target: {href: {foo: 'bar'}}});
-        sinon.stub(window, 'open', function(val) {return val;});
-        sinon.stub(node_view.node, 'fetch', function() {return;}); // stops rerender
-
-        node_view.popOut(eve);
-        node_view.popIn(eve);
-
-        window.open.restore();
-        node_view.node.fetch.restore();
-
-        assert.isFalse(node_view.$el.hasClass('poppedOut'));
         done();
       });
     });

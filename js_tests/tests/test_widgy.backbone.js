@@ -198,21 +198,6 @@ describe('View.close()', function(){
     this.view_to_close.close();
     assert.isUndefined(this.view_list.at(0));
   });
-
-  it('checks if event.preventDefault is true on close', function(){
-    var event = new $.Event();
-    assert.isFalse(event.isDefaultPrevented());
-    this.view_to_close.close(event);
-    assert.isTrue(event.isDefaultPrevented());
-  });
-
-  it('checks if event.preventDefault is true on close - negative', function() {
-    var event = new $.Event();
-    assert.isFalse(event.isDefaultPrevented());
-    event.preventDefault = false;
-    this.view_to_close.close(event);
-    assert.isFalse(event.isDefaultPrevented());
-  });
 });
 
 describe('View template and render', function(){
@@ -224,15 +209,6 @@ describe('View template and render', function(){
     });
     this.view = new WidgyBackbone.View({model: this.node});
     this.view.template = '<span><%title%></span>';
-  });
-
-  it('gets Template and returns it', function(){
-    assert.strictEqual(this.view.getTemplate(), this.view.template);
-  });
-
-  it('returns false if no template', function(){
-    this.view.template = false;
-    assert.isFalse(this.view.getTemplate());
   });
 
   it('should return a rendered template from Mustache', function(){
