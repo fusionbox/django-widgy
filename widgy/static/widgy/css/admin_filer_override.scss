@@ -18,53 +18,39 @@ p.file-upload {
 
 }
 
-body.popup {
-  #container {
-    position: relative;
-
-    #content-main {
-      display: block;
-      float: none;
-      min-width: 44em;
-      width: auto;
-
-      .object-tools {
-        float: left;
-      }
-    }
-
-    #content-related {
-      position: absolute;
-      margin-right: 0;
-      top: 15px;
-      right: 15px;
-      width: 18em;
-    }
-  }
-}
-
 body.filebrowser {
   #content {
     margin-top: 100px;
+  }
 
-    #content-main {
-      display: block;
-      float: none;
-      min-width: 44em;
-      width: auto;
+  .object-tools {
+    position: absolute;
+    right: 12px;
+  }
 
-      .object-tools {
-        float: left;
-      }
-    }
+  #content-main {
+    display: block;
+    float: none;
+    min-width: 44em;
+    width: auto;
+  }
 
-    #content-related {
-      position: absolute;
-      margin-right: 0;
-      top: 115px;
-      right: 15px;
-      width: 18em;
-    }
+  #content-related {
+    position: absolute;
+    margin-right: 0;
+    top: 116px;
+    right: 15px;
+    width: 18em;
+  }
+}
+
+body.popup {
+  #container {
+    position: relative;
+  }
+
+  #content-related {
+    top: 16px;
   }
 }
 
