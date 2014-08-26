@@ -52,6 +52,10 @@ $label_width: 150px;
       height: 100px;
     }
 
+    input.vDateField, input.vTimeField {
+      width: 100px;
+    }
+
     p.help_text {
       color: $grey;
       font-size: 11px;
