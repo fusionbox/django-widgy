@@ -181,6 +181,7 @@ ADMIN_MENU_ORDER = [
         'page_builder.Callout',
         'form_builder.Form',
         ('Review queue', 'review_queue.ReviewedVersionCommit'),
+        ('File manager', 'filer.Folder'),
     )),
 ]
 
