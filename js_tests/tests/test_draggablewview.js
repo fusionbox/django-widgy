@@ -21,6 +21,10 @@ describe('DraggablewView', function() {
       DraggableView.prototype.render.apply(this, arguments);
     },
 
+    testRenderPromise: function() {
+      DraggableView.prototype.renderPromise.apply(this, arguments);
+    },
+
     testCssClasses: function() {
       return DraggableView.prototype.cssClasses.apply(this, arguments);
     }
@@ -32,29 +36,24 @@ describe('DraggablewView', function() {
       content: {
         component: 'testcomponent'
       },
-      css_classes: { 'foo': 'bar' }
+      css_classes: [ 'foo', 'bar' ]
     });
   });
 
 
   it('should render', function(done) {
     return this.node.ready(function(node) {
-      var spy = sinon.spy(DraggableView.prototype, 'render');
       var test_view = new TestView({ model: node });
       test_view.testRender();
       assert.isTrue(test_view.$el.hasClass('bar'));
-      assert(DraggableView.prototype.render.calledOnce);
       done();
     });
   });
 
-
   it('should return cssClasses', function(done) {
     return this.node.ready(function(node) {
-      var spy = sinon.spy(DraggableView.prototype, 'cssClasses');
       var test_view = new TestView({ model: node });
-      assert.deepEqual(test_view.testCssClasses(), { 'foo': 'bar' });
-      assert(DraggableView.prototype.cssClasses.calledOnce);
+      assert.deepEqual(test_view.testCssClasses(), [ 'foo', 'bar' ]);
       done();
     });
   });
