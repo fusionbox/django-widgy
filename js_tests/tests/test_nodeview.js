@@ -55,10 +55,9 @@ describe('NodeView', function() {
   });
 
   describe('as root node', function() {
-    var root_node_setup;
     beforeEach(function(done) {
       var nodes_promise = Q.all([this.node.ready(), this.node2.ready()]);
-      root_node_setup =  nodes_promise.then(function(node_array) {
+      this.root_node_setup =  nodes_promise.then(function(node_array) {
         var node_object = {};
         _.extend(node_object, node_array[0]);
         var getComponentStub = sinon.stub(nodes.Node.prototype, 'getComponent',
@@ -78,7 +77,7 @@ describe('NodeView', function() {
     });
 
     it('should return if it is the root node', function(done) {
-      root_node_setup.then(function (app_view_object) {
+      this.root_node_setup.then(function (app_view_object) {
         app_view_object.app_view.root_node_promise.then(function(parent_view) {
           parent_view.$preview = parent_view.$(' > .widget > .preview ');
           parent_view.$children = parent_view.$(' > .widget > .node_chidren ');
@@ -104,7 +103,7 @@ describe('NodeView', function() {
 
     it('should create drop targets with startDrag', function(done) {
       test.create();
-      root_node_setup.then(function (app_view_object) {
+      this.root_node_setup.then(function (app_view_object) {
         app_view_object.app_view.root_node_promise.then(function(parent_view) {
           parent_view.$preview = parent_view.$(' > .widget > .preview ');
           parent_view.$children = parent_view.$(' > .widget > .node_chidren ');
@@ -150,7 +149,7 @@ describe('NodeView', function() {
 
     it('should remove drop targets with stopDrag', function(done) {
       test.create();
-      root_node_setup.then(function(app_view_object) {
+      this.root_node_setup.then(function(app_view_object) {
         app_view_object.app_view.root_node_promise.then(function(parent_view) {
           var parent_view = app_view_object.app_view.node_view_list.at(0);
           parent_view.shelf = parent_view.makeShelf();
