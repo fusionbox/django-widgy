@@ -15,7 +15,6 @@ Mezzanine>=3.1.2
 markdown
 phonenumbers
 pyScss>=1.2.0
-psycopg2==2.5.3
 Sphinx==1.2.2
 sorl-thumbnail
 mock==1.0.1
