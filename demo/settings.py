@@ -55,9 +55,6 @@ INSTALLED_APPS = (
     'django_extensions',
     'argonauts',
 
-    # not required
-    'cachebuster',
-
     'demo.demo_widgets',
 )
 
