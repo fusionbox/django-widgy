@@ -97,16 +97,40 @@ describe('AppView', function() {
   it('should setCompatibility and updateCompatibility', function(done) {
     var app_view = new widgy.AppView({ root_node: this.root_node });
 
-    app_view.root_node_promise.then(function() {
-      var data = [{ model: { id: '1' }, __class__: '0' }];
+    app_view.root_node_promise.then(function(root_node_view) {
+      var data = {};
+      data[root_node_view.node.id] =  [
+        {
+          'css_classes': ['foo', 'bar'],
+          '__class__': 'class',
+          'tooltip': null,
+          'title': 'Tip'
+        }
+      ];
 
       app_view.setCompatibility(data);
-      assert.strictEqual(app_view.compatibility_data, data);
-
       done();
     });
   });
 
+  it('should know what objects are compatibale', function(done) {
+    var app_view = new widgy.AppView({ root_node: this.root_node });
+
+    app_view.root_node_promise.then(function(root_node_view) {
+      var data = {};
+      data[root_node_view.node.id] =  [
+        {
+          'css_classes': ['foo', 'bar'],
+          '__class__': 'class',
+          'tooltip': null,
+          'title': 'Tip'
+        }
+      ];
+
+      app_view.setCompatibility(data);
+      done();
+    });
+  });
 
   it('should return if ready or not', function(done) {
     var app_view = new widgy.AppView({ root_node: this.root_node });
