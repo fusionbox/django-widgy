@@ -1,5 +1,6 @@
 import mock
 import datetime
+from contextlib import contextmanager
 
 from django.test import TestCase
 from django.utils.unittest import skipUnless
@@ -9,6 +10,8 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
+from django.core import urlresolvers
+from django.contrib.auth.models import Permission
 
 from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
@@ -233,6 +236,87 @@ class TestUnpublish(AdminView, TestCase):
 
         self.page = WidgyPage.objects.get(pk=self.page.pk)
         self.assertEqual(self.page.status, CONTENT_STATUS_DRAFT)
+
+
+@override_settings(WIDGY_MEZZANINE_SITE=WidgySite())
+class TestAdminButtons(PageSetup, TestCase):
+    def setUp(self):
+        super(TestAdminButtons, self).setUp()
+        self.user = User.objects.create_superuser('test', 'test@example.com', 'password')
+        self.client.login(username='test', password='password')
+
+    def test_status_embryo(self):
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_add')
+        response = self.client.get(url)
+        self.assertIn('Save', response.content)
+
+    def test_status_draft(self):
+        self.page.status = CONTENT_STATUS_DRAFT
+        self.page.save()
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        response = self.client.get(url)
+        self.assertIn('Save as Draft', response.content)
+        self.assertIn('Publish', response.content)
+
+    def test_status_published(self):
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        response = self.client.get(url)
+        self.assertIn('Publish Changes', response.content)
+
+
+@skipUnless(REVIEW_QUEUE_INSTALLED, 'review_queue is not installed')
+@override_settings(WIDGY_MEZZANINE_SITE=ReviewedWidgySite())
+class TestAdminButtonsWhenReviewed(PageSetup, TestCase):
+    def setUp(self):
+        super(TestAdminButtonsWhenReviewed, self).setUp()
+        self.superuser = User.objects.create_superuser('superuser', 'test@example.com', 'password')
+        self.staffuser = User.objects.create_user('staffuser', 'test@example.com', 'password')
+        self.staffuser.is_staff = True
+        self.staffuser.save()
+        self.staffuser.user_permissions = Permission.objects.filter(
+            content_type__app_label__in=['pages', 'widgy_mezzanine', 'review_queue']
+        ).exclude(codename='change_reviewedversioncommit')
+
+    @contextmanager
+    def as_user(self, username):
+        self.client.login(username=username, password='password')
+        yield
+        self.client.logout()
+
+    def test_status_embryo(self):
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_add')
+        # same for staff or superuser
+        with self.as_user('staffuser'):
+            response = self.client.get(url)
+            self.assertIn('Save', response.content)
+
+    def test_status_draft(self):
+        self.page.status = CONTENT_STATUS_DRAFT
+        self.page.save()
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        with self.as_user('staffuser'):
+            response = self.client.get(url)
+            self.assertIn('Save as Draft', response.content)
+            self.assertIn('Submit for Review', response.content)
+            self.assertNotIn('_save_and_approve', response.content)
+        with self.as_user('superuser'):
+            response = self.client.get(url)
+            self.assertIn('Save as Draft', response.content)
+            self.assertIn('Submit for Review', response.content)
+            self.assertIn('_save_and_approve', response.content)
+
+    def test_status_published(self):
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        with self.as_user('staffuser'):
+            response = self.client.get(url)
+            self.assertNotIn('Save as Draft', response.content)
+            self.assertIn('Submit for Review', response.content)
+            self.assertNotIn('_save_and_approve', response.content)
+        with self.as_user('superuser'):
+            response = self.client.get(url)
+            self.assertNotIn('Save as Draft', response.content)
+            self.assertIn('Submit for Review', response.content)
+            self.assertIn('Publish Changes', response.content)
 
 
 def refetch(obj):

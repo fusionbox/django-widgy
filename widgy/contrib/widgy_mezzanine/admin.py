@@ -78,7 +78,7 @@ class WidgyPageAdmin(PageAdmin):
                                              ('_save_and_approve', _('Publish'))],
         (CONTENT_STATUS_PUBLISHED, False) : [('_save_and_commit', _('Submit for Review'))],
         (CONTENT_STATUS_PUBLISHED, True)  : [('_save_and_commit', _('Submit for Review')),
-                                             ('_save_and_approve', _('Publish changes'))],
+                                             ('_save_and_approve', _('Publish Changes'))],
     }
 
     def get_urls(self):
@@ -164,7 +164,7 @@ class WidgyPageAdmin(PageAdmin):
 
     @property
     def has_review_queue(self):
-        return 'widgy.contrib.review_queue' in settings.INSTALLED_APPS
+        return isinstance(self.get_site(), ReviewedWidgySite)
 
     def get_site(self):
         return get_site(settings.WIDGY_MEZZANINE_SITE)
