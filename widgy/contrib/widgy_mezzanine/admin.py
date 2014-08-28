@@ -46,13 +46,6 @@ class WidgyPageAdminForm(WidgyFormMixin, PageAdminForm):
         if not self.instance.pk:
             self.instance.status = CONTENT_STATUS_DRAFT
 
-    def clean_status(self):
-        status = self.cleaned_data.get('status')
-        if (status == CONTENT_STATUS_PUBLISHED and (not self.instance.root_node or
-                                                    not self.instance.root_node.head)):
-            raise forms.ValidationError(_('You must commit before you can publish'))
-        return status
-
 
 # the status of a page before it's created, on the add page
 CONTENT_STATUS_EMBRYO = 0
