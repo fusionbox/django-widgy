@@ -120,8 +120,7 @@ class WidgyPageAdmin(PageAdmin):
             unapproved = 0
             future = 0
             for commit in obj.root_node.get_history_list():
-                # this condition is suspiciously similiar to is_interesting_to_approve_or_unapprove
-                if commit.is_published and (not self.has_review_queue or commit.reviewedversioncommit.is_approved):
+                if obj.root_node.commit_is_ready(commit):
                     # got to the currently-published commit
                     break
                 # XXX: duplication with ReviewedVersionTracker
