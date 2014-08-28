@@ -113,9 +113,17 @@ class VersionTracker(models.Model):
             # The tree couldn't be deleted, so just let it float away...
             pass
 
+    def commit_is_ready(self, commit):
+        """
+        This method exists on the VersionTracker (instead of the VersionCommit)
+        so that it is easier to override behavior in things like the
+        review_queue.
+        """
+        return commit.is_published
+
     def get_published_node(self, request):
         for commit in self.get_history():
-            if commit.is_published:
+            if self.commit_is_ready(commit):
                 return commit.root_node
         return None
 
