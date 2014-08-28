@@ -135,11 +135,18 @@ describe('AppView', function() {
   it('should return if ready or not', function(done) {
     var app_view = new widgy.AppView({ root_node: this.root_node });
 
-    app_view.root_node_promise.then(function() {
+    app_view.root_node_promise.then(function(root_node_view) {
       assert.isFalse(app_view.ready());
 
-      var data = [{ model: { id: '1' }, __class__: '0' }];
-
+      var data = {};
+      data[root_node_view.node.id] =  [
+        {
+          'css_classes': ['foo', 'bar'],
+          '__class__': 'class',
+          'tooltip': null,
+          'title': 'Tip'
+        }
+      ];
       app_view.setCompatibility(data);
 
       assert.isTrue(app_view.ready());
