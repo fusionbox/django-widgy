@@ -45,7 +45,7 @@ describe('Modal Static Functions', function() {
 
 
   describe('should handle an ajaxError', function() {
-    var model = new Object(),
+    var model = {},
         resp = {
           getResponseHeader: function() { return ['application/json']; },
           responseText: '"Data Test"',
@@ -59,7 +59,7 @@ describe('Modal Static Functions', function() {
     });
 
     it('with responseText Object', function() {
-      resp.responseText = new Object('{ "message": "Object Test" }');
+      resp.responseText = '{ "message": "Object Test" }';
       modal.ajaxError(model, resp, options);
       assert.equal($('.serverResponse').html(), 'Object Test');
     });
