@@ -82,36 +82,44 @@ class WidgyPageAdmin(PageAdmin):
             url('^(.+)/unpublish/$', self.admin_site.admin_view(unpublish_view)),
         ] + super(WidgyPageAdmin, self).get_urls()
 
-    def save_model(self, request, obj, form, change):
+    def _save_and_commit(self, request, obj):
         site = self.get_site()
         commit_model = site.get_version_tracker_model().commit_model
-        if '_save_and_commit' in request.POST:
-            if not site.has_add_permission(request, commit_model):
-                messages.error(request, _("You don't have permission to commit."))
-            else:
-                if obj.root_node.has_changes():
-                    obj.root_node.commit(user=request.user)
-                elif self.has_review_queue:
-                    messages.warning(request, _("There was nothing to submit for review."))
+        if not site.has_add_permission(request, commit_model):
+            messages.error(request, _("You don't have permission to commit."))
+        else:
+            if obj.root_node.has_changes():
+                obj.root_node.commit(user=request.user)
+            elif self.has_review_queue:
+                messages.warning(request, _("There was nothing to submit for review."))
 
-                if not self.has_review_queue:
-                    obj.status = CONTENT_STATUS_PUBLISHED
-                # else:
-                    # If we are reviewed, we'll have to wait for approval.
-                    # Handled by the publish_page_on_approve signal.
-        elif '_save_and_approve' in request.POST and self.has_review_queue:
-            if not site.has_add_permission(request, commit_model) or \
-                    not site.has_change_permission(request, commit_model):
-                messages.error(request, _("You don't have permission to approve commits."))
-            else:
-                if obj.root_node.has_changes():
-                    obj.root_node.commit(request.user)
-                # If we had changes, `head` is the same commit we just created.
-                # If we didn't need to create a commit, we want to publish the
-                # most recent one instead.
-                obj.root_node.head.reviewedversioncommit.approve(request.user)
-                obj.root_node.head.reviewedversioncommit.save()
+            if not self.has_review_queue:
                 obj.status = CONTENT_STATUS_PUBLISHED
+            # else:
+                # If we are reviewed, we'll have to wait for approval.
+                # Handled by the publish_page_on_approve signal.
+
+    def _save_and_approve(self, request, obj):
+        site = self.get_site()
+        commit_model = site.get_version_tracker_model().commit_model
+        if not site.has_add_permission(request, commit_model) or \
+                not site.has_change_permission(request, commit_model):
+            messages.error(request, _("You don't have permission to approve commits."))
+        else:
+            if obj.root_node.has_changes():
+                obj.root_node.commit(request.user)
+            # If we had changes, `head` is the same commit we just created.
+            # If we didn't need to create a commit, we want to publish the
+            # most recent one instead.
+            obj.root_node.head.reviewedversioncommit.approve(request.user)
+            obj.root_node.head.reviewedversioncommit.save()
+            obj.status = CONTENT_STATUS_PUBLISHED
+
+    def save_model(self, request, obj, form, change):
+        if '_save_and_commit' in request.POST:
+            self._save_and_commit(request, obj)
+        elif '_save_and_approve' in request.POST and self.has_review_queue:
+            self._save_and_approve(request, obj)
         request.POST['_continue'] = True
         super(WidgyPageAdmin, self).save_model(request, obj, form, change)
 
@@ -123,15 +131,14 @@ class WidgyPageAdmin(PageAdmin):
                 if obj.root_node.commit_is_ready(commit):
                     # got to the currently-published commit
                     break
-                # XXX: duplication with ReviewedVersionTracker
                 if self.has_review_queue and not commit.reviewedversioncommit.is_approved:
                     unapproved += 1
-                if commit.publish_at > timezone.now():
+                if not commit.is_published:
                     future += 1
             if unapproved:
                 messages.warning(request, ungettext(
-                    "There is one pending commit for this page.",
-                    "There are {count} pending commits for this page.",
+                    "There is one unreviewed commit for this page.",
+                    "There are {count} unreviewed commits for this page.",
                     unapproved
                 ).format(count=unapproved))
             if future:
