@@ -1,5 +1,6 @@
 {% extends "admin/change_form.html" %}
 {% load i18n widgy_tags %}
+
 {% block object-tools %}
   {% if change %}
     <ul class="object-tools">
@@ -12,6 +13,9 @@
     {% endfor %}
     {% if has_add_permission %}
       <li><a class="widgy-fancybox" href="clone/">Clone</a></li>
+    {% endif %}
+    {% if history_url %}
+      <li><a class="historylink" target="_blank" href="{{ history_url }}">{% trans "History" %}</a></li>
     {% endif %}
     {% if has_absolute_url %}
         <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">

@@ -16,6 +16,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import admin
 from django.db.models.signals import post_save
+from django.conf.urls import url, include
 
 from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
@@ -31,6 +32,8 @@ from widgy.contrib.widgy_mezzanine.admin import WidgyPageAdmin
 User = get_user_model()
 widgy_site = WidgySite()
 WidgyPage = get_widgypage_model()
+
+urlpatterns = __import__(settings.ROOT_URLCONF).urlpatterns + [url('^widgy_site/', include(widgy_site.urls))]
 
 FORM_BUILDER_INSTALLED = 'widgy.contrib.form_builder' in settings.INSTALLED_APPS
 
@@ -48,6 +51,8 @@ REVIEW_QUEUE_INSTALLED = 'widgy.contrib.review_queue' in settings.INSTALLED_APPS
 
 if REVIEW_QUEUE_INSTALLED:
     from widgy.contrib.review_queue.site import ReviewedWidgySite
+    reviewed_widgy_site = ReviewedWidgySite()
+    urlpatterns += [url('^reviewed_widgy_site/', include(reviewed_widgy_site.urls))]
 
 
 def make_reviewed(fn):
@@ -60,7 +65,7 @@ def make_reviewed(fn):
     """
     from widgy.contrib.widgy_mezzanine.admin import publish_page_on_approve
 
-    site = ReviewedWidgySite()
+    site = reviewed_widgy_site
     rel = WidgyPage._meta.get_field('root_node').rel
     old_to = rel.to
     dispatch_uid = str(uuid.uuid4())
@@ -319,6 +324,8 @@ class UserSetup(object):
 
 
 class TestAdminButtonsBase(PageSetup, UserSetup):
+    urls = 'widgy.contrib.widgy_mezzanine.tests'
+
     def setUp(self):
         super(TestAdminButtonsBase, self).setUp()
         self.model_admin = WidgyPageAdmin(WidgyPage, admin.site)
@@ -336,7 +343,7 @@ class TestAdminButtonsBase(PageSetup, UserSetup):
 
 
 @skipUnless(PAGE_BUILDER_INSTALLED, 'page_builder is not installed')
-@override_settings(WIDGY_MEZZANINE_SITE=WidgySite())
+@override_settings(WIDGY_MEZZANINE_SITE=widgy_site)
 class TestAdminButtons(TestAdminButtonsBase, TestCase):
     def setUp(self):
         super(TestAdminButtons, self).setUp()
@@ -475,6 +482,8 @@ class TestAdminButtonsWhenReviewed(TestAdminButtonsBase, TestCase):
 
 
 class TestAdminMessages(PageSetup, TestCase):
+    urls = 'widgy.contrib.widgy_mezzanine.tests'
+
     def setUp(self):
         super(TestAdminMessages, self).setUp()
         self.user = User.objects.create_superuser('test', 'test@example.com', 'password')
