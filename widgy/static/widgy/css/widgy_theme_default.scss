@@ -106,7 +106,7 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
   > .widget > .nodeChildren {
     padding-left: 1em;
   }
-  
+
 
   &:first-child > .widget > p.drag-row button {
     float: none;
@@ -371,7 +371,7 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
     max-width: 98.5%;
     height: 120px;
     width: 98.5%;
-    
+
     + span.cke {
       clear: both !important;
     }
@@ -466,4 +466,43 @@ input.cke_dialog_ui_input_text, input.cke_dialog_ui_input_password, textarea.cke
 
 .change-form div.submit-row {
   z-index: 100; // fixes the mezzanine action bar floating under the widgy shelf
+}
+
+/* Widgy Tools Buttons
+--------------------------------------------------*/
+
+ul.widgy-tools {
+  @include clearfix;
+  margin-bottom: 15px;
+
+  li {
+    display: inline;
+    float: left;
+    margin-right: 5px;
+
+    a {
+      @include outside-button;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 2px 8px !important;
+
+      &.commit {
+        border-color: $green;
+        color: $green;
+
+        &:hover {
+          background-color: lighten($green,50%);
+        }
+      }
+
+      &.reset {
+        border-color: $red;
+        color: $red;
+
+        &:hover {
+          background-color: lighten($red,35%);
+        }
+      }
+    }
+  }
 }

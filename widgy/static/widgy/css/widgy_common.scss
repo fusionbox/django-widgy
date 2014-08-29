@@ -1,14 +1,14 @@
 /*
  * Common SCSS File - SCSS v1.0
  * last edited 02/17/12
- * @author Justin Stollsteimer - Fusionbox, Inc. 
+ * @author Justin Stollsteimer - Fusionbox, Inc.
  * http://www.fusionbox.com
  *
  *
- * Lists: Line 
- * HR: Line 
- * Table: Line 
- * Form Elements: Line 
+ * Lists: Line
+ * HR: Line
+ * Table: Line
+ * Form Elements: Line
  *
  */
 
@@ -259,4 +259,62 @@ $widget_icon_sprite: sprite-map("widgy/image/widget-*");
   cursor: $cursor;
   cursor: -moz-#{$cursor};
   cursor: -webkit-#{$cursor};
+}
+
+@mixin outside-button {
+  // This button style is for buttons that exist outside of the widgy editor.
+  @include rounded(3px);
+  background: transparent;
+  border: 1px solid $blue;
+  color: $blue;
+  display: inline-block;
+  height: auto;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 18px;
+  padding: 4px 8px;
+  width: auto;
+
+  &:hover {
+    background-color: lighten($blue,35%);
+    color: $blue;
+  }
+
+  &.cancel {
+    border-color: $grey;
+    color: $grey;
+
+    &:hover {
+      background: lighten($lightgrey,15%);
+    }
+  }
+
+  &.delete {
+    border-color: $red;
+    color: $red;
+
+    &:hover {
+      background: lighten($red,35%);
+    }
+  }
+
+  &.loading {
+    @extend %loading;
+  }
+
+  &[type='submit'] {
+    @include rounded(3px);
+    border-color: $green;
+    color: $green;
+    height: auto;
+    font-weight: bold;
+    line-height: 16px;
+    padding: 5px !important;
+    position: relative;
+    top: -1px;
+
+    &:hover {
+      background: lighten($green,50%);
+    }
+  }
 }

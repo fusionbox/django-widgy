@@ -1,0 +1,81 @@
+@import '/widgy/css/widgy_common.scss';
+
+/* History/Basic Page Styles
+--------------------------------------------------*/
+
+section.main {
+  @include clearfix;
+  @include default;
+  @include html;
+
+  ol.history {
+    list-style: none;
+    padding: 0px !important;
+
+    li {
+      @include gradient(#eeeeee,#fafafa);
+      @include rounded(5px);
+      @include shadow($black30,0px,2px,0px);
+      @include clearfix;
+      margin: 0px 0px 15px 0px;
+      padding: 0px;
+
+      div.top {
+        border-bottom: 1px solid #cccccc;
+        display: block;
+        float: none;
+        height: auto;
+        line-height: 26px;
+        margin: 0px !important;
+        padding: 5px 10px 5px 10px;
+        width: auto;
+
+        div.actions {
+          float: right;
+        }
+      }
+
+      a {
+        @include outside-button;
+      }
+
+      form {
+        display: inline;
+
+        input.button[type='submit'] {
+          @include outside-button;
+
+          &.unapprove {
+            border-color: $red;
+            color: $red;
+
+            &:hover {
+              background: lighten($red,35%);
+            }
+          }
+        }
+      }
+
+      blockquote {
+        border: 0px;
+        margin: 0px;
+        padding: 5px 10px 5px 10px;
+
+        p {
+          margin: 0px !important;
+        }
+      }
+    }
+  }
+}
+
+/* Message List Form Fix
+--------------------------------------------------*/
+
+ul.messagelist {
+  li {
+    form {
+      display: inline;
+    }
+  }
+}
