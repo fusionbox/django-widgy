@@ -21,7 +21,7 @@ except ImportError:
 from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
 
-from widgy.forms import WidgyFormMixin
+from widgy.forms import WidgyFormMixin, VersionedWidgyWidget
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.contrib.widgy_mezzanine.views import ClonePageView, UnpublishView
 from widgy.utils import format_html
@@ -31,9 +31,16 @@ from widgy.db.fields import get_site
 WidgyPage = get_widgypage_model()
 
 
+class PageVersionedWidgyWidget(VersionedWidgyWidget):
+    template_name = 'widgy/widgy_mezzanine/versioned_widgy_field.html'
+
+
 class WidgyPageAdminForm(WidgyFormMixin, PageAdminForm):
     class Meta:
         model = WidgyPage
+        widgets = {
+            'root_node': PageVersionedWidgyWidget,
+        }
 
     def __init__(self, *args, **kwargs):
         super(WidgyPageAdminForm, self).__init__(*args, **kwargs)
@@ -148,17 +155,19 @@ class WidgyPageAdmin(PageAdmin):
                     future
                 ).format(count=future))
 
+        site = self.get_site()
         if add:
             status = CONTENT_STATUS_EMBRYO
         else:
             status = obj.status
         if self.has_review_queue:
-            site = self.get_site()
             commit_model = site.get_version_tracker_model().commit_model
             can_approve = site.has_change_permission(request, commit_model)
             context['save_buttons'] = self.reviewed_buttons[(status, can_approve)]
         else:
             context['save_buttons'] = self.unreviewed_buttons[status]
+        if not add:
+            context['history_url'] =  site.reverse(site.history_view, kwargs={'pk': obj.pk})
         return super(WidgyPageAdmin, self).render_change_form(request, context, add, change, form_url, obj, *args, **kwargs)
 
     @property
