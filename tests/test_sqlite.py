@@ -41,3 +41,9 @@ PACKAGE_NAME_GRAPPELLI = "grappelli_safe"
 TESTING = False
 GRAPPELLI_INSTALLED = True
 SITE_ID = 1
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)
