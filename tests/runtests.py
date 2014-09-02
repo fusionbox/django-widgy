@@ -50,6 +50,9 @@ ALWAYS_INSTALLED_APPS = [
     "mezzanine.generic",
     "mezzanine.pages",
     "mezzanine.forms",
+    'django.contrib.comments',
+    'filebrowser_safe',
+    'grappelli_safe',
     # blog is affected by https://code.djangoproject.com/ticket/12728
     # "mezzanine.blog",
     "widgy",
@@ -121,8 +124,6 @@ def setup(verbosity, test_labels):
 
     # mezzanine junk
     settings.PACKAGE_NAME_FILEBROWSER = "filebrowser_safe"
-    from mezzanine.utils.conf import set_dynamic_settings
-    set_dynamic_settings(vars(settings._wrapped))
 
     # mezzanine sets this to a tuple, but we need ot to be a list
     settings.INSTALLED_APPS = list(settings.INSTALLED_APPS)

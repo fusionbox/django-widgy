@@ -35,3 +35,9 @@ URLCONF_INCLUDE_CHOICES = tuple()
 TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+PACKAGE_NAME_FILEBROWSER = "filebrowser_safe"
+PACKAGE_NAME_GRAPPELLI = "grappelli_safe"
+TESTING = False
+GRAPPELLI_INSTALLED = True
+SITE_ID = 1
