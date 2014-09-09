@@ -4,7 +4,7 @@ import subprocess
 import os
 
 __doc__ = """
-Widgy widgy widgy
+A CMS framework for Django built on a heterogenous tree editor.
 """
 
 
