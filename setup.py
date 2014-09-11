@@ -46,6 +46,8 @@ extras_require = {
     ],
 }
 
+extras_require['all'] = set(j for i in extras_require.values() for j in i)
+
 STAGE = 'alpha'
 
 version = (0, 4, 0, STAGE)

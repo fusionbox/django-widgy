@@ -34,7 +34,7 @@ install: |
     then
       pip install -q --use-mirrors psycopg2
     fi
-    pip install --use-mirrors -e .[page_builder,form_builder,widgy_mezzanine]
+    pip install --use-mirrors -e .[all]
     pip freeze
   fi
 before_script:
