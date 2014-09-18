@@ -30,14 +30,6 @@ class Layout(StrictDefaultChildrenMixin, Content):
     draggable = False
     deletable = False
 
-    @property
-    def owner_class(self):
-        if 'widgy.contrib.widgy_mezzanine' in settings.INSTALLED_APPS:
-            from widgy.contrib.widgy_mezzanine.models import WidgyPage
-            return getattr(settings, 'WIDGY_MEZZANINE_PAGE_MODEL', WidgyPage)
-        else:
-            return getattr(settings, 'WIDGY_MEZZANINE_PAGE_MODEL', None)
-
     @classmethod
     def valid_child_of(cls, content, obj=None):
         return False
