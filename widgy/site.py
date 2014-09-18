@@ -192,4 +192,4 @@ class WidgySite(object):
 
     def valid_root_of(self, owner_class, root_class, root_choices):
         return issubclass(root_class, root_choices) and \
-            root_class.owner_class == owner_class
+            root_class().owner_class == owner_class
