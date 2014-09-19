@@ -11,7 +11,7 @@ This quickstart assumes you wish to use the following packages:
 Install the Widgy package::
 
     cd widgy
-    pip install -e .
+    pip install -e .[all]
 
 Add Mezzanine apps to ``INSTALLED_APPS``::
 

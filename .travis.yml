@@ -26,6 +26,7 @@ install: |
     pip install --upgrade pip
     pip install -q $DJANGO_PACKAGE --use-mirrors
     pip install -q --use-mirrors mock
+    pip install -q --use-mirrors South
 
     if [ "$DATABASE_ENGINE" = "mysql" ]
     then
@@ -36,7 +37,7 @@ install: |
     then
       pip install -q --use-mirrors psycopg2
     fi
-    pip install --use-mirrors .
+    pip install --use-mirrors -e .[all]
     pip freeze
   fi
 before_script:

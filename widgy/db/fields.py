@@ -9,10 +9,13 @@ from django.utils.functional import SimpleLazyObject
 from widgy.generic.models import ContentType as WidgyContentType
 from widgy.utils import fancy_import, update_context
 
-from south.modelsinspector import add_introspection_rules
-
-add_introspection_rules([], ["^widgy\.db.fields\.WidgyField"])
-add_introspection_rules([], ["^widgy\.db.fields\.VersionedWidgyField"])
+try:
+    from south.modelsinspector import add_introspection_rules
+except ImportError:  # South not installed
+    pass
+else:
+    add_introspection_rules([], ["^widgy\.db.fields\.WidgyField"])
+    add_introspection_rules([], ["^widgy\.db.fields\.VersionedWidgyField"])
 
 
 def get_site(site):
