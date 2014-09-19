@@ -2,6 +2,7 @@
 from setuptools import setup, find_packages
 import subprocess
 import os
+import sys
 
 __doc__ = """
 A CMS framework for Django built on a heterogenous tree editor.
@@ -19,7 +20,6 @@ install_requires = [
     'South',
     'django-pyscss',
     'six',
-    'markdown',
     'bleach',
     'django-compressor>=1.3',
     'django-extensions',
@@ -29,6 +29,12 @@ install_requires = [
     'phonenumbers>=5',
     'django-argonauts>=1.0.0',
 ]
+
+# Markdown stops support for Python 2.6 in version 2.5
+if sys.version_info < (2, 7):
+    install_requires.append('markdown<2.5')
+else:
+    install_requires.append('markdown')
 
 STAGE = 'final'
 
