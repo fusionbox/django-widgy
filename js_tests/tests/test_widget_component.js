@@ -66,16 +66,6 @@ describe('FormView', function() {
     });
   });
 
-  it("doesn't submit form if right clicked", function() {
-    var form_view = new form.FormView(),
-        evt = $.Event();
-    evt.target = { disabled: false };
-    evt.which = 3;
-    assert.isTrue(form_view.handleClick(evt));
-    evt.which = 1;
-    assert.isFalse(form_view.handleClick(evt));
-  });
-
   it('should not submit if the submit button is disabled', function() {
     var form_view = new form.FormView(),
         evt = $.Event();
