@@ -7,7 +7,7 @@ var nodes = requirejs('nodes/nodes'),
     DraggableView = requirejs('nodes/base'),
     _ = requirejs('underscore');
 
-describe('DraggablewView', function() {
+describe('DraggableView', function() {
   var TestView = DraggableView.extend({
     initialize: function() {
       DraggableView.prototype.initialize.apply(this, arguments);
