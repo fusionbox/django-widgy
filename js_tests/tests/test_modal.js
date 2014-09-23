@@ -45,41 +45,43 @@ describe('Modal Static Functions', function() {
 
 
   describe('should handle an ajaxError', function() {
-    var model = {},
-        resp = {
-          getResponseHeader: function() { return ['application/json']; },
-          responseText: '"Data Test"',
-          status: 200
-        },
-        options = {};
+    beforeEach(function() {
+      this.model = {};
+      this.resp = {
+            getResponseHeader: function() { return ['application/json']; },
+            responseText: '"Data Test"',
+            status: 200
+          };
+      this.options = {};
+    });
 
     it('with responseText', function() {
-      modal.ajaxError(model, resp, options);
+      modal.ajaxError(this.model, this.resp, this.options);
       assert.equal($('.serverResponse').html(), 'Data Test');
     });
 
     it('with responseText Object', function() {
-      resp.responseText = '{ "message": "Object Test" }';
-      modal.ajaxError(model, resp, options);
+      this.resp.responseText = '{ "message": "Object Test" }';
+      modal.ajaxError(this.model, this.resp, this.options);
       assert.equal($('.serverResponse').html(), 'Object Test');
     });
 
     it('with undefined responseText', function() {
-      resp.responseText = '{}';
-      modal.ajaxError(model, resp, options);
+      this.resp.responseText = '{}';
+      modal.ajaxError(this.model, this.resp, this.options);
       assert.equal($('.serverResponse').html(), 'Unknown error');
     });
 
     it('with 404 status', function() {
-      resp.status = 404;
-      modal.ajaxError(model, resp, options);
+      this.resp.status = 404;
+      modal.ajaxError(this.model, this.resp, this.options);
       assert.equal($('.serverResponse').html(), 'Try refreshing the page');
     });
 
-    it("does not eploade with a non-json response", function() {
-      resp.getResponseHeader = function() { return ['app/not/json']; };
-      modal.ajaxError(model, resp, options);
-      assert.equal($('.serverResponse').html(), '{}');
+    it("does not explode with a non-json response", function() {
+      this.resp.getResponseHeader = function() { return ['app/not/json']; };
+      modal.ajaxError(this.model, this.resp, this.options);
+      assert.equal($('.serverResponse').html(), '"Data Test"');
     });
   });
 

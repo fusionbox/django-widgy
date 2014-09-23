@@ -43,7 +43,7 @@ requirejs.define('components/testcomponent/component', ['widgy.contents'], funct
 
   var WidgetView = contents.View.extend({
     editorClass: EditorView,
-    makeSticky: function() {return},
+    makeSticky: function() {},
   });
 
   return _.extend({}, contents, {
