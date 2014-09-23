@@ -75,19 +75,4 @@ describe('NodeView', function() {
       done();
     });
   });
-
-  it('should addChildren', function(done) {
-    var nd = this.node;
-    this.app_view.root_node_promise.then(function (root_node_view) {
-      root_node_view.renderNode();
-      nd.ready(function(node) {
-        var child_promise = root_node_view.addChild(node);
-
-        child_promise.then(function(child) {
-          assert.strictEqual(child.parent.cid, root_node_view.cid);
-          done();
-        });
-      });
-    });
-  });
 });

@@ -187,16 +187,13 @@ describe('Spinner View', function(){
 });
 
 describe('View.close()', function(){
-  beforeEach(function(){
-    this.view_list = new WidgyBackbone.ViewList();
-    this.view_to_close = new WidgyBackbone.View();
-    this.view_list.push(this.view_to_close);
-  });
-
   it('has a function to close', function(){
-    assert.strictEqual(this.view_list.at(0), this.view_to_close);
-    this.view_to_close.close();
-    assert.isUndefined(this.view_list.at(0));
+    var view_list = new WidgyBackbone.ViewList();
+    var view_to_close = new WidgyBackbone.View();
+    view_list.push(view_to_close);
+    assert.strictEqual(view_list.at(0), view_to_close);
+    view_to_close.close();
+    assert.isUndefined(view_list.at(0));
   });
 });
 
@@ -216,11 +213,6 @@ describe('View template and render', function(){
       {title: 'test'}), 'test');
   });
 
-  it('should render a template with render', function(){
-    this.view.render();
-    assert.strictEqual(this.view.$el.html(), '<span>test</span>');
-  });
-
   it('should render a template with renderHTML', function(){
     this.view.renderHTML(this.view.getTemplate());
     assert.strictEqual(this.view.$el.html(), '<span>test</span>');
@@ -232,20 +224,5 @@ describe('View template and render', function(){
       assert.strictEqual(temp.$el.html(), '<span>test</span>')
       done();
     })
-  });
-});
-
-describe('Model', function(){
-  it('should return a url', function(){
-    var mdl = new WidgyBackbone.Model();
-    mdl.id = undefined;
-    mdl.urlRoot = 1;
-    assert.strictEqual(mdl.url(), 1);
-  });
-
-  it('should return and ID', function(){
-    var mdl = new WidgyBackbone.Model();
-    mdl.id = 1;
-    assert.strictEqual(mdl.url(), 1);
   });
 });

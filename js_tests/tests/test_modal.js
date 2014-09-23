@@ -7,13 +7,6 @@ var modal = requirejs('modal/modal'),
     $ = requirejs('jquery');
 
 describe('ModalView', function() {
-  it('should return the message with toJSON', function() {
-    var modal_view = new modal.ModalView();
-    modal_view.message = 'Test Complete';
-    assert.deepEqual(modal_view.toJSON(), { message: 'Test Complete' });
-  });
-
-
   it('should open a window', function() {
     test.create();
     var modal_view = new modal.ModalView();

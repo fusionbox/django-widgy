@@ -66,12 +66,14 @@ describe('FormView', function() {
     });
   });
 
-  it('should only submit if left clicked', function() {
+  it("doesn't submit form if right clicked", function() {
     var form_view = new form.FormView(),
         evt = $.Event();
     evt.target = { disabled: false };
     evt.which = 3;
     assert.isTrue(form_view.handleClick(evt));
+    evt.which = 1;
+    assert.isFalse(form_view.handleClick(evt));
   });
 
   it('should not submit if the submit button is disabled', function() {
@@ -87,11 +89,7 @@ describe('FormView', function() {
     var callback = sinon.spy();
     var form_view = new form.FormView();
     form_view.$el.append('<div class="widgy_ckeditor" id="0"></div>');
-    window.CKEDITOR = new Object({instances: []});
-    window.CKEDITOR.instances[0] = new Object({
-      id: '0',
-      destroy: callback
-    });
+    window.CKEDITOR = { instances: [{ id: '0', destroy: callback }] };
     form_view.close();
     assert.isTrue(callback.calledOnce);
     test.destroy();
