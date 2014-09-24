@@ -70,7 +70,7 @@ describe('FormView', function() {
     var form_view = new form.FormView(),
         evt = $.Event();
     evt.target = { disabled: true };
-    evt.which = 3;
+    evt.which = 1;
     assert.isFalse(form_view.handleClick(evt));
   });
 
@@ -96,7 +96,7 @@ describe('Editor', function() {
     });
   });
 
-  var create_editor = function(node) {
+  var createEditor = function(node) {
     return new node.component.View.prototype.editorClass({
       'model': node.content
     });
@@ -105,7 +105,7 @@ describe('Editor', function() {
   describe('knows how to deal with prefixes', function() {
     it('field name method', function() {
       return this.node.ready(function(node) {
-        var edit_view = create_editor(node);
+        var edit_view = createEditor(node);
 
         assert.equal(edit_view.getPrefixedFieldName('xxx'), '23-xxx');
         assert.equal(edit_view.removeFieldNamePrefix('23-xxx'), 'xxx');
@@ -115,7 +115,7 @@ describe('Editor', function() {
 
     it('in form hydration', function() {
       return this.node.ready(function(node) {
-        var edit_view = create_editor(node);
+        var edit_view = createEditor(node);
 
         edit_view.$el.html('<input name="23-foo" value="1">' +
                            '<input name="24-bar" value="2">' +

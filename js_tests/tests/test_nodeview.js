@@ -42,13 +42,13 @@ describe('NodeView', function() {
   beforeEach(function() {
     test.create();
 
-    root_node = {
+    var root_node = {
       content: {
         preview_template: '<span><%author%><span>',
         component: 'testcomponent',
       },
       title: 'Test Title',
-      author: 'Test Author',
+      author: 'Test Author'
     };
 
     this.node = new nodes.Node({
@@ -57,7 +57,7 @@ describe('NodeView', function() {
         component: 'testcomponent',
       },
       title: 'Node Title',
-      author: 'Node Author',
+      author: 'Node Author'
     });
 
 
