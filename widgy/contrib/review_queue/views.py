@@ -124,6 +124,5 @@ class HistoryView(OldHistoryView):
         interesting = True
         for commit in kwargs['commits']:
             commit.is_interesting_to_approve_or_unapprove = interesting
-            if commit.reviewedversioncommit.is_approved:
-                interesting = False
+            interesting &= not self.object.commit_is_ready(commit)
         return kwargs

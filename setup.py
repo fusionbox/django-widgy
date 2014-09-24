@@ -13,7 +13,7 @@ def read(fname):
 
 
 install_requires = [
-    'mezzanine >= 1.3.0',
+    'mezzanine >= 3.1.10',
     'django-treebeard',
     'django-filer>=0.9.6',
     'South',

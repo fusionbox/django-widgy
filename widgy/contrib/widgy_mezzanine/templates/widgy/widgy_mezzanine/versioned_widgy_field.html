@@ -1,0 +1,8 @@
+{% extends "widgy/versioned_widgy_field_base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block widgy_tools %}
+  <li><a class="widgy-fancybox commit" href="{{ commit_url }}">{% trans "Schedule changes" %}</a></li>
+  <li><a class="widgy-fancybox reset" href="{{ reset_url }}">{% trans "Reset" %}</a></li>
+{% endblock %}

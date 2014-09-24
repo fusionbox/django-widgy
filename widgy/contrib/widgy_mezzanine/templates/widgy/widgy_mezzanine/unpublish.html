@@ -1,0 +1,20 @@
+{% extends "widgy/popup_base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{% blocktrans with page_title=object.title %}Unpublishing {{ page_title }}{% endblocktrans %}</h1>
+<p>
+  {% blocktrans %}
+  Unpublishing will cause this page to disappear from the live site.  Users who
+  go to this page will get a 404 (File Not Found) error page.  Are you sure you
+  want to unpublish this page?
+  {% endblocktrans %}
+</p>
+<form method="post">
+  {% csrf_token %}
+  <div class="submit-row">
+    <p class="cancellink-box"><a href="../" class="cancellink">{% trans "Cancel" %}</a></p>
+    <input type="submit" value="{% trans "Yes, I'm sure" %}" class="default" />
+ </div>
+</form>
+{% endblock %}

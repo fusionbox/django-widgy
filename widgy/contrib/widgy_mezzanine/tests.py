@@ -1,4 +1,7 @@
 import mock
+import datetime
+from contextlib import contextmanager
+import uuid
 
 from django.test import TestCase
 from django.utils.unittest import skipUnless
@@ -7,15 +10,30 @@ from django.test.utils import override_settings
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.utils import timezone
+from django.core import urlresolvers
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+from django.contrib import admin
+from django.db.models.signals import post_save
+from django.conf.urls import url, include
+
+from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
+                                   CONTENT_STATUS_DRAFT)
 
 from widgy.site import WidgySite
 from widgy.utils import get_user_model
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
-from widgy.contrib.widgy_mezzanine.views import ClonePageView
+from widgy.contrib.widgy_mezzanine.views import ClonePageView, UnpublishView
+from widgy.db.fields import get_site
+
+from widgy.contrib.widgy_mezzanine.admin import WidgyPageAdmin
 
 User = get_user_model()
 widgy_site = WidgySite()
 WidgyPage = get_widgypage_model()
+
+urlpatterns = __import__(settings.ROOT_URLCONF).urlpatterns + [url('^widgy_site/', include(widgy_site.urls))]
 
 FORM_BUILDER_INSTALLED = 'widgy.contrib.form_builder' in settings.INSTALLED_APPS
 
@@ -26,8 +44,69 @@ if FORM_BUILDER_INSTALLED:
 PAGE_BUILDER_INSTALLED = 'widgy.contrib.page_builder' in settings.INSTALLED_APPS
 
 if PAGE_BUILDER_INSTALLED:
-    from widgy.contrib.page_builder.models import Button
+    from widgy.contrib.page_builder.models import Button, DefaultLayout
     from widgy.contrib.widgy_mezzanine.views import PreviewView
+
+REVIEW_QUEUE_INSTALLED = 'widgy.contrib.review_queue' in settings.INSTALLED_APPS
+
+if REVIEW_QUEUE_INSTALLED:
+    from widgy.contrib.review_queue.site import ReviewedWidgySite
+    reviewed_widgy_site = ReviewedWidgySite()
+    urlpatterns += [url('^reviewed_widgy_site/', include(reviewed_widgy_site.urls))]
+
+
+def make_reviewed(fn):
+    """
+    Just setting the WIDGY_MEZZANINE_SITE is not enough during tests, because
+    WidgyPage.root_node has been set to point to VersionTracker.  We have to
+    manually point it to ReviewedVersionTracker.  We do this only in tests
+    because on a normal run, you are never going to be changing what models a
+    ForeignKey points to (I would hope).
+    """
+    from widgy.contrib.widgy_mezzanine.admin import publish_page_on_approve
+
+    site = reviewed_widgy_site
+    rel = WidgyPage._meta.get_field('root_node').rel
+    old_to = rel.to
+    dispatch_uid = str(uuid.uuid4())
+
+    fn = override_settings(WIDGY_MEZZANINE_SITE=site)(fn)
+    fn = skipUnless(REVIEW_QUEUE_INSTALLED, 'review_queue is not installed')(fn)
+
+    def up():
+        rel.to = site.get_version_tracker_model()
+        post_save.connect(publish_page_on_approve,
+                          sender=site.get_version_tracker_model().commit_model,
+                          dispatch_uid=dispatch_uid)
+
+    def down():
+        rel.to = old_to
+        post_save.disconnect(dispatch_uid=dispatch_uid)
+
+    if isinstance(fn, type):
+        old_pre_setup = fn._pre_setup
+        old_post_teardown = fn._post_teardown
+
+        def _pre_setup(self):
+            up()
+            old_pre_setup(self)
+
+        def _post_teardown(self):
+            old_post_teardown(self)
+            down()
+
+        fn._pre_setup = _pre_setup
+        fn._post_teardown = _post_teardown
+
+        return fn
+    else:
+        def change_foreign_key(*args, **kwargs):
+            up()
+            try:
+                return fn(*args, **kwargs)
+            finally:
+                down()
+        return change_foreign_key
 
 
 @skipUnless(FORM_BUILDER_INSTALLED, 'form_builder not installed')
@@ -146,27 +225,36 @@ class TestPreviewView(TestCase):
 
 
 @skipUnless(PAGE_BUILDER_INSTALLED, 'page_builder is not installed')
-class TestClonePage(TestCase):
+class PageSetup(object):
     def setUp(self):
+        super(PageSetup, self).setUp()
         self.factory = RequestFactory()
 
+        site = get_site(getattr(settings, 'WIDGY_MEZZANINE_SITE', widgy_site))
+
         self.page = WidgyPage.objects.create(
-            root_node=widgy_site.get_version_tracker_model().objects.create(
-                working_copy=Button.add_root(widgy_site, text='buttontext').node,
+            root_node=site.get_version_tracker_model().objects.create(
+                working_copy=Button.add_root(site, text='buttontext').node,
             ),
             title='titleabc',
             slug='slugabc',
         )
 
+
+class AdminView(PageSetup):
     def as_view(self, **kwargs):
         kwargs.setdefault('has_permission', lambda req: True)
-        return ClonePageView.as_view(**kwargs)
+        return self.view_cls.as_view(**kwargs)
 
     def test_permissions(self):
         with self.assertRaises(PermissionDenied):
             forbid_everything = lambda req: False
             req = self.factory.get('/')
             self.as_view(has_permission=forbid_everything)(req, str(self.page.pk))
+
+
+class TestClonePage(AdminView, TestCase):
+    view_cls = ClonePageView
 
     def test_get(self):
         view = self.as_view()
@@ -194,3 +282,304 @@ class TestClonePage(TestCase):
         self.assertEqual(new_page.title, 'new title')
 
         self.assertEqual(new_page.root_node.working_copy.content.text, 'buttontext')
+
+
+class TestUnpublish(AdminView, TestCase):
+    view_cls = UnpublishView
+
+    def test_unpublish(self):
+        self.assertEqual(self.page.status, CONTENT_STATUS_PUBLISHED)
+
+        view = self.as_view()
+        resp = view(self.factory.get('/'), str(self.page.pk))
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(self.page.title, resp.rendered_content)
+
+        with mock.patch('django.contrib.messages.success') as success_mock:
+            req = self.factory.post('/')
+            resp = view(req, str(self.page.pk))
+        self.assertEqual(resp.status_code, 302)
+        success_mock.assert_called_with(req, mock.ANY)
+
+        self.page = WidgyPage.objects.get(pk=self.page.pk)
+        self.assertEqual(self.page.status, CONTENT_STATUS_DRAFT)
+
+
+class UserSetup(object):
+    def setUp(self):
+        super(UserSetup, self).setUp()
+        self.superuser = User.objects.create_superuser('superuser', 'test@example.com', 'password')
+        self.staffuser = User.objects.create_user('staffuser', 'test@example.com', 'password')
+        self.staffuser.is_staff = True
+        self.staffuser.save()
+        self.staffuser.user_permissions = Permission.objects.filter(
+            content_type__app_label__in=['pages', 'widgy_mezzanine', 'review_queue']
+        ).exclude(codename='change_reviewedversioncommit')
+
+    @contextmanager
+    def as_user(self, username):
+        self.client.login(username=username, password='password')
+        yield
+        self.client.logout()
+
+
+class TestAdminButtonsBase(PageSetup, UserSetup):
+    urls = 'widgy.contrib.widgy_mezzanine.tests'
+
+    def setUp(self):
+        super(TestAdminButtonsBase, self).setUp()
+        self.model_admin = WidgyPageAdmin(WidgyPage, admin.site)
+
+    def test_save_and_commit_without_changes(self):
+        req = self.factory.post('/')
+        req.user = self.superuser
+
+        self.model_admin._save_and_commit(req, self.page)
+        self.assertEqual(self.page.root_node.commits.count(), 1)
+        # save and commit again should not commit again when there are no
+        # changes to commit
+        self.model_admin._save_and_commit(req, self.page)
+        self.assertEqual(self.page.root_node.commits.count(), 1)
+
+
+@skipUnless(PAGE_BUILDER_INSTALLED, 'page_builder is not installed')
+@override_settings(WIDGY_MEZZANINE_SITE=widgy_site)
+class TestAdminButtons(TestAdminButtonsBase, TestCase):
+    def setUp(self):
+        super(TestAdminButtons, self).setUp()
+        self.client.login(username='superuser', password='password')
+
+    def test_status_embryo(self):
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_add')
+        response = self.client.get(url)
+        self.assertIn('Save', response.content)
+
+    def test_status_embryo_save(self):
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_add')
+        response = self.client.get(url)
+        data = {
+            '_continue': '',
+            'title': 'Title',
+            'slug': 'test_status_embryo_save',
+            'root_node': ContentType.objects.get_for_model(DefaultLayout).pk,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        page = WidgyPage.objects.get(slug='test_status_embryo_save')
+        self.assertEqual(page.status, CONTENT_STATUS_DRAFT)
+
+    def test_save_and_commit(self):
+        self.page.status = CONTENT_STATUS_DRAFT
+        self.page.save()
+        req = self.factory.post('/')
+        req.user = self.superuser
+        self.model_admin._save_and_commit(req, self.page)
+        self.assertEqual(self.page.status, CONTENT_STATUS_PUBLISHED)
+
+    def test_save_and_commit_without_permission(self):
+        self.model_admin = WidgyPageAdmin(WidgyPage, admin.site)
+        req = self.factory.post('/')
+        req.user = self.staffuser
+
+        self.staffuser.user_permissions.filter(codename='add_versioncommit').delete()
+
+        with mock.patch('django.contrib.messages.error') as error_mock:
+            self.model_admin._save_and_commit(req, self.page)
+        error_mock.assert_called_with(req, mock.ANY)
+        self.assertEqual(self.page.root_node.commits.count(), 0)
+
+    def test_status_draft(self):
+        self.page.status = CONTENT_STATUS_DRAFT
+        self.page.save()
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        response = self.client.get(url)
+        self.assertIn('Save as Draft', response.content)
+        self.assertIn('Publish', response.content)
+
+    def test_status_published(self):
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        response = self.client.get(url)
+        self.assertIn('Publish Changes', response.content)
+
+
+@make_reviewed
+class TestAdminButtonsWhenReviewed(TestAdminButtonsBase, TestCase):
+    def test_save_and_commit(self):
+        self.page.status = CONTENT_STATUS_DRAFT
+        self.page.save()
+        req = self.factory.post('/')
+        req.user = self.staffuser
+        self.model_admin._save_and_commit(req, self.page)
+        self.assertEqual(self.page.status, CONTENT_STATUS_DRAFT)
+        self.assertEqual(self.page.root_node.commits.count(), 1)
+        commit = self.page.root_node.commits.get()
+        self.assertFalse(commit.reviewedversioncommit.is_approved)
+
+    def test_save_and_approve(self):
+        self.page.status = CONTENT_STATUS_DRAFT
+        self.page.save()
+        req = self.factory.post('/')
+        req.user = self.superuser
+        self.model_admin._save_and_approve(req, self.page)
+        self.assertEqual(self.page.status, CONTENT_STATUS_PUBLISHED)
+        self.assertEqual(self.page.root_node.commits.count(), 1)
+        self.assertTrue(self.page.root_node.head.reviewedversioncommit.is_approved)
+
+    def test_save_and_approve_without_permission(self):
+        req = self.factory.post('/')
+        req.user = self.staffuser
+        with mock.patch('django.contrib.messages.error') as error_mock:
+            self.model_admin._save_and_approve(req, self.page)
+        error_mock.assert_called_with(req, mock.ANY)
+        self.assertEqual(self.page.root_node.commits.count(), 0)
+
+    def test_save_and_approve_without_commit(self):
+        commit = self.page.root_node.commit()
+        req = self.factory.post('/')
+        req.user = self.superuser
+        self.model_admin._save_and_approve(req, self.page)
+        self.assertTrue(refetch(commit).reviewedversioncommit.is_approved)
+        self.assertEqual(self.page.root_node.commits.count(), 1)
+
+    def test_save_and_commit_without_changes(self):
+        with mock.patch('django.contrib.messages.warning') as warning_mock:
+            super(TestAdminButtonsWhenReviewed, self).test_save_and_commit_without_changes()
+        warning_mock.assert_called_with(mock.ANY, mock.ANY)
+
+    def test_status_embryo(self):
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_add')
+        # same for staff or superuser
+        with self.as_user('staffuser'):
+            response = self.client.get(url)
+            self.assertIn('Save', response.content)
+
+    def test_status_draft(self):
+        self.page.status = CONTENT_STATUS_DRAFT
+        self.page.save()
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        with self.as_user('staffuser'):
+            response = self.client.get(url)
+            self.assertIn('Save as Draft', response.content)
+            self.assertIn('Submit for Review', response.content)
+            self.assertNotIn('_save_and_approve', response.content)
+        with self.as_user('superuser'):
+            response = self.client.get(url)
+            self.assertIn('Save as Draft', response.content)
+            self.assertIn('Submit for Review', response.content)
+            self.assertIn('_save_and_approve', response.content)
+
+    def test_status_published(self):
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        with self.as_user('staffuser'):
+            response = self.client.get(url)
+            self.assertNotIn('Save as Draft', response.content)
+            self.assertIn('Submit for Review', response.content)
+            self.assertNotIn('_save_and_approve', response.content)
+        with self.as_user('superuser'):
+            response = self.client.get(url)
+            self.assertNotIn('Save as Draft', response.content)
+            self.assertIn('Submit for Review', response.content)
+
+
+class TestAdminMessages(PageSetup, TestCase):
+    urls = 'widgy.contrib.widgy_mezzanine.tests'
+
+    def setUp(self):
+        super(TestAdminMessages, self).setUp()
+        self.user = User.objects.create_superuser('test', 'test@example.com', 'password')
+        self.client.login(username='test', password='password')
+
+    def test_future_schedule_message(self):
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        self.page.root_node.commit(publish_at=timezone.now() + datetime.timedelta(days=1))
+        response = self.client.get(url)
+        self.assertIn('one future-scheduled commit', response.content)
+        # make the future commit uninteresting
+        self.page.root_node.commit()
+        response = self.client.get(url)
+        self.assertNotIn('future-scheduled commit', response.content)
+
+    @make_reviewed
+    def test_unapproved_commit_message(self):
+        self.page = refetch(self.page)
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        self.page.root_node.commit()
+        response = self.client.get(url)
+        self.assertIn('one unreviewed commit', response.content)
+        # make the unreviewed commit uninteresting
+        new_commit = self.page.root_node.commit()
+        new_commit.approve(user=self.user)
+        response = self.client.get(url)
+        self.assertNotIn('unreviewed commit', response.content)
+
+
+def refetch(obj):
+    return obj.__class__.objects.get(pk=obj.pk)
+
+
+@make_reviewed
+class TestPublicationCommitHandling(PageSetup, TestCase):
+    def setUp(self):
+        super(TestPublicationCommitHandling, self).setUp()
+        self.user = User.objects.create_superuser(
+            username='asfd', password='asdfasdf', email='asdf@example.com',
+        )
+
+        self.vt = self.page.root_node
+
+    def test_publish_on_commit(self):
+        self.page.status = CONTENT_STATUS_DRAFT
+        self.page.save()
+
+        commit = self.vt.commit()
+        commit.publish_at = timezone.now() + datetime.timedelta(days=1)
+
+        self.assertEqual(refetch(self.page).status, CONTENT_STATUS_DRAFT)
+
+        commit.approve(self.user)
+        self.assertEqual(refetch(self.page).status, CONTENT_STATUS_PUBLISHED)
+        self.assertEqual(refetch(self.page).publish_date, refetch(commit).publish_at)
+
+    def test_committing_again_does_nothing(self):
+        self.page.status = CONTENT_STATUS_DRAFT
+        self.page.save()
+
+        commit = self.vt.commit()
+        commit.approve(self.user)
+        original_publish_date = refetch(self.page).publish_date
+
+        self.assertEqual(refetch(self.page).status, CONTENT_STATUS_PUBLISHED)
+        self.vt.commit(publish_at=timezone.now() + datetime.timedelta(days=1))
+
+        self.assertEqual(refetch(self.page).status, CONTENT_STATUS_PUBLISHED)
+        self.assertEqual(refetch(self.page).publish_date, original_publish_date)
+
+    def test_publish_commit_moves_publish_date_up(self):
+        self.page.publish_date = timezone.now() + datetime.timedelta(days=1)
+        self.page.save()
+
+        commit = self.vt.commit()
+        commit.approve(self.user)
+        self.assertEqual(refetch(self.page).publish_date, refetch(commit).publish_at)
+
+    def test_unapprove_commit_unpublishes_page_when_there_are_no_other_published_commits(self):
+        commit = self.vt.commit()
+        commit.approve(self.user)
+        self.assertEqual(refetch(self.page).status, CONTENT_STATUS_PUBLISHED)
+
+        commit.unapprove(self.user)
+
+        self.assertEqual(refetch(self.page).status, CONTENT_STATUS_DRAFT)
+
+    def test_unapprove_commit_corrects_publish_date_there_is_another_commit(self):
+        c1 = self.vt.commit()
+        c1.approve(self.user)
+
+        c2 = self.vt.commit(publish_at=timezone.now() + datetime.timedelta(days=1))
+        c2.approve(self.user)
+        self.assertEqual(refetch(self.page).status, CONTENT_STATUS_PUBLISHED)
+
+        c1.unapprove(self.user)
+
+        self.assertEqual(refetch(self.page).status, CONTENT_STATUS_PUBLISHED)
+        self.assertEqual(refetch(self.page).publish_date, refetch(c2).publish_at)

@@ -23,6 +23,10 @@ class ReviewedVersionCommit(VersionCommit):
             return self.filter(approved_at__isnull=True,
                                approved_by__isnull=True)
 
+        def approved(self):
+            return self.exclude(approved_at__isnull=True,
+                                approved_by__isnull=True)
+
     objects = ReviewedVersionCommitQuerySet.as_manager()
 
     @property
@@ -61,11 +65,8 @@ class ReviewedVersionTracker(VersionTracker):
 
     objects = ReviewedVersionTrackerQuerySet.as_manager()
 
-    def get_published_node(self, request):
-        for commit in self.get_history():
-            if commit.is_published and commit.reviewedversioncommit.is_approved:
-                return commit.root_node
-        return None
+    def commit_is_ready(self, commit):
+        return commit.is_published and commit.reviewedversioncommit.is_approved
 
     @property
     def commits(self):
