@@ -17,6 +17,7 @@ have many different uses.
    contrib/index
    api/index
    tutorials/index
+   changelog
 
 
 Development
