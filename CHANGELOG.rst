@@ -1,11 +1,76 @@
 Changelog
 =========
 
-0.3.0 (not yet released)
-------------------------
+0.3.0 (2014-09-24)
+------------------
 
-* Updated overridden directory_table template for django-filer 0.9.6. Requires
-  upgrading django-filer to 0.9.6. [Scott Clark, #179]
+This release mainly focusses on the New Save Flow feature, but also includes
+several bug fixes and some nice CSS touch ups.  There have been some updates to
+the dependencies, so please be sure to check the `How to Upgrade`_ section to
+make sure that you get everything updated correctly.
+
+Major Changes
+^^^^^^^^^^^^^
+
+* New Save Flow **Requires upgrading Mezzanine to at least 3.1.10** [Gavin
+  Wahl, Rocky Meza, #241]
+
+  We have updated the workflow for WidgyPage.  We consider this an experiment
+  that we can hopefully expand to all WidgyAdmins in the future.  We hope that
+  this new save flow is more intuitive and less tedious.
+
+  Screenshot of before:
+
+  .. image:: https://raw.githubusercontent.com/fusionbox/django-widgy/master/docs/_images/new-save-flow_before.png
+     :alt: Widgy Page Admin Old Save Flow
+
+  Screenshot of after:
+
+  .. image:: https://raw.githubusercontent.com/fusionbox/django-widgy/master/docs/_images/new-save-flow_after.png
+     :alt: Widgy Page Admin New Save Flow
+
+  As you can see, we have rearranged some of the buttons and have gotten rid of
+  the Published Status button.  The new save buttons on the bottom right now
+  will control the publish state as well as the commit status.  This means that
+  now instead of committing and saving being a two-step process, it all lives
+  in one button.  This should make editing and saving a smoother process.
+  Additionally, we have renamed some buttons to make their intent more obvious.
+
+Bug Fixes
+^^^^^^^^^
+
+* Updated overridden directory_table template for django-filer 0.9.6. **Requires
+  upgrading django-filer to at least 0.9.6**. [Scott Clark, #179]
+* Fix bug in ReviewedVersionTrackerQuerySet.published [Gavin Wahl, #240]
+* Made commit buttons not look disabled [Justin Stollsteimer, #250, #205]
+* (Demo) Added ADD_PAGE_ORDER to demo settings [Zach Metcalf, #248]
+* (Demo) Updated demo project requirements [Scott Clark, #234]
+* Make Widgy's jQuery private to prevent clashes with other admin extensions [Gavin Wahl, #246]
+
+Documentation
+^^^^^^^^^^^^^
+
+* Update recommend ADMIN_MENU_ORDER to clarify django-filer [Gavin Wahl, #249]
+
+How to Upgrade
+^^^^^^^^^^^^^^
+
+In this release, widgy has udpated two of its dependencies:
+
+* The minimum supported version of django-filer is now 0.9.6 (previously 0.9.6).
+* The minimum supported version of Mezzanine is now 3.1.10 (previously 1.3.0).
+
+If you ``pip install django-widgy==0.3.0``, it should upgrade the dependencies
+for you, but just to be sure, you may want to also run ::
+
+    pip install 'django-filer>=0.9.6' 'Mezzanine>=3.1.10'
+
+to make sure that you get the updates.
+
+.. note::
+
+    Please note that if you are upgrading from an older version of Mezzanine,
+    that the admin center has been restyled a little bit.
 
 
 0.2.0 (2014-08-04)
