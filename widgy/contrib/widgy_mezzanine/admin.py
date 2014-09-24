@@ -50,7 +50,7 @@ class WidgyPageAdminForm(WidgyFormMixin, PageAdminForm):
         self.fields['expiry_date'].help_text = _(
             "If you enter a date here, the page will not be viewable after this time"
         )
-        if self.instance.pk is not None:
+        if self.instance.pk is None:
             self.instance.status = CONTENT_STATUS_DRAFT
 
 
