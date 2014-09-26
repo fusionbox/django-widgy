@@ -17,7 +17,7 @@
     {% if history_url %}
       <li><a class="historylink" target="_blank" href="{{ history_url }}">{% trans "History" %}</a></li>
     {% endif %}
-    {% if has_absolute_url %}
+    {% if has_absolute_url and original.status == 2 %}
         <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">
             {% trans "View live version" %}
         </a></li>
