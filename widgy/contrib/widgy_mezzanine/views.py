@@ -168,6 +168,7 @@ class ClonePageView(AdminViewMixin, UpdateView):
         page = form.instance
         unset_pks(page)
         page.root_node = page.root_node.clone()
+        page.status = CONTENT_STATUS_DRAFT
         form.save()
 
         messages.success(
