@@ -167,7 +167,7 @@ class WidgyPageAdmin(PageAdmin):
         else:
             context['save_buttons'] = self.unreviewed_buttons[status]
         if not add:
-            context['history_url'] =  site.reverse(site.history_view, kwargs={'pk': obj.pk})
+            context['history_url'] =  site.reverse(site.history_view, kwargs={'pk': obj.root_node_id})
         return super(WidgyPageAdmin, self).render_change_form(request, context, add, change, form_url, obj, *args, **kwargs)
 
     @property
