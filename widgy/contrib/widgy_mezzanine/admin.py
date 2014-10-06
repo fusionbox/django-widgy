@@ -24,6 +24,7 @@ from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
 from widgy.forms import WidgyFormMixin, VersionedWidgyWidget
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.contrib.widgy_mezzanine.views import ClonePageView, UnpublishView
+from widgy.contrib.review_queue.site import ReviewedWidgySite
 from widgy.utils import format_html
 from widgy.db.fields import get_site
 
@@ -295,7 +296,6 @@ def publish_page_on_approve(sender, instance, created, **kwargs):
 if 'widgy.contrib.review_queue' in settings.INSTALLED_APPS:
     from widgy.contrib.review_queue.admin import VersionCommitAdminBase
     from widgy.contrib.review_queue.models import ReviewedVersionCommit
-    from widgy.contrib.review_queue.site import ReviewedWidgySite
 
     class VersionCommitAdmin(VersionCommitAdminBase):
         def get_site(self):
