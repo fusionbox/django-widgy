@@ -256,3 +256,9 @@ class ReviewedVersionedPage(models.Model):
         root_choices=[Layout, AnotherLayout],
         to='review_queue.ReviewedVersionTracker',
     )
+
+
+# This just tests that it is possible to have two widgets of the same name in
+# different apps.
+class Button(Content):
+    pass
