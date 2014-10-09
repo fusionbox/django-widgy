@@ -35,6 +35,11 @@ else:
 
 
     class ProxyGenericRelation(generic.GenericRelation):
+        def __init__(self, *args, **kwargs):
+            # work around django #16920, #16913
+            kwargs.setdefault('related_name', '%(app_label)s_%(class)s_set')
+            super(ProxyGenericRelation, self).__init__(*args, **kwargs)
+
         def get_content_type(self):
             """
             Returns the content type associated with this field's model.
