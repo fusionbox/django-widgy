@@ -399,8 +399,8 @@ class Content(models.Model):
     """
     _nodes = ProxyGenericRelation(Node,
                                   content_type_field='content_type',
-                                  object_id_field='content_id',
-                                  related_name='%(app_label)s_%(class)s_set')
+                                  object_id_field='content_id')
+
 
     # these preferences only affect the frontend interface and editing through
     # the API
