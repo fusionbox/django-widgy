@@ -24,12 +24,18 @@ from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
 from widgy.forms import WidgyFormMixin, VersionedWidgyWidget
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.contrib.widgy_mezzanine.views import ClonePageView, UnpublishView
-from widgy.contrib.review_queue.site import ReviewedWidgySite
 from widgy.utils import format_html
 from widgy.db.fields import get_site
 
 
 WidgyPage = get_widgypage_model()
+
+
+if 'widgy.contrib.review_queue' in settings.INSTALLED_APPS:
+    REVIEW_QUEUE_INSTALLED = True
+    from widgy.contrib.review_queue.site import ReviewedWidgySite
+else:
+    REVIEW_QUEUE_INSTALLED = False
 
 
 class PageVersionedWidgyWidget(VersionedWidgyWidget):
@@ -173,7 +179,7 @@ class WidgyPageAdmin(PageAdmin):
 
     @property
     def has_review_queue(self):
-        return isinstance(self.get_site(), ReviewedWidgySite)
+        return REVIEW_QUEUE_INSTALLED and isinstance(self.get_site(), ReviewedWidgySite)
 
     def get_site(self):
         return get_site(settings.WIDGY_MEZZANINE_SITE)
@@ -293,7 +299,8 @@ def publish_page_on_approve(sender, instance, created, **kwargs):
                 status=CONTENT_STATUS_DRAFT,
             )
 
-if 'widgy.contrib.review_queue' in settings.INSTALLED_APPS:
+
+if REVIEW_QUEUE_INSTALLED:
     from widgy.contrib.review_queue.admin import VersionCommitAdminBase
     from widgy.contrib.review_queue.models import ReviewedVersionCommit
 
