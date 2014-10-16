@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.3.2 (unreleased)
+-----------------
+
+Bugfix - Allow WidgyAdmin to check for ReviewedWidgySite without review_queue
+installed [Scott Clark, #265]
+
 0.3.1 (2014-10-01)
 ------------------
 
