@@ -1,11 +1,15 @@
 Changelog
 =========
 
-0.3.2 (unreleased)
+0.3.2 (2014-10-16)
 -----------------
 
-Bugfix - Allow WidgyAdmin to check for ReviewedWidgySite without review_queue
-installed [Scott Clark, #265]
+Bugfix release:
+
+- Allow WidgyAdmin to check for ReviewedWidgySite without review_queue
+  installed [Scott Clark, #265]
+- Fix handling of related_name on ProxyGenericRelation [#264]
+
 
 0.3.1 (2014-10-01)
 ------------------
