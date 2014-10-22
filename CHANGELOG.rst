@@ -72,7 +72,7 @@ How to Upgrade
 
 In this release, widgy has udpated two of its dependencies:
 
-* The minimum supported version of django-filer is now 0.9.6 (previously 0.9.6).
+* The minimum supported version of django-filer is now 0.9.6 (previously 0.9.5).
 * The minimum supported version of Mezzanine is now 3.1.10 (previously 1.3.0).
 
 If you ``pip install django-widgy==0.3.0``, it should upgrade the dependencies
