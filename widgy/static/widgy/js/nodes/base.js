@@ -46,13 +46,6 @@ define(['jquery', 'underscore', 'widgy.backbone', 'geometry'], function(
       this.parent = options.parent;
     },
 
-    render: function() {
-      Backbone.View.prototype.render.apply(this, arguments);
-      _.each(this.cssClasses(), this.$el.addClass, this.$el);
-
-      return this;
-    },
-
     renderPromise: function() {
       return Backbone.View.prototype.renderPromise.apply(this, arguments)
         .then(function(self) {

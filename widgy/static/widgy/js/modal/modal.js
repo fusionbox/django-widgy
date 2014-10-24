@@ -21,11 +21,15 @@ define([ 'jquery',
     },
 
     open: function() {
-      $(document.body).append(this.render().$el.css({
-        left: $(window).width()/2,
-        top: $(window).height()/2,
-        position: 'fixed'
-      }));
+      this.renderPromise().then(
+        $(document.body).append(
+          this.$el.css({
+            left: $(window).width()/2,
+            top: $(window).height()/2,
+            position: 'fixed'
+          })
+        )
+      ).done()
     }
   });
 

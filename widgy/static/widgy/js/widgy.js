@@ -50,15 +50,6 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'lib/csrf', 'lib/q', 'nodes/n
       });
     },
 
-    render: function() {
-      Backbone.View.prototype.render.apply(this, arguments);
-
-      this.$editor = this.$el.children('.editor');
-      this.$editor.append(this.root_node_view.render().el);
-
-      return this;
-    },
-
     renderPromise: function() {
       var compatibility_promise = this.fetchCompatibility();
 
