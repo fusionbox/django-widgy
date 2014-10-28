@@ -69,7 +69,7 @@ you can add the following line to your settings file::
         'widgy_mezzanine.WidgyPage',
     )
 
-add Mezzanine context processor. If you don't already have
+add Mezzanine's context processors. If you don't already have
 ``TEMPLATE_CONTEXT_PROCESSORS`` in your settings file, you should copy the
 default before add Mezzanine's::
 
@@ -82,6 +82,7 @@ default before add Mezzanine's::
         "django.core.context_processors.media",
         "django.core.context_processors.request",
         "mezzanine.conf.context_processors.settings",
+        "mezzanine.pages.context_processors.page",
     )
 
 make a :class:`Widgy site <widgy.site.WidgySite>` and set it in settings::
