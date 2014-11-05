@@ -274,9 +274,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
      * nature of the beast with recursive nodes.
      */
     addDropTargets: function(view) {
-      var $children = this.$children,
-          that = this,
-          mine = this.list.contains(view);
+      var $children = this.$children;
 
       // I can't be my own grandfather.
       if (this !== view) {
@@ -286,19 +284,20 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       }
 
       if (this.canAcceptChild(view)) {
-        this.createDropTarget(view).then(function(drop_target) {
+        var createDropTarget = _.partial(this.createDropTarget, view);
+        var first_drop_target_promise = createDropTarget().then(function(drop_target) {
           $children.prepend(drop_target.el);
-        }).done();
-        this.list.each(function(node_view) {
-          that.createDropTarget(view).then(function(that_drop_target) {
-            var drop_target = that_drop_target.$el.insertAfter(node_view.el);
-          }).done();
-        }, this);
-        this.refreshDropTargetVisibility();
-
-        $(window).on('scroll.' + this.cid, function() {
-          that.refreshDropTargetVisibility();
         });
+        var other_drop_target_promises = this.list.map(function(node_view) {
+          return createDropTarget().then(function(drop_target) {
+            drop_target.$el.insertAfter(node_view.el);
+          });
+        });
+        Q.all([first_drop_target_promise].concat(other_drop_target_promises))
+          .then(this.refreshDropTargetVisibility)
+          .done();
+
+        $(window).on('scroll.' + this.cid, this.refreshDropTargetVisibility);
       }
     },
 

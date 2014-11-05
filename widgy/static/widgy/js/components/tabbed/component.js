@@ -95,9 +95,11 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'components/widget/component'
     },
 
     createDropTarget: function(view) {
-      var drop_target = widget.View.prototype.createDropTarget.apply(this, arguments);
-      drop_target.$el.css('height', '');
-      return drop_target;
+      var drop_target_promise = widget.View.prototype.createDropTarget.apply(this, arguments);
+      return drop_target_promise.then(function(drop_target) {
+        drop_target.$el.css('height', '');
+        return drop_target;
+      });
     }
   });
 

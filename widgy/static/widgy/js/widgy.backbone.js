@@ -222,7 +222,7 @@ define([ 'jquery', 'underscore', 'backbone', 'lib/mustache', 'lib/q', 'geometry'
 
   // mixin some underscore methods.
   var methods = [
-    'each', 'find', 'contains', 'indexOf', 'size'
+    'each', 'find', 'contains', 'indexOf', 'size', 'map'
     ];
 
   _.each(methods, function(method) {
