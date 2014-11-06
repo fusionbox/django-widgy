@@ -1,5 +1,5 @@
 from django.db.models import Q
-from django.views.generic import View, UpdateView, FormView, DetailView
+from django.views.generic import View, UpdateView, DetailView
 from django.views.generic.detail import SingleObjectMixin
 from django.conf import settings
 from django.http import (
@@ -135,7 +135,6 @@ class CloneForm(forms.ModelForm):
         self.fields['slug'].label = _('New URL')
 
 
-
 class AdminViewMixin(object):
     model = WidgyPage
 
@@ -147,6 +146,11 @@ class AdminViewMixin(object):
         if not self.has_permission(request):
             raise PermissionDenied
         return super(AdminViewMixin, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return urlresolvers.reverse('admin:{}_{}_change'.format(
+            self.object._meta.app_label,
+            self.object._meta.module_name), args=(self.object.pk,))
 
 
 class ClonePageView(AdminViewMixin, UpdateView):
@@ -184,10 +188,6 @@ class ClonePageView(AdminViewMixin, UpdateView):
             'success_url': self.get_success_url(),
         })
 
-    def get_success_url(self):
-        return urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change',
-                                    args=(self.object.pk,))
-
     def get_context_data(self, **kwargs):
         kwargs = super(ClonePageView, self).get_context_data(**kwargs)
         kwargs['is_popup'] = True
@@ -213,7 +213,3 @@ class UnpublishView(AdminViewMixin, DetailView):
         self.object.save()
         messages.success(self.request, "Page unpublished.")
         return HttpResponseRedirect(self.get_success_url())
-
-    def get_success_url(self):
-        return urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change',
-                                    args=(self.object.pk,))
