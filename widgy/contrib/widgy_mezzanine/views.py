@@ -148,7 +148,7 @@ class AdminViewMixin(object):
         return super(AdminViewMixin, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return urlresolvers.reverse('admin:{}_{}_change'.format(
+        return urlresolvers.reverse('admin:{0}_{1}_change'.format(
             self.object._meta.app_label,
             self.object._meta.module_name), args=(self.object.pk,))
 
