@@ -95,13 +95,12 @@ $label_width: 150px;
   }
 
   .submitRow {
-      margin-left: 5px;
-      float: right;
-      font-size: 11px;
-      text-transform: capitalize;
-      line-height: 13px;
-      padding: 6px 10px !important;
-    }
+    margin-left: 5px;
+    float: right;
+    font-size: 11px;
+    text-transform: capitalize;
+    line-height: 13px;
+    padding: 6px 10px !important;
 
     input[type=submit] {
       @include rounded(3px);
