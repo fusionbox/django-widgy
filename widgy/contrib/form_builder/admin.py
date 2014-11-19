@@ -1,7 +1,6 @@
-import csv
-
 from django.contrib import admin
 from django.contrib.admin.util import unquote
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
@@ -46,6 +45,9 @@ class FormAdmin(admin.ModelAdmin):
             'headers': headers,
             'rows': rows,
             'csv_file_name': self.csv_file_name(obj),
+            'download_url': reverse('admin:{0}_{1}_download'.format(
+                self.model._meta.app_label,
+                self.model._meta.module_name), args=[object_id])
         })
 
     def csv_file_name(self, obj):
