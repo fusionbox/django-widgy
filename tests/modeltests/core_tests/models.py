@@ -266,3 +266,12 @@ class Button(Content):
 
 class WidgetWithHTMLHelpText(Content):
     name = models.CharField(max_length=255, help_text="Your<br>Name")
+
+
+class VerboseNameLayout(Content):
+    pass
+
+
+class VerboseNameLayoutChild(VerboseNameLayout):
+    class Meta:
+        verbose_name = 'Foobar'

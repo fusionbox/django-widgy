@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
+from django.template.defaultfilters import capfirst
 
 from widgy.utils import format_html
 from widgy.models import Node
@@ -149,6 +150,13 @@ class WidgyFormField(forms.ModelChoiceField):
                 raise
 
         return value
+
+    def label_from_instance(self, obj):
+        ModelClass = obj.model_class()
+        if ModelClass:
+            return capfirst(ModelClass._meta.verbose_name)
+        else:
+            return super(WidgyFormField, self).label_from_instance(obj)
 
 
 class VersionedWidgyWidget(WidgyWidget):
