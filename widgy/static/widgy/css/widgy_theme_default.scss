@@ -100,7 +100,7 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
   > .widget > .drag-row > .title {
     font-family: $font-default;
     font-size: 2.4em;
-    padding: 5px 0;
+    padding: 5px 0 5px 10px;
   }
 
   > .widget > .nodeChildren {
@@ -451,6 +451,7 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
     font-size: 22px;
     font-weight: 300;
     line-height: 28px;
+    margin: 0 0 10px 0;
   }
 
   span.title {
