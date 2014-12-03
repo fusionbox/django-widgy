@@ -208,25 +208,10 @@ then set ``URLCONF_INCLUDE_CHOICES`` to a list of allowed urlpatterns. For examp
         ('blog.urls', 'Blog'),
     )
 
-
-.. _django-pyscss: https://github.com/fusionbox/django-pyscss
-.. _pyScss: https://github.com/Kronuz/pyScss
-
 Adding Widgy to Mezzanine
 -------------------------
 If you are adding widgy to an existing mezzanine site, there are
 some additional considerations.
-
-If you have existing mezzanine RichTextPages, you will need
-to reregister it. Simply create an admin.py file in your directory
-and add this code::
-
-    from django.contrib import admin
-
-    from mezzanine.pages.admin import PageAdmin
-    from mezzanine.pages.models import RichTextPage
-
-    admin.site.register(RichTextPage, PageAdmin)
 
 If you have not done so already, add the root directory of your mezzanine
 install to INSTALLED_APPS.
@@ -239,3 +224,22 @@ it uses your root directory as your project file::
     WIDGY_MEZZANINE_SITE = 'myproject.demo.widgy_site.site'
     # Not:
     WIDGY_MEZZANINE_SITE = 'demo.widgy_site.site'
+
+
+Common Customizations
+---------------------
+
+If you only have :class:`WidgyPages
+<widgy.contrib.widgy_mezzanine.models.WidgyPage>`, you can choose to unregister
+the Mezzanine provided ``RichTextPage``.  Simply add this to an ``admin.py``
+file in your directory and add this code::
+
+    from django.contrib import admin
+
+    from mezzanine.pages.models import RichTextPage
+
+    admin.site.unregister(RichTextPage)
+
+
+.. _django-pyscss: https://github.com/fusionbox/django-pyscss
+.. _pyScss: https://github.com/Kronuz/pyScss
