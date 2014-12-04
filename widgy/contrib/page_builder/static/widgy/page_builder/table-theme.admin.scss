@@ -135,7 +135,8 @@
   }
 
   .node.tableheader {
-    margin: 0 1em;
+    // This margin needs to be the same as for children of InvisibleMixin.
+    margin: 0;
 
     > div.widget {
       > p.drag-row {
