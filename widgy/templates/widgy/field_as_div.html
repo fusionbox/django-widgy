@@ -1,7 +1,7 @@
 {% if field.is_hidden %}
   {{ field }}
 {% else %}
-<div class="{{ field.css_classes }} {{ field.html_name }} formField">
+<div class="{{ field.css_classes }} {{ field.html_name }}{% if field.html_name != field.name %} {{ field.name }}{% endif %} formField">
   {{ field.label_tag }}
   {{ field }}
   {{ field.errors }}
