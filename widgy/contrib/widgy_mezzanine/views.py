@@ -136,8 +136,6 @@ class CloneForm(forms.ModelForm):
 
 
 class AdminViewMixin(object):
-    model = WidgyPage
-
     def get_object(self):
         obj = get_object_or_404(self.model, pk=unquote(self.args[0]))
         return obj
