@@ -1,7 +1,9 @@
 @import "widgy_common.scss";
 
 // Mezzanine Override
-body.widgets-projectwidgypage {
+body.widgets-projectwidgypage,
+body.page_builder-callout,
+body.blog-projectblog {
   #container {
     overflow: hidden;
   }
