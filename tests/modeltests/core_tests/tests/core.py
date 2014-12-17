@@ -260,6 +260,12 @@ class TestCore(RootNodeTestCase):
             self.assertEqual(widget.get_attributes(),
                              attributes)
 
+    def test_delete_queryset(self):
+        Layout.objects.all().delete()
+        self.assertFalse(Layout.objects.all().exists())
+        # deleting the content should also delete the node's children
+        self.assertFalse(Node.objects.all().exists())
+
 
 class TestRegistry(RootNodeTestCase):
     def setUp(self):
