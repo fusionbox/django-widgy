@@ -1,3 +1,4 @@
+sudo: false
 language: python
 python:
   - "2.7"
@@ -20,20 +21,20 @@ install: |
   set -e
   if [ -z "$JAVASCRIPT" ]
   then
-    pip install --upgrade pip
-    pip install -q $DJANGO_PACKAGE --use-mirrors
-    pip install -q --use-mirrors mock
+    pip install --upgrade pip --download-cache $HOME/.pip-cache
+    pip install -q $DJANGO_PACKAGE --use-mirrors --download-cache $HOME/.pip-cache
+    pip install -q --use-mirrors mock --download-cache $HOME/.pip-cache
 
     if [ "$DATABASE_ENGINE" = "mysql" ]
     then
-      pip install -q --use-mirrors MySQL-python
+      pip install -q --use-mirrors MySQL-python --download-cache $HOME/.pip-cache
     fi
 
     if [ "$DATABASE_ENGINE" = "postgres" ]
     then
-      pip install -q --use-mirrors psycopg2
+      pip install -q --use-mirrors psycopg2 --download-cache $HOME/.pip-cache
     fi
-    pip install --use-mirrors .
+    pip install --use-mirrors --download-cache $HOME/.pip-cache .
     pip freeze
   fi
 before_script:
@@ -46,3 +47,6 @@ script: |
   else
     make test-js
   fi
+cache:
+  directories:
+    - $HOME/.pip-cache/
