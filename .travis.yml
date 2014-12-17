@@ -21,20 +21,20 @@ install: |
   set -e
   if [ -z "$JAVASCRIPT" ]
   then
-    pip install --upgrade pip --download-cache $HOME/.pip-cache
-    pip install -q $DJANGO_PACKAGE --use-mirrors --download-cache $HOME/.pip-cache
-    pip install -q --use-mirrors mock --download-cache $HOME/.pip-cache
+    pip install --upgrade pip
+    pip install -q $DJANGO_PACKAGE --use-mirrors
+    pip install -q --use-mirrors mock
 
     if [ "$DATABASE_ENGINE" = "mysql" ]
     then
-      pip install -q --use-mirrors MySQL-python --download-cache $HOME/.pip-cache
+      pip install -q --use-mirrors MySQL-python
     fi
 
     if [ "$DATABASE_ENGINE" = "postgres" ]
     then
-      pip install -q --use-mirrors psycopg2 --download-cache $HOME/.pip-cache
+      pip install -q --use-mirrors psycopg2
     fi
-    pip install --use-mirrors --download-cache $HOME/.pip-cache .
+    pip install --use-mirrors .
     pip freeze
   fi
 before_script:
@@ -49,4 +49,4 @@ script: |
   fi
 cache:
   directories:
-    - $HOME/.pip-cache/
+    - "/home/travis/virtualenv/python2.7/lib/python2.7/site-packages"
