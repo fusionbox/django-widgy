@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.3.3 (2014-12-22)
+------------------
+Bugfix release:
+
+- Allow cloning with an overridden WIDGY_MEZZANINE_PAGE_MODEL [Zach Metcalf, #269]
+- SCSS syntax error [Rivo Laks, #271]
+
 0.3.2 (2014-10-16)
 -----------------
 
