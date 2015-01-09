@@ -21,7 +21,7 @@ DATABASES = {
 }
 
 SECRET_KEY = "widgy_tests_secret_key"
-# To speed up tests under SQLite we use the MD5 hasher as the default one. 
+# To speed up tests under SQLite we use the MD5 hasher as the default one.
 # This should not be needed under other databases, as the relative speedup
 # is only marginal there.
 PASSWORD_HASHERS = (
@@ -56,6 +56,4 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.static",
     "django.core.context_processors.media",
     "django.core.context_processors.request",
-    "mezzanine.conf.context_processors.settings",
-    "mezzanine.pages.context_processors.page",
 )

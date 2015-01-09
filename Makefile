@@ -3,7 +3,7 @@ JS_FILES?=`find ./js_tests/tests -type f -name '*.js'`
 test: test-py test-js
 
 test-py:
-	cd tests && $(COVERAGE_COMMAND) ./runtests.py --settings=test_multidb --verbosity=2 $(TESTS)
+	cd tests && $(COVERAGE_COMMAND) ./runtests.py --verbosity=2 $(TESTS)
 
 coverage:
 	+make test-py COVERAGE_COMMAND='coverage run --source=widgy'

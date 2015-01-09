@@ -1,49 +1,42 @@
 language: python
 python:
   - "2.7"
-  - "2.6"
+cache:
+  directories:
+    - $HOME/.pip-cache/
 env:
   global:
     - SOUTH_TESTS_MIGRATE=1
   matrix:
-    - DATABASE_ENGINE=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
-    - DATABASE_ENGINE=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.4.x.zip
-    - DATABASE_ENGINE=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
-    - DATABASE_ENGINE=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.4.x.zip
-    - DATABASE_ENGINE=mysql DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
-    - DATABASE_ENGINE=mysql DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.4.x.zip
-matrix:
-  include:
-    - python: "2.7"
-      env: JAVASCRIPT=1
-install: |
-  set -e
-  if [ -z "$JAVASCRIPT" ]
-  then
-    pip install --upgrade pip
-    pip install -q $DJANGO_PACKAGE --use-mirrors
-    pip install -q --use-mirrors mock
-    pip install -q --use-mirrors South
-
-    if [ "$DATABASE_ENGINE" = "mysql" ]
-    then
-      pip install -q --use-mirrors MySQL-python
-    fi
-
-    if [ "$DATABASE_ENGINE" = "postgres" ]
-    then
-      pip install -q --use-mirrors psycopg2
-    fi
-    pip install --use-mirrors -e .[all]
-    pip freeze
-  fi
+    - TOX_ENV=py26-dj14-sqlite
+    - TOX_ENV=py26-dj14-mysql
+    - TOX_ENV=py26-dj14-postgres
+    - TOX_ENV=py26-dj15-sqlite
+    - TOX_ENV=py26-dj15-mysql
+    - TOX_ENV=py26-dj15-postgres
+    - TOX_ENV=py27-dj14-sqlite
+    - TOX_ENV=py27-dj14-mysql
+    - TOX_ENV=py27-dj14-postgres
+    - TOX_ENV=py27-dj15-sqlite
+    - TOX_ENV=py27-dj15-mysql
+    - TOX_ENV=py27-dj15-postgres
+    - TOX_ENV=py27-dj16-sqlite
+    - TOX_ENV=py27-dj16-mysql
+    - TOX_ENV=py27-dj16-postgres
+    - TOX_ENV=javascript
+    - TOX_ENV=py26-dj14-contrib
+    - TOX_ENV=py26-dj15-contrib
+    - TOX_ENV=py26-dj16-contrib
+    - TOX_ENV=py27-dj14-contrib
+    - TOX_ENV=py27-dj15-contrib
+    - TOX_ENV=py27-dj16-contrib
+install:
+  - pip install --upgrade pip
+  - pip install tox
 before_script:
   - psql -c 'create database widgy;' -U postgres
   - mysql -e 'create database widgy;'
-script: |
-  if [ -z "$JAVASCRIPT" ]
-  then
-    make test-py
-  else
-    make test-js
-  fi
+script:
+  - tox -e $TOX_ENV
+after_script:
+  - cat .tox/$TOX_ENV/log/*.log

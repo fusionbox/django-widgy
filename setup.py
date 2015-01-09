@@ -15,6 +15,8 @@ def read(fname):
 
 install_requires = [
     'django-treebeard',
+    # pyScss fixed until https://github.com/fusionbox/django-pyscss/pull/26 is fixed.
+    'pyScss==1.2.1',
     'django-pyscss',
     'six',
     'django-compressor>=1.3',
@@ -34,7 +36,9 @@ extras_require = {
         'mezzanine>=3.1.10',
     ],
     'page_builder': [
-        'django-filer>=0.9.6',
+        # until https://github.com/stefanfoulis/django-filer/pull/480 is merged.
+        #'django-filer>0.9.8',
+        'django-filer==0.9.5',
         'markdown',
         'bleach',
         'sorl-thumbnail>=11.12',
