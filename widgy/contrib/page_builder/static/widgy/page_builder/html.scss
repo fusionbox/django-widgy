@@ -1,5 +1,5 @@
 .cke_editable, .htmlOutput {
-  @each $i in 'left' 'center' 'right' 'justify' {
+  @each $i in left center right justify {
     .align-#{$i} {
       text-align: $i;
     }
