@@ -10,8 +10,7 @@ This quickstart assumes you wish to use the following packages:
 
 Install the Widgy package::
 
-    cd widgy
-    pip install -e .
+    pip install django-widgy
 
 Add Mezzanine apps to ``INSTALLED_APPS``::
 
@@ -38,7 +37,6 @@ add required Widgy apps to ``INSTALLED_APPS``::
         'easy_thumbnails',
         'compressor',
         'argonauts',
-        'scss',
         'sorl.thumbnail',
         'south',
 
