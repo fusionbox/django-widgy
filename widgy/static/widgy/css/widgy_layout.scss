@@ -43,11 +43,18 @@ body.page_builder-callout {
     &.invisible {
       background-color: inherit;
       border: 0 none;
-      margin: inherit 0 !important;
+      margin: 0 !important;
       padding: 0;
 
-      & > .widget > .nodeChildren:empty {
-        display: none;
+      & > .widget > .nodeChildren {
+        & > .node {
+          margin-left: 0;
+          margin-right: 0;
+        }
+
+        &:empty {
+          display: none;
+        }
       }
     }
 
