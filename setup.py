@@ -36,9 +36,7 @@ extras_require = {
         'mezzanine>=3.1.10',
     ],
     'page_builder': [
-        # until https://github.com/stefanfoulis/django-filer/pull/480 is merged.
-        #'django-filer>0.9.8',
-        'django-filer==0.9.5',
+        'django-filer>=0.9.9',
         'markdown',
         'bleach',
         'sorl-thumbnail>=11.12',
