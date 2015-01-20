@@ -31,7 +31,6 @@ INSTALLED_APPS = [
     "treebeard",
     "compressor",
     "argonauts",
-    "south",
     # tests modules
     "modeltests.core_tests",
     "modeltests.proxy_gfk",
@@ -41,6 +40,10 @@ INSTALLED_APPS = [
     # contrib test suite, that app neeeds to be installed.
     "widgy.contrib.review_queue",
 ]
+import django
+
+if django.get_version() < "1.7":
+    INSTALLED_APPS.append("south")
 
 SOUTH_TESTS_MIGRATE = excavator.env_bool('SOUTH_TESTS_MIGRATE', default=False)
 

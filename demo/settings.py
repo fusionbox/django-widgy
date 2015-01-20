@@ -50,13 +50,16 @@ INSTALLED_APPS = (
     'compressor',
     'scss',
     'sorl.thumbnail',
-    'south',
     'debug_toolbar',
     'django_extensions',
     'argonauts',
 
     'demo.demo_widgets',
 )
+import django
+
+if django.get_version() < "1.7":
+    INSTALLED_APPS += ("south",)
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
