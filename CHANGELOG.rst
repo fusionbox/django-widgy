@@ -1,6 +1,22 @@
 Changelog
 =========
 
+0.3.4 (2015-01-22)
+------------------
+
+Bugfix release:
+
+- Documentation fixes [Rocky Meza and Gavin Wahl]
+- Fixes unintentional horizontal scrolling of Widgy content [Justin Stollsteimer]
+- Increased spacing after widget title paragraphs [Justin Stollsteimer]
+- Fixed styles in ckeditor to show justifications [Zachery Metcalf, #279]
+- Eliminated the margins for InvisibleMixin [Rocky Meza]
+- CSS support for adding fields to Image. [Rocky Meza]
+- Additional mezzanine container style overflow fixes [Justin Stollsteimer]
+- Fix r.js optimization errors with daisydiff [Rocky Meza]
+- Remove delete button from widgypage add form [Gavin Wahl]
+
+
 0.3.3 (2014-12-22)
 ------------------
 Bugfix release:
