@@ -36,9 +36,9 @@ if sys.version_info < (2, 7):
 else:
     install_requires.append('markdown')
 
-STAGE = 'final'
+STAGE = 'beta'
 
-version = (0, 3, 3, STAGE)
+version = (0, 3, 4, STAGE)
 
 
 def get_version():
