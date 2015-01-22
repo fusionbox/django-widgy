@@ -401,6 +401,14 @@ class TestAdminButtons(TestAdminButtonsBase, TestCase):
         response = self.client.get(url)
         self.assertIn('Publish Changes', response.content)
 
+    def test_delete_button(self):
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_add')
+        response = self.client.get(url)
+        self.assertNotIn('Delete', response.content)
+        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        response = self.client.get(url)
+        self.assertIn('Delete', response.content)
+
 
 @make_reviewed
 class TestAdminButtonsWhenReviewed(TestAdminButtonsBase, TestCase):
