@@ -28,7 +28,7 @@
 
 {% block submit_buttons_bottom %}
 <div class="submit-row" {% if is_popup %}style="overflow: auto;"{% endif %}>
-    {% if has_delete_permission %}
+    {% if has_delete_permission and not add %}
       <p class="deletelink-box">
         <a href="delete/" class="deletelink">{% trans "Delete" %}</a>
       </p>
