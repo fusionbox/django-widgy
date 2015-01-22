@@ -36,7 +36,7 @@ if sys.version_info < (2, 7):
 else:
     install_requires.append('markdown')
 
-STAGE = 'beta'
+STAGE = 'final'
 
 version = (0, 3, 4, STAGE)
 
