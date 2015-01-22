@@ -39,13 +39,11 @@ span.diff-html-removed {
 }
 
 span.diff-html-changed {
-  /* background: url(/static/daisydiff/images/diffunderline.gif) bottom repeat-x; */
   *background-color: #c6c6fd; /* light blue */
   cursor: pointer;
 }
 
 span.diff-html-conflict {
-/*  background: url(../images/diffunderline.gif) bottom repeat-x; */
   background-color: #f781be; /* light rose */
 }
 
