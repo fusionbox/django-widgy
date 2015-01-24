@@ -15,8 +15,6 @@ def read(fname):
 
 install_requires = [
     'django-treebeard',
-    # pyScss fixed until https://github.com/fusionbox/django-pyscss/pull/26 is fixed.
-    'pyScss==1.2.1',
     'django-pyscss',
     'six',
     'django-compressor>=1.3',
