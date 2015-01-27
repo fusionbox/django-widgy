@@ -23,13 +23,25 @@ env:
     - TOX_ENV=py27-dj16-sqlite
     - TOX_ENV=py27-dj16-mysql
     - TOX_ENV=py27-dj16-postgres
+    - TOX_ENV=py26-dj14-contrib-sqlite
+    - TOX_ENV=py26-dj14-contrib-mysql
+    - TOX_ENV=py26-dj14-contrib-postgres
+    - TOX_ENV=py26-dj15-contrib-sqlite
+    - TOX_ENV=py26-dj15-contrib-mysql
+    - TOX_ENV=py26-dj15-contrib-postgres
+    - TOX_ENV=py26-dj16-contrib-sqlite
+    - TOX_ENV=py26-dj16-contrib-mysql
+    - TOX_ENV=py26-dj16-contrib-postgres
+    - TOX_ENV=py27-dj14-contrib-sqlite
+    - TOX_ENV=py27-dj14-contrib-mysql
+    - TOX_ENV=py27-dj14-contrib-postgres
+    - TOX_ENV=py27-dj15-contrib-sqlite
+    - TOX_ENV=py27-dj15-contrib-mysql
+    - TOX_ENV=py27-dj15-contrib-postgres
+    - TOX_ENV=py27-dj16-contrib-sqlite
+    - TOX_ENV=py27-dj16-contrib-mysql
+    - TOX_ENV=py27-dj16-contrib-postgres
     - TOX_ENV=javascript
-    - TOX_ENV=py26-dj14-contrib
-    - TOX_ENV=py26-dj15-contrib
-    - TOX_ENV=py26-dj16-contrib
-    - TOX_ENV=py27-dj14-contrib
-    - TOX_ENV=py27-dj15-contrib
-    - TOX_ENV=py27-dj16-contrib
 install:
   - pip install --upgrade pip
   - pip install tox
