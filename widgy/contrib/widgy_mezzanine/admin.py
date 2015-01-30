@@ -89,8 +89,14 @@ class WidgyPageAdmin(PageAdmin):
     }
 
     def get_urls(self):
-        clone_view = ClonePageView.as_view(has_permission=self.has_add_permission)
-        unpublish_view = UnpublishView.as_view(has_change_permission=self.has_change_permission)
+        clone_view = ClonePageView.as_view(
+            model=self.model,
+            has_permission=self.has_add_permission,
+        )
+        unpublish_view = UnpublishView.as_view(
+            model=self.model,
+            has_change_permission=self.has_change_permission,
+        )
         return [
             url('^(.+)/clone/$', self.admin_site.admin_view(clone_view)),
             url('^(.+)/unpublish/$', self.admin_site.admin_view(unpublish_view)),
