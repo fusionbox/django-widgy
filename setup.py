@@ -38,7 +38,7 @@ else:
 
 STAGE = 'final'
 
-version = (0, 3, 4, STAGE)
+version = (0, 3, 5, STAGE)
 
 
 def get_version():
