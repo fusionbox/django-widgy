@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.3.5 (2015-01-30)
+------------------
+
+Bugfix release:
+
+- Set model at runtime for ClonePageView and UnpublishView [Rocky Meza, #286]
+
 0.3.4 (2015-01-22)
 ------------------
 
