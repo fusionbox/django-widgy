@@ -51,6 +51,7 @@ Running the Tests
 
 ::
 
+    pip install -r requirements-test.txt
     make test
 
 ``make test`` will run both the JavaScript and Python tests. To test one
