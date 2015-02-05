@@ -2,8 +2,6 @@ from django import template
 from django.conf import settings
 from django.utils.safestring import mark_safe
 
-import markdown
-
 from widgy.utils import fancy_import, update_context
 
 register = template.Library()
@@ -40,6 +38,7 @@ def js_files(site):
 
 @register.filter(name='markdown')
 def mdown(value):
+    import markdown
     value = markdown.markdown(
         value,
         extensions=['sane_lists'],

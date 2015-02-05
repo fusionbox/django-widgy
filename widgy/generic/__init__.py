@@ -3,11 +3,15 @@ from django.contrib.contenttypes import generic
 from django.db import DEFAULT_DB_ALIAS, connection
 from widgy.generic.models import ContentType
 
-from south.modelsinspector import add_ignored_fields
+try:
+    from south.modelsinspector import add_ignored_fields
+except ImportError:  # South not installed.
+    pass
+else:
+    add_ignored_fields(["^widgy\.generic\.ProxyGenericRelation",
+                        "^widgy\.generic\.ProxyGenericForeignKey",
+                        "^widgy\.generic\.WidgyGenericForeignKey"])
 
-add_ignored_fields(["^widgy\.generic\.ProxyGenericRelation",
-                    "^widgy\.generic\.ProxyGenericForeignKey",
-                    "^widgy\.generic\.WidgyGenericForeignKey"])
 
 if django.VERSION >= (1, 6):
     class ProxyGenericForeignKey(generic.GenericForeignKey):

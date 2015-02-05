@@ -10,7 +10,8 @@ This quickstart assumes you wish to use the following packages:
 
 Install the Widgy package::
 
-    pip install django-widgy
+    cd widgy
+    pip install -e .[all]
 
 Add Mezzanine apps to ``INSTALLED_APPS``::
 

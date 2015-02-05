@@ -12,6 +12,21 @@ your :django:setting:`INSTALLED_APPS`.
 
 .. currentmodule:: widgy.contrib.form_builder.models
 
+Installation
+------------
+
+Form builder depends on the following packages:
+
+* django-widgy[page_builder]
+* django-extensions
+* html2text
+* phonenumbers
+
+You can install them manually, or you can install them using the django-widgy
+package::
+
+    $ pip install django-widgy[page_builder,form_builder]
+
 Success Handlers
 ----------------
 

@@ -244,6 +244,7 @@ class PageSetup(object):
 class AdminView(PageSetup):
     def as_view(self, **kwargs):
         kwargs.setdefault('has_permission', lambda req: True)
+        kwargs.setdefault('model', WidgyPage)
         return self.view_cls.as_view(**kwargs)
 
     def test_permissions(self):
@@ -257,7 +258,7 @@ class TestClonePage(AdminView, TestCase):
     view_cls = ClonePageView
 
     def test_get(self):
-        view = self.as_view()
+        view = self.as_view(model=WidgyPage)
 
         resp = view(self.factory.get('/'), str(self.page.pk))
         self.assertEqual(resp.status_code, 200)
@@ -265,7 +266,7 @@ class TestClonePage(AdminView, TestCase):
         self.assertNotIn(self.page.slug, resp.rendered_content)
 
     def test_post(self):
-        view = self.as_view()
+        view = self.as_view(model=WidgyPage)
         with mock.patch('django.contrib.messages.success') as success_mock:
             req = self.factory.post('/', {'title': 'new title'})
 
@@ -290,7 +291,7 @@ class TestUnpublish(AdminView, TestCase):
     def test_unpublish(self):
         self.assertEqual(self.page.status, CONTENT_STATUS_PUBLISHED)
 
-        view = self.as_view()
+        view = self.as_view(model=WidgyPage)
         resp = view(self.factory.get('/'), str(self.page.pk))
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.page.title, resp.rendered_content)

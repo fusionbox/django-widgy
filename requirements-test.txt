@@ -1,0 +1,4 @@
+mock
+env-excavator
+dj-database-url
+tox>=1.8.0
