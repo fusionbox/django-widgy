@@ -262,3 +262,7 @@ class ReviewedVersionedPage(models.Model):
 # different apps.
 class Button(Content):
     pass
+
+
+class WidgetWithHTMLHelpText(Content):
+    name = models.CharField(max_length=255, help_text="Your<br>Name")

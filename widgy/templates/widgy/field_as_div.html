@@ -7,7 +7,7 @@
   {{ field.errors }}
 
   {% if field.help_text %}
-    <p class="help_text">{{ field.help_text }}</p>
+    <p class="help_text">{{ field.help_text|safe }}</p>
   {% endif %}
 </div>
 {% endif %}
