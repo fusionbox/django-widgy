@@ -150,11 +150,20 @@ class WidgySite(object):
         bad_parent = not self.valid_child_of(parent, child_class, child)
 
         if bad_parent and bad_child:
-            raise MutualRejection
+            raise MutualRejection("Neither {parent} nor {child} want to be together.".format(
+                child=child_class.__name__,
+                parent=type(parent).__name__,
+            ))
         elif bad_parent:
-            raise ParentWasRejected
+            raise ParentWasRejected("{child} refuses to be put in {parent}.".format(
+                child=child_class.__name__,
+                parent=type(parent).__name__,
+            ))
         elif bad_child:
-            raise ChildWasRejected
+            raise ChildWasRejected("{parent} refuses to accept {child}.".format(
+                child=child_class.__name__,
+                parent=type(parent).__name__,
+            ))
 
     def get_version_tracker_model(self):
         from widgy.models import VersionTracker

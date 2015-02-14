@@ -61,15 +61,28 @@ class TestCore(RootNodeTestCase):
         self.assertEqual(len(self.root_node.get_descendants()), 50 + 2)
 
     def test_validate_relationship_cls(self):
-        with self.assertRaises(ChildWasRejected):
+        try:
             self.widgy_site.validate_relationship(self.root_node.content, RawTextWidget)
+        except ChildWasRejected as e:
+            self.assertIn("Layout refuses to accept RawTextWidget.", str(e))
+            self.assertTrue(e.message_dict)
+        else:
+            assert False, "Should have raised a ChildWasRejected exception"
 
         bucket = list(self.root_node.content.get_children())[0]
-        with self.assertRaises(ParentWasRejected):
+        try:
             self.widgy_site.validate_relationship(bucket, CantGoAnywhereWidget)
+        except ParentWasRejected as e:
+            self.assertIn("CantGoAnywhereWidget refuses to be put in Bucket.", str(e))
+        else:
+            assert False, "Should have raised a ParentWasRejected exception"
 
-        with self.assertRaises(MutualRejection):
+        try:
             self.widgy_site.validate_relationship(self.root_node.content, CantGoAnywhereWidget)
+        except MutualRejection as e:
+            self.assertIn("Neither Layout nor CantGoAnywhereWidget want to be together.", str(e))
+        else:
+            assert False, "Should have raised a MutualRejection exception"
 
     def test_validate_relationship_instance(self):
         picky_bucket = self.root_node.content.add_child(self.widgy_site,
