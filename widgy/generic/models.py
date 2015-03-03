@@ -86,8 +86,10 @@ class ContentTypeManager(ContentTypeManager):
         return results
 
 
-class ContentType(ContentType):
-    objects = ContentTypeManager()
+import django
+if django.VERSION < (1, 5):
+    class ContentType(ContentType):
+        objects = ContentTypeManager()
 
-    class Meta:
-        proxy = True
+        class Meta:
+            proxy = True
