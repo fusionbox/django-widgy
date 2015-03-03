@@ -30,6 +30,7 @@ class WidgyWidget(forms.HiddenInput):
     for a Widgy field.
     """
     template_name = 'widgy/widgy_field.html'
+    is_hidden = False
 
     def render(self, name, value, attrs=None, context={}):
         # If this fails, perhaps they aren't using the WidgyFormMixin.  If you
