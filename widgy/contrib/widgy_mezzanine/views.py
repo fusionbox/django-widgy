@@ -49,7 +49,7 @@ def get_page_from_node(node):
 class PageViewMixin(object):
     def get_page(self):
         try:
-            return Page.objects.published(for_user=self.request.user).get(slug=self.kwargs['slug'])
+            return Page.objects.published(for_user=self.request.user).get(pk=self.kwargs['page_pk'])
         except (KeyError, Page.DoesNotExist):
             # restoring, use a fake page
             return WidgyPage(

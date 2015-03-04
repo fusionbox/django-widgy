@@ -28,7 +28,7 @@ class WidgyPageMixin(object):
             'widgy.contrib.widgy_mezzanine.views.handle_form',
             kwargs={
                 'form_node_pk': form.node.pk,
-                'slug': self.slug,
+                'page_pk': self.pk,
             })
 
     def get_action_links(self, root_node):
@@ -38,7 +38,7 @@ class WidgyPageMixin(object):
                 'text': _('Preview'),
                 'url': urlresolvers.reverse(
                     'widgy.contrib.widgy_mezzanine.views.preview',
-                    kwargs={'slug': self.slug, 'node_pk': root_node.pk}
+                    kwargs={'page_pk': self.pk, 'node_pk': root_node.pk}
                 )
             },
         ]

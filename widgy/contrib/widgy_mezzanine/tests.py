@@ -206,7 +206,7 @@ class TestPreviewView(TestCase):
         root_node1 = Button.add_root(widgy_site, text='Test 1')
         root_node2 = Button.add_root(widgy_site, text='Test 2')
 
-        resp1 = self.preview_view(self.request, node_pk=root_node1.node.pk, slug=page.slug)
+        resp1 = self.preview_view(self.request, node_pk=root_node1.node.pk, page_pk=page.pk)
 
         self.assertEqual(resp1.status_code, 200)
         self.assertIn('Test 1', resp1.rendered_content)
