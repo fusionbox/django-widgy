@@ -1,5 +1,6 @@
 import os
 import imp
+import django
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -50,13 +51,15 @@ INSTALLED_APPS = (
     'compressor',
     'scss',
     'sorl.thumbnail',
-    'south',
     'debug_toolbar',
     'django_extensions',
     'argonauts',
 
     'demo.demo_widgets',
 )
+
+if django.VERSION < (1, 7):
+    INSTALLED_APPS+= ('south',)
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
