@@ -10,3 +10,4 @@ Tutorials
     first-widget
     proxy-widget
     custom-owner
+    ckeditor-to-widgy
