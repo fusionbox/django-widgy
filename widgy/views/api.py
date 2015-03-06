@@ -102,9 +102,14 @@ class NodeView(WidgyView):
     def post(self, request, node_pk=None):
         data = self.data()
         app_label, model = data['__class__'].split('.')
-        content_class = get_model(app_label, model)
-        if not content_class:
+        try:
+            content_class = get_model(app_label, model)
+            if content_class is None:
+                # BBB Django < 1.7 returns None instead of raising LookupError
+                raise LookupError
+        except LookupError:
             raise Http404
+
         if not self.site.has_add_permission(request, content_class):
             raise PermissionDenied(_("You don't have permission to add this widget."))
 
