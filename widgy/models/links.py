@@ -3,11 +3,11 @@ from operator import or_
 import itertools
 
 from django.db import models
-from django.db.models.fields import Field
 from django.contrib.contenttypes.models import ContentType
 from django.template.defaultfilters import capfirst
 from django import forms
 
+from widgy.compat import check_if_field_name_exists_on_cls
 from widgy.generic import WidgyGenericForeignKey
 from widgy import BaseRegistry
 
@@ -77,12 +77,12 @@ class LinkField(WidgyGenericForeignKey):
 
         # do not do anything that loads the app cache here, like
         # _meta.get_all_field_names, or you'll cause a circular import.
-        if self.ct_field not in [i.name for i, _ in cls._meta.get_fields_with_model()]:
+        if not check_if_field_name_exists_on_cls(self.ct_field, cls):
             ct_field = models.ForeignKey(ContentType, related_name='+',
                                          null=self.null, editable=False)
             cls.add_to_class(self.ct_field, ct_field)
 
-        if self.fk_field not in [i.name for i, _ in cls._meta.get_fields_with_model()]:
+        if not check_if_field_name_exists_on_cls(self.fk_field, cls):
             fk_field = models.PositiveIntegerField(null=self.null,
                                                    editable=False)
             cls.add_to_class(self.fk_field, fk_field)
