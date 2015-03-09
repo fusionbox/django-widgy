@@ -1,5 +1,6 @@
 import imp
 
+import django
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.decorators import decorator_from_middleware
@@ -54,6 +55,13 @@ class TestMiddleware(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
 
+    if django.VERSION > (1, 7):
+        def resolver_cache_size(self):
+            return urlresolvers.get_resolver.cache_info().currsize
+    else:
+        def resolver_cache_size(self):
+            return len(urlresolvers._resolver_cache)
+
     def get_request(self, path='/'):
         r = self.factory.get(path)
         r.user = AnonymousUser()
@@ -74,10 +82,10 @@ class TestMiddleware(TestCase):
         doit()
         doit()
 
-        n = len(urlresolvers._resolver_cache)
+        n = self.resolver_cache_size()
         doit()
         doit()
-        n_after = len(urlresolvers._resolver_cache)
+        n_after = self.resolver_cache_size()
 
         self.assertEqual(n, n_after)
 
