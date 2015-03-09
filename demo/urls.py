@@ -1,10 +1,12 @@
+import django
 from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
 from demo.widgysite import widgy_site
 
-admin.autodiscover()
+if django.VERSION < (1, 7):
+    admin.autodiscover()
 
 # Add the urlpatterns for any custom Django applications here.
 # You can also change the ``home`` view to add your own functionality

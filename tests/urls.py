@@ -1,8 +1,10 @@
+import django
 from django.conf.urls import patterns, include, url
 from django.conf import settings
-
 from django.contrib import admin
-admin.autodiscover()
+
+if django.VERSION < (1, 7):
+    admin.autodiscover()
 
 
 def dummy_view(*args, **kwargs):
