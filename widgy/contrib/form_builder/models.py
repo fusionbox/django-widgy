@@ -342,7 +342,7 @@ class EmailUserHandler(EmailSuccessHandlerBase):
 @widgy.register
 @python_2_unicode_compatible
 class SubmitButton(StrDisplayNameMixin, FormElement):
-    text = models.CharField(max_length=255, default=lambda: ugettext('submit'), verbose_name=_('text'))
+    text = models.CharField(max_length=255, default=_('submit'), verbose_name=_('text'))
 
     tooltip = _("The submit button for a form.")
 

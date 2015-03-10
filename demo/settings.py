@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'widgy.contrib.widgy_mezzanine',
     'widgy.contrib.urlconf_include',
     'widgy.contrib.review_queue',
+    'widgy.contrib.widgy_i18n',
 
     'django.contrib.admin',
 

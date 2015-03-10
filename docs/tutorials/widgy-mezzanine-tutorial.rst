@@ -119,13 +119,19 @@ Configure django-compressor::
 
 .. note::
 
-    With easy_thumbnails version 2.0+, an additional setting is required::
+    If you are using a version of Django older than 1.7, you will need use
+    South 1.0 or set SOUTH_MIGRATION_MODULES.
 
-    SOUTH_MIGRATION_MODULES = {
-        'easy_thumbnails': 'easy_thumbnails.south_migrations',
-    }
+Then run the following command::
 
-syncdb; migrate
+    $ python manage.py migrate
+
+.. note::
+
+    If you are on a version of Django older than 1.7, you will need to run the
+    following command as well::
+
+        $ python manage.py syncdb
 
 add urls::
 
