@@ -1,46 +1,80 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+import widgy.db.fields
+import django.utils.timezone
+import django.db.models.deletion
+from django.conf import settings
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Node'
-        db.create_table('widgy_node', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('path', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255)),
-            ('depth', self.gf('django.db.models.fields.PositiveIntegerField')()),
-            ('numchild', self.gf('django.db.models.fields.PositiveIntegerField')(default=0)),
-            ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
-            ('content_id', self.gf('django.db.models.fields.PositiveIntegerField')()),
-        ))
-        db.send_create_signal('widgy', ['Node'])
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('contenttypes', '0001_initial'),
+    ]
 
-    def backwards(self, orm):
-        # Deleting model 'Node'
-        db.delete_table('widgy_node')
-
-
-    models = {
-        'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'widgy.node': {
-            'Meta': {'object_name': 'Node'},
-            'content_id': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'depth': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'numchild': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
-            'path': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'})
-        },
-    }
-
-    complete_apps = ['widgy']
+    operations = [
+        migrations.CreateModel(
+            name='UnknownWidget',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+            ],
+            options={
+                'managed': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Node',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('path', models.CharField(unique=True, max_length=255)),
+                ('depth', models.PositiveIntegerField()),
+                ('numchild', models.PositiveIntegerField(default=0)),
+                ('content_id', models.PositiveIntegerField()),
+                ('is_frozen', models.BooleanField(default=False)),
+                ('content_type', models.ForeignKey(to='contenttypes.ContentType')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='VersionCommit',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('message', models.TextField(null=True, blank=True)),
+                ('publish_at', models.DateTimeField(default=django.utils.timezone.now)),
+                ('author', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, null=True)),
+                ('parent', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='widgy.VersionCommit', null=True)),
+                ('root_node', widgy.db.fields.WidgyField(to='widgy.Node', on_delete=django.db.models.deletion.PROTECT)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='VersionTracker',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('head', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='widgy.VersionCommit', unique=True)),
+                ('working_copy', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='widgy.Node', unique=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='versioncommit',
+            name='tracker',
+            field=models.ForeignKey(related_name='commits', to='widgy.VersionTracker'),
+            preserve_default=True,
+        ),
+        migrations.AlterUniqueTogether(
+            name='node',
+            unique_together=set([('content_type', 'content_id')]),
+        ),
+    ]

@@ -107,6 +107,9 @@ def DisplayNameMixin(fn):
         thing.display_name  # Thing - title
     """
     class cls(object):
+        def deconstruct(self):
+            return 'widgy.models.mixins.DisplayNameMixin', (fn,), {}
+
         @property
         def display_name(self):
             name = super(cls, self).display_name

@@ -119,13 +119,27 @@ Configure django-compressor::
 
 .. note::
 
-    With easy_thumbnails version 2.0+, an additional setting is required::
+    If you are using a version of Django older than 1.7, you will need to add
+    the following to your ``settings.py``::
 
-    SOUTH_MIGRATION_MODULES = {
-        'easy_thumbnails': 'easy_thumbnails.south_migrations',
-    }
+        SOUTH_MIGRATION_MODULES = {
+            'easy_thumbnails': 'easy_thumbnails.south_migrations',
+            'widgy': 'widgy.south_migrations',
+            'widgy.contrib.page_builder': 'widgy.contrib.page_builder.south_migrations',
+            'widgy.contrib.form_builder': 'widgy.contrib.form_builder.south_migrations',
+            'widgy.contrib.widgy_mezzanine': 'widgy.contrib.widgy_mezzanine.south_migrations',
+        }
 
-syncdb; migrate
+Then run the following command::
+
+    $ python manage.py migrate
+
+.. note::
+
+    If you are on a version of Django older than 1.7, you will need to run the
+    following command as well::
+
+        $ python manage.py syncdb
 
 add urls::
 
