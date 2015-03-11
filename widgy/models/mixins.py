@@ -124,3 +124,7 @@ def DisplayNameMixin(fn):
 
 TitleDisplayNameMixin = DisplayNameMixin(attrgetter('title'))
 StrDisplayNameMixin = DisplayNameMixin(six.text_type)
+
+# for migration serialization
+TitleDisplayNameMixin.__name__ = str('TitleDisplayNameMixin')
+StrDisplayNameMixin.__name__ = str('StrDisplayNameMixin')

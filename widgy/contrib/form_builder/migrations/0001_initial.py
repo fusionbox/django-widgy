@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(widgy.models.mixins.cls, models.Model),
+            bases=(widgy.models.mixins.StrDisplayNameMixin, models.Model),
         ),
         migrations.CreateModel(
             name='EmailSuccessHandler',
@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'admin success email',
                 'verbose_name_plural': 'admin success emails',
             },
-            bases=(widgy.models.mixins.cls, models.Model),
+            bases=(widgy.models.mixins.StrDisplayNameMixin, models.Model),
         ),
         migrations.CreateModel(
             name='EmailUserHandler',
@@ -59,7 +59,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'user success email',
                 'verbose_name_plural': 'user success emails',
             },
-            bases=(widgy.models.mixins.cls, models.Model),
+            bases=(widgy.models.mixins.StrDisplayNameMixin, models.Model),
         ),
         migrations.CreateModel(
             name='FieldMappingValue',
@@ -72,7 +72,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'mapped field',
                 'verbose_name_plural': 'mapped field',
             },
-            bases=(widgy.models.mixins.cls, models.Model),
+            bases=(widgy.models.mixins.StrDisplayNameMixin, models.Model),
         ),
         migrations.CreateModel(
             name='FileUpload',
@@ -86,20 +86,20 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(widgy.models.mixins.cls, models.Model),
+            bases=(widgy.models.mixins.StrDisplayNameMixin, models.Model),
         ),
         migrations.CreateModel(
             name='Form',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(default=widgy.contrib.form_builder.models.untitled_form, help_text='A name to help identify this form. Only admins see this.', max_length=255, verbose_name='Name')),
+                ('name', models.CharField(help_text='A name to help identify this form. Only admins see this.', max_length=255, verbose_name='Name')),
                 ('ident', django_extensions.db.fields.UUIDField(editable=False, blank=True)),
             ],
             options={
                 'verbose_name': 'form',
                 'verbose_name_plural': 'forms',
             },
-            bases=(widgy.models.mixins.TabbedContainer, widgy.models.mixins.cls, widgy.models.mixins.StrictDefaultChildrenMixin, models.Model),
+            bases=(widgy.models.mixins.TabbedContainer, widgy.models.mixins.StrDisplayNameMixin, widgy.models.mixins.StrictDefaultChildrenMixin, models.Model),
         ),
         migrations.CreateModel(
             name='FormBody',
@@ -126,7 +126,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'form input',
                 'verbose_name_plural': 'form inputs',
             },
-            bases=(widgy.models.mixins.cls, models.Model),
+            bases=(widgy.models.mixins.StrDisplayNameMixin, models.Model),
         ),
         migrations.CreateModel(
             name='FormMeta',
@@ -181,7 +181,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(widgy.models.mixins.cls, models.Model),
+            bases=(widgy.models.mixins.StrDisplayNameMixin, models.Model),
         ),
         migrations.CreateModel(
             name='SaveDataHandler',
@@ -204,7 +204,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'submit button',
                 'verbose_name_plural': 'submit buttons',
             },
-            bases=(widgy.models.mixins.cls, models.Model),
+            bases=(widgy.models.mixins.StrDisplayNameMixin, models.Model),
         ),
         migrations.CreateModel(
             name='SuccessHandlers',
@@ -241,7 +241,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'text area',
                 'verbose_name_plural': 'text areas',
             },
-            bases=(widgy.models.mixins.cls, models.Model),
+            bases=(widgy.models.mixins.StrDisplayNameMixin, models.Model),
         ),
         migrations.CreateModel(
             name='Uncaptcha',

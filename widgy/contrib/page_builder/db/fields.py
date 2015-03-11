@@ -91,6 +91,8 @@ class VideoField(models.URLField):
 
     def to_python(self, value):
         url = super(VideoField, self).to_python(value)
+        if url is None:
+            return url
         return self.get_url_instance(url)
 
     def get_url_instance(cls, value):
