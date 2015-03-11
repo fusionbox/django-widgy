@@ -190,12 +190,31 @@ class TestFormHandler(TestCase):
         self.assertEqual(resp.status_code, 200)
 
 
+class UserSetup(object):
+    def setUp(self):
+        super(UserSetup, self).setUp()
+        self.superuser = User.objects.create_superuser('superuser', 'test@example.com', 'password')
+        self.staffuser = User.objects.create_user('staffuser', 'test@example.com', 'password')
+        self.staffuser.is_staff = True
+        self.staffuser.save()
+        self.staffuser.user_permissions = Permission.objects.filter(
+            content_type__app_label__in=['pages', 'widgy_mezzanine', 'review_queue']
+        ).exclude(codename='change_reviewedversioncommit')
+
+    @contextmanager
+    def as_user(self, username):
+        self.client.login(username=username, password='password')
+        yield
+        self.client.logout()
+
+
 @skipUnless(PAGE_BUILDER_INSTALLED, 'page_builder is not installed')
 @override_settings(MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + (
     'mezzanine.pages.middleware.PageMiddleware',
 ))
-class TestPreviewView(TestCase):
+class TestPreviewView(UserSetup, TestCase):
     def setUp(self):
+        super(TestPreviewView, self).setUp()
         self.factory = RequestFactory()
         self.preview_view = PreviewView.as_view(site=widgy_site)
         self.request = self.factory.get('/')
@@ -212,7 +231,7 @@ class TestPreviewView(TestCase):
         self.assertIn('Test 1', resp1.rendered_content)
         self.assertEqual(resp1.context_data['page'].get_content_model(), page)
 
-        resp2 = self.preview_view(self.request, node_pk=root_node2.node.pk, slug=page.slug)
+        resp2 = self.preview_view(self.request, node_pk=root_node2.node.pk, page_pk=page.pk)
 
         self.assertEqual(resp2.status_code, 200)
         self.assertIn('Test 2', resp2.rendered_content)
@@ -222,6 +241,23 @@ class TestPreviewView(TestCase):
 
         resp = self.preview_view(self.request, node_pk=button.node.pk)
         self.assertIn(button.text, resp.rendered_content)
+
+    def test_legacy_url(self):
+        page = WidgyPage.objects.create(title='Foo')
+        root_node = Button.add_root(widgy_site, text='Foo')
+        with self.as_user('superuser'):
+            r = self.client.get(urlresolvers.reverse(
+                'widgy.contrib.widgy_mezzanine.views.preview',
+                kwargs={'slug': page.slug, 'node_pk': root_node.pk}
+            ))
+            self.assertRedirects(
+                response=r,
+                expected_url= urlresolvers.reverse(
+                    'widgy.contrib.widgy_mezzanine.views.preview',
+                    kwargs={'page_pk': page.pk, 'node_pk': root_node.pk}
+                ),
+                status_code=301,
+            )
 
 
 @skipUnless(PAGE_BUILDER_INSTALLED, 'page_builder is not installed')
@@ -304,24 +340,6 @@ class TestUnpublish(AdminView, TestCase):
 
         self.page = WidgyPage.objects.get(pk=self.page.pk)
         self.assertEqual(self.page.status, CONTENT_STATUS_DRAFT)
-
-
-class UserSetup(object):
-    def setUp(self):
-        super(UserSetup, self).setUp()
-        self.superuser = User.objects.create_superuser('superuser', 'test@example.com', 'password')
-        self.staffuser = User.objects.create_user('staffuser', 'test@example.com', 'password')
-        self.staffuser.is_staff = True
-        self.staffuser.save()
-        self.staffuser.user_permissions = Permission.objects.filter(
-            content_type__app_label__in=['pages', 'widgy_mezzanine', 'review_queue']
-        ).exclude(codename='change_reviewedversioncommit')
-
-    @contextmanager
-    def as_user(self, username):
-        self.client.login(username=username, password='password')
-        yield
-        self.client.logout()
 
 
 class TestAdminButtonsBase(PageSetup, UserSetup):

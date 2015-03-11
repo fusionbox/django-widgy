@@ -1,3 +1,5 @@
+import warnings
+
 from django.db.models import Q
 from django.views.generic import View, UpdateView, DetailView
 from django.views.generic.detail import SingleObjectMixin
@@ -49,7 +51,24 @@ def get_page_from_node(node):
 class PageViewMixin(object):
     def get_page(self):
         try:
-            return Page.objects.published(for_user=self.request.user).get(pk=self.kwargs['page_pk'])
+            qs = Page.objects.published(for_user=self.request.user)
+            if 'slug' in self.kwargs:
+                warnings.warn(
+                """
+Using slug when reversing widgy.contrib.widgy_mezzanine.views.handle_form or
+widgy.contrib.widgy_mezzanine.preview is deprecated. You should update your
+code to look like this:
+
+    url = urlresolvers.reverse('widgy.contrib.widgy_mezzanine.views.preview', kwargs={
+        'node_pk': node.pk,
+        'page_pk': page.pk,
+    })
+""",
+                    DeprecationWarning
+                )
+                return qs.get(slug=self.kwargs['slug'])
+            else:
+                return qs.get(pk=self.kwargs['page_pk'])
         except (KeyError, Page.DoesNotExist):
             # restoring, use a fake page
             return WidgyPage(
@@ -112,6 +131,10 @@ class PreviewView(AuthorizedMixin, SingleObjectMixin, PageViewMixin, View):
     def get(self, request, *args, **kwargs):
         node = self.get_object()
         page = self.get_page()
+        if 'slug' in self.kwargs:
+            return HttpResponsePermanentRedirect(urlresolvers.reverse(
+                preview, kwargs={'page_pk': page.pk, 'node_pk': node.pk}
+            ))
 
         context = {
             'root_node_override': node,

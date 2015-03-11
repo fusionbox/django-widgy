@@ -28,7 +28,7 @@ class WidgyPageMixin(object):
             'widgy.contrib.widgy_mezzanine.views.handle_form',
             kwargs={
                 'form_node_pk': form.node.pk,
-                'page_pk': self.pk,
+                'slug': self.pk,
             })
 
     def get_action_links(self, root_node):
