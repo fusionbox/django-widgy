@@ -1,9 +1,14 @@
 language: python
+
 python:
   - "2.7"
+
 cache:
   directories:
     - $HOME/.pip-cache/
+
+sudo: false
+
 env:
   global:
     - SOUTH_TESTS_MIGRATE=1
@@ -42,13 +47,17 @@ env:
     - TOX_ENV=py27-dj16-contrib-mysql
     - TOX_ENV=py27-dj16-contrib-postgres
     - TOX_ENV=javascript
+
 install:
   - pip install --upgrade pip
   - pip install tox
+
 before_script:
   - psql -c 'create database widgy;' -U postgres
   - mysql -e 'create database widgy;'
+
 script:
   - tox -e $TOX_ENV
+
 after_script:
   - cat .tox/$TOX_ENV/log/*.log
