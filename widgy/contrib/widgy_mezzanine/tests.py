@@ -244,7 +244,7 @@ class TestPreviewView(UserSetup, TestCase):
 
     def test_legacy_url(self):
         page = WidgyPage.objects.create(title='Foo')
-        root_node = Button.add_root(widgy_site, text='Foo')
+        root_node = Button.add_root(widgy_site, text='Foo').node
         with self.as_user('superuser'):
             r = self.client.get(urlresolvers.reverse(
                 'widgy.contrib.widgy_mezzanine.views.preview',
