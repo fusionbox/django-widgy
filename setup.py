@@ -51,7 +51,7 @@ extras_require['all'] = set(j for i in extras_require.values() for j in i)
 
 setup(
     name='django-widgy',
-    version='0.4.0',
+    version='0.5.0.dev0',
     author='Fusionbox, Inc.',
     author_email='programmers@fusionbox.com',
     description=__doc__,
