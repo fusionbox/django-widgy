@@ -424,6 +424,7 @@ class Content(models.Model):
 
     class Meta:
         abstract = True
+        app_label = 'widgy'
 
     def __init__(self, *args, **kwargs):
         super(Content, self).__init__(*args, **kwargs)
@@ -822,6 +823,11 @@ class Content(models.Model):
 
     def equal(self, other):
         return self.get_attributes() == other.get_attributes()
+
+
+# Otherwise, mixins will inherit Content.Meta and get wierd app_labels
+# Delete this line and the app_label line when we drop support for Django < 1.7
+del Content.Meta
 
 
 class UnknownWidget(Content):

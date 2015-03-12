@@ -1,5 +1,6 @@
 import os
 import imp
+import django
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -42,6 +43,7 @@ INSTALLED_APPS = (
     'widgy.contrib.widgy_mezzanine',
     'widgy.contrib.urlconf_include',
     'widgy.contrib.review_queue',
+    'widgy.contrib.widgy_i18n',
 
     'django.contrib.admin',
 
@@ -50,13 +52,15 @@ INSTALLED_APPS = (
     'compressor',
     'scss',
     'sorl.thumbnail',
-    'south',
     'debug_toolbar',
     'django_extensions',
     'argonauts',
 
     'demo.demo_widgets',
 )
+
+if django.VERSION < (1, 7):
+    INSTALLED_APPS+= ('south',)
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -200,11 +204,3 @@ WIDGY_MEZZANINE_SITE = 'demo.widgysite.widgy_site'
 
 
 DATABASE_ENGINE = DATABASES['default']['ENGINE']
-
-# easy_thumbnails' versions 2.0+ changed their migrations
-import easy_thumbnails
-
-if easy_thumbnails.VERSION >= (2,):
-    SOUTH_MIGRATION_MODULES = {
-        'easy_thumbnails': 'easy_thumbnails.south_migrations',
-    }

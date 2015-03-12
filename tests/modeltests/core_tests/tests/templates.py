@@ -114,10 +114,10 @@ class TestTemplateHierarchy(TestCase):
         self.assertEqual(list(unique_everseen(MyInvisibleBucket.get_templates_hierarchy(template_name='test'))), [
             'widgy/core_tests/myinvisiblebucket/test.html',
             'widgy/mixins/invisible/test.html',
-            'widgy/models/content/test.html',
+            'widgy/widgy/content/test.html',
             'widgy/core_tests/test.html',
             'widgy/mixins/test.html',
-            'widgy/models/test.html',
+            'widgy/widgy/test.html',
             'widgy/test.html',
         ])
 
@@ -126,8 +126,8 @@ class TestTemplateHierarchy(TestCase):
             'widgy/core_tests/weirdpkbucket/test.html',
             'widgy/core_tests/weirdpkbucketbase/test.html',
             'widgy/core_tests/weirdpkbase/test.html',
-            'widgy/models/content/test.html',
+            'widgy/widgy/content/test.html',
             'widgy/core_tests/test.html',
-            'widgy/models/test.html',
+            'widgy/widgy/test.html',
             'widgy/test.html',
         ])

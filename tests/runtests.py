@@ -30,11 +30,17 @@ def teardown():
 
 
 def django_tests(verbosity, interactive, failfast, test_labels):
+    import django
     from django.conf import settings
 
-    # must be imported after settings are set up
-    from south.management.commands import patch_for_test_db_setup
-    patch_for_test_db_setup()
+    if hasattr(django, 'setup'):
+        # Django >= 1.7 requires this for setting up the application.
+        django.setup()
+
+    if django.VERSION < (1, 7):
+        # must be imported after settings are set up
+        from south.management.commands import patch_for_test_db_setup
+        patch_for_test_db_setup()
 
     from django.test.utils import get_runner
     TestRunner = get_runner(settings)
