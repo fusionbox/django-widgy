@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.4.0 (unreleased)
+0.4.0 (2015-03-12)
 ------------------
 
 - Django 1.7 support. Requires upgrade to South 1.0 (Or use of
