@@ -21,13 +21,20 @@ class FormAdmin(admin.ModelAdmin):
     def queryset(self, request):
         return self.model.objects.filter(_nodes__is_frozen=False).annotate_submission_count()
 
+    @property
+    def download_url_name(self):
+        return '{0}_{1}_download'.format(
+            self.model._meta.app_label,
+            self.model._meta.module_name,
+        )
+
     def get_urls(self, *args, **kwargs):
         urls = super(FormAdmin, self).get_urls(*args, **kwargs)
-        info = self.model._meta.app_label, self.model._meta.module_name
         return urls + patterns('',
                                url(r'^(.+).csv$',
                                    self.admin_site.admin_view(self.download_view),
-                                   name='%s_%s_download' % info),
+                                   name=self.download_url_name,
+                                   ),
                                )
 
     def change_view(self, request, object_id, *args, **kwargs):
@@ -45,9 +52,7 @@ class FormAdmin(admin.ModelAdmin):
             'headers': headers,
             'rows': rows,
             'csv_file_name': self.csv_file_name(obj),
-            'download_url': reverse('admin:{0}_{1}_download'.format(
-                self.model._meta.app_label,
-                self.model._meta.module_name), args=[object_id])
+            'download_url': reverse('admin:{0}'.format(self.download_url_name), args=[object_id])
         })
 
     def csv_file_name(self, obj):
