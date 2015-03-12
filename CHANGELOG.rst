@@ -4,7 +4,41 @@ Changelog
 0.4.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Django 1.7 support. Requires upgrade to South 1.0 (Or use of
+  SOUTH_MIGRATION_MODULES) if you stay on Django < 1.7. You may have to --fake
+  some migrations to upgrade to the builtin Django migrations. Make sure your
+  database is up to date using South, then upgrade Django and run::
+
+
+  ./manage.py migrate --fake widgy
+  ./manage.py migrate --fake easy_thumbnails
+  ./manage.py migrate
+
+- Support for installing Widgy without the dependencies of its contrib apps.
+  The 'django-widgy' package only has dependencies required for Widgy core.
+  Each contrib package has a setuptools 'extra'. To install everything, replace
+  'django-widgy' with 'django-widgy[all]'. [#221]
+
+- Switched to tox for test running and allow running core tests without
+  contrib. [#294]
+
+- Stopped relying on urls with consecutive '/' characters [#233]. This adds a new
+  urlpattern for widgy_mezzanine's preview page and form submission handler.
+  The old ones will keep working, but you should reverse with 'page_pk' instead
+  of 'slug'. For example::
+
+    url = urlresolvers.reverse('widgy.contrib.widgy_mezzanine.views.preview', kwargs={
+        'node_pk': node.pk,
+        'page_pk': page.pk,
+    })
+
+- Treat help_text for fields in a widget form as safe (HTML will not be
+  escaped) [#298]. If you were relying on HTML special characters being
+  escaped, you should replace ``help_text="1 is < 2"`` with
+  ``help_text=django.utils.html.escape("1 is < 2")``.
+
+- Reverse URLs in form_builder admin with consideration for Form
+  subclasses [#274].
 
 
 0.3.5 (2015-01-30)
