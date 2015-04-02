@@ -33,19 +33,24 @@ class WidgyFieldObjectDescriptor(ReverseSingleRelatedObjectDescriptor):
         know if the rest of the model is valid yet.
     """
     def __set__(self, instance, value):
-        """
-        """
         if isinstance(value, ContentType):
-            ModelClass = self.field.rel.to
-            value, value._ct = ModelClass(), value
-
-        super(WidgyFieldObjectDescriptor, self).__set__(instance, value)
+            setattr(instance, self.field.pre_save_ct_field_name, value)
+        else:
+            super(WidgyFieldObjectDescriptor, self).__set__(instance, value)
 
 
 class WidgyField(models.ForeignKey):
     """
     Model field that inherits from ``models.ForeignKey``.  Contains validation
     and context switching that is needed for Widgy fields.
+
+    A WidgyField can be assigned a ContentType instance in order to create a
+    new root node of that content type. ::
+
+        my_content_type = ContentType.objects.get_for_model(Layout)
+        my_model = MyModel(
+            root_node=my_content_type
+        )
     """
     def __init__(self, site=None, to=None, root_choices=None, **kwargs):
         if to is None:
@@ -67,22 +72,24 @@ class WidgyField(models.ForeignKey):
         super(WidgyField, self).contribute_to_class(cls, name)
         setattr(cls, self.name, WidgyFieldObjectDescriptor(self))
 
+    @property
+    def pre_save_ct_field_name(self):
+        return '_widgy_field_pre_save_ct_{0}'.format(self.name)
+
     def add_root(self, model_instance, root_content_kwargs={}):
-        value = getattr(model_instance, self.name)
-        return value._ct.model_class().add_root(self.site, **root_content_kwargs).node
+        # This is a weird API. It would be nicer to take the content class of
+        # the new root node, but add_root is a public interface
+        # (django-widgy-blog is using it).
+        content_type = getattr(model_instance, self.pre_save_ct_field_name)
+        return content_type.model_class().add_root(self.site, **root_content_kwargs).node
 
     def pre_save(self, model_instance, add):
         """
-        Relies on WidgyFieldObjectDescriptor to set the content type on an
-        unsaved throwaway Node so that we know how to properly instantiate a
-        real node later on.
+        When adding a new root, we might be passed a ContentType that we need
+        to turn into a root node. Relies on WidgyFieldObjectDescriptor to set
+        the content type in pre_save_ct_field_name.
         """
-        try:
-            value = getattr(model_instance, self.name)
-        except models.ObjectDoesNotExist:
-            value = None
-
-        if hasattr(value, '_ct'):
+        if hasattr(model_instance, self.pre_save_ct_field_name):
             node = self.add_root(model_instance)
             setattr(model_instance, self.name, node)
             setattr(model_instance, self.attname, node.pk)
@@ -157,7 +164,7 @@ class WidgyField(models.ForeignKey):
         # the root node, it isn't saved so it can't have a pk. The base
         # field's validate will fail, even though pre_save will actually
         # create a node and set the fk field.
-        if value is None and not self.blank and getattr(model_instance, self.name):
+        if value is None and not self.blank and hasattr(model_instance, self.pre_save_ct_field_name):
             return
         else:
             return super(WidgyField, self).validate(value, model_instance)
