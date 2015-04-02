@@ -11,7 +11,7 @@ sudo: false
 
 env:
   global:
-    - SOUTH_TESTS_MIGRATE=1
+    - SOUTH_TESTS_MIGRATE=True
   matrix:
     - TOX_ENV=py26-dj16-sqlite
     - TOX_ENV=py26-dj16-mysql
