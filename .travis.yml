@@ -22,6 +22,9 @@ env:
     - TOX_ENV=py27-dj17-sqlite
     - TOX_ENV=py27-dj17-mysql
     - TOX_ENV=py27-dj17-postgres
+    - TOX_ENV=py27-dj18-sqlite
+    - TOX_ENV=py27-dj18-mysql
+    - TOX_ENV=py27-dj18-postgres
     - TOX_ENV=py26-dj16-contrib-sqlite
     - TOX_ENV=py26-dj16-contrib-mysql
     - TOX_ENV=py26-dj16-contrib-postgres
@@ -31,6 +34,9 @@ env:
     - TOX_ENV=py27-dj17-contrib-sqlite
     - TOX_ENV=py27-dj17-contrib-mysql
     - TOX_ENV=py27-dj17-contrib-postgres
+    - TOX_ENV=py27-dj18-contrib-sqlite
+    - TOX_ENV=py27-dj18-contrib-mysql
+    - TOX_ENV=py27-dj18-contrib-postgres
     - TOX_ENV=javascript
 
 install:
