@@ -4,7 +4,6 @@ import shutil
 import sys
 import tempfile
 
-from django.utils._os import upath
 
 try:
     import six
@@ -12,7 +11,7 @@ except ImportError:
     from django.utils import six
 
 
-RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
+RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
