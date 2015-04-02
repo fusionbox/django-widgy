@@ -347,11 +347,11 @@ class TestUnpublish(AdminView, TestCase):
         self.assertEqual(self.page.status, CONTENT_STATUS_DRAFT)
 
 
-class TestAdminButtonsBase(PageSetup, UserSetup):
+class AdminButtonsTestBase(PageSetup, UserSetup):
     urls = 'widgy.contrib.widgy_mezzanine.tests'
 
     def setUp(self):
-        super(TestAdminButtonsBase, self).setUp()
+        super(AdminButtonsTestBase, self).setUp()
         self.model_admin = WidgyPageAdmin(WidgyPage, admin.site)
 
     def test_save_and_commit_without_changes(self):
@@ -368,7 +368,7 @@ class TestAdminButtonsBase(PageSetup, UserSetup):
 
 @skipUnless(PAGE_BUILDER_INSTALLED, 'page_builder is not installed')
 @override_settings(WIDGY_MEZZANINE_SITE=widgy_site)
-class TestAdminButtons(TestAdminButtonsBase, TestCase):
+class TestAdminButtons(AdminButtonsTestBase, TestCase):
     def setUp(self):
         super(TestAdminButtons, self).setUp()
         self.client.login(username='superuser', password='password')
@@ -435,7 +435,7 @@ class TestAdminButtons(TestAdminButtonsBase, TestCase):
 
 
 @make_reviewed
-class TestAdminButtonsWhenReviewed(TestAdminButtonsBase, TestCase):
+class TestAdminButtonsWhenReviewed(AdminButtonsTestBase, TestCase):
     def test_save_and_commit(self):
         self.page.status = CONTENT_STATUS_DRAFT
         self.page.save()
