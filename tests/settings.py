@@ -32,11 +32,12 @@ INSTALLED_APPS = [
     "treebeard",
     "compressor",
     "argonauts",
+    'filer',
     # tests modules
-    "modeltests.core_tests",
-    "modeltests.proxy_gfk",
-    "regressiontests.utilstests",
-    # tests/modeltests/core_tests/models::ReviewedVersionedPage has an fk to
+    "core_tests",
+    "proxy_gfk",
+    "utilstests",
+    # tests/core_tests/models::ReviewedVersionedPage has an fk to
     # `review_queue.ReviewedVersionTracker`.  Until that test is moved into a
     # contrib test suite, that app neeeds to be installed.
     "widgy.contrib.review_queue",
@@ -59,7 +60,6 @@ else:
         }
 
 URLCONF_INCLUDE_CHOICES = tuple()
-TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
@@ -115,7 +115,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 # Widgy Settings
-WIDGY_MEZZANINE_SITE = 'modeltests.core_tests.widgy_config.widgy_site'
+WIDGY_MEZZANINE_SITE = 'core_tests.widgy_config.widgy_site'
 
 DAISYDIFF_JAR_PATH = os.path.join(
     os.path.dirname(__file__), '..', 'bin', 'daisydiff', 'daisydiff.jar',

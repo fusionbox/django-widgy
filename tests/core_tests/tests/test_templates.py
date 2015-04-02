@@ -5,8 +5,8 @@ from django.template import Template, Context
 
 from widgy.models import VersionTracker
 
-from modeltests.core_tests.widgy_config import widgy_site
-from modeltests.core_tests.models import (
+from core_tests.widgy_config import widgy_site
+from core_tests.models import (
     RawTextWidget, HasAWidgy, VersionedPage,
     MyInvisibleBucket, WeirdPkBucket
 )

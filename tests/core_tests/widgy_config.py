@@ -9,5 +9,5 @@ widgy_site = WidgySite()
 # site.
 # We have to be able to import models from the site file to use when
 # checking compatibility.
-VersionedWidgyField(site='modeltests.core_tests.widgy_config.widgy_site')
-WidgyField(site='modeltests.core_tests.widgy_config.widgy_site')
+VersionedWidgyField(site='core_tests.widgy_config.widgy_site')
+WidgyField(site='core_tests.widgy_config.widgy_site')

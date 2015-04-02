@@ -8,7 +8,7 @@ from widgy.models.links import (
     get_composite_key, convert_linkable_to_choice, LinkRegistry, LinkField
 )
 
-from modeltests.core_tests.models import (
+from core_tests.models import (
     LinkableThing, ThingWithLink, AnotherLinkableThing, LinkableThing3,
     Bucket, VersionPageThrough, ChildThingWithLink
 )

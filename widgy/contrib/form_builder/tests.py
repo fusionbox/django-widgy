@@ -14,7 +14,7 @@ from django.core.files.base import ContentFile
 
 import mock
 
-from modeltests.core_tests.widgy_config import widgy_site
+from core_tests.widgy_config import widgy_site
 from widgy.contrib.form_builder.forms import PhoneNumberField
 from widgy.contrib.form_builder.models import (
     Form, FormInput, Textarea, FormSubmission, FormField, Uncaptcha,

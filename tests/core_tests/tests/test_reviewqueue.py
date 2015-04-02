@@ -12,12 +12,12 @@ from widgy.contrib.review_queue.models import (
     ReviewedVersionTracker, ReviewedVersionCommit,
 )
 
-from modeltests.core_tests.tests.base import (
+from core_tests.tests.base import (
     RootNodeTestCase, refetch, SwitchUserTestCase,
 )
-from modeltests.core_tests.tests.api import TestApi
-from modeltests.core_tests.models import ReviewedVersionedPage, RawTextWidget
-from modeltests.core_tests.widgy_config import widgy_site
+from core_tests.tests.test_api import TestApi
+from core_tests.models import ReviewedVersionedPage, RawTextWidget
+from core_tests.widgy_config import widgy_site
 
 
 def make_tracker(site, vt_class=ReviewedVersionTracker):

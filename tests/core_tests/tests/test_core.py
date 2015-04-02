@@ -18,15 +18,15 @@ from widgy.exceptions import (
     InvalidOperation, ParentChildRejection)
 from widgy.views.versioning import daisydiff
 
-from modeltests.core_tests.widgy_config import widgy_site
-from modeltests.core_tests.models import (
+from core_tests.widgy_config import widgy_site
+from core_tests.models import (
     Layout, Bucket, RawTextWidget, CantGoAnywhereWidget, PickyBucket,
     ImmovableBucket, AnotherLayout, VowelBucket, VersionedPage, VersionedPage2,
     VersionedPage3, VersionedPage4, VersionPageThrough, Related,
     ForeignKeyWidget, WeirdPkBucket, UnnestableWidget,
     CssClassesWidget, CssClassesWidgetSubclass, CssClassesWidgetProperty,
 )
-from modeltests.core_tests.tests.base import (
+from core_tests.tests.base import (
     RootNodeTestCase, make_a_nice_tree, SwitchUserTestCase, refetch)
 
 

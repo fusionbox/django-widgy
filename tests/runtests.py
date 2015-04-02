@@ -4,21 +4,40 @@ import shutil
 import sys
 import tempfile
 
+from django.utils._os import upath
+
 try:
     import six
 except ImportError:
     from django.utils import six
 
 
+RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
 TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
 
 def get_contrib_test_modules():
     from django.conf import settings
-    return tuple((
-        module.split('.')[-1] for module in settings.INSTALLED_APPS if module.startswith('widgy.contrib')
-    ))
+    return [
+        module for module in settings.INSTALLED_APPS if module.startswith('widgy.contrib')
+    ]
+
+
+def get_test_modules():
+    modules = []
+    discovery_paths = [
+        (None, RUNTESTS_DIR),
+    ]
+
+    for modpath, dirpath in discovery_paths:
+        for f in os.listdir(dirpath):
+            if ('.' in f or
+                    os.path.isfile(f) or
+                    not os.path.exists(os.path.join(dirpath, f, '__init__.py'))):
+                continue
+            modules.append(f)
+    return modules
 
 
 def teardown():
@@ -47,7 +66,7 @@ def django_tests(verbosity, interactive, failfast, test_labels):
 
     if not test_labels:
         # apps to test
-        test_labels = CORE_TEST_MODULES + get_contrib_test_modules()
+        test_labels = get_test_modules() + get_contrib_test_modules()
 
     test_runner = TestRunner(verbosity=verbosity, interactive=interactive,
                              failfast=failfast)
@@ -55,24 +74,6 @@ def django_tests(verbosity, interactive, failfast, test_labels):
 
     teardown()
     return failures
-
-
-CONTRIB_TEST_MODULES = (
-    'form_builder',
-    'page_builder',
-    'review_queue',
-    'urlconf_include',
-    'widgy_i18n',
-    'widgy_mezzanine',
-)
-
-
-CORE_TEST_MODULES = (
-    'core_tests',
-    'proxy_gfk',
-    'utilstests',
-    'widgy',
-)
 
 
 if __name__ == "__main__":

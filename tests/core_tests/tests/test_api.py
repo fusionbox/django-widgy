@@ -12,12 +12,12 @@ from django.core.exceptions import PermissionDenied
 from widgy.views import extract_id
 from widgy.models import Node
 
-from modeltests.core_tests.widgy_config import widgy_site
-from modeltests.core_tests.models import (
+from core_tests.widgy_config import widgy_site
+from core_tests.models import (
     Bucket, ImmovableBucket, UndeletableRawTextWidget, RawTextWidget, Layout,
     PickyBucket,
 )
-from modeltests.core_tests.tests.base import RootNodeTestCase, HttpTestCase, make_a_nice_tree, SwitchUserTestCase
+from core_tests.tests.base import RootNodeTestCase, HttpTestCase, make_a_nice_tree, SwitchUserTestCase
 
 
 class TestApi(RootNodeTestCase, HttpTestCase):

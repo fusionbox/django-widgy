@@ -11,8 +11,8 @@ import mock
 from widgy.forms import WidgyFormMixin, WidgyFormField
 from widgy.models import Node, VersionTracker
 
-from modeltests.core_tests.widgy_config import widgy_site
-from modeltests.core_tests.models import (
+from core_tests.widgy_config import widgy_site
+from core_tests.models import (
     HasAWidgy, HasAWidgyNonNull, Layout, HasAWidgyOnlyAnotherLayout, AnotherLayout,
     VersionedPage, RawTextWidget)
 

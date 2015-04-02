@@ -3,8 +3,8 @@ from django.test.client import RequestFactory
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 
-from modeltests.core_tests.widgy_config import widgy_site
-from modeltests.core_tests.models import (
+from core_tests.widgy_config import widgy_site
+from core_tests.models import (
     VariegatedFieldsWidget, VerboseNameLayout,
     VerboseNameLayoutChild, WidgetWithHTMLHelpText,
 )
