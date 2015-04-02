@@ -31,7 +31,7 @@ def monkey_patch():
         res = old_get_templates_hierarchy_unbound(cls, **kwargs)
         res = unique_list(res)
         try:
-            name = select_template(res).name
+            name = select_template(res).origin.name
         except TemplateDoesNotExist:
             name = [i for i in res if finders.find(i)]
         template_hierarchy_called.send(sender=cls, cls=cls, kwargs=kwargs, templates=res, used=name)
