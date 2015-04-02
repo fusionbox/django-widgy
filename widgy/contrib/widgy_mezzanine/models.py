@@ -4,8 +4,9 @@ from django.conf import settings
 from django.core import urlresolvers
 
 from mezzanine.pages.managers import PageManager
-from mezzanine.pages.models import Link
+from mezzanine.pages.models import Link, Page
 
+from widgy.db.fields import VersionedWidgyField
 from widgy.utils import SelectRelatedManager
 from widgy.models import links
 
@@ -61,34 +62,32 @@ class PageSelectRelatedManager(SelectRelatedManager, PageManager):
     """
     use_for_related_fields = True
 
+
+@links.register
+class WidgyPage(WidgyPageMixin, Page):
+    root_node = VersionedWidgyField(
+        site=settings.WIDGY_MEZZANINE_SITE,
+        verbose_name=_('widgy content'),
+        root_choices=(
+            'page_builder.Layout',
+        ),
+        # WidgyField used to have these as defaults.
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+
+    class Meta:
+        verbose_name = _('widgy page')
+        verbose_name_plural = _('widgy pages')
+        swappable = 'WIDGY_MEZZANINE_PAGE_MODEL'
+
+    objects = PageSelectRelatedManager(select_related=[
+        'root_node'
+        'root_node__head',
+        # we might not need this, if head isn't published, but we
+        # probably will.
+        'root_node__head__root_node',
+    ])
+
+
 links.register(Link)
-
-# In Django 1.5+, we could use swappable = True
-if getattr(settings, 'WIDGY_MEZZANINE_PAGE_MODEL', None) is None:
-    from mezzanine.pages.models import Page
-    from widgy.db.fields import VersionedWidgyField
-
-    @links.register
-    class WidgyPage(WidgyPageMixin, Page):
-        root_node = VersionedWidgyField(
-            site=settings.WIDGY_MEZZANINE_SITE,
-            verbose_name=_('widgy content'),
-            root_choices=(
-                'page_builder.Layout',
-            ),
-            # WidgyField used to have these as defaults.
-            null=True,
-            on_delete=models.SET_NULL,
-        )
-
-        class Meta:
-            verbose_name = _('widgy page')
-            verbose_name_plural = _('widgy pages')
-
-        objects = PageSelectRelatedManager(select_related=[
-            'root_node'
-            'root_node__head',
-            # we might not need this, if head isn't published, but we
-            # probably will.
-            'root_node__head__root_node',
-        ])
