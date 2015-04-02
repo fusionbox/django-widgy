@@ -2,6 +2,7 @@ from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
 from django.contrib.staticfiles import finders
+from django.contrib.auth import get_permission_codename
 from django.utils.functional import cached_property
 
 from widgy import registry
@@ -73,14 +74,17 @@ class WidgySite(object):
             raise PermissionDenied
 
     def has_add_permission(self, request, content_class):
-        return request.user.has_perm('%s.%s' % (content_class._meta.app_label, content_class._meta.get_add_permission()))
+        codename = get_permission_codename('add', content_class._meta)
+        return request.user.has_perm('%s.%s' % (content_class._meta.app_label, codename))
 
     def has_change_permission(self, request, obj_or_class):
-        return request.user.has_perm('%s.%s' % (obj_or_class._meta.app_label, obj_or_class._meta.get_change_permission()))
+        codename = get_permission_codename('change', obj_or_class._meta)
+        return request.user.has_perm('%s.%s' % (obj_or_class._meta.app_label, codename))
 
     def has_delete_permission(self, request, obj_or_class):
         def has_perm(o):
-            return request.user.has_perm('%s.%s' % (o._meta.app_label, o._meta.get_delete_permission()))
+            codename = get_permission_codename('delete', o._meta)
+            return request.user.has_perm('%s.%s' % (o._meta.app_label, codename))
 
         if isinstance(obj_or_class, type):
             return has_perm(obj_or_class)
