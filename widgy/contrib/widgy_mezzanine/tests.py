@@ -14,6 +14,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.core import urlresolvers
 from django.contrib.auth.models import Permission
+from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import admin
 from django.db.models.signals import post_save
@@ -24,7 +25,6 @@ from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
 
 from widgy.site import WidgySite
-from widgy.utils import get_user_model
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.contrib.widgy_mezzanine.views import ClonePageView, UnpublishView
 from widgy.db.fields import get_site

@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf.urls import patterns, url
 from django.template.defaultfilters import slugify
 
-from widgy.utils import force_text
+from django.utils.encoding import force_text
 
 from .models import Form
 

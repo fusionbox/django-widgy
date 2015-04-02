@@ -15,6 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.template import RequestContext
 from django.contrib.admin import widgets
 from django.template.defaultfilters import capfirst
+from django.utils.encoding import force_text
 
 from treebeard.mp_tree import MP_Node
 
@@ -27,7 +28,7 @@ from widgy.exceptions import (
 from widgy.signals import pre_delete_widget
 from widgy.generic import WidgyGenericForeignKey, ProxyGenericRelation
 from widgy.utils import (
-    exception_to_bool, update_context, render_to_string, force_text, unset_pks,
+    exception_to_bool, update_context, render_to_string, unset_pks,
 )
 from widgy.widgets import DateTimeWidget, DateWidget, TimeWidget
 

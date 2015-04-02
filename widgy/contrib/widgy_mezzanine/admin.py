@@ -7,6 +7,7 @@ from django import forms
 from django.core.urlresolvers import reverse
 from django.contrib.admin.util import quote
 from django.utils.translation import ugettext_lazy as _, ugettext, ungettext
+from django.utils.html import format_html
 from django.utils import timezone
 from django.contrib import messages
 from django.db.models.signals import post_save
@@ -24,7 +25,6 @@ from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
 from widgy.forms import WidgyFormMixin, VersionedWidgyWidget
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.contrib.widgy_mezzanine.views import ClonePageView, UnpublishView
-from widgy.utils import format_html
 from widgy.db.fields import get_site
 
 

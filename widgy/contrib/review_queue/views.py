@@ -4,10 +4,10 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.utils.http import is_safe_url
+from django.utils.html import format_html
 from django.views.generic import RedirectView, FormView
 from django.core.exceptions import PermissionDenied
 
-from widgy.utils import format_html
 from widgy.views.base import AuthorizedMixin
 from widgy.views.versioning import VersionTrackerMixin, CommitView, HistoryView as OldHistoryView
 

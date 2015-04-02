@@ -16,7 +16,7 @@ from django.shortcuts import redirect
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils.functional import cached_property
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.encoding import python_2_unicode_compatible, force_bytes
 from django.template.defaultfilters import truncatechars
 from django.core.files import File
 from django.core.files.storage import default_storage
@@ -27,7 +27,7 @@ import html2text
 from widgy.models import Content, Node
 from widgy.signals import pre_delete_widget
 from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, StrDisplayNameMixin
-from widgy.utils import update_context, build_url, force_bytes, QuerySet
+from widgy.utils import update_context, build_url, QuerySet
 from widgy.contrib.page_builder.models import Bucket, Html
 from widgy.contrib.page_builder.forms import MiniCKEditorField, CKEditorField
 from .forms import PhoneNumberField

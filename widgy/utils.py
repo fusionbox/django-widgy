@@ -1,13 +1,13 @@
 """
 Some utility functions used throughout the project.
 """
+import warnings
 from itertools import ifilterfalse
 from contextlib import contextmanager
+from functools import wraps
 
 import bs4
 
-from django.utils.html import conditional_escape
-from django.utils.safestring import mark_safe
 from django.template import Context
 from django.template.loader import select_template, get_template
 from django.db import models
@@ -16,37 +16,29 @@ from django.utils.http import urlencode
 from django.utils.functional import memoize
 from django.conf import settings
 
-try:
-    from django.contrib.auth import get_user_model
-except ImportError:
-    def get_user_model():
-        from django.contrib.auth.models import User
-        return User
+from django.contrib.auth import get_user_model
+from django.utils.html import format_html
+from django.utils.encoding import force_text, force_bytes
 
-try:
-    from django.utils.html import format_html
-except ImportError:
-    # Django < 1.5 doesn't have this
 
-    def format_html(format_string, *args, **kwargs):  # NOQA
-        """
-        Similar to str.format, but passes all arguments through
-        conditional_escape, and calls 'mark_safe' on the result. This function
-        should be used instead of str.format or % interpolation to build up
-        small HTML fragments.
-        """
-        args_safe = map(conditional_escape, args)
-        kwargs_safe = dict([(k, conditional_escape(v)) for (k, v) in kwargs.iteritems()])
-        return mark_safe(format_string.format(*args_safe, **kwargs_safe))
+def deprecate(fn):
+    @wraps(fn)
+    def new(*args, **kwargs):
+        warnings.warn(
+            "widgy.utils.{} is deprecated. Use the version from {} instead.".format(
+                fn.__name__,
+                fn.__module__
+            ),
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return fn(*args, **kwargs)
+    return new
 
-try:
-    from django.utils.encoding import force_text
-    from django.utils.encoding import force_bytes
-except ImportError:
-    # Django 1.4
-    from django.utils.encoding import force_unicode, smart_str
-    force_bytes = smart_str
-    force_text = force_unicode
+get_user_model = deprecate(get_user_model)
+format_html = deprecate(format_html)
+force_text = deprecate(force_text)
+force_bytes = deprecate(force_bytes)
 
 
 def extract_id(url):

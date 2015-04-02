@@ -7,12 +7,12 @@ from django.forms import widgets
 from django.contrib.contenttypes.models import ContentType
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from django.utils.html import format_html
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.template.defaultfilters import capfirst
 
-from widgy.utils import format_html
 from widgy.models import Node
 
 

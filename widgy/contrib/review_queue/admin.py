@@ -5,10 +5,10 @@ from django.contrib.admin.views.main import ChangeList
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _, ungettext
+from django.utils.html import format_html
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
-from widgy.utils import format_html
 from widgy.admin import AuthorizedAdminMixin
 
 from .forms import ApproveForm
