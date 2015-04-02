@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from operator import itemgetter
 from itertools import chain
 import json
@@ -12,12 +13,12 @@ from django.core.exceptions import PermissionDenied
 from widgy.views import extract_id
 from widgy.models import Node
 
-from core_tests.widgy_config import widgy_site
-from core_tests.models import (
+from ..widgy_config import widgy_site
+from ..models import (
     Bucket, ImmovableBucket, UndeletableRawTextWidget, RawTextWidget, Layout,
     PickyBucket,
 )
-from core_tests.tests.base import RootNodeTestCase, HttpTestCase, make_a_nice_tree, SwitchUserTestCase
+from .base import RootNodeTestCase, HttpTestCase, make_a_nice_tree, SwitchUserTestCase
 
 
 class TestApi(RootNodeTestCase, HttpTestCase):

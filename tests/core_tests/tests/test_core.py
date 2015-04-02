@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from pprint import pprint
 import datetime
 import time
@@ -18,15 +19,15 @@ from widgy.exceptions import (
     InvalidOperation, ParentChildRejection)
 from widgy.views.versioning import daisydiff
 
-from core_tests.widgy_config import widgy_site
-from core_tests.models import (
+from ..widgy_config import widgy_site
+from ..models import (
     Layout, Bucket, RawTextWidget, CantGoAnywhereWidget, PickyBucket,
     ImmovableBucket, AnotherLayout, VowelBucket, VersionedPage, VersionedPage2,
     VersionedPage3, VersionedPage4, VersionPageThrough, Related,
     ForeignKeyWidget, WeirdPkBucket, UnnestableWidget,
     CssClassesWidget, CssClassesWidgetSubclass, CssClassesWidgetProperty,
 )
-from core_tests.tests.base import (
+from .base import (
     RootNodeTestCase, make_a_nice_tree, SwitchUserTestCase, refetch)
 
 

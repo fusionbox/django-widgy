@@ -1,10 +1,12 @@
+from __future__ import absolute_import
+
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 
-from core_tests.widgy_config import widgy_site
-from core_tests.models import (
+from ..widgy_config import widgy_site
+from ..models import (
     VariegatedFieldsWidget, VerboseNameLayout,
     VerboseNameLayoutChild, WidgetWithHTMLHelpText,
 )

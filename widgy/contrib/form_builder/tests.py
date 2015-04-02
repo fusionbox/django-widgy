@@ -14,7 +14,6 @@ from django.core.files.base import ContentFile
 
 import mock
 
-from core_tests.widgy_config import widgy_site
 from widgy.contrib.form_builder.forms import PhoneNumberField
 from widgy.contrib.form_builder.models import (
     Form, FormInput, Textarea, FormSubmission, FormField, Uncaptcha,
@@ -23,6 +22,9 @@ from widgy.contrib.form_builder.models import (
 from widgy.exceptions import ParentChildRejection
 from widgy.utils import build_url
 from widgy.models import VersionTracker
+from widgy.site import WidgySite
+
+widgy_site = WidgySite()
 
 
 class GetFormTest(TestCase):

@@ -12,7 +12,7 @@ def dummy_view(*args, **kwargs):
 
 
 urlpatterns = patterns('',
-    url('^core_tests/', include('core_tests.urls')),
+    url('^core_tests/', include('tests.core_tests.urls')),
     url("^admin/", include(admin.site.urls)),
     # mezzanine.pages.views.page reverses the 'home' url.
     url('^$', dummy_view, name='home'),

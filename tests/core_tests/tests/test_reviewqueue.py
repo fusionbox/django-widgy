@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import datetime
 import imp
 import json
@@ -12,12 +13,12 @@ from widgy.contrib.review_queue.models import (
     ReviewedVersionTracker, ReviewedVersionCommit,
 )
 
-from core_tests.tests.base import (
+from .base import (
     RootNodeTestCase, refetch, SwitchUserTestCase,
 )
-from core_tests.tests.test_api import TestApi
-from core_tests.models import ReviewedVersionedPage, RawTextWidget
-from core_tests.widgy_config import widgy_site
+from .test_api import TestApi
+from ..models import ReviewedVersionedPage, RawTextWidget
+from ..widgy_config import widgy_site
 
 
 def make_tracker(site, vt_class=ReviewedVersionTracker):

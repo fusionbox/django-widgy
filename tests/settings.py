@@ -33,9 +33,9 @@ INSTALLED_APPS = [
     "compressor",
     "argonauts",
     # tests modules
-    "core_tests",
-    "proxy_gfk",
-    "utilstests",
+    "tests.core_tests",
+    "tests.proxy_gfk",
+    "tests.utilstests",
     # tests/core_tests/models::ReviewedVersionedPage has an fk to
     # `review_queue.ReviewedVersionTracker`.  Until that test is moved into a
     # contrib test suite, that app neeeds to be installed.
@@ -80,7 +80,7 @@ TEST_TEMPLATE_DIR = 'templates'
 
 TEMP_DIR = excavator.env_string('DJANGO_TEST_TEMP_DIR', required=True)
 
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'tests.urls'
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(TEMP_DIR, 'static')
 MEDIA_URL = '/media/'
@@ -114,7 +114,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 # Widgy Settings
-WIDGY_MEZZANINE_SITE = 'core_tests.widgy_config.widgy_site'
+WIDGY_MEZZANINE_SITE = 'tests.core_tests.widgy_config.widgy_site'
 
 DAISYDIFF_JAR_PATH = os.path.join(
     os.path.dirname(__file__), '..', 'bin', 'daisydiff', 'daisydiff.jar',
