@@ -4,9 +4,7 @@ from django.db.models.loading import get_app
 from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import SimpleLazyObject
 
-# WidgyContentType has a patched get_for_models that doesn't ignore proxy
-# models
-from widgy.generic.models import ContentType as WidgyContentType
+from django.contrib.contenttypes.models import ContentType
 from widgy.utils import fancy_import, update_context
 
 try:
@@ -134,7 +132,7 @@ class WidgyField(models.ForeignKey):
         # test databases haven't been set up yet, but we try to query
         # the ContentType table.
         return ContentType.objects.filter(pk__in=[
-            ct.pk for ct in WidgyContentType.objects.get_for_models(
+            ct.pk for ct in ContentType.objects.get_for_models(
                 for_concrete_models=False,
                 *classes
             ).values()])
