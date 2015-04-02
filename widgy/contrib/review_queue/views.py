@@ -64,20 +64,15 @@ class ApproveView(ApprovalChangeBaseView):
         commit.save()
 
     def get_message(self, commit, history_url):
-        # XXX: Avoid circular import
-        from .admin import HTML_IN_MESSAGES
-
-        message = _('Commit %s has been approved') % commit
-        if HTML_IN_MESSAGES:
-            message = format_html('{0} {1}',
-                message,
-                UndoApprovalsForm(
-                    initial={
-                        'actions': [commit.pk],
-                        'referer': history_url,
-                    }
-                ).render(self.request, self.site)
-            )
+        message = format_html('{0} {1}',
+            _('Commit %s has been approved') % commit,
+            UndoApprovalsForm(
+                initial={
+                    'actions': [commit.pk],
+                    'referer': history_url,
+                }
+            ).render(self.request, self.site)
+        )
         return message
 
 

@@ -5,22 +5,14 @@ from django.contrib.admin.views.main import ChangeList
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _, ungettext
-from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
-import django
 
 from widgy.utils import format_html
 from widgy.admin import AuthorizedAdminMixin
 
 from .forms import ApproveForm
 from .models import ReviewedVersionTracker
-
-
-# BBB: Before django 1.5, only session storage supported safe string in
-# messages. This is needed in order to put the undo form in messages.
-HTML_IN_MESSAGES = django.VERSION >= (1, 5) or \
-    settings.MESSAGE_STORAGE == 'django.contrib.messages.storage.session.SessionStorage'
 
 
 class VersionCommitChangeList(ChangeList):
@@ -101,17 +93,16 @@ class VersionCommitAdminBase(AuthorizedAdminMixin, ModelAdmin):
         ) % (commit_count,)
 
         from .forms import UndoApprovalsForm
-        if HTML_IN_MESSAGES:
-            message = format_html(
-                '{0} {1}',
-                message,
-                UndoApprovalsForm(
-                    initial={
-                        'actions': [c.pk for c in queryset],
-                        'referer': request.path,
-                    }
-                ).render(request, self.get_site())
-            )
+        message = format_html(
+            '{0} {1}',
+            message,
+            UndoApprovalsForm(
+                initial={
+                    'actions': [c.pk for c in queryset],
+                    'referer': request.path,
+                }
+            ).render(request, self.get_site())
+        )
 
         messages.info(request, message, extra_tags='safe')
     approve_selected.short_description = _('Approve selected commits')
