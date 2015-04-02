@@ -48,6 +48,7 @@ class WidgyPageAdminForm(WidgyFormMixin, PageAdminForm):
         widgets = {
             'root_node': PageVersionedWidgyWidget,
         }
+        fields = '__all__'
 
     def __init__(self, *args, **kwargs):
         super(WidgyPageAdminForm, self).__init__(*args, **kwargs)

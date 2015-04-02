@@ -547,6 +547,7 @@ class Content(models.Model):
         defaults = {
             "form": self.form,
             "formfield_callback": partial(self.formfield_for_dbfield, request=request),
+            "fields": "__all__",
         }
         form_class = modelform_factory(self.__class__, **defaults)
         # Rather than make everybody subclass a special form, add the
