@@ -1,5 +1,3 @@
-import excavator
-
 from settings import *
 
 
@@ -7,9 +5,22 @@ PACKAGE_NAME_FILEBROWSER = "filebrowser_safe"
 PACKAGE_NAME_GRAPPELLI = "grappelli_safe"
 GRAPPELLI_INSTALLED = True
 
-#INSTALLED_APPS += excavator.env_list('EXTRA_INSTALLED_APPS', required=True)
 INSTALLED_APPS += [
-    i for i in excavator.env_list('EXTRA_INSTALLED_APPS', required=True) if i not in INSTALLED_APPS
+    'mezzanine.boot',
+    'mezzanine.conf',
+    'mezzanine.core',
+    'mezzanine.generic',
+    'mezzanine.pages',
+    'mezzanine.forms',
+    'django.contrib.comments',
+    'filebrowser_safe',
+    'grappelli_safe',
+    'filer',
+    'widgy.contrib.widgy_mezzanine',
+    'widgy.contrib.form_builder',
+    'widgy.contrib.page_builder',
+    'widgy.contrib.urlconf_include',
+    'widgy.contrib.widgy_i18n',
 ]
 
 

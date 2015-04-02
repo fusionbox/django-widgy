@@ -1,8 +1,8 @@
 import os
 import sys
-import excavator
 import dj_database_url
 import django
+import tempfile
 
 try:
     import six
@@ -46,7 +46,7 @@ if django.VERSION < (1, 7):
     INSTALLED_APPS.append("south")
 
 
-SOUTH_TESTS_MIGRATE = excavator.env_bool('SOUTH_TESTS_MIGRATE', default=False)
+SOUTH_TESTS_MIGRATE = os.environ.get('SOUTH_TESTS_MIGRATE', 'False').lower() in ('true', 'yes', 'y', '1')
 
 try:
     import easy_thumbnails
@@ -78,13 +78,17 @@ def upath(path):
 RUNTESTS_DIR = os.path.dirname(upath(__file__))
 TEST_TEMPLATE_DIR = 'templates'
 
-TEMP_DIR = excavator.env_string('DJANGO_TEST_TEMP_DIR', required=True)
+# This directory is removed by /conftest.py
+TEMP_DIR = tempfile.mkdtemp(prefix='widgy_')
 
 ROOT_URLCONF = 'tests.urls'
+
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(TEMP_DIR, 'static')
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(TEMP_DIR, 'media')
+
 TEMPLATE_DIRS = (os.path.join(RUNTESTS_DIR, TEST_TEMPLATE_DIR),)
 USE_I18N = True
 LANGUAGE_CODE = 'en'
