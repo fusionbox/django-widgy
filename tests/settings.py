@@ -32,7 +32,6 @@ INSTALLED_APPS = [
     "treebeard",
     "compressor",
     "argonauts",
-    'filer',
     # tests modules
     "core_tests",
     "proxy_gfk",
