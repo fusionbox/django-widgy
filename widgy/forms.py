@@ -58,7 +58,7 @@ class WidgyWidget(forms.HiddenInput):
         return render_to_string(self.template_name, defaults)
 
 
-class ContentTypeRadioInput(widgets.RadioInput):
+class ContentTypeRadioInput(widgets.RadioChoiceInput):
     def __init__(self, name, value, attrs, choice, index):
         super(ContentTypeRadioInput, self).__init__(name, value, attrs, choice, index)
         self.choice_label = format_html('<span class="label">{0}</span>', self.choice_label)
