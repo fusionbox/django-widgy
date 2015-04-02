@@ -63,8 +63,12 @@ class ContentTypeRadioInput(widgets.RadioChoiceInput):
         super(ContentTypeRadioInput, self).__init__(name, value, attrs, choice, index)
         self.choice_label = format_html('<span class="label">{0}</span>', self.choice_label)
 
-    def tag(self):
-        tag = super(ContentTypeRadioInput, self).tag()
+    def tag(self, attrs=None):
+        if attrs is None:
+            # BBB Django < 1.8 tag doesn't take any arguments
+            tag = super(ContentTypeRadioInput, self).tag()
+        else:
+            tag = super(ContentTypeRadioInput, self).tag(attrs)
         ct = ContentType.objects.get_for_id(self.choice_value)
         return format_html('<div class="previewImage {0} {1}"></div>{2}', ct.app_label, ct.model, tag)
 
