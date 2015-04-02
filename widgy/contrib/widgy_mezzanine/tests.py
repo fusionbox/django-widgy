@@ -18,6 +18,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib import admin
 from django.db.models.signals import post_save
 from django.conf.urls import url, include
+from django.core.urlresolvers import get_resolver
 
 from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
@@ -34,7 +35,10 @@ User = get_user_model()
 widgy_site = WidgySite()
 WidgyPage = get_widgypage_model()
 
-urlpatterns = __import__(settings.ROOT_URLCONF).urlpatterns + [url('^widgy_site/', include(widgy_site.urls))]
+# XXX: Let django import the urlconf module. Django does it smarter
+# FIXME: Don't monkeypatch urlpatterns
+urlpatterns = get_resolver(None).url_patterns
+urlpatterns += [url('^widgy_site/', include(widgy_site.urls))]
 
 FORM_BUILDER_INSTALLED = 'widgy.contrib.form_builder' in settings.INSTALLED_APPS
 
