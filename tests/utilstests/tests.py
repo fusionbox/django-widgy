@@ -1,8 +1,9 @@
 from itertools import izip_longest
 
 from django.test import TestCase
+from django.db import models
 
-from widgy.utils import html_to_plaintext, unset_pks
+from widgy.utils import html_to_plaintext, unset_pks, model_has_field
 
 from .models import Child
 
@@ -108,9 +109,34 @@ class HtmlToText(TestCase):
             'content'
         )
 
+
 class TestUnsetPks(TestCase):
     def test_unset_pks(self):
         obj = Child.objects.create()
         unset_pks(obj)
         self.assertIsNone(obj.foo)
         self.assertIsNone(obj.base_ptr_id)
+
+
+class FieldExistsModel(models.Model):
+    field_a = models.IntegerField()
+
+
+class ChildFieldExistsModel(FieldExistsModel):
+    field_b = models.IntegerField()
+
+
+class TestLinkField(TestCase):
+    def test_for_existing_field(self):
+        assert model_has_field(FieldExistsModel, 'field_a')
+
+    def test_for_non_existent_field(self):
+        assert not model_has_field(FieldExistsModel, 'does_not_exist')
+
+    def test_for_existing_field_on_child_model(self):
+        assert model_has_field(ChildFieldExistsModel, 'field_a')
+        assert model_has_field(ChildFieldExistsModel, 'field_b')
+
+    def test_for_non_existent_field_on_child_model(self):
+        assert not model_has_field(ChildFieldExistsModel, 'does_not_exist')
+        assert not model_has_field(ChildFieldExistsModel, 'does_not_exist')

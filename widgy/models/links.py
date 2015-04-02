@@ -10,6 +10,7 @@ from django import forms
 
 from widgy.generic import WidgyGenericForeignKey
 from widgy import BaseRegistry
+from widgy.utils import model_has_field
 
 
 class LinkRegistry(BaseRegistry):
@@ -77,12 +78,12 @@ class LinkField(WidgyGenericForeignKey):
 
         # do not do anything that loads the app cache here, like
         # _meta.get_all_field_names, or you'll cause a circular import.
-        if self.ct_field not in [i.name for i, _ in cls._meta.get_fields_with_model()]:
+        if not model_has_field(cls, self.ct_field):
             ct_field = models.ForeignKey(ContentType, related_name='+',
                                          null=self.null, editable=False)
             cls.add_to_class(self.ct_field, ct_field)
 
-        if self.fk_field not in [i.name for i, _ in cls._meta.get_fields_with_model()]:
+        if not model_has_field(cls, self.fk_field):
             fk_field = models.PositiveIntegerField(null=self.null,
                                                    editable=False)
             cls.add_to_class(self.fk_field, fk_field)

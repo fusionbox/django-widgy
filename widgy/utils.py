@@ -249,3 +249,19 @@ def unset_pks(obj):
     for field in obj._meta.fields:
         if field.primary_key:
             setattr(obj, field.attname, None)
+
+
+def model_has_field(cls, field_name):
+    """
+    Check if a field is already present on a model in a `safe` manner that does
+    not trigger or violate application loading.
+    """
+    exists = field_name in [f.name for f in cls._meta.local_fields]
+    if exists:
+        return exists
+    elif cls._meta.parents:
+        return any((
+            model_has_field(parent, field_name) for parent in cls._meta.parents.keys()
+        ))
+    else:
+        return False
