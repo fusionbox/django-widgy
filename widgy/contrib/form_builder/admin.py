@@ -25,7 +25,7 @@ class FormAdmin(admin.ModelAdmin):
     def download_url_name(self):
         return '{0}_{1}_download'.format(
             self.model._meta.app_label,
-            self.model._meta.module_name,
+            self.model._meta.model_name,
         )
 
     def get_urls(self, *args, **kwargs):

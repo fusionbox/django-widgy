@@ -609,7 +609,7 @@ class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Con
 
     @models.permalink
     def submission_url(self):
-        return ('admin:%s_%s_change' % (self._meta.app_label, self._meta.module_name),
+        return ('admin:%s_%s_change' % (self._meta.app_label, self._meta.model_name),
                 (self.pk,),
                 {})
 

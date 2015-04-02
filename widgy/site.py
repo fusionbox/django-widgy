@@ -164,7 +164,7 @@ class WidgySite(object):
         path = finders.find(filename)
         return bool(path)
 
-    def find_media_files(self, extension, hierarchy=['widgy/{app_label}/{module_name}{extension}']):
+    def find_media_files(self, extension, hierarchy=['widgy/{app_label}/{model_name}{extension}']):
         files = set()
         for widget in self.get_all_content_classes():
             files.update(widget.get_templates_hierarchy(
@@ -186,6 +186,6 @@ class WidgySite(object):
         return self.find_media_files(
             extension='.scss',
             hierarchy=[
-                'widgy/{app_label}/{module_name}.admin{extension}',
+                'widgy/{app_label}/{model_name}.admin{extension}',
                 'widgy/{app_label}/admin{extension}',
             ])

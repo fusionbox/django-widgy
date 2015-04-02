@@ -25,7 +25,7 @@ def get_content(orm, node):
 
 
 def get_node(orm, content):
-    ct = orm['contenttypes.ContentType'].objects.get(app_label=content._meta.app_label, model=content._meta.module_name)
+    ct = orm['contenttypes.ContentType'].objects.get(app_label=content._meta.app_label, model=content._meta.model_name)
     return orm['widgy.Node'].objects.get(content_type_id=ct.pk, content_id=content.pk)
 
 

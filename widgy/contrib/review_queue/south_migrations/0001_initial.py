@@ -8,7 +8,7 @@ from widgy.utils import get_user_model
 User = get_user_model()
 
 user_orm_label = '%s.%s' % (User._meta.app_label, User._meta.object_name)
-user_model_label = '%s.%s' % (User._meta.app_label, User._meta.module_name)
+user_model_label = '%s.%s' % (User._meta.app_label, User._meta.model_name)
 
 
 class Migration(SchemaMigration):

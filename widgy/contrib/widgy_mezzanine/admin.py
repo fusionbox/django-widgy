@@ -238,7 +238,7 @@ class UndeletePageAdminMixin(object):
         if resp.status_code == 302 and resp['Location'].startswith('../'):
             viewname = 'admin:%s_%s_change' % (
                 obj._meta.app_label,
-                obj._meta.module_name)
+                obj._meta.model_name)
             resp['Location'] = reverse(viewname, args=(quote(obj.pk),))
         return resp
 

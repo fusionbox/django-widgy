@@ -434,7 +434,7 @@ class Content(models.Model):
 
     def get_api_url(self, site):
         return site.reverse(site.content_view, kwargs={
-            'object_name': self._meta.module_name,
+            'object_name': self._meta.model_name,
             'app_label': self._meta.app_label,
             'object_pk': self.pk})
 
@@ -445,7 +445,7 @@ class Content(models.Model):
             '__class__': self.class_name,
             'css_classes': self.get_css_classes(),
             'component': self.component_name,
-            'model': self._meta.module_name,
+            'model': self._meta.model_name,
             'object_name': self._meta.object_name,
             'draggable': self.draggable,
             'deletable': self.deletable,
@@ -475,7 +475,7 @@ class Content(models.Model):
         :Returns: a json-able python object that represents the class type.
         """
         return {
-            '__class__': "%s.%s" % (cls._meta.app_label, cls._meta.module_name),
+            '__class__': "%s.%s" % (cls._meta.app_label, cls._meta.model_name),
             'title': capfirst(cls._meta.verbose_name),
             'css_classes': cls.get_class_css_classes(),
             'tooltip': cls.tooltip and force_text(cls.tooltip),
@@ -488,15 +488,15 @@ class Content(models.Model):
     @property
     def class_name(self):
         """
-        :Returns: a fully qualified classname including app_label and module_name
+        :Returns: a fully qualified classname including app_label and model_name
         """
-        return "%s.%s" % (self._meta.app_label, self._meta.module_name)
+        return "%s.%s" % (self._meta.app_label, self._meta.model_name)
 
     @classmethod
     def get_class_css_classes(cls):
         if hasattr(cls, 'css_classes'):
             return cls.css_classes
-        return (cls._meta.app_label, cls._meta.module_name)
+        return (cls._meta.app_label, cls._meta.model_name)
 
     def get_css_classes(self):
         if hasattr(self, 'css_classes'):
@@ -635,7 +635,7 @@ class Content(models.Model):
     @classmethod
     def get_templates_hierarchy(cls, **kwargs):
         templates = kwargs.get('hierarchy', (
-            'widgy/{app_label}/{module_name}/{template_name}{extension}',
+            'widgy/{app_label}/{model_name}/{template_name}{extension}',
             'widgy/{app_label}/{template_name}{extension}',
             'widgy/{template_name}{extension}',
         ))
@@ -658,7 +658,7 @@ class Content(models.Model):
     def get_template_kwargs(cls, **kwargs):
         defaults = {
             'app_label': cls._meta.app_label,
-            'module_name': cls._meta.module_name,
+            'model_name': cls._meta.model_name,
         }
         defaults.update(**kwargs)
 

@@ -171,7 +171,7 @@ class AdminViewMixin(object):
     def get_success_url(self):
         return urlresolvers.reverse('admin:{0}_{1}_change'.format(
             self.object._meta.app_label,
-            self.object._meta.module_name), args=(self.object.pk,))
+            self.object._meta.model_name), args=(self.object.pk,))
 
 
 class ClonePageView(AdminViewMixin, UpdateView):
