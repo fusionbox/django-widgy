@@ -1,16 +1,17 @@
 JS_FILES?=`find ./js_tests/tests -type f -name '*.js'`
+DJANGO_SETTINGS_MODULE?=tests.settings_contrib
 
 test: test-py test-js
 
 test-py:
-	cd tests && $(COVERAGE_COMMAND) ./runtests.py --verbosity=2 $(TESTS)
+	DJANGO_SETTINGS_MODULE=$(DJANGO_SETTINGS_MODULE) py.test $(PYTEST_OPTIONS)
 
 coverage:
-	+make test-py COVERAGE_COMMAND='coverage run --source=widgy'
-	cd tests && coverage html --omit='../widgy/migrations/*,../widgy/contrib/*/migrations/*'
+	+make test-py PYTEST_OPTIONS='--cov widgy'
+	coverage html --omit='widgy/*migrations/*,widgy/contrib/*/*migrations/*,'
 
 browser: coverage
-	sensible-browser tests/coverage_html/index.html
+	sensible-browser ./htmlcov/index.html
 
 js_tests/node_modules: js_tests/package.json
 	cd js_tests && npm install .
