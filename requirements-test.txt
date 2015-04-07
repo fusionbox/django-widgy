@@ -3,3 +3,4 @@ dj-database-url
 tox>=1.8.0
 pytest
 pytest-django
+pytest-cov
