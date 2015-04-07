@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import json
 from contextlib import contextmanager
 
@@ -5,8 +6,8 @@ from django.test import TestCase
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
 
-from modeltests.core_tests.models import Layout, RawTextWidget, Bucket
-from modeltests.core_tests.widgy_config import widgy_site
+from ..models import Layout, RawTextWidget, Bucket
+from ..widgy_config import widgy_site
 
 
 class RootNodeTestCase(TestCase):

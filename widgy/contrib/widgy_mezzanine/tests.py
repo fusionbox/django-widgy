@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import mock
 import datetime
 from contextlib import contextmanager
@@ -17,6 +18,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib import admin
 from django.db.models.signals import post_save
 from django.conf.urls import url, include
+from django.core.urlresolvers import get_resolver
 
 from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
@@ -33,7 +35,10 @@ User = get_user_model()
 widgy_site = WidgySite()
 WidgyPage = get_widgypage_model()
 
-urlpatterns = __import__(settings.ROOT_URLCONF).urlpatterns + [url('^widgy_site/', include(widgy_site.urls))]
+# XXX: Let django import the urlconf module. Django does it smarter
+# FIXME: Don't monkeypatch urlpatterns
+urlpatterns = get_resolver(None).url_patterns
+urlpatterns += [url('^widgy_site/', include(widgy_site.urls))]
 
 FORM_BUILDER_INSTALLED = 'widgy.contrib.form_builder' in settings.INSTALLED_APPS
 
@@ -342,11 +347,11 @@ class TestUnpublish(AdminView, TestCase):
         self.assertEqual(self.page.status, CONTENT_STATUS_DRAFT)
 
 
-class TestAdminButtonsBase(PageSetup, UserSetup):
+class AdminButtonsTestBase(PageSetup, UserSetup):
     urls = 'widgy.contrib.widgy_mezzanine.tests'
 
     def setUp(self):
-        super(TestAdminButtonsBase, self).setUp()
+        super(AdminButtonsTestBase, self).setUp()
         self.model_admin = WidgyPageAdmin(WidgyPage, admin.site)
 
     def test_save_and_commit_without_changes(self):
@@ -363,7 +368,7 @@ class TestAdminButtonsBase(PageSetup, UserSetup):
 
 @skipUnless(PAGE_BUILDER_INSTALLED, 'page_builder is not installed')
 @override_settings(WIDGY_MEZZANINE_SITE=widgy_site)
-class TestAdminButtons(TestAdminButtonsBase, TestCase):
+class TestAdminButtons(AdminButtonsTestBase, TestCase):
     def setUp(self):
         super(TestAdminButtons, self).setUp()
         self.client.login(username='superuser', password='password')
@@ -430,7 +435,7 @@ class TestAdminButtons(TestAdminButtonsBase, TestCase):
 
 
 @make_reviewed
-class TestAdminButtonsWhenReviewed(TestAdminButtonsBase, TestCase):
+class TestAdminButtonsWhenReviewed(AdminButtonsTestBase, TestCase):
     def test_save_and_commit(self):
         self.page.status = CONTENT_STATUS_DRAFT
         self.page.save()

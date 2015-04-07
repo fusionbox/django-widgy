@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import uuid
 
 from django.test import TestCase
@@ -5,8 +6,8 @@ from django.template import Template, Context
 
 from widgy.models import VersionTracker
 
-from modeltests.core_tests.widgy_config import widgy_site
-from modeltests.core_tests.models import (
+from ..widgy_config import widgy_site
+from ..models import (
     RawTextWidget, HasAWidgy, VersionedPage,
     MyInvisibleBucket, WeirdPkBucket
 )

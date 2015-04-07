@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import copy
 
 from django import forms
@@ -8,7 +9,7 @@ from widgy.models.links import (
     get_composite_key, convert_linkable_to_choice, LinkRegistry, LinkField
 )
 
-from modeltests.core_tests.models import (
+from ..models import (
     LinkableThing, ThingWithLink, AnotherLinkableThing, LinkableThing3,
     Bucket, VersionPageThrough, ChildThingWithLink
 )

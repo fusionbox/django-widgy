@@ -144,13 +144,13 @@ class HasAWidgy(models.Model):
         null=True,
         blank=True,
         root_choices=[Layout],
-        site='modeltests.core_tests.widgy_config.widgy_site',
+        site='tests.core_tests.widgy_config.widgy_site',
     )
 
 class HasAWidgyNonNull(models.Model):
     widgy = WidgyField(
         root_choices=[AnotherLayout],
-        site='modeltests.core_tests.widgy_config.widgy_site',
+        site='tests.core_tests.widgy_config.widgy_site',
     )
 
 
@@ -159,7 +159,7 @@ class HasAWidgyOnlyAnotherLayout(models.Model):
         null=True,
         blank=True,
         root_choices=[AnotherLayout],
-        site='modeltests.core_tests.widgy_config.widgy_site'
+        site='tests.core_tests.widgy_config.widgy_site'
     )
 
 
@@ -169,7 +169,7 @@ class UnregisteredLayout(Layout):
 
 class VersionedPage(models.Model):
     version_tracker = VersionedWidgyField(
-        site='modeltests.core_tests.widgy_config.widgy_site',
+        site='tests.core_tests.widgy_config.widgy_site',
         root_choices=[Layout, AnotherLayout],
         blank=True,
         null=True,
@@ -177,11 +177,16 @@ class VersionedPage(models.Model):
 
 
 class VersionedPage2(models.Model):
-    bar = VersionedWidgyField(site='modeltests.core_tests.widgy_config.widgy_site', related_name='asdf', null=True)
+    bar = VersionedWidgyField(
+        site='tests.core_tests.widgy_config.widgy_site',
+        related_name='asdf',
+        null=True
+    )
 
 
 class VersionedPage3(models.Model):
-    foo = VersionedWidgyField(site='modeltests.core_tests.widgy_config.widgy_site', related_name='+')
+    foo = VersionedWidgyField(
+        site='tests.core_tests.widgy_config.widgy_site', related_name='+')
 
 
 class VersionedPage4(models.Model):
@@ -189,7 +194,8 @@ class VersionedPage4(models.Model):
 
 
 class VersionPageThrough(models.Model):
-    widgy = VersionedWidgyField(site='modeltests.core_tests.widgy_config.widgy_site', related_name='+')
+    widgy = VersionedWidgyField(
+        site='tests.core_tests.widgy_config.widgy_site', related_name='+')
     page = models.ForeignKey(VersionedPage4)
 
 
@@ -252,7 +258,7 @@ class VariegatedFieldsWidget(Content):
 
 class ReviewedVersionedPage(models.Model):
     version_tracker = VersionedWidgyField(
-        site='modeltests.core_tests.widgy_config.widgy_site',
+        site='tests.core_tests.widgy_config.widgy_site',
         root_choices=[Layout, AnotherLayout],
         to='review_queue.ReviewedVersionTracker',
     )

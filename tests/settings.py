@@ -1,8 +1,8 @@
 import os
 import sys
-import excavator
 import dj_database_url
 import django
+import tempfile
 
 try:
     import six
@@ -33,10 +33,10 @@ INSTALLED_APPS = [
     "compressor",
     "argonauts",
     # tests modules
-    "modeltests.core_tests",
-    "modeltests.proxy_gfk",
-    "regressiontests.utilstests",
-    # tests/modeltests/core_tests/models::ReviewedVersionedPage has an fk to
+    "tests.core_tests",
+    "tests.proxy_gfk",
+    "tests.utilstests",
+    # tests/core_tests/models::ReviewedVersionedPage has an fk to
     # `review_queue.ReviewedVersionTracker`.  Until that test is moved into a
     # contrib test suite, that app neeeds to be installed.
     "widgy.contrib.review_queue",
@@ -46,7 +46,7 @@ if django.VERSION < (1, 7):
     INSTALLED_APPS.append("south")
 
 
-SOUTH_TESTS_MIGRATE = excavator.env_bool('SOUTH_TESTS_MIGRATE', default=False)
+SOUTH_TESTS_MIGRATE = os.environ.get('SOUTH_TESTS_MIGRATE', 'False').lower() in ('true', 'yes', 'y', '1')
 
 try:
     import easy_thumbnails
@@ -59,7 +59,6 @@ else:
         }
 
 URLCONF_INCLUDE_CHOICES = tuple()
-TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
@@ -79,13 +78,17 @@ def upath(path):
 RUNTESTS_DIR = os.path.dirname(upath(__file__))
 TEST_TEMPLATE_DIR = 'templates'
 
-TEMP_DIR = excavator.env_string('DJANGO_TEST_TEMP_DIR', required=True)
+# This directory is removed by /conftest.py
+TEMP_DIR = tempfile.mkdtemp(prefix='widgy_')
 
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'tests.urls'
+
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(TEMP_DIR, 'static')
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(TEMP_DIR, 'media')
+
 TEMPLATE_DIRS = (os.path.join(RUNTESTS_DIR, TEST_TEMPLATE_DIR),)
 USE_I18N = True
 LANGUAGE_CODE = 'en'
@@ -115,7 +118,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 # Widgy Settings
-WIDGY_MEZZANINE_SITE = 'modeltests.core_tests.widgy_config.widgy_site'
+WIDGY_MEZZANINE_SITE = 'tests.core_tests.widgy_config.widgy_site'
 
 DAISYDIFF_JAR_PATH = os.path.join(
     os.path.dirname(__file__), '..', 'bin', 'daisydiff', 'daisydiff.jar',
