@@ -1,3 +1,7 @@
+from django.contrib.auth.views import redirect_to_login
+from django.core.exceptions import PermissionDenied
+
+
 class WidgyViewMixin(object):
     site = None
 
@@ -13,6 +17,13 @@ class AuthorizedMixin(WidgyViewMixin):
     makes the call to auth, but conveniently wraps the errors to return them in
     JSON-encoded responses.
     """
-    def dispatch(self, *args, **kwargs):
-        self.auth(*args, **kwargs)
-        return super(AuthorizedMixin, self).dispatch(*args, **kwargs)
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.auth(request, *args, **kwargs)
+        except PermissionDenied:
+            if request.user.is_authenticated():
+                raise
+            else:
+                return redirect_to_login(request.get_full_path())
+        else:
+            return super(AuthorizedMixin, self).dispatch(request, *args, **kwargs)

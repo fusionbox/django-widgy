@@ -13,7 +13,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.core import urlresolvers
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission, AnonymousUser
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import admin
 from django.db.models.signals import post_save
@@ -36,9 +36,11 @@ widgy_site = WidgySite()
 WidgyPage = get_widgypage_model()
 
 # XXX: Let django import the urlconf module. Django does it smarter
-# FIXME: Don't monkeypatch urlpatterns
 urlpatterns = get_resolver(None).url_patterns
-urlpatterns += [url('^widgy_site/', include(widgy_site.urls))]
+urlpatterns = urlpatterns + [
+    url('^widgy_site/', include(widgy_site.urls)),
+    url('^accounts/', include('django.contrib.auth.urls')),
+]
 
 FORM_BUILDER_INSTALLED = 'widgy.contrib.form_builder' in settings.INSTALLED_APPS
 
@@ -218,6 +220,8 @@ class UserSetup(object):
     'mezzanine.pages.middleware.PageMiddleware',
 ))
 class TestPreviewView(UserSetup, TestCase):
+    urls = 'widgy.contrib.widgy_mezzanine.tests'
+
     def setUp(self):
         super(TestPreviewView, self).setUp()
         self.factory = RequestFactory()
@@ -263,6 +267,17 @@ class TestPreviewView(UserSetup, TestCase):
                 ),
                 status_code=301,
             )
+
+    def test_redirects_to_login(self):
+        """
+        Unauthenticated users trying to preview should be redirected to the login page.
+        """
+
+        button = Button.add_root(widgy_site, text='Button text')
+        request = self.factory.get('/')
+        request.user = AnonymousUser()
+        resp = self.preview_view(request, node_pk=button.node.pk)
+        self.assertEqual(resp['Location'], urlresolvers.reverse('login') + '?next=' + request.get_full_path())
 
 
 @skipUnless(PAGE_BUILDER_INSTALLED, 'page_builder is not installed')

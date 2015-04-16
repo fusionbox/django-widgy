@@ -538,7 +538,7 @@ class PermissionsTest(SwitchUserTestCase, RootNodeTestCase, HttpTestCase):
 
         def fail():
             resp = doit()
-            self.assertEqual(resp.status_code, 403)
+            self.assertIn(resp.status_code, (403, 302))
 
         def win():
             resp = doit()
