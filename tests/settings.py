@@ -92,7 +92,8 @@ MEDIA_ROOT = os.path.join(TEMP_DIR, 'media')
 TEMPLATE_DIRS = (os.path.join(RUNTESTS_DIR, TEST_TEMPLATE_DIR),)
 USE_I18N = True
 LANGUAGE_CODE = 'en'
-LOGIN_URL = 'django.contrib.auth.views.login'
+# BBB: Django 1.4 doesn't reverse LOGIN_URL
+LOGIN_URL = '/accounts/login/'
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
