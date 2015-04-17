@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.5.0 (unreleased)
+0.5.0 (2015-04-17)
 ------------------
 
 - **Backwards Incompatible** RichTextPage is no longer unregistered by default
