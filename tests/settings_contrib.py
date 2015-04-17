@@ -12,7 +12,6 @@ INSTALLED_APPS += [
     'mezzanine.generic',
     'mezzanine.pages',
     'mezzanine.forms',
-    'django.contrib.comments',
     'filebrowser_safe',
     'grappelli_safe',
     'filer',
@@ -22,6 +21,15 @@ INSTALLED_APPS += [
     'widgy.contrib.urlconf_include',
     'widgy.contrib.widgy_i18n',
 ]
+
+# XXX Mezzanine insists on having some version of django comments installed.
+try:
+    import django.contrib.comments
+except ImportError:
+    INSTALLED_APPS.append('django_comments')
+else:
+    INSTALLED_APPS.append('django.contrib.comments')
+
 
 
 TEMPLATE_CONTEXT_PROCESSORS += (
