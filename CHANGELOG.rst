@@ -4,7 +4,18 @@ Changelog
 0.5.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- **Backwards Incompatible** RichTextPage is no longer unregistered by default
+  in widgy_mezzanine. If you wish to unregister it, you can add the following
+  to your admin.py file::
+
+      from django.contrib import admin
+      from mezzanine.pages.models import RichTextPage
+      admin.site.unregister(RichTextPage)
+
+- Bugfix: Previously, the Widgy editor would break if CSRF_COOKIE_HTTPONLY was
+  set to True [#311]
+
+- Switched to py.test for testing. [#309]
 
 
 0.4.0 (2015-03-12)
