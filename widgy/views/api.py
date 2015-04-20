@@ -203,7 +203,7 @@ class ShelfView(WidgyView):
         we'll do it manually.
         """
         res = {}
-        for node, classes in obj.iteritems():
+        for node, classes in obj.items():
             res[node.get_api_url(site)] = [i.class_to_json(site) for i in classes]
         return res
 
@@ -211,7 +211,7 @@ class ShelfView(WidgyView):
     def get_compatibility_data(site, request, root_node):
         root_node.maybe_prefetch_tree()
         content_classes = site.get_all_content_classes()
-        content_classes = filter(partial(site.has_add_permission, request), content_classes)
+        content_classes = list(filter(partial(site.has_add_permission, request), content_classes))
         content_classes = root_node.filter_child_classes_recursive(site, content_classes)
         return ShelfView.serialize_content_classes(site, content_classes)
 

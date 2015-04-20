@@ -196,7 +196,7 @@ class WidgyFormMixin(object):
     def __init__(self, *args, **kwargs):
         super(WidgyFormMixin, self).__init__(*args, **kwargs)
 
-        for name, field in self.fields.iteritems():
+        for name, field in self.fields.items():
             if isinstance(field, WidgyFormField):
                 try:
                     value = getattr(self.instance, name)

@@ -1,3 +1,5 @@
+import six
+
 from django.db import models
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from django.db.models.loading import get_app
@@ -17,7 +19,7 @@ else:
 
 
 def get_site(site):
-    if isinstance(site, basestring):
+    if isinstance(site, six.string_types):
         return fancy_import(site)
     else:
         return site

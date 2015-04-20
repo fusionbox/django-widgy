@@ -16,7 +16,7 @@ from django.shortcuts import redirect
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils.functional import cached_property
-from django.utils.encoding import python_2_unicode_compatible, force_bytes
+from django.utils.encoding import python_2_unicode_compatible, force_bytes, force_text
 from django.template.defaultfilters import truncatechars
 from django.core.files import File
 from django.core.files.storage import default_storage
@@ -441,9 +441,9 @@ def friendly_uuid(uuid):
     A shortend version of a UUID to use when collisions are acceptable.
     The returned string will have 40 bits of entropy assuming a UUID4.
     """
-    result = base64.b32encode(hashlib.sha1(str(uuid)).digest()[:5]).lower()
+    result = base64.b32encode(hashlib.sha1(force_bytes(uuid)).digest()[:5]).lower()
     # avoid accidental profanity
-    return result.replace('e', '0').replace('o', '1').replace('u', '8').replace('i', '9')
+    return result.replace(b'e', b'0').replace(b'o', b'1').replace(b'u', b'8').replace(b'i', b'9')
 
 
 @widgy.register
@@ -681,7 +681,7 @@ class FormField(StrDisplayNameMixin, BaseFormField):
         to store in the db. The return value with also be used in the
         CSV download of form data.
         """
-        return unicode(value)
+        return force_text(value)
 
     @property
     def widget_attrs(self):
@@ -993,7 +993,7 @@ class FormSubmission(models.Model):
                 form_ident=form.ident,
             )
 
-            for name, field in form.get_fields().iteritems():
+            for name, field in form.get_fields().items():
                 value = field.serialize_value(data[name])
                 submission.values.create(
                     field_node=field.node,

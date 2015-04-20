@@ -3,6 +3,7 @@ import copy
 from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.encoding import python_2_unicode_compatible
 from django.db.models.deletion import ProtectedError
 from django.conf import settings
 from django.template.defaultfilters import date as date_format
@@ -12,6 +13,7 @@ from widgy.models.base import Node
 from widgy.utils import QuerySet, unset_pks
 
 
+@python_2_unicode_compatible
 class VersionCommit(models.Model):
     tracker = models.ForeignKey('VersionTracker', related_name='commits')
     parent = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT)
@@ -29,7 +31,7 @@ class VersionCommit(models.Model):
     def is_published(self):
         return self.publish_at <= timezone.now()
 
-    def __unicode__(self):
+    def __str__(self):
         if self.message:
             subject = " - '%s'" % self.message.strip().split('\n')[0]
         else:

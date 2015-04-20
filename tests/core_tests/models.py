@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from widgy.models import Content
 from widgy.db.fields import WidgyField, VersionedWidgyField
 from widgy import registry
+from django.utils.encoding import python_2_unicode_compatible
 
 from widgy.models import links
 from widgy.models.mixins import InvisibleMixin
@@ -41,10 +42,11 @@ class Bucket(Content):
         verbose_name = _("bucket")
 
 
+@python_2_unicode_compatible
 class RawTextWidget(Content):
     text = models.TextField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.text
 
     def render(self, context):
@@ -210,10 +212,11 @@ registry.register(ForeignKeyWidget)
 
 
 @links.register
+@python_2_unicode_compatible
 class LinkableThing(models.Model):
     name = models.CharField(max_length=255, default='')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 

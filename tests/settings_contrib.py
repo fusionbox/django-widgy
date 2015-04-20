@@ -1,4 +1,4 @@
-from settings import *
+from .settings import *
 
 
 PACKAGE_NAME_FILEBROWSER = "filebrowser_safe"

@@ -274,7 +274,7 @@ def copy_call_args(mock):
     new_mock = mock.Mock()
     def side_effect(*args, **kwargs):
         new_args = tuple(copy.copy(i) for i in args)
-        new_kwargs = dict((k, copy.copy(v)) for k, v in kwargs.iteritems())
+        new_kwargs = dict((k, copy.copy(v)) for k, v in kwargs.items())
         new_mock(*new_args, **new_kwargs)
         return mock.DEFAULT
     mock.side_effect = side_effect

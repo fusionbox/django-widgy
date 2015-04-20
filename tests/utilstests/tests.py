@@ -1,4 +1,4 @@
-from itertools import izip_longest
+from six.moves import zip_longest
 
 from django.test import TestCase
 from django.db import models
@@ -12,7 +12,7 @@ class HtmlToText(TestCase):
 
     def assertContainsSameWords(self, string1, string2):
         try:
-            for w1, w2 in izip_longest(string1.split(), string2.split(), fillvalue=''):
+            for w1, w2 in zip_longest(string1.split(), string2.split(), fillvalue=''):
                 self.assertEqual(w1, w2)
         except AssertionError:
             raise AssertionError("%r does not contain the same words as %r" % (string1,

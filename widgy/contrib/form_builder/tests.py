@@ -235,9 +235,9 @@ class TestForm(TestCase):
 
         letters_dict, numbers_dict = list(FormSubmission.objects.as_ordered_dictionaries(field_name_order))
 
-        self.assertEqual(letters_dict.keys(), field_name_order)
-        self.assertEqual(letters_dict.values(), [first, 'c', 'a', 'b'])
-        self.assertEqual(numbers_dict.values(), [second, '3', '1', '2'])
+        self.assertEqual(list(letters_dict.keys()), field_name_order)
+        self.assertEqual(list(letters_dict.values()), [first, 'c', 'a', 'b'])
+        self.assertEqual(list(numbers_dict.values()), [second, '3', '1', '2'])
 
     def test_parent_form(self):
         for field in self.fields:

@@ -25,7 +25,7 @@ def monkey_patch():
     Monkey patch in our own, instrumented, get_templates_hierarchy. Make
     sure to keep it a classmethod.
     """
-    old_get_templates_hierarchy_unbound = Content.get_templates_hierarchy.im_func
+    old_get_templates_hierarchy_unbound = Content.get_templates_hierarchy
 
     def new_get_templates_hierarchy(cls, **kwargs):
         res = old_get_templates_hierarchy_unbound(cls, **kwargs)

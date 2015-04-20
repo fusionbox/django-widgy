@@ -1,12 +1,14 @@
 import copy
 from operator import or_
 import itertools
+from six.moves import reduce
 
 from django.db import models
 from django.db.models.fields import Field
 from django.contrib.contenttypes.models import ContentType
 from django.template.defaultfilters import capfirst
 from django import forms
+from django.utils.encoding import force_text
 
 from widgy.generic import WidgyGenericForeignKey
 from widgy import BaseRegistry
@@ -106,9 +108,9 @@ def convert_linkable_to_choice(linkable):
     key = get_composite_key(linkable)
 
     try:
-        value = u'%s (%s)' % (unicode(linkable), linkable.get_absolute_url())
+        value = u'%s (%s)' % (force_text(linkable), linkable.get_absolute_url())
     except AttributeError:
-        value = unicode(linkable)
+        value = force_text(linkable)
 
     return (key, value)
 

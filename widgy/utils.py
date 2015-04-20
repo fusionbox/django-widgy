@@ -2,9 +2,10 @@
 Some utility functions used throughout the project.
 """
 import warnings
-from itertools import ifilterfalse
+from six.moves import filterfalse
 from contextlib import contextmanager
 from functools import wraps
+import six
 
 import bs4
 
@@ -74,7 +75,7 @@ def fancy_import(name):
     and turns it into the accounts.models.ProxyUser object.
     """
     import_path, import_me = name.rsplit('.', 1)
-    imported = __import__(import_path, globals(), locals(), [import_me], -1)
+    imported = __import__(import_path, globals(), locals(), [import_me])
     return getattr(imported, import_me)
 
 
@@ -104,7 +105,7 @@ def html_to_plaintext(html):
             pass
         else:
             for c in node.children:
-                if isinstance(c, unicode):
+                if isinstance(c, six.string_types):
                     if not isinstance(c, bs4.Comment):
                         yield c.strip()
                 elif isinstance(c, bs4.Tag):
@@ -130,7 +131,7 @@ def unique_everseen(iterable, key=None):
     seen = set()
     seen_add = seen.add
     if key is None:
-        for element in ifilterfalse(seen.__contains__, iterable):
+        for element in filterfalse(seen.__contains__, iterable):
             seen_add(element)
             yield element
     else:

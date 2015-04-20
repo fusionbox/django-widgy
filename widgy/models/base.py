@@ -15,7 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.template import RequestContext
 from django.contrib.admin import widgets
 from django.template.defaultfilters import capfirst
-from django.utils.encoding import force_text
+from django.utils.encoding import force_text, python_2_unicode_compatible
 
 from treebeard.mp_tree import MP_Node
 
@@ -45,6 +45,7 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 }
 
 
+@python_2_unicode_compatible
 class Node(MP_Node):
     """
     Instances of this class maintain the Materialized Path tree structure that
@@ -70,8 +71,8 @@ class Node(MP_Node):
         app_label = 'widgy'
         unique_together = [('content_type', 'content_id')]
 
-    def __unicode__(self):
-        return unicode(self.content)
+    def __str__(self):
+        return force_text(self.content)
 
     def to_json(self, site):
         children = [c.to_json(site) for c in self.get_children()]
@@ -177,7 +178,7 @@ class Node(MP_Node):
             contents[node.content_type_id].add(node.content_id)
 
         # Convert that mapping to content_types -> Content instances
-        for content_type_id, content_ids in contents.iteritems():
+        for content_type_id, content_ids in contents.items():
             try:
                 ct = ContentType.objects.get_for_id(content_type_id)
                 model_class = ct.model_class()
@@ -190,7 +191,7 @@ class Node(MP_Node):
                 ct = ContentType.objects.get(id=content_type_id)
                 contents[content_type_id] = dict((id, UnknownWidget(ct, id)) for id in content_ids)
                 # Warn about using an UnknownWidget. It doesn't matter which instance we use.
-                next(contents[content_type_id].itervalues(), UnknownWidget(ct, None)).warn()
+                next(iter(contents[content_type_id].values()), UnknownWidget(ct, None)).warn()
         return contents
 
     @classmethod
@@ -258,9 +259,9 @@ class Node(MP_Node):
         """
 
         validator = partial(site.validate_relationship, self.content)
-        return filter(
+        return list(filter(
             exception_to_bool(validator, ParentChildRejection),
-            classes)
+            classes))
 
     def filter_child_classes_recursive(self, site, classes):
         """
@@ -484,7 +485,7 @@ class Content(models.Model):
 
     @property
     def display_name(self):
-        return unicode(self._meta.verbose_name)
+        return force_text(self._meta.verbose_name)
 
     @property
     def class_name(self):

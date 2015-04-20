@@ -1,10 +1,11 @@
-Django>=1.4.0,<1.5.0
-South>=1.0
+Django>=1.7
 Werkzeug
 django-debug-toolbar>=1.0.0
 django-extensions
 django-require
-Mezzanine>=3.1.2
 pyScss>=1.2.0
 Sphinx==1.2.2
+Mezzanine>=3.1.10
 mock==1.0.1
+# not ours, but really mezzanine's
+django-contrib-comments

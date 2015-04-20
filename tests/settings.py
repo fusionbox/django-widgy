@@ -52,7 +52,7 @@ try:
 except ImportError:
     pass
 else:
-    if easy_thumbnails.VERSION >= 2:
+    if easy_thumbnails.VERSION >= (2, 0):
         SOUTH_MIGRATION_MODULES = {
             'easy_thumbnails': 'easy_thumbnails.south_migrations',
         }

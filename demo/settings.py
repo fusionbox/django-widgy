@@ -33,7 +33,7 @@ INSTALLED_APPS = (
     'mezzanine.core',
     'mezzanine.generic',
     'mezzanine.pages',
-    'django.contrib.comments',
+    'django_comments',
     'filebrowser_safe',
     'grappelli_safe',
 
