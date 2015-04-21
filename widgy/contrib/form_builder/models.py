@@ -5,6 +5,7 @@ import urllib
 import base64
 import hashlib
 import os.path
+import six
 
 from django.db import models
 from django import forms
@@ -977,10 +978,15 @@ class FormSubmission(models.Model):
 
             writer = csv.DictWriter(output, list(headers))
 
-            def encode(d):
-                return dict(
-                    (k, force_bytes(v)) for k, v in d.items()
-                )
+            # python2 csv expects bytes, but python3's works in unicode
+            if six.PY2:
+                def encode(d):
+                    return dict(
+                        (k, force_bytes(v)) for k, v in d.items()
+                    )
+            else:
+                def encode(d):
+                    return d
 
             writer.writerow(encode(headers))
 
