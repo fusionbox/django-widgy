@@ -4,10 +4,7 @@ import dj_database_url
 import django
 import tempfile
 
-try:
-    import six
-except ImportError:
-    from django.utils import six
+import six
 
 DATABASES = {'default': dj_database_url.config(default='sqlite:///test_db.sqlite3')}
 
