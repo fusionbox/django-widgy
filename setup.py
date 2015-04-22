@@ -30,7 +30,7 @@ def read(fname):
 # <https://bitbucket.org/pypa/setuptools/issue/196/tests_require-pytest-pytest-cov-breaks>.
 install_requires = [
     'django-treebeard',
-    'django-pyscss',
+    'django-pyscss>=2.0.0',
     'six',
     'django-compressor>=1.3',
     'beautifulsoup4',

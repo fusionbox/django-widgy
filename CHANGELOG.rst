@@ -4,7 +4,10 @@ Changelog
 0.6.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- **Possible Breaking Change** Updated the django-pyscss_ dependency. Please
+  see the `django-pyscss changelog
+  <https://pypi.python.org/pypi/django-pyscss/2.0.0#changelog>`_ for
+  documentation on how/if you need to change anything.
 
 
 0.5.0 (2015-04-17)
