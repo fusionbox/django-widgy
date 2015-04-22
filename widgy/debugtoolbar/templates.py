@@ -1,3 +1,5 @@
+import six
+
 from django.dispatch import Signal
 from django.template.loader import select_template, TemplateDoesNotExist
 from django.contrib.staticfiles import finders
@@ -25,7 +27,12 @@ def monkey_patch():
     Monkey patch in our own, instrumented, get_templates_hierarchy. Make
     sure to keep it a classmethod.
     """
-    old_get_templates_hierarchy_unbound = Content.get_templates_hierarchy
+    # We need to get the unbound class method here. The bound method will use
+    # the MRO of Content, which might not be the same as subclasses of Content.
+    # The MRO above Content doesn't actually matter (it currently doesn't call
+    # super), but if it did, using the bound classmethod here would mean that
+    # the MRO stops at Content.
+    old_get_templates_hierarchy_unbound = six.get_method_function(Content.get_templates_hierarchy)
 
     def new_get_templates_hierarchy(cls, **kwargs):
         res = old_get_templates_hierarchy_unbound(cls, **kwargs)
