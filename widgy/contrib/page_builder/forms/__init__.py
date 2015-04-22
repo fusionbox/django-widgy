@@ -7,7 +7,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 
 import bleach
-from django_pyscss.scss import DjangoScss
+from django_pyscss import DjangoScssCompiler
 
 
 PAGEDOWN_EDITOR_TEMPLATE = u'''
@@ -18,8 +18,8 @@ PAGEDOWN_EDITOR_TEMPLATE = u'''
 
 
 def scss_compile(scss_filename):
-    scss = DjangoScss()
-    css_content = scss.compile(scss_file=scss_filename)
+    scss = DjangoScssCompiler()
+    css_content = scss.compile(scss_filename)
     return css_content
 
 
