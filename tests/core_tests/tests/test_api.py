@@ -335,17 +335,12 @@ class PermissionsTest(SwitchUserTestCase, RootNodeTestCase, HttpTestCase):
 
         fail()  # not logged in
 
-        with self.logged_in() as user:
-            resp = doit()  # not staff
-            self.assertEqual(resp.status_code, 200)
-            data = json.loads(resp.content)
-            self.assertEqual(data, {self.root_node.get_api_url(self.widgy_site): []})
-
         with self.as_staffuser() as user:
             resp = doit()  # staff, no permissions
             self.assertEqual(resp.status_code, 200)
             data = json.loads(resp.content)
             self.assertCompatibilityNotContains('core_tests.bucket', data)
+            self.assertEqual(data, {self.root_node.get_api_url(self.widgy_site): []})
 
         with self.as_staffuser() as user:
             with self.with_permission(user, 'add', Bucket):
@@ -545,3 +540,12 @@ class PermissionsTest(SwitchUserTestCase, RootNodeTestCase, HttpTestCase):
             self.assertEqual(resp.status_code, 200)
 
         self.as_different_types_of_user(('change', Node), fail, win)
+
+    def test_node_edit_view_staff_only(self):
+        bucket = self.root_node.content.add_child(self.widgy_site, PickyBucket)
+        bucket.editable = True
+        url = bucket.to_json(self.widgy_site)['edit_url']
+        with self.logged_in():
+            with self.with_permission(self.user, 'change', bucket.node):
+                response =  self.client.get(url)
+        self.assertEqual(response.status_code, 403)

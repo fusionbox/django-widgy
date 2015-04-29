@@ -8,6 +8,15 @@ Changelog
   see the `django-pyscss changelog
   <https://pypi.python.org/pypi/django-pyscss/2.0.0#changelog>`_ for
   documentation on how/if you need to change anything.
+- By default, Widgy views are restricted to staff members. Previously any
+  authenticated user was allowed. This effects the preview view and pop out
+  edit view, among others. If you were relying on the ability for any user to
+  access those, override ``authorize_view`` in your ``WidgySite``. ::
+
+    class MyWidgySite(WidgySite):
+        def authorize_view(self, request, view):
+            if not request.user.is_authenticated()
+                raise PermissionDenied
 
 
 0.5.0 (2015-04-17)

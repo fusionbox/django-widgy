@@ -69,7 +69,7 @@ class WidgySite(object):
         return reverse(*args, **kwargs)
 
     def authorize_view(self, request, view):
-        if not request.user.is_authenticated():
+        if not (request.user.is_authenticated() and request.user.is_staff):
             raise PermissionDenied
 
     def has_add_permission(self, request, content_class):

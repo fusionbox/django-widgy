@@ -227,7 +227,7 @@ class TestPreviewView(UserSetup, TestCase):
         self.factory = RequestFactory()
         self.preview_view = PreviewView.as_view(site=widgy_site)
         self.request = self.factory.get('/')
-        self.request.user = User(is_superuser=True)
+        self.request.user = User(is_superuser=True, is_staff=True)
 
     def test_preview(self):
         page = WidgyPage.objects.create(title='Test')
