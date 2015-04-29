@@ -28,7 +28,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
-    'mezzanine.boot',
     'mezzanine.conf',
     'mezzanine.core',
     'mezzanine.generic',

@@ -14,7 +14,6 @@ Install the Widgy package::
 
 Add Mezzanine apps to ``INSTALLED_APPS``::
 
-        'mezzanine.boot',
         'mezzanine.conf',
         'mezzanine.core',
         'mezzanine.generic',

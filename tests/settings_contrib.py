@@ -6,7 +6,6 @@ PACKAGE_NAME_GRAPPELLI = "grappelli_safe"
 GRAPPELLI_INSTALLED = True
 
 INSTALLED_APPS += [
-    'mezzanine.boot',
     'mezzanine.conf',
     'mezzanine.core',
     'mezzanine.generic',
