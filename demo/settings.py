@@ -204,3 +204,4 @@ WIDGY_MEZZANINE_SITE = 'demo.widgysite.widgy_site'
 
 
 DATABASE_ENGINE = DATABASES['default']['ENGINE']
+LOGIN_URL = '/admin/'

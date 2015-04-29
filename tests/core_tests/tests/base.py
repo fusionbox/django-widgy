@@ -20,12 +20,11 @@ class HttpTestCase(TestCase):
     def setUp(self):
         super(HttpTestCase, self).setUp()
 
-        u = User.objects.create_user(
+        u = User.objects.create_superuser(
             username='testuser',
             email='asdf@example.com',
             password='asdfasdf',
         )
-        u.is_superuser = True
         u.save()
         self.client.login(username=u.username, password='asdfasdf')
         self.user = u
