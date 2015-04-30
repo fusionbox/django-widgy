@@ -4,6 +4,8 @@ Changelog
 0.6.0 (unreleased)
 ------------------
 
+- Improved the compatibility error messages [#299, #193]
+- Remove the recommendation to use mezzanine.boot as it was not required [#291]
 - **Possible Breaking Change** Updated the django-pyscss_ dependency. Please
   see the `django-pyscss changelog
   <https://pypi.python.org/pypi/django-pyscss/2.0.0#changelog>`_ for
@@ -11,7 +13,7 @@ Changelog
 - By default, Widgy views are restricted to staff members. Previously any
   authenticated user was allowed. This effects the preview view and pop out
   edit view, among others. If you were relying on the ability for any user to
-  access those, override ``authorize_view`` in your ``WidgySite``. ::
+  access those, override ``authorize_view`` in your ``WidgySite``. [#267]::
 
     class MyWidgySite(WidgySite):
         def authorize_view(self, request, view):
