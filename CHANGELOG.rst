@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.6.0 (unreleased)
+0.6.0 (2015-04-30)
 ------------------
 
 - Improved the compatibility error messages [#299, #193]
