@@ -180,7 +180,7 @@ class WidgySite(object):
                 hierarchy=hierarchy,
                 extension=extension,
             ))
-        return filter(self.filter_existing_staticfiles, files)
+        return sorted(filter(self.filter_existing_staticfiles, files))
 
     @cached_property
     def scss_files(self):
