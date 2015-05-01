@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.6.1 (unreleased)
+0.6.1 (2015-05-01)
 ------------------
 
 - Fix non-determinism bug with find_media_files.
