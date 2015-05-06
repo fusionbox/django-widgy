@@ -12,7 +12,7 @@ Install the Widgy package::
 
     pip install django-widgy[all]
 
-Add Mezzanine apps to ``INSTALLED_APPS``::
+Add Mezzanine apps to ``INSTALLED_APPS`` in ``settings.py``::
 
         'mezzanine.conf',
         'mezzanine.core',
@@ -42,7 +42,7 @@ add required Widgy apps to ``INSTALLED_APPS``::
 ``django.contrib.admin`` should be installed after Mezzanine and Widgy,
 so move it under them in ``INSTALLED_APPS``.
 
-add Mezzanine middleware::
+add Mezzanine middleware to ``MIDDLEWARE_CLASSES``::
 
         'mezzanine.core.request.CurrentRequestMiddleware',
         'mezzanine.core.middleware.AdminLoginInterfaceSelectorMiddleware',
@@ -50,6 +50,7 @@ add Mezzanine middleware::
 
 Mezzanine settings::
 
+    # settings.py
     PACKAGE_NAME_FILEBROWSER = "filebrowser_safe"
     PACKAGE_NAME_GRAPPELLI = "grappelli_safe"
     ADMIN_MEDIA_PREFIX = STATIC_URL + "grappelli/"
@@ -59,7 +60,7 @@ Mezzanine settings::
 
 If you want mezzanine to use
 :class:`~widgy.contrib.widgy_mezzanine.models.WidgyPage` as the default page,
-you can add the following line to your settings file::
+you can add the following line to ``settings.py``::
 
     ADD_PAGE_ORDER = (
         'widgy_mezzanine.WidgyPage',
@@ -67,9 +68,10 @@ you can add the following line to your settings file::
 
 add Mezzanine's context processors. If you don't already have
 ``TEMPLATE_CONTEXT_PROCESSORS`` in your settings file, you should copy the
-default before add Mezzanine's::
+default before adding Mezzanine's::
 
     TEMPLATE_CONTEXT_PROCESSORS = (
+        # Defaults
         "django.contrib.auth.context_processors.auth",
         "django.contrib.messages.context_processors.messages",
         "django.core.context_processors.debug",
@@ -77,6 +79,7 @@ default before add Mezzanine's::
         "django.core.context_processors.static",
         "django.core.context_processors.media",
         "django.core.context_processors.request",
+	# Mezzanine
         "mezzanine.conf.context_processors.settings",
         "mezzanine.pages.context_processors.page",
     )
@@ -96,6 +99,7 @@ make a :class:`Widgy site <widgy.site.WidgySite>` and set it in settings::
 
 Configure django-compressor::
 
+    # settings.py
     STATICFILES_FINDERS = (
         'compressor.finders.CompressorFinder',
         'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -132,6 +136,7 @@ Then run the following command::
 
 add urls::
 
+    # urls.py
     from django.conf.urls import patterns, include, url
     from demo.widgy_site import site as widgy_site
 
@@ -181,6 +186,7 @@ Admin center
 
 A nice ``ADMIN_MENU_ORDER``::
 
+    # settings.py
     ADMIN_MENU_ORDER = [
         ('Widgy', (
             'pages.Page',
@@ -200,7 +206,7 @@ urlpatterns in the Mezzanine page tree. To use it, put it in
 
         'widgy.contrib.urlconf_include',
 
-then add ``urlconf_include`` middleware,::
+then add the ``urlconf_include`` middleware,::
 
         'widgy.contrib.urlconf_include.middleware.PatchUrlconfMiddleware',
 
