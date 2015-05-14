@@ -89,7 +89,7 @@ class WidgySite(object):
         if isinstance(obj_or_class, type):
             return has_perm(obj_or_class)
         else:
-            return all(map(has_perm, obj_or_class.depth_first_order()))
+            return all(has_perm(o) for o in obj_or_class.depth_first_order())
 
     # These must return the same instance throughout the whole lifetime
     # of the widgy site for reverse to work.
