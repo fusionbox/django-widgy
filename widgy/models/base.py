@@ -727,7 +727,7 @@ class Content(models.Model):
 
         If kwargs are given, they're passed to the form Field's constructor.
         """
-        request = kwargs.pop("request", None)
+        request = kwargs.pop("request")
         formfield = db_field.formfield(**kwargs)
 
         if formfield and isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
