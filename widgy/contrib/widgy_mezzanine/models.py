@@ -6,6 +6,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.db.models.signals import post_migrate
 from django.db import transaction
 
+from mezzanine.core.request import current_request
 from mezzanine.pages.managers import PageManager
 from mezzanine.pages.models import Link, Page
 from mezzanine.utils.sites import current_site_id
@@ -67,6 +68,23 @@ class PageSelectRelatedManager(SelectRelatedManager, PageManager):
     WidgyPage's manager must be a PageManager.
     """
     use_for_related_fields = True
+
+    def get_widgy_owners(self, item):
+        user = current_request().user
+
+        # We want owners from all sites. But CurrentSiteManager.get_queryset() filters by
+        # the current site. Unfortunately, there's no way to hook into the mro() in
+        # order to skip CurrentSiteManager.get_queryset().
+        qs = models.QuerySet(model=self.model).filter(root_node=item)
+
+        # Limit Pages to pages the users has access to
+        if not user.is_superuser:
+            qs = qs.filter(site__sitepermission__user=user)
+
+        # XXX: Copy/pasted from SelectRelatedManager
+        qs = qs.select_related(*self.select_related).prefetch_related(*self.prefetch_related)
+
+        return qs
 
 widgy.unregister(CalloutWidget)
 

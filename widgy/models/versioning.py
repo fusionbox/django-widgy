@@ -193,9 +193,18 @@ class VersionTracker(models.Model):
 
     @cached_property
     def owners(self):
-        return list(owner
-                    for attr in self.get_owner_related_names()
-                    for owner in getattr(self, attr).all())
+        acc = []
+        for attr in self.get_owner_related_names():
+            manager = getattr(self, attr)
+
+            # If the manager has a get_widgy_owners() method, use this.
+            # Otherwise, just fall back to to all()
+            if hasattr(manager, 'get_widgy_owners'):
+                acc.extend(manager.get_widgy_owners(self))
+            else:
+                acc.extend(manager.all())
+
+        return acc
 
     def clone(self):
         vt = copy.copy(self)

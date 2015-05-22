@@ -12,7 +12,9 @@ from django.utils import timezone
 from django.contrib import messages
 from django.db.models.signals import post_save
 from django.db.models import Min, Q
+from django.contrib.sites.models import Site
 
+from mezzanine.utils.sites import current_site_id
 from mezzanine.pages.admin import PageAdmin
 try:
     from mezzanine.pages.admin import PageAdminForm
@@ -304,11 +306,22 @@ def publish_page_on_approve(sender, instance, created, **kwargs):
 
 if REVIEW_QUEUE_INSTALLED:
     from widgy.contrib.review_queue.admin import VersionCommitAdminBase
-    from widgy.contrib.review_queue.models import ReviewedVersionCommit
+    from widgy.contrib.review_queue.models import ReviewedVersionCommit, ReviewedVersionTracker
 
     class VersionCommitAdmin(VersionCommitAdminBase):
         def get_site(self):
             return get_site(settings.WIDGY_MEZZANINE_SITE)
+
+        def get_queryset(self, request):
+            qs = super(VersionCommitAdmin, self).get_queryset(request)
+
+            if not request.user.is_superuser:
+                sites = Site.objects.filter(sitepermission__user=request.user)
+                qs = qs.filter(
+                    tracker__in=ReviewedVersionTracker.objects.filter(widgypage__site__in=sites)
+                )
+
+            return qs
 
     admin.site.register(ReviewedVersionCommit, VersionCommitAdmin)
 
