@@ -363,7 +363,7 @@ class TestUnpublish(AdminView, TestCase):
 
 
 class AdminButtonsTestBase(PageSetup, UserSetup):
-    urls = 'widgy.contrib.widgy_mezzanine.tests'
+    urls = 'widgy.contrib.widgy_mezzanine.tests.test_core'
 
     def setUp(self):
         super(AdminButtonsTestBase, self).setUp()
@@ -529,7 +529,7 @@ class TestAdminButtonsWhenReviewed(AdminButtonsTestBase, TestCase):
 
 
 class TestAdminMessages(PageSetup, TestCase):
-    urls = 'widgy.contrib.widgy_mezzanine.tests'
+    urls = 'widgy.contrib.widgy_mezzanine.tests.test_core'
 
     def setUp(self):
         super(TestAdminMessages, self).setUp()
