@@ -14,7 +14,6 @@ from django.db.models.signals import post_save
 from django.db.models import Min, Q
 from django.contrib.sites.models import Site
 
-from mezzanine.utils.sites import current_site_id
 from mezzanine.pages.admin import PageAdmin
 try:
     from mezzanine.pages.admin import PageAdminForm
