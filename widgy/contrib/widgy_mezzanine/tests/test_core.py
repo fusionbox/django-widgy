@@ -51,7 +51,7 @@ if FORM_BUILDER_INSTALLED:
 PAGE_BUILDER_INSTALLED = 'widgy.contrib.page_builder' in settings.INSTALLED_APPS
 
 if PAGE_BUILDER_INSTALLED:
-    from widgy.contrib.page_builder.models import Button, DefaultLayout
+    from widgy.contrib.page_builder.models import Button, DefaultLayout, MainContent
     from widgy.contrib.widgy_mezzanine.views import PreviewView
 
 REVIEW_QUEUE_INSTALLED = 'widgy.contrib.review_queue' in settings.INSTALLED_APPS
@@ -205,7 +205,7 @@ class UserSetup(object):
         self.staffuser.is_staff = True
         self.staffuser.save()
         self.staffuser.user_permissions = Permission.objects.filter(
-            content_type__app_label__in=['pages', 'widgy_mezzanine', 'review_queue']
+            content_type__app_label__in=['pages', 'widgy_mezzanine', 'review_queue', 'page_builder']
         ).exclude(codename='change_reviewedversioncommit')
 
     @contextmanager
@@ -286,11 +286,11 @@ class PageSetup(object):
         super(PageSetup, self).setUp()
         self.factory = RequestFactory()
 
-        site = get_site(getattr(settings, 'WIDGY_MEZZANINE_SITE', widgy_site))
+        self.widgy_site = get_site(getattr(settings, 'WIDGY_MEZZANINE_SITE', widgy_site))
 
         self.page = WidgyPage.objects.create(
-            root_node=site.get_version_tracker_model().objects.create(
-                working_copy=Button.add_root(site, text='buttontext').node,
+            root_node=self.widgy_site.get_version_tracker_model().objects.create(
+                working_copy=MainContent.add_root(self.widgy_site).node,
             ),
             title='titleabc',
             slug='slugabc',
@@ -322,6 +322,9 @@ class TestClonePage(AdminView, TestCase):
         self.assertNotIn(self.page.slug, resp.rendered_content)
 
     def test_post(self):
+        self.page.root_node.working_copy.content.add_child(
+            self.widgy_site, Button, text='buttontext')
+
         view = self.as_view(model=WidgyPage)
         with mock.patch('django.contrib.messages.success') as success_mock:
             req = self.factory.post('/', {'title': 'new title'})
@@ -338,7 +341,8 @@ class TestClonePage(AdminView, TestCase):
         self.assertNotEqual(new_page.slug, self.page.slug)
         self.assertEqual(new_page.title, 'new title')
 
-        self.assertEqual(new_page.root_node.working_copy.content.text, 'buttontext')
+        button = new_page.root_node.working_copy.content.get_children()[0]
+        self.assertEqual(button.text, 'buttontext')
 
 
 class TestUnpublish(AdminView, TestCase):
