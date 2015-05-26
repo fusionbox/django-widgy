@@ -122,8 +122,8 @@ class CommitView(PopupView, AuthorizedMixin, VersionTrackerMixin, FormView):
 
         return kwargs
 
-    def has_permission(self, object):
-        return self.site.has_add_permission(self.request, object.commit_model)
+    def has_permission(self, obj):
+        return self.site.has_add_permission(self.request, obj, obj.commit_model)
 
     def form_valid(self, form):
         obj = self.get_object()
@@ -158,10 +158,10 @@ class ResetView(PopupView, AuthorizedMixin, VersionTrackerMixin, TemplateView):
 
         return kwargs
 
-    def has_permission(self, object):
+    def has_permission(self, obj):
         # We don't really add a commit while resetting, but this permission is
         # used for everything commit related.
-        return self.site.has_add_permission(self.request, object.commit_model)
+        return self.site.has_add_permission(self.request, obj, obj.commit_model)
 
     def post(self, request, *args, **kwargs):
         version_tracker = self.get_object()
@@ -228,8 +228,9 @@ class RevertView(PopupView, AuthorizedMixin, VersionTrackerMixin, FormView):
         }
         return kwargs
 
-    def has_permission(self, object):
-        return self.site.has_add_permission(self.request, object)
+    def has_permission(self, obj):
+        parent = obj.tracker
+        return self.site.has_add_permission(self.request, parent, type(obj))
 
     def form_valid(self, form):
         commit = self.get_object()

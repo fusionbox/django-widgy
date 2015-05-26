@@ -82,8 +82,9 @@ def has_change_permission(context, site, obj):
 
 
 @register.assignment_tag(takes_context=True)
-def has_add_permission(context, site, obj):
-    return site.has_add_permission(context['request'], obj)
+def has_add_permission(context, site, parent, obj):
+    created_obj_cls = type(obj)
+    return site.has_add_permission(context['request'], parent, created_obj_cls)
 
 
 @register.assignment_tag(takes_context=True)

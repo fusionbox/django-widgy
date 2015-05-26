@@ -106,7 +106,7 @@ class WidgyPageAdmin(PageAdmin):
     def _save_and_commit(self, request, obj):
         site = self.get_site()
         commit_model = site.get_version_tracker_model().commit_model
-        if not site.has_add_permission(request, commit_model):
+        if not site.has_add_permission(request, obj, commit_model):
             messages.error(request, _("You don't have permission to commit."))
         else:
             if obj.root_node.has_changes():
@@ -123,7 +123,7 @@ class WidgyPageAdmin(PageAdmin):
     def _save_and_approve(self, request, obj):
         site = self.get_site()
         commit_model = site.get_version_tracker_model().commit_model
-        if not site.has_add_permission(request, commit_model) or \
+        if not site.has_add_permission(request, obj, commit_model) or \
                 not site.has_change_permission(request, commit_model):
             messages.error(request, _("You don't have permission to approve commits."))
         else:

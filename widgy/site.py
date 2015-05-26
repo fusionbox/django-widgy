@@ -73,9 +73,9 @@ class WidgySite(object):
         if not (request.user.is_authenticated() and request.user.is_staff):
             raise PermissionDenied
 
-    def has_add_permission(self, request, content_class):
-        codename = get_permission_codename('add', content_class._meta)
-        return request.user.has_perm('%s.%s' % (content_class._meta.app_label, codename))
+    def has_add_permission(self, request, parent, created_obj_cls):
+        codename = get_permission_codename('add', created_obj_cls._meta)
+        return request.user.has_perm('%s.%s' % (created_obj_cls._meta.app_label, codename))
 
     def has_change_permission(self, request, obj_or_class):
         codename = get_permission_codename('change', obj_or_class._meta)
