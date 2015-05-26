@@ -3,6 +3,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core import urlresolvers
 from django.utils.encoding import python_2_unicode_compatible
+from django.db.models.signals import post_migrate
+from django.db import transaction
 
 from mezzanine.pages.managers import PageManager
 from mezzanine.pages.models import Link, Page
@@ -112,3 +114,39 @@ class WidgyPage(WidgyPageMixin, Page):
 
 
 links.register(Link)
+
+
+# Django < 1.9 workaround. (Remove this when support for Django < 1.9 is dropped)
+def _create_permissions_for_mezzaninecalloutwidget(sender, **kwargs):
+    """
+    This works around this bug which has been fixed in Django 1.9:
+    <https://github.com/django/django/pull/4681>
+    """
+    PERMISSIONS = {'add_mezzaninecalloutwidget': 'Can add Callout Widget',
+                   'change_mezzaninecalloutwidget': 'Can change Callout Widget',
+                   'delete_mezzaninecalloutwidget': 'Can delete Callout Widget'}
+
+    from django.contrib.auth.models import Permission
+    from django.contrib.contenttypes.models import ContentType
+
+    ct = ContentType.objects.get_for_model(MezzanineCalloutWidget, for_concrete_model=False)
+
+    permissions = Permission.objects.filter(codename__in=PERMISSIONS.keys()).select_related('content_type')
+
+
+    # Delete permission with the wrong content type (these are created by Django < 1.9)
+    to_delete = set(p.pk for p in permissions if p.content_type != ct)
+
+    permissions_set = set(p.codename for p in permissions if p.pk not in to_delete)
+    to_create = [Permission(codename=k, name=v, content_type=ct)
+                 for k, v in PERMISSIONS.items()
+                 if k not in permissions_set]
+
+    with transaction.atomic():
+        if to_delete:
+            Permission.objects.filter(pk__in=to_delete).delete()
+
+        if to_create:
+            Permission.objects.bulk_create(to_create)
+
+post_migrate.connect(_create_permissions_for_mezzaninecalloutwidget)
