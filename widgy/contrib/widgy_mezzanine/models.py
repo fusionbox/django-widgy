@@ -2,13 +2,17 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core import urlresolvers
+from django.utils.encoding import python_2_unicode_compatible
 
 from mezzanine.pages.managers import PageManager
 from mezzanine.pages.models import Link, Page
+from mezzanine.utils.sites import current_site_id
 
 from widgy.db.fields import VersionedWidgyField
 from widgy.utils import SelectRelatedManager
 from widgy.models import links
+from widgy.contrib.page_builder.models import CalloutWidget, Callout
+import widgy
 
 
 class WidgyPageMixin(object):
@@ -61,6 +65,23 @@ class PageSelectRelatedManager(SelectRelatedManager, PageManager):
     WidgyPage's manager must be a PageManager.
     """
     use_for_related_fields = True
+
+widgy.unregister(CalloutWidget)
+
+
+@widgy.register
+@python_2_unicode_compatible
+class MezzanineCalloutWidget(CalloutWidget):
+    class Meta:
+        verbose_name = _('callout widget')
+        verbose_name_plural = _('callout widgets')
+        proxy = True
+
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        if db_field.name == 'callout':
+            cond = models.Q(site=None) | models.Q(site=current_site_id())
+            kwargs['queryset'] = Callout.objects.filter(cond)
+        return super(CalloutWidget, self).formfield_for_dbfield(db_field, **kwargs)
 
 
 @links.register
