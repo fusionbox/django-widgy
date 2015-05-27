@@ -90,7 +90,6 @@ widgy.unregister(CalloutWidget)
 
 
 @widgy.register
-@python_2_unicode_compatible
 class MezzanineCalloutWidget(CalloutWidget):
     class Meta:
         verbose_name = _('callout widget')
