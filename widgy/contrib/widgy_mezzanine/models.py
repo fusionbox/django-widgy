@@ -134,6 +134,29 @@ class WidgyPage(WidgyPageMixin, Page):
 links.register(Link)
 
 
+class PathRoot(models.Transform):
+    lookup_name = 'path_root'
+
+    @property
+    def steplen(self):
+        """
+        Length of a step for the materialized tree
+        """
+        return self.lhs.field.model.steplen
+
+    def as_sqlite(self, qn, connection):
+        lhs, params = qn.compile(self.lhs)
+        return 'SUBSTR(%s, %%s, %%s)' % lhs, (params + [0, self.steplen+1])
+
+    def as_mysql(self, qn, connection):
+        raise NotImplementedError
+
+    def as_postgresql(self, qn, connection):
+        raise NotImplementedError
+
+models.Field.register_lookup(PathRoot)
+
+
 # Django < 1.9 workaround. (Remove this when support for Django < 1.9 is dropped)
 def _create_permissions_for_mezzaninecalloutwidget(sender, **kwargs):
     """

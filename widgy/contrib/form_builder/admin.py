@@ -18,7 +18,7 @@ class FormAdmin(admin.ModelAdmin):
     def has_add_permission(self, *args, **kwargs):
         return False
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         return self.model.objects.filter(_nodes__is_frozen=False).annotate_submission_count()
 
     @property

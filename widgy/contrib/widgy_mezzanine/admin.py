@@ -14,6 +14,7 @@ from django.db.models.signals import post_save
 from django.db.models import Min, Q
 from django.contrib.sites.models import Site
 
+from mezzanine.utils.sites import current_site_id
 from mezzanine.pages.admin import PageAdmin
 try:
     from mezzanine.pages.admin import PageAdminForm
@@ -26,7 +27,10 @@ from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
 from widgy.forms import WidgyFormMixin, VersionedWidgyWidget
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.contrib.widgy_mezzanine.views import ClonePageView, UnpublishView
+from widgy.contrib.form_builder.admin import FormAdmin
+from widgy.contrib.form_builder.models import Form
 from widgy.db.fields import get_site
+from widgy.models import Node, VersionTracker
 
 
 WidgyPage = get_widgypage_model()
@@ -301,6 +305,24 @@ def publish_page_on_approve(sender, instance, created, **kwargs):
             pages.update(
                 status=CONTENT_STATUS_DRAFT,
             )
+
+
+class MultiSiteFormAdmin(FormAdmin):
+    def get_queryset(self, request):
+        version_tracker_model = self.get_site().get_version_tracker_model()
+        site_pages = version_tracker_model.objects.filter(widgypage__site_id=current_site_id())
+        site_nodes = Node.objects.filter(versiontracker__in=site_pages)
+
+        qs = super(MultiSiteFormAdmin, self).get_queryset(request).filter(
+            _nodes__path__path_root__in=site_nodes.values_list('path'),
+        )
+        return qs
+
+    def get_site(self):
+        return get_site(settings.WIDGY_MEZZANINE_SITE)
+
+admin.site.unregister(Form)
+admin.site.register(Form, MultiSiteFormAdmin)
 
 
 if REVIEW_QUEUE_INSTALLED:
