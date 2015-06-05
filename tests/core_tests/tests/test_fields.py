@@ -66,6 +66,19 @@ class TestWidgyField(TestCase):
 
         self.assertEqual(root_node.content.pk, 1337)
 
+    def test_override_add_root(self):
+        """
+        If we put a widgy content before save()ing, the root_node shouldn't be overridden.
+        """
+        instance = HasAWidgy()
+
+        field = HasAWidgy._meta.get_field('widgy')
+        instance.widgy = ContentType.objects.get_for_model(Layout)
+        instance.widgy = field.add_root(instance, {'pk': 1337})
+        instance.save()
+
+        self.assertEqual(instance.widgy.content.pk, 1337)
+
 
 @unittest.skip("We want WidgyFields to work with non-modelforms, but we haven't designed an API yet.")
 class TestPlainForm(TestCase):

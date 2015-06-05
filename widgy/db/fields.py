@@ -37,6 +37,8 @@ class WidgyFieldObjectDescriptor(ReverseSingleRelatedObjectDescriptor):
             setattr(instance, self.field.pre_save_ct_field_name, value)
         else:
             super(WidgyFieldObjectDescriptor, self).__set__(instance, value)
+            if hasattr(instance, self.field.pre_save_ct_field_name):
+                delattr(instance, self.field.pre_save_ct_field_name)
 
 
 class WidgyField(models.ForeignKey):
