@@ -232,6 +232,10 @@ $font-default: "Open Sans", Arial, Helvetica, sans-serif;
   .node:not(section) .shelf {
     border-bottom: 2px solid $lightgrey;
     padding: 10px 0 5px 1em;
+    
+    &.empty {
+      display: none;
+    }
   }
 }
 
