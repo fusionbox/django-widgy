@@ -50,7 +50,7 @@ extras_require = {
         'mezzanine>=3.1.10',
     ],
     'page_builder': [
-        'django-filer>=0.9.9',
+        'django-filer>=0.9.10',
         'markdown',
         'bleach',
         'sorl-thumbnail>=11.12',
