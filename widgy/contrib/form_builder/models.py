@@ -5,6 +5,7 @@ import urllib
 import base64
 import hashlib
 import os.path
+import six
 
 from django.db import models
 from django import forms
@@ -16,7 +17,7 @@ from django.shortcuts import redirect
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils.functional import cached_property
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.encoding import python_2_unicode_compatible, force_bytes, force_text
 from django.template.defaultfilters import truncatechars
 from django.core.files import File
 from django.core.files.storage import default_storage
@@ -27,7 +28,7 @@ import html2text
 from widgy.models import Content, Node
 from widgy.signals import pre_delete_widget
 from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, StrDisplayNameMixin
-from widgy.utils import update_context, build_url, force_bytes, QuerySet
+from widgy.utils import update_context, build_url, QuerySet
 from widgy.contrib.page_builder.models import Bucket, Html
 from widgy.contrib.page_builder.forms import MiniCKEditorField, CKEditorField
 from .forms import PhoneNumberField
@@ -441,9 +442,9 @@ def friendly_uuid(uuid):
     A shortend version of a UUID to use when collisions are acceptable.
     The returned string will have 40 bits of entropy assuming a UUID4.
     """
-    result = base64.b32encode(hashlib.sha1(str(uuid)).digest()[:5]).lower()
+    result = base64.b32encode(hashlib.sha1(force_bytes(uuid)).digest()[:5]).lower()
     # avoid accidental profanity
-    return result.replace('e', '0').replace('o', '1').replace('u', '8').replace('i', '9')
+    return result.replace(b'e', b'0').replace(b'o', b'1').replace(b'u', b'8').replace(b'i', b'9')
 
 
 @widgy.register
@@ -609,7 +610,7 @@ class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Con
 
     @models.permalink
     def submission_url(self):
-        return ('admin:%s_%s_change' % (self._meta.app_label, self._meta.module_name),
+        return ('admin:%s_%s_change' % (self._meta.app_label, self._meta.model_name),
                 (self.pk,),
                 {})
 
@@ -681,7 +682,7 @@ class FormField(StrDisplayNameMixin, BaseFormField):
         to store in the db. The return value with also be used in the
         CSV download of form data.
         """
-        return unicode(value)
+        return force_text(value)
 
     @property
     def widget_attrs(self):
@@ -977,10 +978,15 @@ class FormSubmission(models.Model):
 
             writer = csv.DictWriter(output, list(headers))
 
-            def encode(d):
-                return dict(
-                    (k, force_bytes(v)) for k, v in d.items()
-                )
+            # python2 csv expects bytes, but python3's works in unicode
+            if six.PY2:
+                def encode(d):
+                    return dict(
+                        (k, force_bytes(v)) for k, v in d.items()
+                    )
+            else:
+                def encode(d):
+                    return d
 
             writer.writerow(encode(headers))
 
@@ -993,7 +999,7 @@ class FormSubmission(models.Model):
                 form_ident=form.ident,
             )
 
-            for name, field in form.get_fields().iteritems():
+            for name, field in form.get_fields().items():
                 value = field.serialize_value(data[name])
                 submission.values.create(
                     field_node=field.node,

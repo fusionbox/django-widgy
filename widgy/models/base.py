@@ -15,6 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.template import RequestContext
 from django.contrib.admin import widgets
 from django.template.defaultfilters import capfirst
+from django.utils.encoding import force_text, python_2_unicode_compatible
 
 from treebeard.mp_tree import MP_Node
 
@@ -27,7 +28,7 @@ from widgy.exceptions import (
 from widgy.signals import pre_delete_widget
 from widgy.generic import WidgyGenericForeignKey, ProxyGenericRelation
 from widgy.utils import (
-    exception_to_bool, update_context, render_to_string, force_text, unset_pks,
+    exception_to_bool, update_context, render_to_string, unset_pks,
 )
 from widgy.widgets import DateTimeWidget, DateWidget, TimeWidget
 
@@ -44,6 +45,7 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 }
 
 
+@python_2_unicode_compatible
 class Node(MP_Node):
     """
     Instances of this class maintain the Materialized Path tree structure that
@@ -69,8 +71,8 @@ class Node(MP_Node):
         app_label = 'widgy'
         unique_together = [('content_type', 'content_id')]
 
-    def __unicode__(self):
-        return unicode(self.content)
+    def __str__(self):
+        return force_text(self.content)
 
     def to_json(self, site):
         children = [c.to_json(site) for c in self.get_children()]
@@ -176,7 +178,7 @@ class Node(MP_Node):
             contents[node.content_type_id].add(node.content_id)
 
         # Convert that mapping to content_types -> Content instances
-        for content_type_id, content_ids in contents.iteritems():
+        for content_type_id, content_ids in contents.items():
             try:
                 ct = ContentType.objects.get_for_id(content_type_id)
                 model_class = ct.model_class()
@@ -189,7 +191,7 @@ class Node(MP_Node):
                 ct = ContentType.objects.get(id=content_type_id)
                 contents[content_type_id] = dict((id, UnknownWidget(ct, id)) for id in content_ids)
                 # Warn about using an UnknownWidget. It doesn't matter which instance we use.
-                next(contents[content_type_id].itervalues(), UnknownWidget(ct, None)).warn()
+                next(iter(contents[content_type_id].values()), UnknownWidget(ct, None)).warn()
         return contents
 
     @classmethod
@@ -257,9 +259,9 @@ class Node(MP_Node):
         """
 
         validator = partial(site.validate_relationship, self.content)
-        return filter(
+        return list(filter(
             exception_to_bool(validator, ParentChildRejection),
-            classes)
+            classes))
 
     def filter_child_classes_recursive(self, site, classes):
         """
@@ -434,7 +436,7 @@ class Content(models.Model):
 
     def get_api_url(self, site):
         return site.reverse(site.content_view, kwargs={
-            'object_name': self._meta.module_name,
+            'object_name': self._meta.model_name,
             'app_label': self._meta.app_label,
             'object_pk': self.pk})
 
@@ -445,7 +447,7 @@ class Content(models.Model):
             '__class__': self.class_name,
             'css_classes': self.get_css_classes(),
             'component': self.component_name,
-            'model': self._meta.module_name,
+            'model': self._meta.model_name,
             'object_name': self._meta.object_name,
             'draggable': self.draggable,
             'deletable': self.deletable,
@@ -475,7 +477,7 @@ class Content(models.Model):
         :Returns: a json-able python object that represents the class type.
         """
         return {
-            '__class__': "%s.%s" % (cls._meta.app_label, cls._meta.module_name),
+            '__class__': "%s.%s" % (cls._meta.app_label, cls._meta.model_name),
             'title': capfirst(cls._meta.verbose_name),
             'css_classes': cls.get_class_css_classes(),
             'tooltip': cls.tooltip and force_text(cls.tooltip),
@@ -483,20 +485,20 @@ class Content(models.Model):
 
     @property
     def display_name(self):
-        return unicode(self._meta.verbose_name)
+        return force_text(self._meta.verbose_name)
 
     @property
     def class_name(self):
         """
-        :Returns: a fully qualified classname including app_label and module_name
+        :Returns: a fully qualified classname including app_label and model_name
         """
-        return "%s.%s" % (self._meta.app_label, self._meta.module_name)
+        return "%s.%s" % (self._meta.app_label, self._meta.model_name)
 
     @classmethod
     def get_class_css_classes(cls):
         if hasattr(cls, 'css_classes'):
             return cls.css_classes
-        return (cls._meta.app_label, cls._meta.module_name)
+        return (cls._meta.app_label, cls._meta.model_name)
 
     def get_css_classes(self):
         if hasattr(self, 'css_classes'):
@@ -547,6 +549,7 @@ class Content(models.Model):
         defaults = {
             "form": self.form,
             "formfield_callback": partial(self.formfield_for_dbfield, request=request),
+            "fields": "__all__",
         }
         form_class = modelform_factory(self.__class__, **defaults)
         # Rather than make everybody subclass a special form, add the
@@ -635,7 +638,7 @@ class Content(models.Model):
     @classmethod
     def get_templates_hierarchy(cls, **kwargs):
         templates = kwargs.get('hierarchy', (
-            'widgy/{app_label}/{module_name}/{template_name}{extension}',
+            'widgy/{app_label}/{model_name}/{template_name}{extension}',
             'widgy/{app_label}/{template_name}{extension}',
             'widgy/{template_name}{extension}',
         ))
@@ -658,7 +661,7 @@ class Content(models.Model):
     def get_template_kwargs(cls, **kwargs):
         defaults = {
             'app_label': cls._meta.app_label,
-            'module_name': cls._meta.module_name,
+            'model_name': cls._meta.model_name,
         }
         defaults.update(**kwargs)
 

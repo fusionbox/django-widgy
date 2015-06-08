@@ -92,7 +92,7 @@ class SwitchUserTestCase(TestCase):
     def with_permission(self, user, name, model):
         contenttype = ContentType.objects.get_for_model(model)
         permission, _ = Permission.objects.get_or_create(
-            codename='%s_%s' % (name, model._meta.module_name),
+            codename='%s_%s' % (name, model._meta.model_name),
             defaults={
                 'content_type': contenttype,
             }

@@ -18,7 +18,7 @@ Add Mezzanine apps to ``INSTALLED_APPS`` in ``settings.py``::
         'mezzanine.core',
         'mezzanine.generic',
         'mezzanine.pages',
-        'django.contrib.comments',
+        'django_comments',
         'django.contrib.sites',
         'filebrowser_safe',
         'grappelli_safe',

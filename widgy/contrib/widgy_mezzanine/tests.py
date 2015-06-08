@@ -14,6 +14,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.core import urlresolvers
 from django.contrib.auth.models import Permission, AnonymousUser
+from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import admin
 from django.db.models.signals import post_save
@@ -24,7 +25,6 @@ from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
 
 from widgy.site import WidgySite
-from widgy.utils import get_user_model
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.contrib.widgy_mezzanine.views import ClonePageView, UnpublishView
 from widgy.db.fields import get_site
@@ -391,7 +391,7 @@ class TestAdminButtons(AdminButtonsTestBase, TestCase):
     def test_status_embryo(self):
         url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_add')
         response = self.client.get(url)
-        self.assertIn('Save', response.content)
+        self.assertIn('Save', response.rendered_content)
 
     def test_status_embryo_save(self):
         url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_add')
@@ -432,21 +432,21 @@ class TestAdminButtons(AdminButtonsTestBase, TestCase):
         self.page.save()
         url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
         response = self.client.get(url)
-        self.assertIn('Save as Draft', response.content)
-        self.assertIn('Publish', response.content)
+        self.assertIn('Save as Draft', response.rendered_content)
+        self.assertIn('Publish', response.rendered_content)
 
     def test_status_published(self):
         url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
         response = self.client.get(url)
-        self.assertIn('Publish Changes', response.content)
+        self.assertIn('Publish Changes', response.rendered_content)
 
     def test_delete_button(self):
         url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_add')
         response = self.client.get(url)
-        self.assertNotIn('Delete', response.content)
+        self.assertNotIn('Delete', response.rendered_content)
         url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
         response = self.client.get(url)
-        self.assertIn('Delete', response.content)
+        self.assertIn('Delete', response.rendered_content)
 
 
 @make_reviewed
@@ -498,7 +498,7 @@ class TestAdminButtonsWhenReviewed(AdminButtonsTestBase, TestCase):
         # same for staff or superuser
         with self.as_user('staffuser'):
             response = self.client.get(url)
-            self.assertIn('Save', response.content)
+            self.assertIn('Save', response.rendered_content)
 
     def test_status_draft(self):
         self.page.status = CONTENT_STATUS_DRAFT
@@ -506,26 +506,26 @@ class TestAdminButtonsWhenReviewed(AdminButtonsTestBase, TestCase):
         url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
         with self.as_user('staffuser'):
             response = self.client.get(url)
-            self.assertIn('Save as Draft', response.content)
-            self.assertIn('Submit for Review', response.content)
-            self.assertNotIn('_save_and_approve', response.content)
+            self.assertIn('Save as Draft', response.rendered_content)
+            self.assertIn('Submit for Review', response.rendered_content)
+            self.assertNotIn('_save_and_approve', response.rendered_content)
         with self.as_user('superuser'):
             response = self.client.get(url)
-            self.assertIn('Save as Draft', response.content)
-            self.assertIn('Submit for Review', response.content)
-            self.assertIn('_save_and_approve', response.content)
+            self.assertIn('Save as Draft', response.rendered_content)
+            self.assertIn('Submit for Review', response.rendered_content)
+            self.assertIn('_save_and_approve', response.rendered_content)
 
     def test_status_published(self):
         url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
         with self.as_user('staffuser'):
             response = self.client.get(url)
-            self.assertNotIn('Save as Draft', response.content)
-            self.assertIn('Submit for Review', response.content)
-            self.assertNotIn('_save_and_approve', response.content)
+            self.assertNotIn('Save as Draft', response.rendered_content)
+            self.assertIn('Submit for Review', response.rendered_content)
+            self.assertNotIn('_save_and_approve', response.rendered_content)
         with self.as_user('superuser'):
             response = self.client.get(url)
-            self.assertNotIn('Save as Draft', response.content)
-            self.assertIn('Submit for Review', response.content)
+            self.assertNotIn('Save as Draft', response.rendered_content)
+            self.assertIn('Submit for Review', response.rendered_content)
 
 
 class TestAdminMessages(PageSetup, TestCase):
@@ -540,11 +540,11 @@ class TestAdminMessages(PageSetup, TestCase):
         url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
         self.page.root_node.commit(publish_at=timezone.now() + datetime.timedelta(days=1))
         response = self.client.get(url)
-        self.assertIn('one future-scheduled commit', response.content)
+        self.assertIn('one future-scheduled commit', response.rendered_content)
         # make the future commit uninteresting
         self.page.root_node.commit()
         response = self.client.get(url)
-        self.assertNotIn('future-scheduled commit', response.content)
+        self.assertNotIn('future-scheduled commit', response.rendered_content)
 
     @make_reviewed
     def test_unapproved_commit_message(self):
@@ -552,12 +552,12 @@ class TestAdminMessages(PageSetup, TestCase):
         url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
         self.page.root_node.commit()
         response = self.client.get(url)
-        self.assertIn('one unreviewed commit', response.content)
+        self.assertIn('one unreviewed commit', response.rendered_content)
         # make the unreviewed commit uninteresting
         new_commit = self.page.root_node.commit()
         new_commit.approve(user=self.user)
         response = self.client.get(url)
-        self.assertNotIn('unreviewed commit', response.content)
+        self.assertNotIn('unreviewed commit', response.rendered_content)
 
 
 def refetch(obj):

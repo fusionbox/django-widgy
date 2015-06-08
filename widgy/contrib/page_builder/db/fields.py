@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 import re
+import six
 
 from django import forms
 from django.db import models
@@ -34,7 +35,7 @@ class MarkdownField(models.TextField):
         return super(MarkdownField, self).formfield(**defaults)
 
 
-class VideoUrl(unicode):
+class VideoUrl(six.text_type):
 
     def __new__(cls, regex):
         self = super(VideoUrl, cls).__new__(cls, regex.string)

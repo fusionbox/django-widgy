@@ -34,8 +34,8 @@ install_requires = [
     'six',
     'django-compressor>=1.3',
     'beautifulsoup4',
-    'django-argonauts>=1.0.0',
-    'django<1.8',
+    'django-argonauts>=1.1.1',
+    'Django>=1.6',
 ]
 
 # Markdown stops support for Python 2.6 in version 2.5
@@ -50,7 +50,7 @@ extras_require = {
         'mezzanine>=3.1.10',
     ],
     'page_builder': [
-        'django-filer>=0.9.9',
+        'django-filer>=0.9.10',
         'markdown',
         'bleach',
         'sorl-thumbnail>=11.12',

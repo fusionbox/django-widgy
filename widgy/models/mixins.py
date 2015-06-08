@@ -70,7 +70,7 @@ class InvisibleMixin(object):
     def get_template_kwargs(cls, **kwargs):
         defaults = {
             'app_label': 'mixins',
-            'module_name': 'invisible',
+            'model_name': 'invisible',
         }
         defaults.update(**kwargs)
 
@@ -87,7 +87,7 @@ class TabbedContainer(object):
     def get_template_kwargs(cls, **kwargs):
         defaults = {
             'app_label': 'mixins',
-            'module_name': 'tabbed',
+            'model_name': 'tabbed',
         }
         defaults.update(**kwargs)
 

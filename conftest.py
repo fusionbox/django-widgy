@@ -2,10 +2,7 @@ import shutil
 import os
 
 import pytest
-try:
-    import six
-except ImportError:
-    from django.utils import six
+import six
 
 # This is here instead of pytest.ini because it can't be overridden from the
 # environ if specified there.

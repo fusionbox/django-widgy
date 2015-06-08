@@ -4,10 +4,7 @@ import dj_database_url
 import django
 import tempfile
 
-try:
-    import six
-except ImportError:
-    from django.utils import six
+import six
 
 DATABASES = {'default': dj_database_url.config(default='sqlite:///test_db.sqlite3')}
 
@@ -34,7 +31,6 @@ INSTALLED_APPS = [
     "argonauts",
     # tests modules
     "tests.core_tests",
-    "tests.proxy_gfk",
     "tests.utilstests",
     # tests/core_tests/models::ReviewedVersionedPage has an fk to
     # `review_queue.ReviewedVersionTracker`.  Until that test is moved into a
@@ -53,7 +49,7 @@ try:
 except ImportError:
     pass
 else:
-    if easy_thumbnails.VERSION >= 2:
+    if easy_thumbnails.VERSION >= (2, 0):
         SOUTH_MIGRATION_MODULES = {
             'easy_thumbnails': 'easy_thumbnails.south_migrations',
         }
@@ -124,3 +120,7 @@ WIDGY_MEZZANINE_SITE = 'tests.core_tests.widgy_config.widgy_site'
 DAISYDIFF_JAR_PATH = os.path.join(
     os.path.dirname(__file__), '..', 'bin', 'daisydiff', 'daisydiff.jar',
 )
+
+SOUTH_MIGRATION_MODULES = {
+    'core_tests': 'ignore',
+}

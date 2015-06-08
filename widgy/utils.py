@@ -1,13 +1,14 @@
 """
 Some utility functions used throughout the project.
 """
-from itertools import ifilterfalse
+import warnings
+from six.moves import filterfalse
 from contextlib import contextmanager
+from functools import wraps
+import six
 
 import bs4
 
-from django.utils.html import conditional_escape
-from django.utils.safestring import mark_safe
 from django.template import Context
 from django.template.loader import select_template, get_template
 from django.db import models
@@ -16,37 +17,29 @@ from django.utils.http import urlencode
 from django.utils.functional import memoize
 from django.conf import settings
 
-try:
-    from django.contrib.auth import get_user_model
-except ImportError:
-    def get_user_model():
-        from django.contrib.auth.models import User
-        return User
+from django.contrib.auth import get_user_model
+from django.utils.html import format_html
+from django.utils.encoding import force_text, force_bytes
 
-try:
-    from django.utils.html import format_html
-except ImportError:
-    # Django < 1.5 doesn't have this
 
-    def format_html(format_string, *args, **kwargs):  # NOQA
-        """
-        Similar to str.format, but passes all arguments through
-        conditional_escape, and calls 'mark_safe' on the result. This function
-        should be used instead of str.format or % interpolation to build up
-        small HTML fragments.
-        """
-        args_safe = map(conditional_escape, args)
-        kwargs_safe = dict([(k, conditional_escape(v)) for (k, v) in kwargs.iteritems()])
-        return mark_safe(format_string.format(*args_safe, **kwargs_safe))
+def deprecate(fn):
+    @wraps(fn)
+    def new(*args, **kwargs):
+        warnings.warn(
+            "widgy.utils.{} is deprecated. Use the version from {} instead.".format(
+                fn.__name__,
+                fn.__module__
+            ),
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return fn(*args, **kwargs)
+    return new
 
-try:
-    from django.utils.encoding import force_text
-    from django.utils.encoding import force_bytes
-except ImportError:
-    # Django 1.4
-    from django.utils.encoding import force_unicode, smart_str
-    force_bytes = smart_str
-    force_text = force_unicode
+get_user_model = deprecate(get_user_model)
+format_html = deprecate(format_html)
+force_text = deprecate(force_text)
+force_bytes = deprecate(force_bytes)
 
 
 def extract_id(url):
@@ -82,7 +75,7 @@ def fancy_import(name):
     and turns it into the accounts.models.ProxyUser object.
     """
     import_path, import_me = name.rsplit('.', 1)
-    imported = __import__(import_path, globals(), locals(), [import_me], -1)
+    imported = __import__(import_path, globals(), locals(), [import_me])
     return getattr(imported, import_me)
 
 
@@ -112,7 +105,7 @@ def html_to_plaintext(html):
             pass
         else:
             for c in node.children:
-                if isinstance(c, unicode):
+                if isinstance(c, six.string_types):
                     if not isinstance(c, bs4.Comment):
                         yield c.strip()
                 elif isinstance(c, bs4.Tag):
@@ -138,7 +131,7 @@ def unique_everseen(iterable, key=None):
     seen = set()
     seen_add = seen.add
     if key is None:
-        for element in ifilterfalse(seen.__contains__, iterable):
+        for element in filterfalse(seen.__contains__, iterable):
             seen_add(element)
             yield element
     else:
@@ -249,3 +242,19 @@ def unset_pks(obj):
     for field in obj._meta.fields:
         if field.primary_key:
             setattr(obj, field.attname, None)
+
+
+def model_has_field(cls, field_name):
+    """
+    Check if a field is already present on a model in a `safe` manner that does
+    not trigger or violate application loading.
+    """
+    exists = field_name in [f.name for f in cls._meta.local_fields]
+    if exists:
+        return exists
+    elif cls._meta.parents:
+        return any((
+            model_has_field(parent, field_name) for parent in cls._meta.parents.keys()
+        ))
+    else:
+        return False

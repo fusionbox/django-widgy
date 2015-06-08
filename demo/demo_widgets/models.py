@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import python_2_unicode_compatible
 
 import widgy
 from widgy.models import Content
@@ -15,13 +16,14 @@ class AcceptsSimpleHtmlChildrenMixin(object):
 
 
 @widgy.register
+@python_2_unicode_compatible
 class Slide(StrDisplayNameMixin, AcceptsSimpleHtmlChildrenMixin, Content):
     tagline = models.CharField(_('tagline'), max_length=255)
     background_image = ImageField(verbose_name=_('background image'))
 
     editable = True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.tagline
 
     @classmethod
@@ -40,12 +42,13 @@ class Slideshow(Content):
 
 
 @widgy.register
+@python_2_unicode_compatible
 class Box(StrDisplayNameMixin, AcceptsSimpleHtmlChildrenMixin, Content):
     title = models.CharField(verbose_name=_('title'), max_length=255)
 
     editable = True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     @classmethod

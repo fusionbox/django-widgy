@@ -31,6 +31,7 @@ class TestWidgyField(TestCase):
         class TheForm(forms.ModelForm):
             class Meta:
                 model = HasAWidgy
+                fields = '__all__'
 
         the_layout_contenttype = ContentType.objects.get_for_model(Layout)
         x = TheForm({'widgy': the_layout_contenttype.id})
@@ -48,6 +49,7 @@ class TestWidgyField(TestCase):
         class TheForm(forms.ModelForm):
             class Meta:
                 model = HasAWidgyOnlyAnotherLayout
+                fields = '__all__'
 
         the_layout_contenttype = ContentType.objects.get_for_model(AnotherLayout)
         x = TheForm({'widgy': the_layout_contenttype.id})
@@ -122,6 +124,7 @@ class TestModelForm(TestCase):
 
             class Meta:
                 model = HasAWidgy
+                fields = '__all__'
 
         self.form = WidgiedModelForm
 
@@ -190,6 +193,7 @@ class TestModelForm(TestCase):
         class Form(WidgyFormMixin, forms.ModelForm):
             class Meta:
                 model = HasAWidgyOnlyAnotherLayout
+                fields = '__all__'
 
         x = Form()
         self.assertIn(AnotherLayout._meta.verbose_name.lower(),
@@ -204,6 +208,7 @@ class TestModelForm(TestCase):
         class TheForm(WidgyFormMixin, forms.ModelForm):
             class Meta:
                 model = HasAWidgyNonNull
+                fields = '__all__'
 
         x = TheForm({})
         self.assertTrue(x.is_valid())
@@ -216,6 +221,7 @@ class TestVersionedModelForm(TestCase):
         class VersionedWidgiedForm(WidgyFormMixin, forms.ModelForm):
             class Meta:
                 model = VersionedPage
+                fields = '__all__'
         self.form = VersionedWidgiedForm
 
     def test_render(self):
@@ -268,7 +274,7 @@ def copy_call_args(mock):
     new_mock = mock.Mock()
     def side_effect(*args, **kwargs):
         new_args = tuple(copy.copy(i) for i in args)
-        new_kwargs = dict((k, copy.copy(v)) for k, v in kwargs.iteritems())
+        new_kwargs = dict((k, copy.copy(v)) for k, v in kwargs.items())
         new_mock(*new_args, **new_kwargs)
         return mock.DEFAULT
     mock.side_effect = side_effect

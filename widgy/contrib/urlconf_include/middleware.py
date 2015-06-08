@@ -1,5 +1,6 @@
 import imp
 import re
+import six
 
 from django.utils.importlib import import_module
 from django.conf import settings
@@ -34,7 +35,7 @@ def uncache_urlconf(urlconf):
 class PatchUrlconfMiddleware(object):
     def process_request(self, request):
         root_urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
-        if isinstance(root_urlconf, basestring):
+        if isinstance(root_urlconf, six.string_types):
             root_urlconf = import_module(root_urlconf)
         request.urlconf = self.get_urlconf(root_urlconf, self.get_pages(logged_in=request.user.is_authenticated()))
         request._patch_urlconf_middleware_urlconf = request.urlconf

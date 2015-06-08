@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf.urls import patterns, url
 from django.template.defaultfilters import slugify
 
-from widgy.utils import force_text
+from django.utils.encoding import force_text
 
 from .models import Form
 
@@ -25,7 +25,7 @@ class FormAdmin(admin.ModelAdmin):
     def download_url_name(self):
         return '{0}_{1}_download'.format(
             self.model._meta.app_label,
-            self.model._meta.module_name,
+            self.model._meta.model_name,
         )
 
     def get_urls(self, *args, **kwargs):

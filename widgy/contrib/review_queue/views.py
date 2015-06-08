@@ -4,10 +4,10 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.utils.http import is_safe_url
+from django.utils.html import format_html
 from django.views.generic import RedirectView, FormView
 from django.core.exceptions import PermissionDenied
 
-from widgy.utils import format_html
 from widgy.views.base import AuthorizedMixin
 from widgy.views.versioning import VersionTrackerMixin, CommitView, HistoryView as OldHistoryView
 
@@ -64,20 +64,15 @@ class ApproveView(ApprovalChangeBaseView):
         commit.save()
 
     def get_message(self, commit, history_url):
-        # XXX: Avoid circular import
-        from .admin import HTML_IN_MESSAGES
-
-        message = _('Commit %s has been approved') % commit
-        if HTML_IN_MESSAGES:
-            message = format_html('{0} {1}',
-                message,
-                UndoApprovalsForm(
-                    initial={
-                        'actions': [commit.pk],
-                        'referer': history_url,
-                    }
-                ).render(self.request, self.site)
-            )
+        message = format_html('{0} {1}',
+            _('Commit %s has been approved') % commit,
+            UndoApprovalsForm(
+                initial={
+                    'actions': [commit.pk],
+                    'referer': history_url,
+                }
+            ).render(self.request, self.site)
+        )
         return message
 
 

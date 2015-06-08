@@ -1,12 +1,13 @@
 from __future__ import unicode_literals
 
 import contextlib
-from StringIO import StringIO
+from six.moves import StringIO
 
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django import forms
 from django.utils import timezone
+from django.utils.encoding import force_text
 from django.core import mail
 from django.utils import unittest
 from django.db import connection
@@ -235,9 +236,9 @@ class TestForm(TestCase):
 
         letters_dict, numbers_dict = list(FormSubmission.objects.as_ordered_dictionaries(field_name_order))
 
-        self.assertEqual(letters_dict.keys(), field_name_order)
-        self.assertEqual(letters_dict.values(), [first, 'c', 'a', 'b'])
-        self.assertEqual(numbers_dict.values(), [second, '3', '1', '2'])
+        self.assertEqual(list(letters_dict.keys()), field_name_order)
+        self.assertEqual(list(letters_dict.values()), [first, 'c', 'a', 'b'])
+        self.assertEqual(list(numbers_dict.values()), [second, '3', '1', '2'])
 
     def test_parent_form(self):
         for field in self.fields:
@@ -304,9 +305,9 @@ class TestForm(TestCase):
         csv_output = StringIO()
         self.form.submissions.to_csv(csv_output)
 
-        self.assertEqual(csv_output.getvalue(), (
+        self.assertEqual(force_text(csv_output.getvalue()), (
             "Created at,\N{INTERROBANG},field 2,field 3\r\n"
-            "%s,\N{SNOWMAN},2,3\r\n" % (now,)).encode('utf-8')
+            "%s,\N{SNOWMAN},2,3\r\n" % (now,))
         )
 
 
@@ -350,12 +351,12 @@ class TestFormHandler(TestCase):
         request, form_obj = self.get_execute_args(self.form, {
             self.to_field.get_formfield_name(): 'ignored@example.com',
         })
-        form_obj.cleaned_data['file'] = ContentFile(b'foobar', name='asdf.txt')
+        form_obj.cleaned_data['file'] = ContentFile('foobar', name='asdf.txt')
         email_handler.execute(request, form_obj)
 
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].attachments, [
-            ('asdf.txt', b'foobar', None),
+            ('asdf.txt', 'foobar', None),
         ])
 
     def test_email_success_handler_to_pointer_works_after_being_committed(self):

@@ -7,6 +7,7 @@ from django import forms
 from django.core.urlresolvers import reverse
 from django.contrib.admin.util import quote
 from django.utils.translation import ugettext_lazy as _, ugettext, ungettext
+from django.utils.html import format_html
 from django.utils import timezone
 from django.contrib import messages
 from django.db.models.signals import post_save
@@ -24,7 +25,6 @@ from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
 from widgy.forms import WidgyFormMixin, VersionedWidgyWidget
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.contrib.widgy_mezzanine.views import ClonePageView, UnpublishView
-from widgy.utils import format_html
 from widgy.db.fields import get_site
 
 
@@ -48,6 +48,7 @@ class WidgyPageAdminForm(WidgyFormMixin, PageAdminForm):
         widgets = {
             'root_node': PageVersionedWidgyWidget,
         }
+        fields = '__all__'
 
     def __init__(self, *args, **kwargs):
         super(WidgyPageAdminForm, self).__init__(*args, **kwargs)
@@ -238,7 +239,7 @@ class UndeletePageAdminMixin(object):
         if resp.status_code == 302 and resp['Location'].startswith('../'):
             viewname = 'admin:%s_%s_change' % (
                 obj._meta.app_label,
-                obj._meta.module_name)
+                obj._meta.model_name)
             resp['Location'] = reverse(viewname, args=(quote(obj.pk),))
         return resp
 
