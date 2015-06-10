@@ -508,7 +508,7 @@ class Video(StrDisplayNameMixin, Content):
     video = VideoField(verbose_name=_('video'))
 
     editable = True
-    tooltip = _("Add a video to your page. Support YouTube, Vimeo, and"
+    tooltip = _("Add a video to your page. Supports YouTube, Vimeo, and"
                 " others.")
 
     class Meta:
