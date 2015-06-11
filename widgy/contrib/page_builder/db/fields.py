@@ -90,7 +90,14 @@ class VideoField(models.URLField):
         super(VideoField, self).__init__(*args, **kwargs)
         self.validators.append(validators_video_url)
 
+    def from_db_value(self, value, expression, connection, context):
+        """Convert from db starting in Django 1.8"""
+        if value is None:
+            return value
+        return self.get_url_instance(value)
+
     def to_python(self, value):
+        """Convert from db in Django < 1.8"""
         url = super(VideoField, self).to_python(value)
         if url is None:
             return url
