@@ -151,7 +151,8 @@ class PathRoot(models.Transform):
         raise NotImplementedError
 
     def as_postgresql(self, qn, connection):
-        raise NotImplementedError
+        lhs, params = qn.compile(self.lhs)
+        return 'SUBSTRING(%s, %%s, %%s)' % lhs, (params + [1, self.steplen])
 
 models.Field.register_lookup(PathRoot)
 
