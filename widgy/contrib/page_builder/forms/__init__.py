@@ -73,6 +73,7 @@ class CKEditorWidget(forms.Textarea):
             {'name': 'Language: RTL', 'element': 'span', 'attributes': {'dir': 'rtl'}},
             {'name': 'Language: LTR', 'element': 'span', 'attributes': {'dir': 'ltr'}},
         ],
+        'allowedContent': True,
         'removeButtons': '',
         'extraPlugins': 'justify',
         'justifyClasses': ['align-left', 'align-center', 'align-right', 'align-justify'],
