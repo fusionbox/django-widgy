@@ -37,7 +37,7 @@ class LinkRegistry(BaseRegistry):
 
 link_registry = LinkRegistry()
 register = link_registry.register
-unregister = link_registry.register
+unregister = link_registry.unregister
 
 
 def points_to_links(linker, linkable):
