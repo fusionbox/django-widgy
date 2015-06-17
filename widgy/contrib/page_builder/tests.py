@@ -7,7 +7,7 @@ from widgy.exceptions import ParentChildRejection
 
 from widgy.contrib.page_builder.models import (
     Table, TableRow, TableHeaderData, TableHeader, TableBody,
-    Accordion,
+    Accordion, Video, MainContent
 )
 from widgy.contrib.page_builder.forms import CKEditorField
 
@@ -227,3 +227,18 @@ class TestAccordionAutomaticallyAdds2Sections(TestCase):
         self.assertEqual(len(tabs.get_children()), 2)
         self.assertEqual(tabs.get_children()[0].title, 'Title 1')
         self.assertEqual(tabs.get_children()[1].title, 'Title 2')
+
+
+class TestVideoWidget(TestCase):
+    def test_video_has_url(self):
+        """Test video fetch from database."""
+
+        content = MainContent.add_root(widgy_site)
+        video = content.add_child(
+            widgy_site,
+            Video,
+            video='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        )
+
+        video = content.get_children()[0]
+        self.assertEqual(video.video.embed_url, '//youtube.com/embed/dQw4w9WgXcQ')
