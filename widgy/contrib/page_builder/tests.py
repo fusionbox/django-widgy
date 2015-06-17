@@ -7,7 +7,7 @@ from widgy.exceptions import ParentChildRejection
 
 from widgy.contrib.page_builder.models import (
     Table, TableRow, TableHeaderData, TableHeader, TableBody,
-    Accordion, Video
+    Accordion, Video, MainContent
 )
 from widgy.contrib.page_builder.forms import CKEditorField
 
@@ -233,7 +233,12 @@ class TestVideoWidget(TestCase):
     def test_video_has_url(self):
         """Test video fetch from database."""
 
-        video = Video.objects.create(video='https://www.youtube.com/watch?v=dQw4w9WgXcQ')
-        video = Video.objects.get(pk=video.pk)
+        content = MainContent.add_root(widgy_site)
+        video = content.add_child(
+            widgy_site,
+            Video,
+            video='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        )
 
+        video = content.get_children()[0]
         self.assertEqual(video.video.embed_url, '//youtube.com/embed/dQw4w9WgXcQ')
