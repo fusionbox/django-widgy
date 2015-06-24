@@ -103,7 +103,7 @@ class Markdown(Content):
 
 
 class HtmlForm(forms.ModelForm):
-    content = CKEditorField(required=False, label=_('Content'))
+    content = CKEditorField(label=_('Content'))
 
 
 @widgy.register
