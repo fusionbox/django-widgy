@@ -8,7 +8,7 @@ import logging
 import itertools
 import copy
 
-from django.db import models
+from django.db import models, transaction
 from django import forms
 from django.forms.models import modelform_factory, ModelForm
 from django.contrib.contenttypes.models import ContentType
@@ -466,9 +466,19 @@ class Content(models.Model):
 
     def get_attributes(self):
         model_data = {}
-        for field in self._meta.fields:
+        for field in self._meta.concrete_fields:
             if field.serialize:
                 model_data[field.attname] = field.value_from_object(self)
+        for field in self._meta.many_to_many:
+            # this is copied from django.forms.models.model_to_dict
+            if self.pk is None:
+                model_data[field.name] = []
+            else:
+                qs = field.value_from_object(self)
+                if qs._result_cache is not None:
+                    model_data[field.name] = [item.pk for item in qs]
+                else:
+                    model_data[field.name] = list(qs.values_list('pk', flat=True))
         return model_data
 
     @classmethod
@@ -796,6 +806,7 @@ class Content(models.Model):
         self.node.delete()
         super(Content, self).delete()
 
+    @transaction.atomic
     def clone(self):
         """
         **Note:** In order for clone to work, you need to have an
@@ -809,6 +820,12 @@ class Content(models.Model):
         new = copy.copy(self)
         unset_pks(new)
         new.save()
+
+        for f in self._meta.many_to_many:
+            # This will only handle simple many-to-manies, those that don't
+            # have a custom through table.
+            f.save_form_data(new, f.value_from_object(self))
+
         return new
 
     def save(self, *args, **kwargs):

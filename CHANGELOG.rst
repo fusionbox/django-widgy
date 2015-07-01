@@ -8,6 +8,11 @@ Changelog
   see the `django-pyscss changelog
   <https://pypi.python.org/pypi/django-pyscss/2.0.0#changelog>`_ for
   documentation on how/if you need to change anything.
+- ``Content.clone`` now copies simple many-to-many relationships. If you have a
+  widget with a many-to-many field and an overridden clone method that calls
+  super, you should take this into account. If you have many-to-many
+  relationships that use a custom through table, you will have to continue to
+  override clone to clone those.
 
 
 0.6.1 (2015-05-01)
