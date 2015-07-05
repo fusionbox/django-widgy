@@ -124,6 +124,6 @@ class ImageField(FilerFileField):
 
     def validate(self, value, model_instance):
         file_obj = File.objects.get(pk=value)
-        iext = os.path.splitext(file_obj.file.path)[1].lower()
+        iext = os.path.splitext(file_obj.file.name)[1].lower()
         if not iext in ['.jpg', '.jpeg', '.png', '.gif']:
             raise forms.ValidationError('File type must be jpg, png, or gif')
