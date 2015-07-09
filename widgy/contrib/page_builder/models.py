@@ -20,7 +20,7 @@ from widgy.utils import build_url, SelectRelatedManager
 import widgy
 
 
-class Layout(StrictDefaultChildrenMixin, Content):
+class BaseLayout(StrictDefaultChildrenMixin, Content):
     """
     Base class for all layouts.
     """
@@ -33,6 +33,14 @@ class Layout(StrictDefaultChildrenMixin, Content):
     @classmethod
     def valid_child_of(cls, content, obj=None):
         return False
+
+
+class Layout(BaseLayout):
+    """
+    Subclasses of Layout will be used to populate WidgyPage root_choices.
+    """
+    class Meta:
+        abstract = True
 
 
 class Bucket(Content):
@@ -51,7 +59,7 @@ class MainContent(Bucket):
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
-        return isinstance(parent, Layout)
+        return isinstance(parent, BaseLayout)
 
     class Meta:
         verbose_name = _('main content')
@@ -67,7 +75,7 @@ class Sidebar(Bucket):
 
     @classmethod
     def valid_child_of(cls, parent, obj=None):
-        return isinstance(parent, Layout)
+        return isinstance(parent, BaseLayout)
 
     class Meta:
         verbose_name = _('sidebar')
