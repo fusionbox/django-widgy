@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
 from django.contrib import messages
-from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _, ungettext
 from django.utils.html import format_html
 from django.template.loader import render_to_string
@@ -50,21 +49,15 @@ class VersionCommitAdminBase(AuthorizedAdminMixin, ModelAdmin):
     actions = ['approve_selected']
 
     def get_queryset(self, request):
-        try:
-            qs = super(VersionCommitAdminBase, self).get_queryset(request)
-        except AttributeError:
-            # BBB: In django 1.5 queryset changed to get_queryset
-            qs = super(VersionCommitAdminBase, self).queryset(request)
-        return qs.unapproved().select_related('author', 'root_node')
+        qs = super(VersionCommitAdminBase, self).get_queryset(request)
+        if not request.resolver_match.args:
+            # This means we're on the changelist page, and shouldn't see
+            # unapproved commits. We only do this for the changelist, because
+            # you should be able to view the detail page for an approved
+            # commit.
+            qs = qs.unapproved()
+        return qs.select_related('author', 'root_node')
     queryset = get_queryset
-
-    def get_object(self, request, object_id):
-        model = self.model
-        try:
-            object_id = model._meta.pk.to_python(object_id)
-            return model.objects.get(pk=object_id)
-        except (model.DoesNotExist, ValidationError, ValueError):
-            return None
 
     def get_changelist(self, request, *args, **kwargs):
         return VersionCommitChangeList
