@@ -5,7 +5,7 @@ var path = require('path'),
 require('mocha-as-promised')();
 
 global.document = global.document || jsdom();
-global.window = global.window = global.document.createWindow();
+global.window = global.window = global.document.parentWindow;
 
 requirejs.config({
   baseUrl: path.join(__dirname, "../../widgy/static/widgy/js/"),
@@ -32,7 +32,7 @@ test = {
   create: function(){
     document.innerHTML = '<html><head></head><body></body></html>';
   },
-  
+
   destroy: function(){
     document.innerHTML = '';
   }
