@@ -23,11 +23,11 @@ INSTALLED_APPS += [
 
 # XXX Mezzanine insists on having some version of django comments installed.
 try:
-    import django.contrib.comments
+    import django_comments
 except ImportError:
-    INSTALLED_APPS.append('django_comments')
-else:
     INSTALLED_APPS.append('django.contrib.comments')
+else:
+    INSTALLED_APPS.append('django_comments')
 
 
 
