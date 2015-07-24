@@ -10,10 +10,6 @@ sudo: false
 env:
   global:
     - SOUTH_TESTS_MIGRATE=True
-      # Needed by node-gyp, a dependency of contextify from jsdom.
-      # Development files for node addons are downloaded to $HOME/.node-gyp.
-      # https://github.com/TooTallNate/node-gyp/issues/21
-    - HOME=/home/travis
   matrix:
     - TOX_ENV=py26-dj16-sqlite
     - TOX_ENV=py26-dj16-mysql
