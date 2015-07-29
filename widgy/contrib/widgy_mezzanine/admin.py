@@ -30,7 +30,7 @@ from widgy.contrib.widgy_mezzanine.views import ClonePageView, UnpublishView
 from widgy.contrib.form_builder.admin import FormAdmin
 from widgy.contrib.form_builder.models import Form
 from widgy.db.fields import get_site
-from widgy.models import Node, VersionTracker
+from widgy.models import Node
 
 
 WidgyPage = get_widgypage_model()
