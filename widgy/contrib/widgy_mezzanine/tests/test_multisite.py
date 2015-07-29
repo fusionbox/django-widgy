@@ -9,6 +9,7 @@ from django.conf.urls import url, include
 from django.core.urlresolvers import get_resolver
 
 from argonauts.testutils import JsonTestMixin
+from mezzanine.core.models import SitePermission
 
 from widgy.site import WidgySite
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
@@ -51,6 +52,8 @@ class PermissionMixin(UserSetup, PageSetup, JsonTestMixin):
             slug='slugabc',
             site=self.other_site,
         )
+
+        SitePermission.objects.create(user=self.staffuser)
 
         self.staffuser.sitepermissions.sites.add(self.main_site)
 
