@@ -197,8 +197,7 @@ class VersionTracker(models.Model):
         for attr in self.get_owner_related_names():
             manager = getattr(self, attr)
 
-            # If the manager has a get_widgy_owners() method, use this.
-            # Otherwise, just fall back to to all()
+            # Owners for a specific manager can be overriden by the method `get_widgy_owners`
             if hasattr(manager, 'get_widgy_owners'):
                 acc.extend(manager.get_widgy_owners(self))
             else:
