@@ -34,7 +34,7 @@ install_requires = [
     'six',
     'django-compressor>=1.3',
     'beautifulsoup4',
-    'django-argonauts>=1.1.2',
+    'django-argonauts>=1.1.4',
     'Django>=1.7',
 ]
 
