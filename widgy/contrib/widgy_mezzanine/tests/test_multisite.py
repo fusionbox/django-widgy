@@ -201,3 +201,11 @@ class TestPermissions(PermissionMixin, TestCase):
     WIDGY_MEZZANINE_SITE='widgy.contrib.widgy_mezzanine.tests.test_multisite.reviewed_widgy_site')
 class TestPermissionsReviewedWidgySite(PermissionMixin, TestCase):
     pass
+
+
+class TestOwners(PageSetup, TestCase):
+    def test_owners_finds_across_all_sites(self):
+        vt = self.page.root_node
+        site_b = Site.objects.create(domain='b', name='b')
+        with self.settings(SITE_ID=site_b.id):
+            assert self.page in vt.owners

@@ -193,17 +193,9 @@ class VersionTracker(models.Model):
 
     @cached_property
     def owners(self):
-        acc = []
-        for attr in self.get_owner_related_names():
-            manager = getattr(self, attr)
-
-            # Owners for a specific manager can be overriden by the method `get_widgy_owners`
-            if hasattr(manager, 'get_widgy_owners'):
-                acc.extend(manager.get_widgy_owners(self))
-            else:
-                acc.extend(manager.all())
-
-        return acc
+        return [owner
+                for attr in self.get_owner_related_names()
+                for owner in getattr(self, attr).all()]
 
     def clone(self):
         vt = copy.copy(self)

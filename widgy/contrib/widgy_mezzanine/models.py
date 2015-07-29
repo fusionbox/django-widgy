@@ -63,28 +63,13 @@ class WidgyPageMixin(object):
         return self
 
 
-class PageSelectRelatedManager(SelectRelatedManager, PageManager):
+class UseForRelatedFieldsSelectRelatedManager(SelectRelatedManager):
     """
-    WidgyPage's manager must be a PageManager.
+    We use this to optimize page rendering. This is the manager that will be
+    used to select the WidgyPage when mezzanine does `page.widgypage`.
     """
     use_for_related_fields = True
 
-    def get_widgy_owners(self, item):
-        user = current_request().user
-
-        # We want owners from all sites. But CurrentSiteManager.get_queryset() filters by
-        # the current site. Unfortunately, there's no way to hook into the mro() in
-        # order to skip CurrentSiteManager.get_queryset().
-        qs = models.QuerySet(model=self.model).filter(root_node=item)
-
-        # Limit Pages to pages the users has access to
-        if not user.is_superuser:
-            qs = qs.filter(site__sitepermission__user=user)
-
-        # XXX: Copy/pasted from SelectRelatedManager
-        qs = qs.select_related(*self.select_related).prefetch_related(*self.prefetch_related)
-
-        return qs
 
 widgy.unregister(CalloutWidget)
 
@@ -121,13 +106,14 @@ class WidgyPage(WidgyPageMixin, Page):
         verbose_name_plural = _('widgy pages')
         swappable = 'WIDGY_MEZZANINE_PAGE_MODEL'
 
-    objects = PageSelectRelatedManager(select_related=[
-        'root_node'
+    _base_manager = UseForRelatedFieldsSelectRelatedManager(select_related=[
+        'root_node',
         'root_node__head',
         # we might not need this, if head isn't published, but we
         # probably will.
         'root_node__head__root_node',
     ])
+    objects = PageManager()
 
 
 links.register(Link)

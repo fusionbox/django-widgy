@@ -23,6 +23,7 @@ from django.core.urlresolvers import get_resolver
 
 from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
+from mezzanine.pages.models import Page
 
 from widgy.site import WidgySite
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
@@ -634,3 +635,10 @@ class TestPublicationCommitHandling(PageSetup, TestCase):
 
         self.assertEqual(refetch(self.page).status, CONTENT_STATUS_PUBLISHED)
         self.assertEqual(refetch(self.page).publish_date, refetch(c2).publish_at)
+
+
+class TestSelectRelated(PageSetup, TestCase):
+    def test_default_manager_selects_related(self):
+        p = Page.objects.get(pk=self.page.pk).widgypage
+        with self.assertNumQueries(1):
+            p.widgypage.root_node.head
