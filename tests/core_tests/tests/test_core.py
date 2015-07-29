@@ -699,6 +699,18 @@ class TestVersioning(RootNodeTestCase):
         a.delete()
         self.assertEqual(list(VersionTracker.objects.orphan()), [vt])
 
+        vt.delete()
+
+        vt, a, b, c = self.orphan_helper()
+        vt.commit()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        c.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        b.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [])
+        a.delete()
+        self.assertEqual(list(VersionTracker.objects.orphan()), [vt])
+
     def test_orphan_no_related_name(self):
         # VersionedPage3 doesn't have a related_name on its
         # VersionedWidgyField. Not having a related name is how you

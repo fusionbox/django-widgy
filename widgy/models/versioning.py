@@ -60,7 +60,7 @@ class VersionTracker(models.Model):
             filters = {}
             for rel_obj in (self.model._meta.get_all_related_objects() +
                             self.model._meta.get_all_related_many_to_many_objects()):
-                if not issubclass(rel_obj.model, VersionCommit):
+                if not issubclass(rel_obj.field.model, VersionCommit):
                     name = rel_obj.field.related_query_name()
                     filters[name + '__isnull'] = True
             return self.filter(**filters)
