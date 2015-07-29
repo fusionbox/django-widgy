@@ -8,6 +8,10 @@ Changelog
   see the `django-pyscss changelog
   <https://pypi.python.org/pypi/django-pyscss/2.0.0#changelog>`_ for
   documentation on how/if you need to change anything.
+- Django 1.8 compatibility.
+- Python 3 compatibility
+- Django 1.7 is now the minimum supported version
+- Mezzanine 4.0 is now the minimum supported version
 
 
 0.6.1 (2015-05-01)

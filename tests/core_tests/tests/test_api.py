@@ -172,7 +172,7 @@ class TestApi(RootNodeTestCase, HttpTestCase):
                     authorize_mock.side_effect = PermissionDenied
                     resp = getattr(self.client, method)(url)
                     self.assertEqual(resp.status_code, 403)
-                    authorize_mock.assert_called_once()
+                    self.assertEqual(authorize_mock.call_count, 1)
 
 
     def test_possible_parents(self):

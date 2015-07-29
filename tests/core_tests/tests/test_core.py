@@ -301,14 +301,14 @@ class TestRegistry(RootNodeTestCase):
             with self.assertRaises(Exception):
                 self.registry.register(self.cls)
                 self.registry.raise_deferred_exception()
-            stderr.write.assert_called_once()
+            self.assertEqual(stderr.write.call_count, 1)
 
     def test_unregister_not_registered(self):
         with mock.patch('sys.stderr') as stderr:
             with self.assertRaises(Exception):
                 self.registry.unregister(self.cls)
                 self.registry.raise_deferred_exception()
-            stderr.write.assert_called_once()
+            self.assertEqual(stderr.write.call_count, 1)
 
 
 class TestTreesEqual(RootNodeTestCase):
