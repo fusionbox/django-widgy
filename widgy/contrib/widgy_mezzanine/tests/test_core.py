@@ -220,7 +220,7 @@ class UserSetup(object):
     'mezzanine.pages.middleware.PageMiddleware',
 ))
 class TestPreviewView(UserSetup, TestCase):
-    urls = 'widgy.contrib.widgy_mezzanine.tests'
+    urls = 'widgy.contrib.widgy_mezzanine.tests.test_core'
 
     def setUp(self):
         super(TestPreviewView, self).setUp()
