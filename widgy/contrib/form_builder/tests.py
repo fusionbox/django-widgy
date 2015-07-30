@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
 import contextlib
+import uuid
+
 from six.moves import StringIO
 
 from django.test import TestCase
@@ -18,7 +20,7 @@ import mock
 from widgy.contrib.form_builder.forms import PhoneNumberField
 from widgy.contrib.form_builder.models import (
     Form, FormInput, Textarea, FormSubmission, FormField, Uncaptcha,
-    EmailUserHandler, EmailSuccessHandler, FileUpload,
+    EmailUserHandler, EmailSuccessHandler, FileUpload, friendly_uuid
 )
 from widgy.exceptions import ParentChildRejection
 from widgy.utils import build_url
@@ -108,6 +110,18 @@ class TestForm(TestCase):
 
     def setUp(self):
         self.form, self.fields = self.make_form()
+
+    def test_friendly_uuid_python2_python3_plays_nice(self):
+        """
+        Regression test for friendly UUID.
+
+        friendly_uuid should return unicode for comparison with
+        values from a request.
+        """
+
+        test_uuid = uuid.UUID('{12345678-1234-5678-1234-567812345678}')
+        short_uuid = friendly_uuid(test_uuid)
+        assert short_uuid == '3cvd8mz9'
 
     def submit(self, a, b, c, form=None):
         form = form or self.form
