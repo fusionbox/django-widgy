@@ -2,11 +2,9 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core import urlresolvers
-from django.utils.encoding import python_2_unicode_compatible
 from django.db.models.signals import post_migrate
 from django.db import transaction
 
-from mezzanine.core.request import current_request
 from mezzanine.pages.managers import PageManager
 from mezzanine.pages.models import Link, Page
 from mezzanine.utils.sites import current_site_id
@@ -151,8 +149,9 @@ def _create_permissions_for_mezzaninecalloutwidget(sender, **kwargs):
 
     ct = ContentType.objects.get_for_model(MezzanineCalloutWidget, for_concrete_model=False)
 
-    permissions = Permission.objects.filter(codename__in=PERMISSIONS.keys()).select_related('content_type')
-
+    permissions = Permission.objects.filter(
+        codename__in=PERMISSIONS.keys()
+    ).select_related('content_type')
 
     # Delete permission with the wrong content type (these are created by Django < 1.9)
     to_delete = set(p.pk for p in permissions if p.content_type != ct)

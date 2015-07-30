@@ -17,7 +17,6 @@ class MultiSitePermissionMixin(object):
         return super(MultiSitePermissionMixin, self).has_add_permission(
             request, parent, created_obj_cls)
 
-
     def has_change_permission(self, request, obj_or_class):
         if not self._can_edit_content(request, obj_or_class):
             return False
