@@ -12,6 +12,11 @@ Changelog
 - Python 3 compatibility
 - Django 1.7 is now the minimum supported version
 - Mezzanine 4.0 is now the minimum supported version
+- ``Content.clone`` now copies simple many-to-many relationships. If you have a
+  widget with a many-to-many field and an overridden clone method that calls
+  super, you should take this into account. If you have many-to-many
+  relationships that use a custom through table, you will have to continue to
+  override clone to clone those.
 
 
 0.6.1 (2015-05-01)

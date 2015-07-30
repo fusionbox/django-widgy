@@ -24,8 +24,8 @@ from ..models import (
     Layout, Bucket, RawTextWidget, CantGoAnywhereWidget, PickyBucket,
     ImmovableBucket, AnotherLayout, VowelBucket, VersionedPage, VersionedPage2,
     VersionedPage3, VersionedPage4, VersionPageThrough, Related,
-    ForeignKeyWidget, WeirdPkBucket, UnnestableWidget,
-    CssClassesWidget, CssClassesWidgetSubclass, CssClassesWidgetProperty,
+    ForeignKeyWidget, WeirdPkBucket, UnnestableWidget, CssClassesWidget,
+    CssClassesWidgetSubclass, CssClassesWidgetProperty, ManyToManyWidget, Tag
 )
 from .base import (
     RootNodeTestCase, make_a_nice_tree, SwitchUserTestCase, refetch)
@@ -274,6 +274,12 @@ class TestCore(RootNodeTestCase):
             self.assertEqual(widget.get_attributes(),
                              attributes)
 
+        widget = ManyToManyWidget.add_root(self.widgy_site)
+        tag = Tag.objects.create(name='foo')
+        widget.tags.add(tag)
+        widget.save()
+        self.assertEqual(widget.get_attributes(), {'tags': [tag.pk]})
+
 
 class TestRegistry(RootNodeTestCase):
     def setUp(self):
@@ -399,11 +405,13 @@ class TestVersioning(RootNodeTestCase):
         root_node = root.node
         root_node.prefetch_tree()
 
+        # - savepoint
         # - root content (1 query)
-        # - root node (2 queries)
-        # - 2 text contents (2 queries)
+        # - release savepoint
+        # - root node (2 queries, 2 savepoints)
+        # - 2 text contents (2 queries, 2 savepoints)
         # - subnodes (1 query)
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(12):
             root_node.clone_tree()
 
     def test_content_equal(self):
@@ -878,6 +886,14 @@ class TestVersioning(RootNodeTestCase):
         root = WeirdPkBucket.add_root(self.widgy_site, bubble=2)
         new_root = root.clone()
         self.assertNotEqual(new_root.pk, root.pk)
+
+    def test_clone_m2m(self):
+        tag = Tag.objects.create(name='foo')
+        root = ManyToManyWidget.add_root(self.widgy_site)
+        root.tags.add(tag)
+
+        new_root = root.clone()
+        self.assertEqual(new_root.tags.get(), tag)
 
     def test_reset_exception(self):
         """

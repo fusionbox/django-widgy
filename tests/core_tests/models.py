@@ -284,3 +284,12 @@ class VerboseNameLayout(Content):
 class VerboseNameLayoutChild(VerboseNameLayout):
     class Meta:
         verbose_name = 'Foobar'
+
+
+class Tag(models.Model):
+    name = models.CharField(unique=True, max_length=100)
+
+
+@registry.register
+class ManyToManyWidget(Content):
+    tags = models.ManyToManyField(Tag)
