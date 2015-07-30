@@ -12,7 +12,16 @@ Changelog
 - Python 3 compatibility
 - Django 1.7 is now the minimum supported version
 - Mezzanine 4.0 is now the minimum supported version
-
+- **Backwards Incompatible** ``WidgySite.has_add_permission`` signature
+  changed.
+- Multisite support
+  * One widgy project can now respond to multiple domains. Use cases could be
+    Widgy as a Service or multi-franchise website.
+  * This feature depends on `Mezzanine multi-tenancy
+    <http://mezzanine.jupo.org/docs/multi-tenancy.html>`_
+  * Callouts are now tied to a django site
+  * This feature is provided by
+    ``widgy.contrib.widgy_mezzanine.site.MultiSitePermissionMixin``
 
 0.6.1 (2015-05-01)
 ------------------
