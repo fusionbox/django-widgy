@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
 from django.contrib.staticfiles import finders
@@ -34,7 +34,7 @@ class WidgySite(object):
         return self.get_registry()
 
     def get_urls(self):
-        urlpatterns = patterns('',
+        urlpatterns = [
             url('^node/$', self.node_view),
             url('^node/(?P<node_pk>[^/]+)/$', self.node_view),
             url('^node/(?P<node_pk>[^/]+)/available-children-recursive/$', self.shelf_view),
@@ -49,7 +49,7 @@ class WidgySite(object):
             url('^history/(?P<pk>[^/]+)/$', self.history_view),
             url('^reset/(?P<pk>[^/]+)/$', self.reset_view),
             url('^diff/$', self.diff_view),
-        )
+        ]
         return urlpatterns
 
     @property

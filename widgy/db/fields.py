@@ -2,7 +2,7 @@ import six
 
 from django.db import models
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
-from django.db.models.loading import get_app
+from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import SimpleLazyObject
 
@@ -122,7 +122,7 @@ class WidgyField(models.ForeignKey):
 
             # we cannot use models.get_model because this class could be
             # abstract.
-            return getattr(get_app(app_label), model_name)
+            return getattr(apps.get_app_config(app_label).models_module, model_name)
 
         layouts = tuple(map(normalize, layouts))
         classes = (cls for cls in self.site.get_all_content_classes()

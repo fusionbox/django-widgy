@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.template.defaultfilters import slugify
 
 from django.utils.encoding import force_text
@@ -30,12 +30,12 @@ class FormAdmin(admin.ModelAdmin):
 
     def get_urls(self, *args, **kwargs):
         urls = super(FormAdmin, self).get_urls(*args, **kwargs)
-        return urls + patterns('',
-                               url(r'^(.+).csv$',
-                                   self.admin_site.admin_view(self.download_view),
-                                   name=self.download_url_name,
-                                   ),
-                               )
+        return urls + [
+            url(r'^(.+).csv$',
+                self.admin_site.admin_view(self.download_view),
+                name=self.download_url_name,
+                ),
+        ]
 
     def change_view(self, request, object_id, *args, **kwargs):
         obj = self.get_object(request, unquote(object_id))

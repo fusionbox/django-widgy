@@ -1,7 +1,8 @@
+from importlib import import_module
+
 from django.core.urlresolvers import set_urlconf
 from django.dispatch import receiver
 from django.conf import settings
-from django.utils.importlib import import_module
 
 from widgy.signals import widgy_pre_index
 
