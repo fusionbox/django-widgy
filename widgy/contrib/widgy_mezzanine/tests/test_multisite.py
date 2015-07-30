@@ -12,6 +12,7 @@ from argonauts.testutils import JsonTestMixin
 from mezzanine.core.models import SitePermission
 
 from widgy.site import WidgySite
+from widgy.models import Node
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.contrib.widgy_mezzanine.site import MultiSitePermissionMixin
 from widgy.contrib.review_queue.site import ReviewedWidgySite
@@ -209,3 +210,16 @@ class TestOwners(PageSetup, TestCase):
         site_b = Site.objects.create(domain='b', name='b')
         with self.settings(SITE_ID=site_b.id):
             assert self.page in vt.owners
+
+
+@skipUnless(PAGE_BUILDER_INSTALLED, 'page builder is not installed')
+class TestPathRoot(TestCase):
+    def test_path_root(self):
+        from widgy.contrib.page_builder.models import MainContent, Button
+
+        tree_1 = MainContent.add_root(widgy_site)
+        tree_2 = MainContent.add_root(widgy_site)
+        tree_2.add_child(widgy_site, Button)
+
+        assert Node.objects.filter(path__path_root=tree_1.node.path).count() == 1
+        assert Node.objects.filter(path__path_root=tree_2.node.path).count() == 2

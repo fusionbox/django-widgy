@@ -129,17 +129,9 @@ class PathRoot(models.Transform):
         """
         return self.lhs.field.model.steplen
 
-    def as_sqlite(self, qn, connection):
-        lhs, params = qn.compile(self.lhs)
-        return 'SUBSTR(%s, %%s, %%s)' % lhs, (params + [0, self.steplen+1])
-
-    def as_mysql(self, qn, connection):
+    def as_sql(self, qn, connection):
         lhs, params = qn.compile(self.lhs)
         return 'SUBSTR(%s, %%s, %%s)' % lhs, (params + [1, self.steplen])
-
-    def as_postgresql(self, qn, connection):
-        lhs, params = qn.compile(self.lhs)
-        return 'SUBSTRING(%s, %%s, %%s)' % lhs, (params + [1, self.steplen])
 
 models.Field.register_lookup(PathRoot)
 
