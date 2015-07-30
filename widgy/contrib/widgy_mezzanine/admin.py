@@ -313,6 +313,22 @@ class MultiSiteFormAdmin(FormAdmin):
         site_pages = version_tracker_model.objects.filter(widgypage__site_id=current_site_id())
         site_nodes = Node.objects.filter(versiontracker__in=site_pages)
 
+        # This query seems like it could get slow. If that's the case,
+        # something along these lines might be helpful:
+        # Node.objects.all().extra(
+        #     tables=[
+        #         '"widgy_node" AS "root"',
+        #         'widgy_versiontracker',
+        #         'widgy_mezzanine_widgypage',
+        #         'pages_page',
+        #     ],
+        #     where=[
+        #         'root.path = SUBSTR(widgy_node.path, 1, 4)',
+        #         'widgy_versiontracker.id = widgy_mezzanine_widgypage.root_node_id',
+        #         'pages_page.id = widgy_mezzanine_widgypage.page_ptr_id',
+        #         'pages_page.site_id = 1',
+        #     ]
+        # )
         qs = super(MultiSiteFormAdmin, self).get_queryset(request).filter(
             _nodes__path__path_root__in=site_nodes.values_list('path'),
         )
