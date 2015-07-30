@@ -443,8 +443,13 @@ def friendly_uuid(uuid):
     The returned string will have 40 bits of entropy assuming a UUID4.
     """
     result = base64.b32encode(hashlib.sha1(force_bytes(uuid)).digest()[:5]).lower()
+    unicode_result = result.decode('ascii')
     # avoid accidental profanity
-    return result.replace(b'e', b'0').replace(b'o', b'1').replace(b'u', b'8').replace(b'i', b'9')
+    profanity_filter = (unicode_result.replace('e', '0')
+                                      .replace('o', '1')
+                                      .replace('u', '8')
+                                      .replace('i', '9'))
+    return profanity_filter
 
 
 @widgy.register
