@@ -1,0 +1,6 @@
+@import "/widgy/css/widgy_common.scss";
+
+li.node,
+li.shelfItem {
+  @include node-icon-sprite("widgy_mezzanine.mezzaninecalloutwidget", "widget-callout");
+}

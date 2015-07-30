@@ -12,7 +12,9 @@ from django.utils import timezone
 from django.contrib import messages
 from django.db.models.signals import post_save
 from django.db.models import Min, Q
+from django.contrib.sites.models import Site
 
+from mezzanine.utils.sites import current_site_id
 from mezzanine.pages.admin import PageAdmin
 try:
     from mezzanine.pages.admin import PageAdminForm
@@ -25,7 +27,13 @@ from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
 from widgy.forms import WidgyFormMixin, VersionedWidgyWidget
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.contrib.widgy_mezzanine.views import ClonePageView, UnpublishView
+from widgy.contrib.page_builder.admin import CalloutAdmin
+from widgy.contrib.page_builder.models import Callout
+from widgy.contrib.form_builder.admin import FormAdmin
+from widgy.contrib.form_builder.models import Form
 from widgy.db.fields import get_site
+from widgy.models import Node
+from widgy.admin import WidgyAdmin
 
 
 WidgyPage = get_widgypage_model()
@@ -106,7 +114,7 @@ class WidgyPageAdmin(PageAdmin):
     def _save_and_commit(self, request, obj):
         site = self.get_site()
         commit_model = site.get_version_tracker_model().commit_model
-        if not site.has_add_permission(request, commit_model):
+        if not site.has_add_permission(request, obj, commit_model):
             messages.error(request, _("You don't have permission to commit."))
         else:
             if obj.root_node.has_changes():
@@ -123,7 +131,7 @@ class WidgyPageAdmin(PageAdmin):
     def _save_and_approve(self, request, obj):
         site = self.get_site()
         commit_model = site.get_version_tracker_model().commit_model
-        if not site.has_add_permission(request, commit_model) or \
+        if not site.has_add_permission(request, obj, commit_model) or \
                 not site.has_change_permission(request, commit_model):
             messages.error(request, _("You don't have permission to approve commits."))
         else:
@@ -181,7 +189,7 @@ class WidgyPageAdmin(PageAdmin):
         else:
             context['save_buttons'] = self.unreviewed_buttons[status]
         if not add:
-            context['history_url'] =  site.reverse(site.history_view, kwargs={'pk': obj.root_node_id})
+            context['history_url'] = site.reverse(site.history_view, kwargs={'pk': obj.root_node_id})
         return super(WidgyPageAdmin, self).render_change_form(request, context, add, change, form_url, obj, *args, **kwargs)
 
     @property
@@ -302,13 +310,95 @@ def publish_page_on_approve(sender, instance, created, **kwargs):
             )
 
 
+class MultiSiteFormAdmin(FormAdmin):
+    def get_queryset(self, request):
+        version_tracker_model = self.get_site().get_version_tracker_model()
+        site_pages = version_tracker_model.objects.filter(widgypage__site_id=current_site_id())
+        site_nodes = Node.objects.filter(versiontracker__in=site_pages)
+
+        # This query seems like it could get slow. If that's the case,
+        # something along these lines might be helpful:
+        # Node.objects.all().extra(
+        #     tables=[
+        #         '"widgy_node" AS "root"',
+        #         'widgy_versiontracker',
+        #         'widgy_mezzanine_widgypage',
+        #         'pages_page',
+        #     ],
+        #     where=[
+        #         'root.path = SUBSTR(widgy_node.path, 1, 4)',
+        #         'widgy_versiontracker.id = widgy_mezzanine_widgypage.root_node_id',
+        #         'pages_page.id = widgy_mezzanine_widgypage.page_ptr_id',
+        #         'pages_page.site_id = 1',
+        #     ]
+        # )
+        qs = super(MultiSiteFormAdmin, self).get_queryset(request).filter(
+            _nodes__path__path_root__in=site_nodes.values_list('path'),
+        )
+        return qs
+
+    def get_site(self):
+        return get_site(settings.WIDGY_MEZZANINE_SITE)
+
+admin.site.unregister(Form)
+admin.site.register(Form, MultiSiteFormAdmin)
+
+
+class MultiSiteCalloutAdmin(WidgyAdmin):
+    def get_fields(self, request, obj=None):
+        # Mezzanine has a weird data model for site permissions. This optimizes the query into
+        # one single SQL statement. This also avoids raising an ObjectDoesNotExist error in case
+        # a user does not have a sitepermission object.
+        site_list = Site.objects.filter(sitepermission__user=request.user)
+
+        if request.user.is_superuser or len(site_list) > 1:
+            return ('name', 'site', 'root_node')
+        else:
+            return ('name', 'root_node')
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'site' and not request.user.is_superuser:
+            # See MultiSiteCalloutAdmin.get_fields() about this query
+            kwargs['queryset'] = Site.objects.filter(sitepermission__user=request.user)
+
+            # Non superusers have to select a site, otherwise the callout will be global.
+            kwargs['required'] = True
+        return super(MultiSiteCalloutAdmin, self).formfield_for_foreignkey(
+            db_field, request, **kwargs)
+
+    def save_model(self, request, obj, form, change):
+        site_list = Site.objects.filter(sitepermission__user=request.user)
+        if not change and len(site_list) == 1:
+            obj.site = site_list.get()
+        return super(MultiSiteCalloutAdmin, self).save_model(request, obj, form, change)
+
+    def get_queryset(self, request):
+        qs = super(MultiSiteCalloutAdmin, self).get_queryset(request)
+        if not request.user.is_superuser:
+            qs = qs.filter(site__sitepermission__user=request.user)
+        return qs
+
+admin.site.unregister(Callout)
+admin.site.register(Callout, MultiSiteCalloutAdmin)
+
 if REVIEW_QUEUE_INSTALLED:
     from widgy.contrib.review_queue.admin import VersionCommitAdminBase
-    from widgy.contrib.review_queue.models import ReviewedVersionCommit
+    from widgy.contrib.review_queue.models import ReviewedVersionCommit, ReviewedVersionTracker
 
     class VersionCommitAdmin(VersionCommitAdminBase):
         def get_site(self):
             return get_site(settings.WIDGY_MEZZANINE_SITE)
+
+        def get_queryset(self, request):
+            qs = super(VersionCommitAdmin, self).get_queryset(request)
+
+            if not request.user.is_superuser:
+                sites = Site.objects.filter(sitepermission__user=request.user)
+                qs = qs.filter(
+                    tracker__in=ReviewedVersionTracker.objects.filter(widgypage__site__in=sites)
+                )
+
+            return qs
 
     admin.site.register(ReviewedVersionCommit, VersionCommitAdmin)
 

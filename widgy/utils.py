@@ -152,13 +152,13 @@ class SelectRelatedManager(models.Manager):
     """
 
     def __init__(self, *args, **kwargs):
-        self.select_related = kwargs.pop('select_related', [])
-        self.prefetch_related = kwargs.pop('prefetch_related', [])
+        self._select_related = kwargs.pop('select_related', [])
+        self._prefetch_related = kwargs.pop('prefetch_related', [])
         super(SelectRelatedManager, self).__init__(*args, **kwargs)
 
-    def get_query_set(self, *args, **kwargs):
-        qs = super(SelectRelatedManager, self).get_query_set(*args, **kwargs)
-        return qs.select_related(*self.select_related).prefetch_related(*self.prefetch_related)
+    def get_queryset(self, *args, **kwargs):
+        qs = super(SelectRelatedManager, self).get_queryset(*args, **kwargs)
+        return qs.select_related(*self._select_related).prefetch_related(*self._prefetch_related)
 
 
 # Pending https://code.djangoproject.com/ticket/20806, Widgy's use of

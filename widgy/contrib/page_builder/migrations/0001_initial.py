@@ -93,7 +93,7 @@ class Migration(migrations.Migration):
             name='Figure',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('position', models.CharField(default='center', max_length=50, verbose_name='position', choices=[(b'left', 'Float left'), (b'right', 'Float right'), (b'center', 'Center')])),
+                ('position', models.CharField(default='center', max_length=50, verbose_name='position', choices=[('left', 'Float left'), ('right', 'Float right'), ('center', 'Center')])),
                 ('title', models.CharField(max_length=1023, null=True, verbose_name='title', blank=True)),
                 ('caption', models.TextField(null=True, verbose_name='caption', blank=True)),
             ],
@@ -108,7 +108,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('address', models.CharField(max_length=500, verbose_name='address')),
-                ('type', models.CharField(default=b'roadmap', max_length=20, verbose_name='type', choices=[(b'roadmap', 'Road map'), (b'satellite', 'Satellite'), (b'hybrid', 'Hybrid'), (b'terrain', 'Terrain')])),
+                ('type', models.CharField(default='roadmap', max_length=20, verbose_name='type', choices=[('roadmap', 'Road map'), ('satellite', 'Satellite'), ('hybrid', 'Hybrid'), ('terrain', 'Terrain')])),
             ],
             options={
                 'verbose_name': 'Google map',
@@ -120,7 +120,7 @@ class Migration(migrations.Migration):
             name='Html',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('content', models.TextField(default=b'')),
+                ('content', models.TextField(default='')),
             ],
             options={
                 'verbose_name': 'HTML',
@@ -257,7 +257,7 @@ class Migration(migrations.Migration):
             name='UnsafeHtml',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('content', models.TextField(default=b'')),
+                ('content', models.TextField(default='')),
             ],
             options={
                 'verbose_name': 'unsafe HTML',

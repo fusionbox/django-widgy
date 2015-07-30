@@ -193,9 +193,9 @@ class VersionTracker(models.Model):
 
     @cached_property
     def owners(self):
-        return list(owner
-                    for attr in self.get_owner_related_names()
-                    for owner in getattr(self, attr).all())
+        return [owner
+                for attr in self.get_owner_related_names()
+                for owner in getattr(self, attr).all()]
 
     def clone(self):
         vt = copy.copy(self)

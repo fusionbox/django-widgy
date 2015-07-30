@@ -17,6 +17,16 @@ Changelog
   super, you should take this into account. If you have many-to-many
   relationships that use a custom through table, you will have to continue to
   override clone to clone those.
+- **Backwards Incompatible** ``WidgySite.has_add_permission`` signature
+  changed.
+- Multisite support
+  * One widgy project can now respond to multiple domains. Use cases could be
+    Widgy as a Service or multi-franchise website.
+  * This feature depends on `Mezzanine multi-tenancy
+    <http://mezzanine.jupo.org/docs/multi-tenancy.html>`_
+  * Callouts are now tied to a django site
+  * This feature is provided by
+    ``widgy.contrib.widgy_mezzanine.site.MultiSitePermissionMixin``
 
 
 0.6.1 (2015-05-01)

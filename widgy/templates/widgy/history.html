@@ -42,7 +42,7 @@
         {% endblock %}
           <div class="actions">
             {% block commit_actions %}
-            {% has_add_permission site commit as can_revert %}
+            {% has_add_permission site commit.tracker commit as can_revert %}
             {% if commit.root_node != commit.tracker.head.root_node and can_revert %}
               <a class="button widgy-fancybox" href="{% reverse_site_url site 'revert_view' pk=commit.tracker.pk commit_pk=commit.pk %}">{% trans "Revert to this Version" %}</a>
             {% elif can_revert %}

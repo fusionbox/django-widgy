@@ -23,6 +23,7 @@ from django.core.urlresolvers import get_resolver
 
 from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
+from mezzanine.pages.models import Page
 
 from widgy.site import WidgySite
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
@@ -51,7 +52,7 @@ if FORM_BUILDER_INSTALLED:
 PAGE_BUILDER_INSTALLED = 'widgy.contrib.page_builder' in settings.INSTALLED_APPS
 
 if PAGE_BUILDER_INSTALLED:
-    from widgy.contrib.page_builder.models import Button, DefaultLayout
+    from widgy.contrib.page_builder.models import Button, DefaultLayout, MainContent
     from widgy.contrib.widgy_mezzanine.views import PreviewView
 
 REVIEW_QUEUE_INSTALLED = 'widgy.contrib.review_queue' in settings.INSTALLED_APPS
@@ -205,7 +206,7 @@ class UserSetup(object):
         self.staffuser.is_staff = True
         self.staffuser.save()
         self.staffuser.user_permissions = Permission.objects.filter(
-            content_type__app_label__in=['pages', 'widgy_mezzanine', 'review_queue']
+            content_type__app_label__in=['pages', 'widgy_mezzanine', 'review_queue', 'page_builder']
         ).exclude(codename='change_reviewedversioncommit')
 
     @contextmanager
@@ -220,7 +221,7 @@ class UserSetup(object):
     'mezzanine.pages.middleware.PageMiddleware',
 ))
 class TestPreviewView(UserSetup, TestCase):
-    urls = 'widgy.contrib.widgy_mezzanine.tests'
+    urls = 'widgy.contrib.widgy_mezzanine.tests.test_core'
 
     def setUp(self):
         super(TestPreviewView, self).setUp()
@@ -286,11 +287,11 @@ class PageSetup(object):
         super(PageSetup, self).setUp()
         self.factory = RequestFactory()
 
-        site = get_site(getattr(settings, 'WIDGY_MEZZANINE_SITE', widgy_site))
+        self.widgy_site = get_site(getattr(settings, 'WIDGY_MEZZANINE_SITE', widgy_site))
 
         self.page = WidgyPage.objects.create(
-            root_node=site.get_version_tracker_model().objects.create(
-                working_copy=Button.add_root(site, text='buttontext').node,
+            root_node=self.widgy_site.get_version_tracker_model().objects.create(
+                working_copy=MainContent.add_root(self.widgy_site).node,
             ),
             title='titleabc',
             slug='slugabc',
@@ -322,6 +323,9 @@ class TestClonePage(AdminView, TestCase):
         self.assertNotIn(self.page.slug, resp.rendered_content)
 
     def test_post(self):
+        self.page.root_node.working_copy.content.add_child(
+            self.widgy_site, Button, text='buttontext')
+
         view = self.as_view(model=WidgyPage)
         with mock.patch('django.contrib.messages.success') as success_mock:
             req = self.factory.post('/', {'title': 'new title'})
@@ -338,7 +342,8 @@ class TestClonePage(AdminView, TestCase):
         self.assertNotEqual(new_page.slug, self.page.slug)
         self.assertEqual(new_page.title, 'new title')
 
-        self.assertEqual(new_page.root_node.working_copy.content.text, 'buttontext')
+        button = new_page.root_node.working_copy.content.get_children()[0]
+        self.assertEqual(button.text, 'buttontext')
 
 
 class TestUnpublish(AdminView, TestCase):
@@ -363,7 +368,7 @@ class TestUnpublish(AdminView, TestCase):
 
 
 class AdminButtonsTestBase(PageSetup, UserSetup):
-    urls = 'widgy.contrib.widgy_mezzanine.tests'
+    urls = 'widgy.contrib.widgy_mezzanine.tests.test_core'
 
     def setUp(self):
         super(AdminButtonsTestBase, self).setUp()
@@ -529,7 +534,7 @@ class TestAdminButtonsWhenReviewed(AdminButtonsTestBase, TestCase):
 
 
 class TestAdminMessages(PageSetup, TestCase):
-    urls = 'widgy.contrib.widgy_mezzanine.tests'
+    urls = 'widgy.contrib.widgy_mezzanine.tests.test_core'
 
     def setUp(self):
         super(TestAdminMessages, self).setUp()
@@ -630,3 +635,10 @@ class TestPublicationCommitHandling(PageSetup, TestCase):
 
         self.assertEqual(refetch(self.page).status, CONTENT_STATUS_PUBLISHED)
         self.assertEqual(refetch(self.page).publish_date, refetch(c2).publish_at)
+
+
+class TestSelectRelated(PageSetup, TestCase):
+    def test_default_manager_selects_related(self):
+        p = Page.objects.get(pk=self.page.pk).widgypage
+        with self.assertNumQueries(1):
+            p.widgypage.root_node.head

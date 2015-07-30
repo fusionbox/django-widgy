@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 from django.utils.encoding import python_2_unicode_compatible
 from django.dispatch import receiver
 from django.template.defaultfilters import truncatechars
+from django.contrib.sites.models import Site
 
 from widgy.models import Content
 from widgy.models.mixins import (
@@ -160,6 +161,7 @@ class CalloutBucket(Bucket):
 @python_2_unicode_compatible
 class Callout(models.Model):
     name = models.CharField(max_length=255, verbose_name=_('name'))
+    site = models.ForeignKey(Site, null=True, blank=True)
     root_node = WidgyField(
         site=settings.WIDGY_MEZZANINE_SITE,
         null=True,
