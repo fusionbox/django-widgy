@@ -125,7 +125,7 @@ class PathRoot(models.Transform):
         """
         Length of a step for the materialized tree
         """
-        return self.lhs.field.model.steplen
+        return self.lhs.output_field.model.steplen
 
     def as_sql(self, qn, connection):
         lhs, params = qn.compile(self.lhs)
