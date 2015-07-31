@@ -293,28 +293,20 @@ class TestRegistry(RootNodeTestCase):
     def test_register(self):
         self.registry.register(self.cls)
         self.assertIn(self.cls, self.registry)
-        self.registry.raise_deferred_exception()
 
     def test_unregister(self):
         self.registry.register(self.cls)
         self.registry.unregister(self.cls)
         self.assertNotIn(self.cls, self.registry)
-        self.registry.raise_deferred_exception()
 
     def test_register_twice(self):
         self.registry.register(self.cls)
-        with mock.patch('sys.stderr') as stderr:
-            with self.assertRaises(Exception):
-                self.registry.register(self.cls)
-                self.registry.raise_deferred_exception()
-            self.assertEqual(stderr.write.call_count, 1)
+        with self.assertRaises(Exception):
+            self.registry.register(self.cls)
 
     def test_unregister_not_registered(self):
-        with mock.patch('sys.stderr') as stderr:
-            with self.assertRaises(Exception):
-                self.registry.unregister(self.cls)
-                self.registry.raise_deferred_exception()
-            self.assertEqual(stderr.write.call_count, 1)
+        with self.assertRaises(Exception):
+            self.registry.unregister(self.cls)
 
 
 class TestTreesEqual(RootNodeTestCase):
