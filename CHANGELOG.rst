@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.7.0 (unreleased)
+0.7.0 (2015-07-31)
 ------------------
 
 - **Possible Breaking Change** Updated the django-pyscss_ dependency. Please
