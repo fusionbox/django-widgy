@@ -104,9 +104,6 @@ class NodeView(WidgyView):
         app_label, model = data['__class__'].split('.')
         try:
             content_class = get_model(app_label, model)
-            if content_class is None:
-                # BBB Django < 1.7 returns None instead of raising LookupError
-                raise LookupError
         except LookupError:
             raise Http404
 

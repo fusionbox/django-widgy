@@ -76,15 +76,6 @@ class ContentTypeRadioInput(widgets.RadioChoiceInput):
 class ContentTypeRadioRenderer(widgets.RadioFieldRenderer):
     choice_input_class = ContentTypeRadioInput
 
-    # BBB django < 1.7 doesn't use choice_input_class
-    def __iter__(self):
-        for i, choice in enumerate(self.choices):
-            yield self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, i)
-
-    def __getitem__(self, idx):
-        choice = self.choices[idx]  # Let the IndexError propogate
-        return self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, idx)
-
 
 class ContentTypeRadioSelect(widgets.RadioSelect):
     renderer = ContentTypeRadioRenderer

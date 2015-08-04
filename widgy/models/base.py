@@ -68,7 +68,6 @@ class Node(MP_Node):
     is_frozen = models.BooleanField(default=False)
 
     class Meta:
-        app_label = 'widgy'
         unique_together = [('content_type', 'content_id')]
 
     def __str__(self):
@@ -426,7 +425,6 @@ class Content(models.Model):
 
     class Meta:
         abstract = True
-        app_label = 'widgy'
 
     def __init__(self, *args, **kwargs):
         super(Content, self).__init__(*args, **kwargs)
@@ -845,11 +843,6 @@ class Content(models.Model):
         return self.get_attributes() == other.get_attributes()
 
 
-# Otherwise, mixins will inherit Content.Meta and get wierd app_labels
-# Delete this line and the app_label line when we drop support for Django < 1.7
-del Content.Meta
-
-
 class UnknownWidget(Content):
     """
     A placeholder Content class used when the correct one can't be found. For
@@ -862,7 +855,6 @@ class UnknownWidget(Content):
     editable = False
 
     class Meta:
-        app_label = 'widgy'
         # we don't actually need a db table
         managed = False
 

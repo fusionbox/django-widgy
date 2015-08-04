@@ -28,7 +28,7 @@ import html2text
 from widgy.models import Content, Node
 from widgy.signals import pre_delete_widget
 from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, StrDisplayNameMixin
-from widgy.utils import update_context, build_url, QuerySet
+from widgy.utils import update_context, build_url
 from widgy.contrib.page_builder.models import Bucket, Html
 from widgy.contrib.page_builder.forms import MiniCKEditorField, CKEditorField
 from .forms import PhoneNumberField
@@ -471,7 +471,7 @@ class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Con
     ]
     tooltip = _("Use this widget to build a Form that your users can fill out.")
 
-    class FormQuerySet(QuerySet):
+    class FormQuerySet(models.QuerySet):
         def annotate_submission_count(self):
             return self.extra(select={
                 'submission_count':
@@ -943,7 +943,7 @@ class FormSubmission(models.Model):
     form_node = models.ForeignKey(Node, on_delete=models.PROTECT, related_name='form_submissions')
     form_ident = models.CharField(max_length=Form._meta.get_field('ident', False).max_length)
 
-    class FormSubmissionQuerySet(QuerySet):
+    class FormSubmissionQuerySet(models.QuerySet):
         def get_formfield_labels(self):
             """
             A dictionary of field uuid to field label. We use the label of the

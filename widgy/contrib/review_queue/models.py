@@ -3,8 +3,6 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from widgy.utils import QuerySet
-
 from widgy.models.versioning import VersionTracker, VersionCommit
 
 
@@ -18,7 +16,7 @@ class ReviewedVersionCommit(VersionCommit):
         verbose_name_plural = _('unapproved commits')
 
 
-    class ReviewedVersionCommitQuerySet(QuerySet):
+    class ReviewedVersionCommitQuerySet(models.QuerySet):
         def unapproved(self):
             return self.filter(approved_at__isnull=True,
                                approved_by__isnull=True)

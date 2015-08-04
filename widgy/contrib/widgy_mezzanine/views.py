@@ -220,9 +220,6 @@ class UnpublishView(AdminViewMixin, DetailView):
     has_change_permission = None
 
     def dispatch(self, request, *args, **kwargs):
-        # BBB django 1.4 sets args/kwargs in dispatch not as_view like later
-        # versions
-        self.args = args
         self.object = self.get_object()
         return super(UnpublishView, self).dispatch(request, *args, **kwargs)
 

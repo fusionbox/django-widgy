@@ -1,6 +1,6 @@
 import imp
+from importlib import import_module
 
-import django
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.decorators import decorator_from_middleware
@@ -8,6 +8,7 @@ from django.http import HttpResponse, HttpResponseNotFound
 from django.core import urlresolvers
 from django.contrib.auth.models import AnonymousUser
 from django.conf.urls import include, url, patterns
+from django.conf import settings
 
 from widgy.contrib.urlconf_include.middleware import PatchUrlconfMiddleware
 from widgy.contrib.urlconf_include.models import UrlconfIncludePage
@@ -55,12 +56,8 @@ class TestMiddleware(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
 
-    if django.VERSION > (1, 7):
-        def resolver_cache_size(self):
-            return urlresolvers.get_resolver.cache_info().currsize
-    else:
-        def resolver_cache_size(self):
-            return len(urlresolvers._resolver_cache)
+    def resolver_cache_size(self):
+        return urlresolvers.get_resolver.cache_info().currsize
 
     def get_request(self, path='/'):
         r = self.factory.get(path)
@@ -162,5 +159,9 @@ class TestMiddleware(TestCase):
         )
 
         r = self.get_request('/foo/login/')
+        r.resolver_match = urlresolvers.resolve(
+            r.get_full_path(),
+            PatchUrlconfMiddleware.get_urlconf(import_module(settings.ROOT_URLCONF))
+        )
         resp = view_not_found(r)
         self.assertEqual(resp.status_code, 404)

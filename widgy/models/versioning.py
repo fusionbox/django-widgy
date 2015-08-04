@@ -10,7 +10,7 @@ from django.template.defaultfilters import date as date_format
 
 from widgy.db.fields import WidgyField
 from widgy.models.base import Node
-from widgy.utils import QuerySet, unset_pks
+from widgy.utils import unset_pks
 
 
 @python_2_unicode_compatible
@@ -49,7 +49,7 @@ class VersionTracker(models.Model):
     class Meta:
         app_label = 'widgy'
 
-    class VersionTrackerQuerySet(QuerySet):
+    class VersionTrackerQuerySet(models.QuerySet):
         def orphan(self):
             """
             Filters the queryset to only include 'orphan' VersionTrackers. That
