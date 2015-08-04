@@ -26,6 +26,7 @@ Changelog
 - **Backwards Incompatible** ``WidgySite.has_add_permission`` signature
   changed.
 - Multisite support
+
   * One widgy project can now respond to multiple domains. Use cases could be
     Widgy as a Service or multi-franchise website.
   * This feature depends on `Mezzanine multi-tenancy
