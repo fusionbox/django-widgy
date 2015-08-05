@@ -13,6 +13,7 @@ from django.contrib import messages
 from django.db.models.signals import post_save
 from django.db.models import Min, Q
 from django.contrib.sites.models import Site
+from django.template.loader import render_to_string
 
 from mezzanine.utils.sites import current_site_id
 from mezzanine.pages.admin import PageAdmin
@@ -200,8 +201,18 @@ class WidgyPageAdmin(PageAdmin):
         return get_site(settings.WIDGY_MEZZANINE_SITE)
 
 
+class UndeleteWidget(forms.RadioSelect):
+    template_name = 'widgy/undelete_field.html'
+
+    def render(self, name, value, attrs=None):
+        return render_to_string(self.template_name, {'self': self,
+                                                     'name': name,
+                                                     'value': value,
+                                                     'attrs': attrs})
+
+
 class UndeleteField(forms.ModelChoiceField):
-    widget = forms.RadioSelect
+    widget = UndeleteWidget
 
     def __init__(self, *args, **kwargs):
         self.site = kwargs.pop('site')
@@ -224,9 +235,8 @@ class UndeleteField(forms.ModelChoiceField):
             working_copy__content_type_id__in=layouts)
 
     def label_from_instance(self, obj):
-        url = reverse('widgy.contrib.widgy_mezzanine.views.preview',
-                      kwargs={'node_pk': obj.working_copy.pk})
-        return format_html('<a href="{url}">{preview}</a>', url=url, preview=ugettext('preview'))
+        return reverse('widgy.contrib.widgy_mezzanine.views.preview',
+                       kwargs={'node_pk': obj.working_copy.pk})
 
 
 class UndeletePageAdminMixin(object):

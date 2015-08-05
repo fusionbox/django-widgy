@@ -1,0 +1,18 @@
+{% load i18n %}
+{% load staticfiles %}
+{% load compress %}
+
+<div class="undelete-field">
+{% for pk, url in self.choices %}
+  <div>
+    <input type="radio" value="{{ value }}" name="{{name }}" id="id_{{ name }}_{{ pk }}">
+    <label for="id_{{ name }}_{{ pk }}">
+      <a href="{{ url }}">{% trans "Preview" %}</a>
+    </label>
+  </div>
+{% endfor %}
+</div>
+
+{% compress css %}
+<link type="text/x-scss" rel="stylesheet" href="{% static 'widgy/css/undelete_field.scss' %}">
+{% endcompress %}
