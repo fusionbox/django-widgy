@@ -4,7 +4,9 @@ Changelog
 0.7.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- ``head`` and ``working_copy`` on VersionTracker are now OneToOneFields. The
+  related names changed: ``versiontracker_set`` became ``versiontracker``, and
+  the related name for ``head`` was removed. Use ``tracker`` instead.
 
 
 0.7.0 (2015-07-31)
