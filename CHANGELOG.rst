@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.7.1 (unreleased)
+0.7.1 (2015-08-18)
 ------------------
 
 - Fix python 3 compatibility: SortedDict.keys() was returning an iterator
