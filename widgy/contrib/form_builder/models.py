@@ -6,10 +6,10 @@ import base64
 import hashlib
 import os.path
 import six
+from collections import OrderedDict
 
 from django.db import models
 from django import forms
-from django.utils.datastructures import SortedDict
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _, ugettext
@@ -499,8 +499,10 @@ class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Con
         """
         Returns a django.forms.Form class based on my child widgets.
         """
-        fields = SortedDict((child.get_formfield_name(), child.get_formfield())
-                            for child in self.depth_first_order() if isinstance(child, BaseFormField))
+        fields = OrderedDict(
+            (child.get_formfield_name(), child.get_formfield())
+            for child in self.depth_first_order() if isinstance(child, BaseFormField)
+        )
 
         mixins = []
         for child in self.depth_first_order():
@@ -586,7 +588,7 @@ class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Con
         """
         A dictionary of formfield name -> FormField widget
         """
-        ret = SortedDict()
+        ret = OrderedDict()
         for child in self.depth_first_order():
             if isinstance(child, FormField):
                 ret[child.get_formfield_name()] = child
@@ -955,7 +957,7 @@ class FormSubmission(models.Model):
                 submission__in=self,
             ).values('field_ident').distinct().order_by('field_node__path').values_list('field_ident', flat=True)
 
-            ret = SortedDict([
+            ret = OrderedDict([
                 ('created_at', ugettext('Created at')),
             ])
             for field_uuid in uuids:
@@ -970,8 +972,8 @@ class FormSubmission(models.Model):
 
         def as_ordered_dictionaries(self, order):
             for submission in self.as_dictionaries():
-                yield SortedDict((ident, submission.get(ident, ''))
-                                 for ident in order)
+                yield OrderedDict((ident, submission.get(ident, ''))
+                                  for ident in order)
 
         def to_csv(self, output):
             """
