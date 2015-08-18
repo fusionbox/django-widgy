@@ -4,7 +4,9 @@ Changelog
 0.7.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix python 3 compatibility: SortedDict.keys() was returning an iterator
+  instead of a view. This was causing ``form_builder/forms/XX`` not to display
+  properly.
 
 
 0.7.0 (2015-07-31)
