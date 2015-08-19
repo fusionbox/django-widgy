@@ -36,4 +36,4 @@ class PageIndex(indexes.SearchIndex, indexes.Indexable):
                          content])
 
     def prepare_keywords(self, obj):
-        return [unicode(k) for k in obj.keywords.all()]
+        return [str(k) for k in obj.keywords.all()]
