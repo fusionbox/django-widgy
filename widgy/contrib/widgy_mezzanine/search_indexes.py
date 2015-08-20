@@ -1,4 +1,5 @@
 from haystack import indexes
+from django.utils.encoding import force_text
 
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.templatetags.widgy_tags import render_root
@@ -36,4 +37,4 @@ class PageIndex(indexes.SearchIndex, indexes.Indexable):
                          content])
 
     def prepare_keywords(self, obj):
-        return [unicode(k) for k in obj.keywords.all()]
+        return [force_text(k) for k in obj.keywords.all()]

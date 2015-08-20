@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_text
 from django.conf import settings
 from django.core import urlresolvers
 from django.db.models.signals import post_migrate
@@ -27,7 +28,7 @@ class WidgyPageMixin(object):
         we need.  We also override this with a real db column in order to do
         translation.
         """
-        return ', '.join(unicode(keyword) for keyword in self.keywords.all())
+        return ', '.join(force_text(keyword) for keyword in self.keywords.all())
 
     def get_form_action_url(self, form, widgy):
         return urlresolvers.reverse(
