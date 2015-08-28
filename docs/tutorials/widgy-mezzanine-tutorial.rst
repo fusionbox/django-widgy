@@ -177,7 +177,7 @@ to enable the ``overextends`` template tag, and then override
 ``admin/base_site.html``::
 
     {% overextends "admin/base_site.html" %}
-    {% block before_content %}{% endblock %}
+    {% block before_content %}{{ block.super }}{% endblock %}
 
 This will prevent mezzanine from displaying the site dropdown. Everything else
 should work as is.
