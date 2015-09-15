@@ -4,7 +4,7 @@ Changelog
 0.7.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Include DaisyDiff.jar with distribution.
 
 
 0.7.1 (2015-08-18)
