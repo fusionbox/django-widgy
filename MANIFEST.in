@@ -2,5 +2,6 @@ include README.rst CHANGELOG.rst LICENSE Makefile tox.ini
 recursive-include widgy *
 recursive-include tests *.py
 recursive-include docs *
+recursive-include bin/daisydiff *
 prune docs/_build
 global-exclude *.pyc
