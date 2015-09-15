@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.7.2 (unreleased)
+0.7.2 (2015-09-15)
 ------------------
 
 - Include DaisyDiff.jar with distribution.
