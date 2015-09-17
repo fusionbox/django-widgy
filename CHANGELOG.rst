@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.7.3 (unreleased)
+0.7.3 (2015-09-17)
 ------------------
 
 - Include and install DaisyDiff binaries and license files.
