@@ -62,6 +62,15 @@ extras_require = {
     ],
 }
 
+data_files = [
+    ('bin/daisydiff', [
+        'bin/daisydiff/daisydiff.jar',
+        'bin/daisydiff/LICENSE.txt',
+        'bin/daisydiff/NOTICE.txt',
+        'bin/daisydiff/README.txt'
+    ]),
+]
+
 extras_require['all'] = set(j for i in extras_require.values() for j in i)
 
 
@@ -80,6 +89,7 @@ setup(
     include_package_data=True,
     tests_require=['mock', 'dj-database-url', 'pytest-django', 'pytest'],
     cmdclass={'test': PyTest},
+    data_files=data_files,
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
