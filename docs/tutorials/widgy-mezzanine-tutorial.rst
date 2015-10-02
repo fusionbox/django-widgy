@@ -118,21 +118,9 @@ Configure django-compressor::
     for ``text/x-scss``.  Widgy uses the django-pyscss_ package for easily
     integrating the pyScss_ library with Django.
 
-.. note::
-
-    If you are using a version of Django older than 1.7, you will need use
-    South 1.0 or set SOUTH_MIGRATION_MODULES.
-
 Then run the following command::
 
     $ python manage.py migrate
-
-.. note::
-
-    If you are on a version of Django older than 1.7, you will need to run the
-    following command as well::
-
-        $ python manage.py syncdb
 
 add urls::
 
