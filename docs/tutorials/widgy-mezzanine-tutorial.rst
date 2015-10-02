@@ -125,17 +125,17 @@ Then run the following command::
 add urls::
 
     # urls.py
-    from django.conf.urls import patterns, include, url
+    from django.conf.urls import include, url
     from demo.widgy_site import site as widgy_site
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         # ...
         # widgy admin
         url(r'^admin/widgy/', include(widgy_site.urls)),
         # widgy frontend
         url(r'^widgy/', include('widgy.contrib.widgy_mezzanine.urls')),
         url(r'^', include('mezzanine.urls')),
-    )
+    ]
 
 
 Make sure you have a url pattern named ``home`` or the admin templates
