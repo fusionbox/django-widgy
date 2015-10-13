@@ -243,9 +243,10 @@ class EmailSuccessHandlerBase(StrDisplayNameMixin, FormSuccessHandler):
         data = []
         # keep the data in the same order as the form
         for name, field in self.parent_form.get_fields().items():
-            data.append(
-                (field.label, form.cleaned_data[name])
+            serialized_value = field.serialize_value(
+                form.cleaned_data[name]
             )
+            data.append((field.label, serialized_value))
         return render_to_string('widgy/form_builder/form_email.html', {
             'data': data,
             'self': self,
