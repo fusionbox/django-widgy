@@ -1,11 +1,11 @@
 from __future__ import absolute_import
 import copy
+import unittest
 
 from django.test import TestCase
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.template import Context
-from django.utils import unittest
 
 import mock
 

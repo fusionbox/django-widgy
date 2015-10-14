@@ -14,7 +14,7 @@ from django.template.loader import select_template, get_template
 from django.db import models
 from django.db.models import query
 from django.utils.http import urlencode
-from django.utils.functional import memoize
+from django.utils.lru_cache import lru_cache
 from django.conf import settings
 
 from django.contrib.auth import get_user_model
@@ -41,6 +41,13 @@ format_html = deprecate(format_html)
 force_text = deprecate(force_text)
 force_bytes = deprecate(force_bytes)
 
+try:
+    from django.apps import apps
+    get_model = apps.get_model
+    del apps
+except ImportError:
+    # Django < 1.8
+    from django.db.models import get_model
 
 def extract_id(url):
     """
@@ -169,7 +176,7 @@ class SelectRelatedManager(models.Manager):
 # When developping, we want to be able to update the templates and see the
 # result right away.
 if not settings.DEBUG:
-    select_template = memoize(select_template, {}, 1)
+    select_template = lru_cache()(select_template)
 def render_to_string(template_name, dictionary=None, context_instance=None):
     """
     Loads the given template_name and renders it with the given dictionary as

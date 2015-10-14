@@ -1,7 +1,12 @@
 import django
-from django.contrib.contenttypes import generic
 from django.db import DEFAULT_DB_ALIAS, connection
 from django.contrib.contenttypes.models import ContentType
+
+try:
+    from django.contrib.contenttypes.generic import GenericForeignKey, GenericRelation
+except ImportError:
+    # django < 1.9
+    from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 try:
     from south.modelsinspector import add_ignored_fields
@@ -13,13 +18,13 @@ else:
                         "^widgy\.generic\.WidgyGenericForeignKey"])
 
 
-class ProxyGenericForeignKey(generic.GenericForeignKey):
+class ProxyGenericForeignKey(GenericForeignKey):
     def __init__(self, *args, **kwargs):
         kwargs['for_concrete_model'] = False
         super(ProxyGenericForeignKey, self).__init__(*args, **kwargs)
 
 
-class ProxyGenericRelation(generic.GenericRelation):
+class ProxyGenericRelation(GenericRelation):
     def __init__(self, *args, **kwargs):
         kwargs['for_concrete_model'] = False
         super(ProxyGenericRelation, self).__init__(*args, **kwargs)
