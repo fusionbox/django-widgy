@@ -4,7 +4,7 @@ Changelog
 0.7.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix compatibility with django-filer 1.0.2
 
 
 0.7.3 (2015-09-17)
