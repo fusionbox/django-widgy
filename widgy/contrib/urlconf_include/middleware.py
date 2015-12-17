@@ -21,15 +21,7 @@ def uncache_urlconf(urlconf):
     # We could use urlresolvers.clear_url_caches to avoid using the
     # private `_resolver_cache`, but that might affect performance
     # because the entire cache would be cleared.
-    try:
-        # the cache_clear method comes from lru_cache
-        urlresolvers.get_resolver.cache_clear()
-    except AttributeError:
-        # BBB Django < 1.7 used its own custom caching instead of lru_cache
-        try:
-            del urlresolvers._resolver_cache[(urlconf,)]
-        except KeyError:
-            pass
+    urlresolvers.get_resolver.cache_clear()
 
 
 class PatchUrlconfMiddleware(object):
