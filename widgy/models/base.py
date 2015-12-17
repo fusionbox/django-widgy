@@ -13,6 +13,7 @@ from django import forms
 from django.forms.models import modelform_factory, ModelForm
 from django.contrib.contenttypes.models import ContentType
 from django.template import RequestContext
+from django.template.loader import render_to_string
 from django.contrib.admin import widgets
 from django.template.defaultfilters import capfirst
 from django.utils.encoding import force_text, python_2_unicode_compatible
@@ -27,9 +28,7 @@ from widgy.exceptions import (
 )
 from widgy.signals import pre_delete_widget
 from widgy.generic import WidgyGenericForeignKey, ProxyGenericRelation
-from widgy.utils import (
-    exception_to_bool, update_context, render_to_string, unset_pks,
-)
+from widgy.utils import exception_to_bool, update_context, unset_pks
 from widgy.widgets import DateTimeWidget, DateWidget, TimeWidget
 
 logger = logging.getLogger(__name__)

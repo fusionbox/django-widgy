@@ -10,12 +10,9 @@ import six
 import bs4
 
 from django.template import Context
-from django.template.loader import select_template, get_template
 from django.db import models
 from django.db.models import query
 from django.utils.http import urlencode
-from django.utils.lru_cache import lru_cache
-from django.conf import settings
 
 from django.contrib.auth import get_user_model
 from django.utils.html import format_html
@@ -166,35 +163,6 @@ class SelectRelatedManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
         qs = super(SelectRelatedManager, self).get_queryset(*args, **kwargs)
         return qs.select_related(*self._select_related).prefetch_related(*self._prefetch_related)
-
-
-# Pending https://code.djangoproject.com/ticket/20806, Widgy's use of
-# select_template is very slow (calling it many times with a long list of
-# templates to choose from). Until it's fixed in Django, memoizing
-# select_template has the same effect. This is only done when DEBUG=False,
-# because it requires restarting the server in order to reload the templates.
-# When developping, we want to be able to update the templates and see the
-# result right away.
-if not settings.DEBUG:
-    select_template = lru_cache()(select_template)
-def render_to_string(template_name, dictionary=None, context_instance=None):
-    """
-    Loads the given template_name and renders it with the given dictionary as
-    context. The template_name may be a string to load a single template using
-    get_template, or it may be a tuple to use select_template to find one of
-    the templates in the list. Returns a string.
-    """
-    dictionary = dictionary or {}
-    if isinstance(template_name, (list, tuple)):
-        t = select_template(tuple(template_name))
-    else:
-        t = get_template(template_name)
-    if not context_instance:
-        return t.render(Context(dictionary))
-    # Add the dictionary to the context stack, ensuring it gets removed again
-    # to keep the context_instance in the same state it started in.
-    with context_instance.push(dictionary):
-        return t.render(context_instance)
 
 
 if hasattr(models.Manager, 'from_queryset'):
