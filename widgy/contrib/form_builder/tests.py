@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import contextlib
+import unittest
 import uuid
 
 from six.moves import StringIO
@@ -11,7 +12,6 @@ from django import forms
 from django.utils import timezone
 from django.utils.encoding import force_text
 from django.core import mail
-from django.utils import unittest
 from django.db import connection
 from django.core.files.base import ContentFile
 

@@ -2,10 +2,10 @@ from __future__ import absolute_import
 import mock
 import datetime
 from contextlib import contextmanager
+from unittest import skipUnless
 import uuid
 
 from django.test import TestCase
-from django.utils.unittest import skipUnless
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django import forms
