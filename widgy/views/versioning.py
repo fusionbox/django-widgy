@@ -15,7 +15,6 @@ from django.utils import timezone
 from django.utils.encoding import force_text
 from django.core.exceptions import PermissionDenied
 from django.core import urlresolvers
-from django.contrib.admin.widgets import AdminSplitDateTime
 from django.http import Http404
 
 from bs4 import BeautifulSoup
@@ -40,10 +39,9 @@ class CommitForm(forms.Form):
                                       choices=PUBLISH_RADIO_CHOICES,
                                       initial=PUBLISH_RADIO_CHOICES[0][0],
                                       )
-    publish_at = forms.DateTimeField(widget=AdminSplitDateTime,
-                                     initial=timezone.now,
-                                     localize=True,
-                                     required=False)
+    publish_at = forms.SplitDateTimeField(initial=timezone.now,
+                                          localize=True,
+                                          required=False)
 
     def get_publish_at(self):
         if self.cleaned_data['publish_radio'] == 'now':
