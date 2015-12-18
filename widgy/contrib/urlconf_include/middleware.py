@@ -2,7 +2,12 @@ import imp
 import re
 import six
 
-from django.utils.importlib import import_module
+# BBB Django 1.8 compatibility
+import django
+if django.VERSION < (1, 9):
+    from django.utils.importlib import import_module
+else:
+    from importlib import import_module
 from django.conf import settings
 from django.conf.urls import include, url, patterns
 from django.conf.urls.i18n import i18n_patterns
