@@ -14,6 +14,7 @@ INSTALLED_APPS += [
     'filebrowser_safe',
     'grappelli_safe',
     'filer',
+    'easy_thumbnails',
     'widgy.contrib.widgy_mezzanine',
     'widgy.contrib.form_builder',
     'widgy.contrib.page_builder',
