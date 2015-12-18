@@ -3,6 +3,7 @@ import datetime
 import imp
 import json
 
+import django
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.contrib.auth.models import Permission, User
@@ -189,7 +190,11 @@ class ReviewQueueViewsTest(SwitchUserTestCase, RootNodeTestCase):
                 resp = doit()
 
         self.assertEqual(resp.status_code, 302)
-        self.assertEqual(resp['Location'], 'http://testserver/referer/')
+        if django.VERSION < (1, 9):
+            self.assertEqual(resp['Location'], 'http://testserver/referer/')
+        else:
+            # https://docs.djangoproject.com/en/1.9/releases/1.9/#http-redirects-no-longer-forced-to-absolute-uris
+            self.assertEqual(resp['Location'], '/referer/')
         self.assertFalse(refetch(commit).is_approved)
         self.assertTrue(refetch(commit2).is_approved)
 
