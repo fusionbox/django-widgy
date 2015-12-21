@@ -10,6 +10,7 @@ from django.views.generic import (
 from django.views.generic.detail import SingleObjectMixin
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.contrib.admin.widgets import AdminSplitDateTime
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.utils.encoding import force_text
@@ -41,7 +42,8 @@ class CommitForm(forms.Form):
                                       )
     publish_at = forms.SplitDateTimeField(initial=timezone.now,
                                           localize=True,
-                                          required=False)
+                                          required=False,
+                                          widget=AdminSplitDateTime())
 
     def get_publish_at(self):
         if self.cleaned_data['publish_radio'] == 'now':
