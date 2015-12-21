@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from unittest import skipUnless
 import uuid
 
+import django
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -75,20 +76,28 @@ def make_reviewed(fn):
 
     site = reviewed_widgy_site
     rel = WidgyPage._meta.get_field('root_node').rel
-    old_to = rel.to
+    old_model = rel.model
     dispatch_uid = str(uuid.uuid4())
 
     fn = override_settings(WIDGY_MEZZANINE_SITE=site)(fn)
     fn = skipUnless(REVIEW_QUEUE_INSTALLED, 'review_queue is not installed')(fn)
 
     def up():
-        rel.to = site.get_version_tracker_model()
+        # BBB Django 1.8 compatiblity
+        if django.VERSION < (1, 9):
+            rel.to = site.get_version_tracker_model()
+        else:
+            rel.model = site.get_version_tracker_model()
         post_save.connect(publish_page_on_approve,
                           sender=site.get_version_tracker_model().commit_model,
                           dispatch_uid=dispatch_uid)
 
     def down():
-        rel.to = old_to
+        # BBB Django 1.8 compatiblity
+        if django.VERSION < (1, 9):
+            rel.to = old_model
+        else:
+            rel.model = old_model
         post_save.disconnect(dispatch_uid=dispatch_uid)
 
     if isinstance(fn, type):
