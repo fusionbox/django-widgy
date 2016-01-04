@@ -345,12 +345,16 @@ admin.site.register(Form, MultiSiteFormAdmin)
 
 
 class MultiSiteCalloutAdmin(WidgyAdmin):
-    def get_fields(self, request, obj=None):
-        # Mezzanine has a weird data model for site permissions. This optimizes the query into
-        # one single SQL statement. This also avoids raising an ObjectDoesNotExist error in case
-        # a user does not have a sitepermission object.
-        site_list = Site.objects.filter(sitepermission__user=request.user)
+    def get_site_list(self, request):
+        if not hasattr(request, '_site_list'):
+            # Mezzanine has a weird data model for site permissions. This optimizes the query into
+            # one single SQL statement. This also avoids raising an ObjectDoesNotExist error in case
+            # a user does not have a sitepermission object.
+            request._site_list = Site.objects.filter(sitepermission__user=request.user)
+        return request._site_list
 
+    def get_fields(self, request, obj=None):
+        site_list = self.get_site_list(request)
         if request.user.is_superuser or len(site_list) > 1:
             return ('name', 'site', 'root_node')
         else:
@@ -359,7 +363,7 @@ class MultiSiteCalloutAdmin(WidgyAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'site' and not request.user.is_superuser:
             # See MultiSiteCalloutAdmin.get_fields() about this query
-            kwargs['queryset'] = Site.objects.filter(sitepermission__user=request.user)
+            kwargs['queryset'] = self.get_site_list(request)
 
             # Non superusers have to select a site, otherwise the callout will be global.
             kwargs['required'] = True
@@ -367,14 +371,15 @@ class MultiSiteCalloutAdmin(WidgyAdmin):
             db_field, request, **kwargs)
 
     def save_model(self, request, obj, form, change):
-        site_list = Site.objects.filter(sitepermission__user=request.user)
-        if not change and len(site_list) == 1:
-            obj.site = site_list.get()
+        if not change:
+            site_list = self.get_site_list(request)
+            if len(site_list) == 1:
+                obj.site = site_list.get()
         return super(MultiSiteCalloutAdmin, self).save_model(request, obj, form, change)
 
     def get_queryset(self, request):
         qs = super(MultiSiteCalloutAdmin, self).get_queryset(request)
-        if not request.user.is_superuser:
+        if not (request.user.is_superuser or (request.user.is_staff and Site.objects.count() == 1)):
             qs = qs.filter(site__sitepermission__user=request.user)
         return qs
 
