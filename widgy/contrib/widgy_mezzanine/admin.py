@@ -374,7 +374,7 @@ class MultiSiteCalloutAdmin(WidgyAdmin):
 
     def get_queryset(self, request):
         qs = super(MultiSiteCalloutAdmin, self).get_queryset(request)
-        if not request.user.is_superuser:
+        if not (request.user.is_superuser or (request.user.is_staff and Site.objects.count() == 1)):
             qs = qs.filter(site__sitepermission__user=request.user)
         return qs
 
