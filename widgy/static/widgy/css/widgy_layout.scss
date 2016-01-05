@@ -7,6 +7,13 @@ body.page_builder-callout {
   }
 }
 
+// Admin Center Positioning (Django Admin)
+.field-root_node .related-widget-wrapper {
+  width: calc(100% - 170px);
+}
+
+
+// Widgy
 .widgy {
   @include clearfix;
 
@@ -24,6 +31,7 @@ body.page_builder-callout {
 
   .nodeChildren {
     clear: both;
+    display: block;
     margin: 0 !important; // mezzanine puts style on UL
     padding: 0;
 
@@ -153,7 +161,7 @@ body.page_builder-callout {
       & > .nodeChildren {
         clear: left;
         float: left;
-        width: 63%;
+        width: 63% !important;
 
         // The first-level children shouldn't have side margins
         > .node {
