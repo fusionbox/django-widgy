@@ -30,6 +30,15 @@ class HandleFormMixin(FormMixin):
         self.form_node = self.get_form_node()
         return self.form_node.content.build_form_class()
 
+    def get_form(self, form_class=None):
+        # Django now calls get_form in get_context_data, but HandleFormMixin
+        # needs to still work even if no form exists.
+        if form_class is None:
+            if self.kwargs.get('form_node_pk') is None:
+                return None
+            form_class = self.get_form_class()
+        return form_class(**self.get_form_kwargs())
+
     def get_context_data(self, **kwargs):
         if 'form' in kwargs:
             kwargs.setdefault(self.form_node.content.context_var, kwargs['form'])
