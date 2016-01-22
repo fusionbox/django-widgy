@@ -14,6 +14,7 @@ from django.template.loader import select_template, get_template
 from django.db import models
 from django.db.models import query
 from django.utils.http import urlencode
+from django.http.request import QueryDict
 from django.utils.functional import memoize
 from django.conf import settings
 
@@ -90,9 +91,26 @@ def update_context(context, dict):
     context.pop()
 
 
-def build_url(path, **kwargs):
+def build_url(path, *args, **kwargs):
+    if args:
+        if len(args) != 1:
+            raise ValueError("Length of args must be exactly 1.")
+        if kwargs:
+            raise ValueError("You may not specify both args and kwargs.")
+
+        arg = args[0]
+        if len(arg):
+            if isinstance(arg, QueryDict):
+                path += '?' + arg.urlencode()
+            else:
+                path += '?' + urlencode(args[0])
+
     if kwargs:
+        if args:
+            raise ValueError("You may not specify both args and kwargs.")
+
         path += '?' + urlencode(kwargs)
+
     return path
 
 
