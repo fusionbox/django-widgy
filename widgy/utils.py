@@ -94,9 +94,9 @@ def update_context(context, dict):
 def build_url(path, *args, **kwargs):
     if args:
         if len(args) != 1:
-            raise ValueError("Length of args must be exactly 1.")
+            raise TypeError("Length of args must be exactly 1.")
         if kwargs:
-            raise ValueError("You may not specify both args and kwargs.")
+            raise TypeError("You may not specify both args and kwargs.")
 
         arg = args[0]
         if len(arg):
@@ -107,7 +107,7 @@ def build_url(path, *args, **kwargs):
 
     if kwargs:
         if args:
-            raise ValueError("You may not specify both args and kwargs.")
+            raise TypeError("You may not specify both args and kwargs.")
 
         path += '?' + urlencode(kwargs)
 
