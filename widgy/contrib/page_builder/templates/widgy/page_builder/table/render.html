@@ -1,0 +1,6 @@
+{% load widgy_tags %}
+<{{ self.tag_name }} {% if self.style %}class="{{ self.style }}"{% endif %}>
+  {% for child in self.get_children %}
+  {% render child %}
+  {% endfor %}
+</{{ self.tag_name }}>

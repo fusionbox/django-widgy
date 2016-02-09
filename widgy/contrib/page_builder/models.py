@@ -461,10 +461,16 @@ class Table(StrictDefaultChildrenMixin, TableElement):
     tag_name = 'table'
     component_name = 'table'
 
+    editable = True
     shelf = True
     tooltip = _("With this widget, you can add tables to your page. A good use"
                 " for tables is numerical data or comparing things side by"
                 " side.")
+
+    style = models.CharField(max_length=50, blank=True, choices=[
+        ('alternating', _('Alternating')),
+        ('bordered', _('Bordered')),
+    ])
 
     default_children = [
         ('header', TableHeader, (), {}),
