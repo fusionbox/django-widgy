@@ -106,9 +106,6 @@ def build_url(path, *args, **kwargs):
                 path += '?' + urlencode(args[0])
 
     if kwargs:
-        if args:
-            raise TypeError("You may not specify both args and kwargs.")
-
         path += '?' + urlencode(kwargs)
 
     return path
