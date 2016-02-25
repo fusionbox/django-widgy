@@ -1,5 +1,7 @@
 from .settings import *
 
+WIDGY_MEZZANINE_PAGE_MODEL = 'widgy_mezzanine.WidgyPage'
+WIDGY_MEZZANINE_SITE = 'widgy.site.WidgySite'
 
 PACKAGE_NAME_FILEBROWSER = "filebrowser_safe"
 PACKAGE_NAME_GRAPPELLI = "grappelli_safe"
