@@ -13,6 +13,7 @@ from django.template import Context
 from django.db import models
 from django.db.models import query
 from django.utils.http import urlencode
+from django.http.request import QueryDict
 
 from django.contrib.auth import get_user_model
 from django.utils.html import format_html
@@ -38,13 +39,6 @@ format_html = deprecate(format_html)
 force_text = deprecate(force_text)
 force_bytes = deprecate(force_bytes)
 
-try:
-    from django.apps import apps
-    get_model = apps.get_model
-    del apps
-except ImportError:
-    # Django < 1.8
-    from django.db.models import get_model
 
 def extract_id(url):
     """
@@ -94,9 +88,23 @@ def update_context(context, dict):
     context.pop()
 
 
-def build_url(path, **kwargs):
+def build_url(path, *args, **kwargs):
+    if args:
+        if len(args) != 1:
+            raise TypeError("Length of args must be exactly 1.")
+        if kwargs:
+            raise TypeError("You may not specify both args and kwargs.")
+
+        arg = args[0]
+        if len(arg):
+            if isinstance(arg, QueryDict):
+                path += '?' + arg.urlencode()
+            else:
+                path += '?' + urlencode(args[0])
+
     if kwargs:
         path += '?' + urlencode(kwargs)
+
     return path
 
 
