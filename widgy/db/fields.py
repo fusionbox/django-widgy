@@ -1,7 +1,6 @@
 import six
 
 from django.db import models
-from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import SimpleLazyObject
@@ -17,6 +16,13 @@ else:
     add_introspection_rules([], ["^widgy\.db.fields\.WidgyField"])
     add_introspection_rules([], ["^widgy\.db.fields\.VersionedWidgyField"])
 
+try:
+    from django.db.models.fields.related import ForwardManyToOneDescriptor
+except ImportError:
+    # django < 1.9
+    from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor as ForwardManyToOneDescriptor
+
+
 
 def get_site(site):
     if isinstance(site, six.string_types):
@@ -25,7 +31,7 @@ def get_site(site):
         return site
 
 
-class WidgyFieldObjectDescriptor(ReverseSingleRelatedObjectDescriptor):
+class WidgyFieldObjectDescriptor(ForwardManyToOneDescriptor):
     """
     .. note::
         we need to transport the ContentType of the Node all the way to

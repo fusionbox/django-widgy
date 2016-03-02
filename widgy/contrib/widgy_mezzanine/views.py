@@ -11,7 +11,10 @@ from django.http import (
     HttpResponseRedirect,
 )
 from django.utils.http import is_safe_url
-from django.contrib.admin.util import unquote
+try:
+    from django.contrib.admin.utils import unquote
+except ImportError:  # < Django 1.8
+    from django.contrib.admin.util import unquote
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, render
 from django.core.exceptions import PermissionDenied

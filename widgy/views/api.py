@@ -11,8 +11,16 @@ from django.shortcuts import get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 from django.views.generic import DetailView
 from django.views.generic.detail import SingleObjectMixin
-from django.db.models import get_model, ProtectedError
+from django.db.models import ProtectedError
 from django.utils.translation import ugettext as _
+
+try:
+    from django.apps import apps
+    get_model = apps.get_model
+    del apps
+except ImportError:
+    # Django < 1.8
+    from django.db.models import get_model
 
 from argonauts.views import RestView
 
@@ -104,9 +112,6 @@ class NodeView(WidgyView):
         app_label, model = data['__class__'].split('.')
         try:
             content_class = get_model(app_label, model)
-            if content_class is None:
-                # BBB Django < 1.7 returns None instead of raising LookupError
-                raise LookupError
         except LookupError:
             raise Http404
 

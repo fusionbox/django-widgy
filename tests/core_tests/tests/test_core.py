@@ -3,13 +3,14 @@ from pprint import pprint
 import datetime
 import time
 import mock
+import unittest
 import contextlib
 
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.utils import unittest, timezone
+from django.utils import timezone
 from django.db.models.deletion import ProtectedError
 from django.db import transaction
 

@@ -1,8 +1,8 @@
 from six.moves import http_client
+from unittest import skipUnless, skip
 
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.utils.unittest import skipUnless, skip
 from django.contrib.sites.models import Site
 from django.conf import settings
 from django.conf.urls import url, include

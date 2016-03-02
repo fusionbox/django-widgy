@@ -4,7 +4,8 @@ Changelog
 0.7.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- **Possible Breaking Change** Remove ``node-icon-sprite`` in
+  ``widgy_common.scss`` this is incompatible with django storages.
 
 
 0.7.4 (2015-11-17)

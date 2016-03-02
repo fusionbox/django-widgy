@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+from django.conf import settings
 import widgy.db.fields
 import django.db.models.deletion
 import widgy.contrib.widgy_mezzanine.models
@@ -12,6 +13,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('pages', '__first__'),
         ('widgy', '0001_initial'),
+        migrations.swappable_dependency(settings.WIDGY_MEZZANINE_PAGE_MODEL),
     ]
 
     operations = [
@@ -25,6 +27,7 @@ class Migration(migrations.Migration):
                 'ordering': ('_order',),
                 'verbose_name': 'widgy page',
                 'verbose_name_plural': 'widgy pages',
+                'swappable': 'WIDGY_MEZZANINE_PAGE_MODEL',
             },
             bases=(widgy.contrib.widgy_mezzanine.models.WidgyPageMixin, 'pages.page'),
         ),
@@ -37,6 +40,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'restore deleted page',
                 'proxy': True,
             },
-            bases=('widgy_mezzanine.widgypage',),
+            bases=(settings.WIDGY_MEZZANINE_PAGE_MODEL,),
         ),
     ]

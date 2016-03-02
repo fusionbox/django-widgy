@@ -2,5 +2,5 @@
 
 li.node,
 li.shelfItem {
-  @include node-icon-sprite("widgy_mezzanine.mezzaninecalloutwidget", "widget-callout");
+  @include node-icon("widgy_mezzanine.mezzaninecalloutwidget", "widgy/image/widget-callout.png");
 }

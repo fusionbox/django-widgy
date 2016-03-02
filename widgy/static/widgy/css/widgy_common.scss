@@ -205,18 +205,9 @@ $orange:      #FF9900;
 $inputFields: "input[type='text'], input[type='password'], input[type='email'], input[type='search'], input[type='number'], textarea";
 
 
-$widget_icon_sprite: sprite-map("widgy/image/widget-*");
-
-@mixin node-icon-sprite ($class, $icon, $sprite: $widget_icon_sprite) {
-  &.#{$class} > span.title:before {
-    background-image: sprite-url($sprite, $icon);
-    background-position: sprite-position($sprite, $icon);
-  }
-}
-
 @mixin node-icon ($class, $img) {
   &.#{$class} > span.title:before {
-    background-image: url($img);
+    background-image: inline-image($img);
   }
 }
 

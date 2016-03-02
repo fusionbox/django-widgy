@@ -1,5 +1,6 @@
+import unittest
+
 from django.test import TestCase
-from django.utils import unittest
 
 from widgy.site import WidgySite
 from widgy.models import Node

@@ -5,6 +5,7 @@
 {% compress css %}
 <link rel="stylesheet" type="text/x-scss" href="{% static 'widgy/css/popup.scss' %}">
 {% endcompress %}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/widgets.css' %}">
 {% endblock %}
 
 {% block extrahead %}{{ block.super }}
@@ -12,7 +13,7 @@
 <script type="text/javascript" src="{{ jsi18nurl|default:"../../../jsi18n/" }}"></script>
 {% compress js %}
 <script src="{% static 'admin/js/core.js' %}"></script>
-<script src="{% static 'admin/js/jquery.js' %}"></script>
+<script src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
 <script src="{% static 'admin/js/jquery.init.js' %}"></script>
 <script src="{% static 'widgy/js/lib/jquery.js' %}"></script>
 <script src="{% static 'widgy/js/popup.js' %}"></script>
