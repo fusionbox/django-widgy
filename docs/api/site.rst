@@ -94,6 +94,11 @@ Widgy Site
     Returns the class to use as a :class:`~widgy.models.VersionTracker`.
     This can be overridden to customize versioning behavior.
 
+    .. method:: valid_root_of(self, owner_field, root_class, root_choices)
+
+    Is ``root_class`` a valid root choice for ``owner_field`` given the full
+    set of available ``root_choices``? This can be overridden to customize the
+    available layouts for the :class:`widgy.site.WidgySite`.
 
     .. rubric:: Views
 
