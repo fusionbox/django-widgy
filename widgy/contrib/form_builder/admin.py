@@ -9,7 +9,8 @@ from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
 from django.conf.urls import url
 from django.template.defaultfilters import slugify
-
+from django.http import Http404
+from django.utils.html import escape
 from django.utils.encoding import force_text
 
 from .models import Form
@@ -43,6 +44,11 @@ class FormAdmin(admin.ModelAdmin):
     def change_view(self, request, object_id, *args, **kwargs):
         obj = self.get_object(request, unquote(object_id))
         opts = self.model._meta
+
+        if obj is None:
+            raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
+                'name': force_text(opts.verbose_name), 'key': escape(object_id)})
+
 
         headers = obj.submissions.get_formfield_labels()
         rows = obj.submissions.as_ordered_dictionaries(headers.keys())
