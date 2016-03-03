@@ -50,7 +50,8 @@ class FormAdmin(admin.ModelAdmin):
             'title': _('View %s submissions') % force_text(opts.verbose_name),
             'object_id': object_id,
             'original': obj,
-            'is_popup': "_popup" in request.REQUEST,
+            'is_popup': ('_popup' in request.POST or
+                         '_popup' in request.GET),
             'app_label': opts.app_label,
             'headers': headers,
             'rows': rows,
