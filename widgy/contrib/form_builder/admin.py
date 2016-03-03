@@ -53,6 +53,7 @@ class FormAdmin(admin.ModelAdmin):
             'is_popup': ('_popup' in request.POST or
                          '_popup' in request.GET),
             'app_label': opts.app_label,
+            'opts': opts,
             'headers': headers,
             'rows': rows,
             'csv_file_name': self.csv_file_name(obj),
