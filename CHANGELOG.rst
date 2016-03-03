@@ -6,6 +6,8 @@ Changelog
 
 - **Possible Breaking Change** Remove ``node-icon-sprite`` in
   ``widgy_common.scss`` this is incompatible with django storages.
+- Add ``WidgySite.valid_root_of`` method. You can override this method to
+  specify which layouts will be available for new pages.
 
 
 0.7.4 (2015-11-17)

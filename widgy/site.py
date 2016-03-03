@@ -202,3 +202,6 @@ class WidgySite(object):
                 'widgy/{app_label}/{model_name}.admin{extension}',
                 'widgy/{app_label}/admin{extension}',
             ])
+
+    def valid_root_of(self, owner_field, root_class, root_choices):
+        return issubclass(root_class, root_choices)
