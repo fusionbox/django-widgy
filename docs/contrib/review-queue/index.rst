@@ -30,6 +30,8 @@ To enabled the review queue,
 
         admin.site.register(ReviewedVersionCommit, VersionCommitAdmin)
 
+    This step is unecessary if using ``widgy.contrib.widgy_mezzanine``.
+
 4.  If upgrading from a non-reviewed site, a
     :class:`widgy.contrib.review_queue.models.ReviewedVersionCommit`
     object must be created for each :class:`widgy.models.VersionCommit`.
