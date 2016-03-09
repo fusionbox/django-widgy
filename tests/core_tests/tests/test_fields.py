@@ -301,7 +301,7 @@ class TestRender(TestCase):
         self.widgied.save()
         self.widgied.widgy.get_children()[1].content.add_child(widgy_site, RawTextWidget, text='asdf')
 
-        self.widgy_field = HasAWidgy._meta.get_field_by_name('widgy')[0]
+        self.widgy_field = HasAWidgy._meta.get_field('widgy')[0]
 
     def test_simple(self):
         rendered = self.widgy_field.render(self.widgied)
@@ -344,7 +344,7 @@ class TestRender(TestCase):
         Rendering a NULL VersionedWidgyField
         """
         page = VersionedPage.objects.create()
-        field = VersionedPage._meta.get_field_by_name('version_tracker')[0]
+        field = VersionedPage._meta.get_field('version_tracker')[0]
         # doesn't matter what happens as long as it doesn't throw an exception
         field.render(page)
 
@@ -357,6 +357,6 @@ class TestRender(TestCase):
                 working_copy=Layout.add_root(widgy_site).node,
             )
         )
-        field = VersionedPage._meta.get_field_by_name('version_tracker')[0]
+        field = VersionedPage._meta.get_field('version_tracker')[0]
         # doesn't matter what happens as long as it doesn't throw an exception
         field.render(page)
