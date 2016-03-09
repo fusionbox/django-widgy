@@ -64,7 +64,7 @@ class InvisibleMixin(object):
     invisible.
     """
     def get_css_classes(self):
-        return super(InvisibleMixin, self).get_css_classes() + ('invisible',)
+        return super(InvisibleMixin, self).get_css_classes() + ('invisibleBucket',)
 
     @classmethod
     def get_template_kwargs(cls, **kwargs):

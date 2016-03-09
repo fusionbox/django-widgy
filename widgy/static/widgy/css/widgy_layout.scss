@@ -48,7 +48,7 @@ body.page_builder-callout {
     padding: 0px;
 
     // invisible mixin, it provides a node with no chrome.
-    &.invisible {
+    &.invisibleBucket {
       background-color: inherit;
       border: 0 none;
       margin: 0 !important;
