@@ -58,7 +58,7 @@ def render_root(context, owner, field_name):
     specify exactly what root node to use.
     """
     root_node = context.get('root_node_override')
-    field = owner._meta.get_field(field_name)[0]
+    field = owner._meta.get_field(field_name)
     with update_context(context, {'root_node_override': None}):
         return field.render(owner, context=context, node=root_node)
 
