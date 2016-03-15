@@ -1,18 +1,18 @@
 {% extends "admin/change_form.html" %}
-{% load i18n widgy_tags %}
+{% load i18n widgy_tags admin_urls %}
 
 {% block object-tools %}
   {% if change %}
     <ul class="object-tools">
     {% if original.status == 2 %}
-      <li><a href="unpublish/">Unpublish</a></li>
+    <li><a href="{% url 'admin:widgy_mezzanine_widgypage_unpublish' original.pk %}">Unpublish</a></li>
     {% endif %}
     {% get_action_links original original.root_node.working_copy as links %}
     {% for link in links %}
       <li><a class="{{ link.type }}" target="_blank" href="{{ link.url }}">{{ link.text }}</a></li>
     {% endfor %}
     {% if has_add_permission %}
-      <li><a class="widgy-fancybox" href="clone/">Clone</a></li>
+    <li><a class="widgy-fancybox" href="{% url 'admin:widgy_mezzanine_widgypage_clone' original.pk %}">Clone</a></li>
     {% endif %}
     {% if history_url %}
       <li><a class="historylink" target="_blank" href="{{ history_url }}">{% trans "History" %}</a></li>
@@ -30,7 +30,7 @@
 <div class="submit-row" {% if is_popup %}style="overflow: auto;"{% endif %}>
     {% if has_delete_permission and not add %}
       <p class="deletelink-box">
-        <a href="delete/" class="deletelink">{% trans "Delete" %}</a>
+      <a href="{% url opts|admin_urlname:'delete' original.pk|admin_urlquote %}" class="deletelink">{% trans "Delete" %}</a>
       </p>
     {% endif %}
     {% for action, title in save_buttons %}

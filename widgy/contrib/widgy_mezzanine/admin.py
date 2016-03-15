@@ -110,8 +110,16 @@ class WidgyPageAdmin(PageAdmin):
             has_change_permission=self.has_change_permission,
         )
         return [
-            url('^(.+)/clone/$', self.admin_site.admin_view(clone_view)),
-            url('^(.+)/unpublish/$', self.admin_site.admin_view(unpublish_view)),
+            url(
+                '^(.+)/clone/$',
+                self.admin_site.admin_view(clone_view),
+                name='widgy_mezzanine_widgypage_clone',
+            ),
+            url(
+                '^(.+)/unpublish/$',
+                self.admin_site.admin_view(unpublish_view),
+                name='widgy_mezzanine_widgypage_unpublish',
+            ),
         ] + super(WidgyPageAdmin, self).get_urls()
 
     def _save_and_commit(self, request, obj):
