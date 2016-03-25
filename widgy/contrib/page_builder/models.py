@@ -7,6 +7,8 @@ from django.dispatch import receiver
 from django.template.defaultfilters import truncatechars
 from django.contrib.sites.models import Site
 
+from filer.fields.image import FilerImageField
+
 from widgy.models import Content
 from widgy.models.mixins import (
     StrictDefaultChildrenMixin, InvisibleMixin, StrDisplayNameMixin,
@@ -274,7 +276,8 @@ class Section(StrDisplayNameMixin, Content):
 class Image(Content):
     editable = True
 
-    image = ImageField(verbose_name=_('image'))
+    image = FilerImageField(verbose_name=_('image'), null=True,
+                            related_name='+', on_delete=models.PROTECT)
 
     objects = SelectRelatedManager(select_related=['image'])
 

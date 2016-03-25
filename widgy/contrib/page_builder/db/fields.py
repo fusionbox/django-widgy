@@ -111,6 +111,10 @@ class VideoField(six.with_metaclass(models.SubfieldBase, models.URLField)):
 
 
 class ImageField(FilerFileField):
+    """
+    This is here for backwards compatibility, but shouldn't be used. Instead use
+    filer.fields.image.FilerImageField.
+    """
     def __init__(self, *args, **kwargs):
         defaults = {
             'null': True,
