@@ -7,11 +7,12 @@ jQuery(function($) {
   if ( ! supported ) {
     $(document.body).addClass('no-details');
     $('summary').on('click', function(event) {
-      var $details = $(this).parents('details');
+      var $details = $(this).closest('details');
       if ( $details.attr('open') || $details.hasClass('open') )
         $details.removeAttr('open').removeClass('open');
       else
         $details.attr('open', true).addClass('open');
     });
+    return false;
   }
 });
