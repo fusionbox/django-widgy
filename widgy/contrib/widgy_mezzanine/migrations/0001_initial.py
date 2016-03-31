@@ -8,12 +8,16 @@ import django.db.models.deletion
 import widgy.contrib.widgy_mezzanine.models
 
 
+def get_page_model():
+    return getattr(settings, 'WIDGY_MEZZANINE_PAGE_MODEL', 'widgy_mezzanine.WidgyPage')
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
         ('pages', '__first__'),
         ('widgy', '0001_initial'),
-        migrations.swappable_dependency(settings.WIDGY_MEZZANINE_PAGE_MODEL),
+        migrations.swappable_dependency(get_page_model()),
     ]
 
     operations = [
@@ -40,6 +44,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'restore deleted page',
                 'proxy': True,
             },
-            bases=(settings.WIDGY_MEZZANINE_PAGE_MODEL,),
+            bases=(get_page_model(),),
         ),
     ]
