@@ -6,6 +6,7 @@ PACKAGE_NAME_GRAPPELLI = "grappelli_safe"
 GRAPPELLI_INSTALLED = True
 
 INSTALLED_APPS += [
+    'django.contrib.redirects',
     'mezzanine.conf',
     'mezzanine.core',
     'mezzanine.generic',
