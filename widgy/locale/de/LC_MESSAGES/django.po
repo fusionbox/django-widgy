@@ -180,7 +180,7 @@ msgstr "Einstellungen"
 
 #: widgy/contrib/form_builder/models.py:459
 msgid "Name"
-msgstr ""
+msgstr "Name"
 
 #: widgy/contrib/form_builder/models.py:462
 msgid "A name to help identify this form. Only admins see this."
@@ -214,7 +214,7 @@ msgstr "benötigt"
 
 #: widgy/contrib/form_builder/models.py:725
 msgid "Text"
-msgstr ""
+msgstr "Text"
 
 #: widgy/contrib/form_builder/models.py:726
 msgid "Number"
@@ -222,7 +222,7 @@ msgstr "Anzahl"
 
 #: widgy/contrib/form_builder/models.py:727
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: widgy/contrib/form_builder/models.py:728
 msgid "Telephone"
@@ -230,7 +230,7 @@ msgstr "Telefon"
 
 #: widgy/contrib/form_builder/models.py:729
 msgid "Checkbox"
-msgstr ""
+msgstr "Auswahlbox"
 
 #: widgy/contrib/form_builder/models.py:730
 msgid "Date"
@@ -278,11 +278,11 @@ msgstr "Eine einzelne Zeile für jede Auswahl."
 
 #: widgy/contrib/form_builder/models.py:814
 msgid "Dropdown"
-msgstr ""
+msgstr "Dropdown"
 
 #: widgy/contrib/form_builder/models.py:815
 msgid "Radio buttons"
-msgstr ""
+msgstr "Radio Buttons"
 
 #: widgy/contrib/form_builder/models.py:818
 msgid ""
@@ -376,11 +376,11 @@ msgstr "Hauptinhalte"
 
 #: widgy/contrib/page_builder/models.py:82
 msgid "sidebar"
-msgstr "Sidebar"
+msgstr "Seitenleiste"
 
 #: widgy/contrib/page_builder/models.py:83
 msgid "sidebars"
-msgstr "Sidebars"
+msgstr "Seitenleisten"
 
 #: widgy/contrib/page_builder/models.py:92
 msgid "default layout"
@@ -406,11 +406,13 @@ msgstr "Inhalt"
 msgid ""
 "Easily add text to your page with this widget. You can have certain styles "
 "like bold or italic, but they won't break your design."
-msgstr "Widget für formatierten Text"
+msgstr ""
+"Widget für formatierten Text. Sie können verschiedene Stile "
+"anwenden wie Fett oder Italic und ihr Design wird intakt bleiben."
 
 #: widgy/contrib/page_builder/models.py:129
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 #: widgy/contrib/page_builder/models.py:130
 msgid "HTML editors"
@@ -494,11 +496,11 @@ msgstr "Akkordeons"
 
 #: widgy/contrib/page_builder/models.py:233
 msgid "Title 1"
-msgstr "Title 1"
+msgstr "Titel 1"
 
 #: widgy/contrib/page_builder/models.py:234
 msgid "Title 2"
-msgstr ""
+msgstr "Titel 2"
 
 #: widgy/contrib/page_builder/models.py:240
 msgid ""
@@ -518,7 +520,7 @@ msgstr "Tabs"
 #: widgy/contrib/page_builder/models.py:253
 #: widgy/contrib/page_builder/models.py:504
 msgid "title"
-msgstr "Title"
+msgstr "Titel"
 
 #: widgy/contrib/page_builder/models.py:254
 msgid "Use a unique title for each section."
@@ -688,11 +690,11 @@ msgstr "Satellit"
 
 #: widgy/contrib/page_builder/models.py:566
 msgid "Hybrid"
-msgstr ""
+msgstr "Hybrid"
 
 #: widgy/contrib/page_builder/models.py:567
 msgid "Terrain"
-msgstr ""
+msgstr "Gelände"
 
 #: widgy/contrib/page_builder/models.py:570
 msgid "address"
@@ -704,15 +706,15 @@ msgstr "Zeigt eine Karte mit der angegebenen Adresse an."
 
 #: widgy/contrib/page_builder/models.py:582
 msgid "Google map"
-msgstr ""
+msgstr "Google Map"
 
 #: widgy/contrib/page_builder/models.py:583
 msgid "Google maps"
-msgstr ""
+msgstr "Google Maps"
 
 #: widgy/contrib/page_builder/templates/widgy/page_builder/figure/preview.html:4
 msgid "Title"
-msgstr ""
+msgstr "Titel"
 
 #: widgy/contrib/page_builder/templates/widgy/page_builder/figure/preview.html:5
 msgid "Caption"
@@ -863,7 +865,7 @@ msgstr "Plugins"
 
 #: widgy/contrib/widgy_i18n/models.py:17
 msgid "Layout"
-msgstr ""
+msgstr "Layout"
 
 #: widgy/contrib/widgy_mezzanine/admin.py:67
 msgid ""
@@ -1127,7 +1129,7 @@ msgstr "Sie haben nicht die Rechte, dieses Widget zu löschen."
 
 #: widgy/views/versioning.py:31
 msgid "Immediately"
-msgstr "Jetzt"
+msgstr "Sofort"
 
 #: widgy/views/versioning.py:32
 msgid "Later"
