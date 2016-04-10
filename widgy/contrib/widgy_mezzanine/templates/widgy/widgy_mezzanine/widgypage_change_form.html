@@ -5,14 +5,14 @@
   {% if change %}
     <ul class="object-tools">
     {% if original.status == 2 %}
-    <li><a href="{% url 'admin:widgy_mezzanine_widgypage_unpublish' original.pk %}">Unpublish</a></li>
+    <li><a href="{% url 'admin:widgy_mezzanine_widgypage_unpublish' original.pk %}">{% trans "Unpublish" %}</a></li>
     {% endif %}
     {% get_action_links original original.root_node.working_copy as links %}
     {% for link in links %}
       <li><a class="{{ link.type }}" target="_blank" href="{{ link.url }}">{{ link.text }}</a></li>
     {% endfor %}
     {% if has_add_permission %}
-    <li><a class="widgy-fancybox" href="{% url 'admin:widgy_mezzanine_widgypage_clone' original.pk %}">Clone</a></li>
+    <li><a class="widgy-fancybox" href="{% url 'admin:widgy_mezzanine_widgypage_clone' original.pk %}">{% trans "Clone" %}</a></li>
     {% endif %}
     {% if history_url %}
       <li><a class="historylink" target="_blank" href="{{ history_url }}">{% trans "History" %}</a></li>

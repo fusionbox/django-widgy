@@ -1,0 +1,1165 @@
+# django-widgy german translation
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Gerald Hien gerald@hien-online.de, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django-widgy\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-03-29 13:04+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Gerald Hien gerald@hien-online.de\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: widgy/contrib/form_builder/admin.py:49
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "%(name)s Objekt mit Primärschlüssel %(key)r existiert nicht."
+
+#: widgy/contrib/form_builder/admin.py:56
+#, python-format
+msgid "View %s submissions"
+msgstr "Vorlage %s ansehen"
+
+#: widgy/contrib/form_builder/admin.py:84
+msgid "submission count"
+msgstr "Anzahl Vorlagen"
+
+#: widgy/contrib/form_builder/models.py:79
+msgid "Saves the data when the Form is filled out. This is enabled by default."
+msgstr ""
+"Speichert die Daten, wenn die Form ausgefüllt wird (Standardeinstellung)."
+
+#: widgy/contrib/form_builder/models.py:83
+msgid "save data handler"
+msgstr "Handler Datenspeicherung"
+
+#: widgy/contrib/form_builder/models.py:84
+msgid "save data handlers"
+msgstr "Handlers Datenspeicherung"
+
+#: widgy/contrib/form_builder/models.py:145
+msgid "Field"
+msgstr "Feld"
+
+#: widgy/contrib/form_builder/models.py:149
+#: widgy/contrib/form_builder/models.py:306
+msgid "------"
+msgstr "------"
+
+#: widgy/contrib/form_builder/models.py:166
+#: widgy/contrib/form_builder/models.py:167
+msgid "mapped field"
+msgstr "zugeordnetes Feld"
+
+#: widgy/contrib/form_builder/models.py:175
+#, python-brace-format
+msgid "{0} to {1}"
+msgstr "{0} nach {1}"
+
+#: widgy/contrib/form_builder/models.py:204
+msgid "Organization ID (OID)"
+msgstr "Organisation ID (OID)"
+
+#: widgy/contrib/form_builder/models.py:207
+#: widgy/contrib/form_builder/models.py:208
+msgid "Salesforce Web-to-Lead"
+msgstr ""
+
+#: widgy/contrib/form_builder/models.py:225
+msgid "subject"
+msgstr "Betreff"
+
+#: widgy/contrib/form_builder/models.py:226
+#: widgy/contrib/page_builder/models.py:103
+msgid "content"
+msgstr "Inhalt"
+
+#: widgy/contrib/form_builder/models.py:228
+msgid "include form data"
+msgstr "Formulardaten beinhalten"
+
+#: widgy/contrib/form_builder/models.py:229
+msgid "Should the form's data be included in the email?"
+msgstr "Sollen die Formulardaten in der Email enthalten sein?"
+
+#: widgy/contrib/form_builder/models.py:278
+#: widgy/contrib/form_builder/models.py:317
+msgid "to"
+msgstr "an"
+
+#: widgy/contrib/form_builder/models.py:280
+msgid ""
+"This widget can be used to send yourself an email when a form has been "
+"filled out. You can customize the body of the email."
+msgstr ""
+"Dieses Widget benutzen, um eine Email zu erhalten, wenn ein Formular "
+"ausgefüllt wurde. Sie können den Inhalt der Email anpassen"
+
+#: widgy/contrib/form_builder/models.py:285
+msgid "admin success email"
+msgstr "Admin Bestätigungsemail"
+
+#: widgy/contrib/form_builder/models.py:286
+msgid "admin success emails"
+msgstr "Admin Bestätigungsemails"
+
+#: widgy/contrib/form_builder/models.py:299
+msgid "To"
+msgstr "Nach"
+
+#: widgy/contrib/form_builder/models.py:313
+msgid ""
+"This widget can be used to send the user an email when they fill out a form. "
+"You can customize the body of the email."
+msgstr ""
+"Dieses Widget benutzen, um eine Email an den Benutzer zu senden, wenn ein "
+"Formular ausgefüllt wurde. Sie können den Inhalt der Email anpassen"
+
+#: widgy/contrib/form_builder/models.py:320
+msgid "user success email"
+msgstr "Bestätigungsmail für Benutzer"
+
+#: widgy/contrib/form_builder/models.py:321
+msgid "user success emails"
+msgstr "Bestätigungsmails für Benutzer"
+
+#: widgy/contrib/form_builder/models.py:347
+msgid "submit"
+msgstr "Absenden"
+
+#: widgy/contrib/form_builder/models.py:347
+#: widgy/contrib/page_builder/models.py:539
+msgid "text"
+msgstr "Text"
+
+#: widgy/contrib/form_builder/models.py:349
+msgid "The submit button for a form."
+msgstr "Der Absendebutton für ein Formular"
+
+#: widgy/contrib/form_builder/models.py:356
+msgid "submit button"
+msgstr "Absendebutton"
+
+#: widgy/contrib/form_builder/models.py:357
+msgid "submit buttons"
+msgstr "Absendebuttons"
+
+#: widgy/contrib/form_builder/models.py:364
+msgid "Untitled form"
+msgstr "Unbenanntes Formular"
+
+#: widgy/contrib/form_builder/models.py:377
+msgid "success message"
+msgstr "Erfolgsnachricht"
+
+#: widgy/contrib/form_builder/models.py:378
+msgid "success messages"
+msgstr "Erfolgsnachrichten"
+
+#: widgy/contrib/form_builder/models.py:391
+#: widgy/contrib/form_builder/models.py:392
+msgid "success handlers"
+msgstr "Erfolgshandler"
+
+#: widgy/contrib/form_builder/models.py:417
+#: widgy/contrib/form_builder/models.py:418
+msgid "fields"
+msgstr "Felder"
+
+#: widgy/contrib/form_builder/models.py:433
+#: widgy/contrib/form_builder/models.py:434
+msgid "settings"
+msgstr "Einstellungen"
+
+#: widgy/contrib/form_builder/models.py:459
+msgid "Name"
+msgstr "Name"
+
+#: widgy/contrib/form_builder/models.py:462
+msgid "A name to help identify this form. Only admins see this."
+msgstr ""
+"Ein Name um dieses Formular zu identifizieren. Nur für Admins sichtbar."
+
+#: widgy/contrib/form_builder/models.py:473
+msgid "Use this widget to build a Form that your users can fill out."
+msgstr "Widget zur Erstellung eines Formulars."
+
+#: widgy/contrib/form_builder/models.py:486
+msgid "form"
+msgstr "Form"
+
+#: widgy/contrib/form_builder/models.py:487
+msgid "forms"
+msgstr "Forms"
+
+#: widgy/contrib/form_builder/models.py:655
+#: widgy/contrib/form_builder/models.py:665
+msgid "help text"
+msgstr "Hilfetext"
+
+#: widgy/contrib/form_builder/models.py:662
+msgid "label"
+msgstr "Label"
+
+#: widgy/contrib/form_builder/models.py:663
+msgid "required"
+msgstr "benötigt"
+
+#: widgy/contrib/form_builder/models.py:725
+msgid "Text"
+msgstr "Text"
+
+#: widgy/contrib/form_builder/models.py:726
+msgid "Number"
+msgstr "Anzahl"
+
+#: widgy/contrib/form_builder/models.py:727
+msgid "Email"
+msgstr "Email"
+
+#: widgy/contrib/form_builder/models.py:728
+msgid "Telephone"
+msgstr "Telefon"
+
+#: widgy/contrib/form_builder/models.py:729
+msgid "Checkbox"
+msgstr "Auswahlbox"
+
+#: widgy/contrib/form_builder/models.py:730
+msgid "Date"
+msgstr "Datum"
+
+#: widgy/contrib/form_builder/models.py:736
+#: widgy/contrib/form_builder/models.py:813
+#: widgy/contrib/form_builder/models.py:842
+#: widgy/contrib/page_builder/models.py:571
+msgid "type"
+msgstr "Art"
+
+#: widgy/contrib/form_builder/models.py:738
+msgid ""
+"A single form input. This widget can accept different types of input like "
+"text, number, or email. See a more complete list inside the widget."
+msgstr ""
+"Eine einzelne Formulareingabe. Dieses Widget kann verschiedene Eingabefelder "
+"(Text, Zahlen oder Email-Adresse) darstellen. Eine komplette Liste finden "
+"Sie im Widget."
+
+#: widgy/contrib/form_builder/models.py:743
+msgid "form input"
+msgstr "Formulareingabe"
+
+#: widgy/contrib/form_builder/models.py:744
+msgid "form inputs"
+msgstr "Formulareingaben"
+
+#: widgy/contrib/form_builder/models.py:770
+msgid "Add this to your form to allow users to add large amounts of text."
+msgstr "Für größere Texteingaben."
+
+#: widgy/contrib/form_builder/models.py:774
+msgid "text area"
+msgstr "Textfeld"
+
+#: widgy/contrib/form_builder/models.py:775
+msgid "text areas"
+msgstr "Textfelder"
+
+#: widgy/contrib/form_builder/models.py:784
+msgid "Place each choice on a separate line."
+msgstr "Eine einzelne Zeile für jede Auswahl."
+
+#: widgy/contrib/form_builder/models.py:814
+msgid "Dropdown"
+msgstr "Dropdown"
+
+#: widgy/contrib/form_builder/models.py:815
+msgid "Radio buttons"
+msgstr "Radio Buttons"
+
+#: widgy/contrib/form_builder/models.py:818
+msgid ""
+"Use this to allow your users to choose from a list of options. ChoiceFields "
+"can be displayed as radio buttons or as a dropdown."
+msgstr ""
+"Für eine Auswahl aus einer Liste von Optionen. Darstellung als Radiobuttons "
+"oder Dropdown"
+
+#: widgy/contrib/form_builder/models.py:843
+msgid "Checkboxes"
+msgstr "Checkboxen"
+
+#: widgy/contrib/form_builder/models.py:844
+msgid "Multi-select"
+msgstr "Mehrfachauswahl"
+
+#: widgy/contrib/form_builder/models.py:847
+msgid ""
+"Use this to allow your users to choose one or more options from a list of "
+"choices. This field can be displayed as checkboxes or as a multi-select "
+"dropdown."
+msgstr ""
+"Für eine Mehrfachauswahl aus einer Liste von Optionen. Darstellung als "
+"Checkboxen oder Dropdown"
+
+#: widgy/contrib/form_builder/models.py:879
+msgid "This widget uses a special script to detect and prevent spam."
+msgstr "Dieses Widget sucht und vermeidet Spam."
+
+#: widgy/contrib/form_builder/models.py:889
+msgid "Incorrect Uncaptcha value"
+msgstr "Ungültiger Uncaptcha Wert"
+
+#: widgy/contrib/form_builder/models.py:908
+msgid "uncaptcha"
+msgstr "Uncaptcha"
+
+#: widgy/contrib/form_builder/models.py:909
+msgid "uncaptchas"
+msgstr "Uncaptchas"
+
+#: widgy/contrib/form_builder/models.py:962
+msgid "Created at"
+msgstr "Erzeugt am"
+
+#: widgy/contrib/form_builder/models.py:1023
+msgid "form submission"
+msgstr "Formularübermittlung"
+
+#: widgy/contrib/form_builder/models.py:1024
+msgid "form submissions"
+msgstr "Formularübermittlungen"
+
+#: widgy/contrib/form_builder/templates/admin/form_builder/form/change_form.html:9
+msgid "Download as CSV"
+msgstr "Als CSV herunterladen"
+
+#: widgy/contrib/form_builder/templates/widgy/form_builder/form/preview.html:6
+msgid "view submissions"
+msgstr "Übermittlungen ansehen"
+
+#: widgy/contrib/form_builder/templates/widgy/form_builder/uncaptcha/render.html:3
+msgid "Uncaptcha:"
+msgstr "Uncaptcha"
+
+#: widgy/contrib/form_builder/templates/widgy/form_builder/uncaptcha/render.html:5
+#, python-format
+msgid "Please copy \"%(csrf_token)s\" into the field labeled \"Uncaptcha\"."
+msgstr "Bitte \"%(csrf_token)s\"  in das \"Uncaptcha\" Feld kopieren."
+
+#: widgy/contrib/page_builder/db/fields.py:80
+msgid "Not a valid YouTube or Vimeo URL"
+msgstr "Keine gültige YouTube oder Vimeo URL"
+
+#: widgy/contrib/page_builder/db/fields.py:85
+msgid ""
+"Please enter a link to the YouTube or Vimeo page for this video.  i.e. "
+"http://www.youtube.com/watch?v=9bZkp7q19f0"
+msgstr ""
+"Bitte Link zu der Seite mit YouTube oder Vimeo Video eingeben z.B. http://"
+"www.youtube.com/watch?v=9bZkp7q19f0"
+
+#: widgy/contrib/page_builder/models.py:66
+msgid "main content"
+msgstr "Hauptinhalt"
+
+#: widgy/contrib/page_builder/models.py:67
+msgid "main contents"
+msgstr "Hauptinhalte"
+
+#: widgy/contrib/page_builder/models.py:82
+msgid "sidebar"
+msgstr "Seitenleiste"
+
+#: widgy/contrib/page_builder/models.py:83
+msgid "sidebars"
+msgstr "Seitenleisten"
+
+#: widgy/contrib/page_builder/models.py:92
+msgid "default layout"
+msgstr "Standardlayout"
+
+#: widgy/contrib/page_builder/models.py:93
+msgid "default layouts"
+msgstr "Standardlayouts"
+
+#: widgy/contrib/page_builder/models.py:110
+msgid "markdown"
+msgstr "Markdown"
+
+#: widgy/contrib/page_builder/models.py:111
+msgid "markdowns"
+msgstr "Markdowns"
+
+#: widgy/contrib/page_builder/models.py:115
+msgid "Content"
+msgstr "Inhalt"
+
+#: widgy/contrib/page_builder/models.py:124
+msgid ""
+"Easily add text to your page with this widget. You can have certain styles "
+"like bold or italic, but they won't break your design."
+msgstr ""
+"Widget für formatierten Text. Sie können verschiedene Stile "
+"anwenden wie Fett oder Italic und ihr Design wird intakt bleiben."
+
+#: widgy/contrib/page_builder/models.py:129
+msgid "HTML"
+msgstr "HTML"
+
+#: widgy/contrib/page_builder/models.py:130
+msgid "HTML editors"
+msgstr "HTML Editoren"
+
+#: widgy/contrib/page_builder/models.py:138
+msgid ""
+"If you need to add some JavaScript or an embed code, you can use this. Staff "
+"users should not have access to this widget."
+msgstr ""
+"Für Javascript oder Embed Code. Normale Mitarbeiter sollten keinen "
+"Zugriff auf dieses Widget haben."
+
+#: widgy/contrib/page_builder/models.py:143
+msgid "unsafe HTML"
+msgstr "unsicheres HTML"
+
+#: widgy/contrib/page_builder/models.py:144
+msgid "unsafe HTML editors"
+msgstr "unsicheres HTML"
+
+#: widgy/contrib/page_builder/models.py:157
+msgid "callout bucket"
+msgstr ""
+
+#: widgy/contrib/page_builder/models.py:158
+msgid "callout buckets"
+msgstr ""
+
+#: widgy/contrib/page_builder/models.py:163
+msgid "name"
+msgstr "Name"
+
+#: widgy/contrib/page_builder/models.py:169
+msgid "Widgy Content"
+msgstr "Widgy Inhalt"
+
+#: widgy/contrib/page_builder/models.py:175
+msgid "callout"
+msgstr ""
+
+#: widgy/contrib/page_builder/models.py:176
+msgid "callouts"
+msgstr ""
+
+#: widgy/contrib/page_builder/models.py:189
+msgid ""
+"Callouts are a way to call a user's attention to something. Callouts can be "
+"shared across pages."
+msgstr ""
+"Callouts lenken die Aufmerksamkeit des Benutzers auf etwas. Sie können "
+" von mehreren Seiten geteilt werden."
+
+#: widgy/contrib/page_builder/models.py:195
+#: widgy/contrib/widgy_mezzanine/models.py:79
+msgid "callout widget"
+msgstr ""
+
+#: widgy/contrib/page_builder/models.py:196
+#: widgy/contrib/widgy_mezzanine/models.py:80
+msgid "callout widgets"
+msgstr ""
+
+#: widgy/contrib/page_builder/models.py:212
+msgid ""
+"Accordions are a good way to separate sections of content. A good use for "
+"accordions is an FAQ page. Use the Section widget to separate each section "
+"of content in the Accordion."
+msgstr ""
+"Akkordeons sind geeignet Inhaltsbereiche aufzuteilen. "
+"Ein Anwendungsfall sind FAQ Seiten. Benutzen Sie das Section Widget, um "
+"Inhaltsbereiche innerhalb des Akkordeons voneinander abzutrennen."
+
+#: widgy/contrib/page_builder/models.py:220
+msgid "accordion"
+msgstr "Akkordeon"
+
+#: widgy/contrib/page_builder/models.py:221
+msgid "accordions"
+msgstr "Akkordeons"
+
+#: widgy/contrib/page_builder/models.py:233
+msgid "Title 1"
+msgstr "Titel 1"
+
+#: widgy/contrib/page_builder/models.py:234
+msgid "Title 2"
+msgstr "Titel 2"
+
+#: widgy/contrib/page_builder/models.py:240
+msgid ""
+"Tabs are another way to separate sections of content, but they are separated "
+"horizontally instead of vertically. A good use for the Tabs widget is a "
+"product detail page."
+msgstr ""
+"Tabs sind ein weiterer Weg, um Inhaltsbereiche zu trennen, aber hier weden sie "
+"horizontal getrennt. Ein typischer Anwendungsfall für das Tab Widget "
+"sind Produktdetailseiten."
+
+#: widgy/contrib/page_builder/models.py:246
+#: widgy/contrib/page_builder/models.py:247
+msgid "tabs"
+msgstr "Tabs"
+
+#: widgy/contrib/page_builder/models.py:253
+#: widgy/contrib/page_builder/models.py:504
+msgid "title"
+msgstr "Titel"
+
+#: widgy/contrib/page_builder/models.py:254
+msgid "Use a unique title for each section."
+msgstr "Verwenden Sie verschiedene Titel für jede Sektion."
+
+#: widgy/contrib/page_builder/models.py:258
+msgid "Use Section to split up your content into more consumable chunks."
+msgstr "Verwenden Sie Sektionen, um Inhalt in kleinere Einheiten aufzuteilen."
+
+#: widgy/contrib/page_builder/models.py:266
+msgid "section"
+msgstr "Sektion"
+
+#: widgy/contrib/page_builder/models.py:267
+msgid "sections"
+msgstr "Sektionen"
+
+#: widgy/contrib/page_builder/models.py:277
+#: widgy/contrib/page_builder/models.py:282
+msgid "image"
+msgstr "Bild"
+
+#: widgy/contrib/page_builder/models.py:283
+msgid "images"
+msgstr "Bilder"
+
+#: widgy/contrib/page_builder/models.py:309
+msgid "Add a row to your table."
+msgstr "Eine Reihe zur Tabelle hinzufügen."
+
+#: widgy/contrib/page_builder/models.py:323
+msgid "row"
+msgstr "Reihe"
+
+#: widgy/contrib/page_builder/models.py:324
+msgid "rows"
+msgstr "Reihen"
+
+#: widgy/contrib/page_builder/models.py:334
+msgid "Add a column to your table."
+msgstr "Eine Spalte zur Tabelle hinzufügen."
+
+#: widgy/contrib/page_builder/models.py:378
+msgid "column"
+msgstr "Spalte"
+
+#: widgy/contrib/page_builder/models.py:379
+msgid "columns"
+msgstr "Spalten"
+
+#: widgy/contrib/page_builder/models.py:406
+msgid "cell"
+msgstr "Zelle"
+
+#: widgy/contrib/page_builder/models.py:407
+msgid "cells"
+msgstr "Zellen"
+
+#: widgy/contrib/page_builder/models.py:430
+msgid "table header"
+msgstr "Tabellenkopf"
+
+#: widgy/contrib/page_builder/models.py:431
+msgid "table headers"
+msgstr "Tabellenköpfe"
+
+#: widgy/contrib/page_builder/models.py:455
+msgid "table body"
+msgstr "Tabelleninhalt"
+
+#: widgy/contrib/page_builder/models.py:456
+msgid "table bodies"
+msgstr "Tabelleninhalte"
+
+#: widgy/contrib/page_builder/models.py:465
+msgid ""
+"With this widget, you can add tables to your page. A good use for tables is "
+"numerical data or comparing things side by side."
+msgstr ""
+"Mit diesem Widget können Sie Tabellen erzeugen. Anwendungsmöglichkeiten "
+"sind numerische Daten oder Seite-an-Seite Vergleiche."
+
+#: widgy/contrib/page_builder/models.py:486
+msgid "table"
+msgstr "Tabelle"
+
+#: widgy/contrib/page_builder/models.py:487
+msgid "tables"
+msgstr "Tabellen"
+
+#: widgy/contrib/page_builder/models.py:495
+msgid ""
+"A figure is a self-contained piece of content. It can be used to add a "
+"caption to an image or a video for example."
+msgstr ""
+"Ein Schaubild kann benutzt werden, um eine Bildunterschrift oder "
+"erklärenden Text zu einem Bild oder einem Video hinzuzufügen."
+
+#: widgy/contrib/page_builder/models.py:498
+msgid "center"
+msgstr "zentral"
+
+#: widgy/contrib/page_builder/models.py:498
+msgid "position"
+msgstr "Position"
+
+#: widgy/contrib/page_builder/models.py:499
+msgid "Float left"
+msgstr "Linksbündig"
+
+#: widgy/contrib/page_builder/models.py:500
+msgid "Float right"
+msgstr "Rechtsbündig"
+
+#: widgy/contrib/page_builder/models.py:501
+msgid "Center"
+msgstr "Zentrum"
+
+#: widgy/contrib/page_builder/models.py:505
+msgid "caption"
+msgstr "Bildunterschrift"
+
+#: widgy/contrib/page_builder/models.py:508
+msgid "figure"
+msgstr "Schaubild"
+
+#: widgy/contrib/page_builder/models.py:509
+msgid "figures"
+msgstr "Schaubilder"
+
+#: widgy/contrib/page_builder/models.py:518
+#: widgy/contrib/page_builder/models.py:525
+msgid "video"
+msgstr "Video"
+
+#: widgy/contrib/page_builder/models.py:521
+msgid "Add a video to your page. Supports YouTube, Vimeo, and others."
+msgstr "Ein Video einbetten. Unterstützt YouTube, Vimeo und andere."
+
+#: widgy/contrib/page_builder/models.py:526
+msgid "videos"
+msgstr "Videos"
+
+#: widgy/contrib/page_builder/models.py:533
+msgid "Link"
+msgstr ""
+
+#: widgy/contrib/page_builder/models.py:546
+msgid "Add a link to another page."
+msgstr "Ein Link zu einer anderen Seite."
+
+#: widgy/contrib/page_builder/models.py:551
+msgid "button"
+msgstr "Button"
+
+#: widgy/contrib/page_builder/models.py:552
+msgid "buttons"
+msgstr "Buttons"
+
+#: widgy/contrib/page_builder/models.py:564
+msgid "Road map"
+msgstr "Straßenkarte"
+
+#: widgy/contrib/page_builder/models.py:565
+msgid "Satellite"
+msgstr "Satellit"
+
+#: widgy/contrib/page_builder/models.py:566
+msgid "Hybrid"
+msgstr "Hybrid"
+
+#: widgy/contrib/page_builder/models.py:567
+msgid "Terrain"
+msgstr "Gelände"
+
+#: widgy/contrib/page_builder/models.py:570
+msgid "address"
+msgstr "Adresse"
+
+#: widgy/contrib/page_builder/models.py:576
+msgid "This will output a map on your page with an address that you specify."
+msgstr "Zeigt eine Karte mit der angegebenen Adresse an."
+
+#: widgy/contrib/page_builder/models.py:582
+msgid "Google map"
+msgstr "Google Map"
+
+#: widgy/contrib/page_builder/models.py:583
+msgid "Google maps"
+msgstr "Google Maps"
+
+#: widgy/contrib/page_builder/templates/widgy/page_builder/figure/preview.html:4
+msgid "Title"
+msgstr "Titel"
+
+#: widgy/contrib/page_builder/templates/widgy/page_builder/figure/preview.html:5
+msgid "Caption"
+msgstr "Bildunterschrift"
+
+#: widgy/contrib/page_builder/templates/widgy/page_builder/googlemap/render.html:4
+msgid "View Larger Map"
+msgstr "Größere Karte ansehen"
+
+#: widgy/contrib/review_queue/admin.py:84
+#, python-format
+msgid "%d commit has been approved."
+msgid_plural "%d commits have been approved."
+msgstr[0] "%d Eingabe wurde bestätigt."
+msgstr[1] "%d Eingaben wurden bestätigt."
+
+#: widgy/contrib/review_queue/admin.py:102
+msgid "Approve selected commits"
+msgstr "Ausgewählte Eingaben bestätigen"
+
+#: widgy/contrib/review_queue/admin.py:117
+msgid "Commit name"
+msgstr "Eingabename"
+
+#: widgy/contrib/review_queue/admin.py:136
+#: widgy/contrib/widgy_mezzanine/models.py:45
+msgid "Preview"
+msgstr "Vorschau"
+
+#: widgy/contrib/review_queue/models.py:17
+msgid "unapproved commit"
+msgstr "Unbestätigte Eingabe"
+
+#: widgy/contrib/review_queue/models.py:18
+msgid "unapproved commits"
+msgstr "Unbestätigte Eingaben"
+
+#: widgy/contrib/review_queue/templates/admin/review_queue/reviewedversioncommit/change_list_results.html:17
+msgid "Remove from sorting"
+msgstr "Von der Sortierung lösen"
+
+#: widgy/contrib/review_queue/templates/admin/review_queue/reviewedversioncommit/change_list_results.html:18
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Sortierungspriorität: %(priority_number)s"
+
+#: widgy/contrib/review_queue/templates/admin/review_queue/reviewedversioncommit/change_list_results.html:19
+msgid "Toggle sorting"
+msgstr "Sortierung umschalten"
+
+#: widgy/contrib/review_queue/templates/review_queue/_commit_form.html:8
+msgid "Commit and approve"
+msgstr "Einreichen und bestätigen"
+
+#: widgy/contrib/review_queue/templates/review_queue/history.html:15
+#, python-format
+msgid ""
+"\n"
+"        <strong>%(created_at)s</strong> by %(author)s, approved by <strong>"
+"%(approved_by)s</strong>. (Scheduled to be published at "
+"%(publish_at)s.)<span title=\"Not live yet\">*</span>\n"
+"      "
+msgstr ""
+"\n"
+"        <strong>%(created_at)s</strong> von %(author)s, bestätigt von "
+"<strong>%(approved_by)s</strong>. (Geplante Veröffentlichung: "
+"%(publish_at)s.)<span title=\"Noch nicht live\">*</span>\n"
+"      "
+
+#: widgy/contrib/review_queue/templates/review_queue/history.html:19
+#, python-format
+msgid ""
+"\n"
+"        <strong>%(created_at)s</strong> by %(author)s, approved by <strong>"
+"%(approved_by)s</strong>. (Was published at %(publish_at)s.)\n"
+"      "
+msgstr ""
+"\n"
+"        <strong>%(created_at)s</strong> von %(author)s, bestätigt von "
+"<strong>%(approved_by)s</strong>. (Veröffentlicht am %(publish_at)s.)\n"
+"      "
+
+#: widgy/contrib/review_queue/templates/review_queue/history.html:23
+#, python-format
+msgid ""
+"\n"
+"        <strong>%(created_at)s</strong> by %(author)s, approved by <strong>"
+"%(approved_by)s</strong>.\n"
+"      "
+msgstr ""
+"\n"
+"        <strong>%(created_at)s</strong> von %(author)s, bestätigt von "
+"<strong>%(approved_by)s</strong>.\n"
+"      "
+
+#: widgy/contrib/review_queue/templates/review_queue/history.html:27
+#, python-format
+msgid ""
+"\n"
+"        <strong>%(created_at)s</strong> by %(author)s. (Not approved "
+"yet.)<span title=\"Not live yet\">*</span>\n"
+"      "
+msgstr ""
+"\n"
+"        <strong>%(created_at)s</strong> von %(author)s. (Noch nicht "
+"bestätigt.)<span title=\"Noch nicht live\">*</span>\n"
+"      "
+
+#: widgy/contrib/review_queue/templates/review_queue/history.html:40
+msgid "Approve this Commit"
+msgstr "Diese Eingabe bestätigen"
+
+#: widgy/contrib/review_queue/templates/review_queue/history.html:44
+msgid "Unapprove this Commit"
+msgstr "Diese Eingabe ablehnen"
+
+#: widgy/contrib/review_queue/templates/review_queue/undoform.html:8
+msgid "Undo"
+msgstr "Zurücksetzen"
+
+#: widgy/contrib/review_queue/views.py:42
+#: widgy/contrib/review_queue/views.py:101
+#: widgy/contrib/widgy_mezzanine/admin.py:147
+msgid "You don't have permission to approve commits."
+msgstr "Sie haben nicht die Rechte um Eingaben zu bestätigen."
+
+#: widgy/contrib/review_queue/views.py:68
+#, python-format
+msgid "Commit %s has been approved"
+msgstr "Eingabe %s wurde bestätigt"
+
+#: widgy/contrib/review_queue/views.py:85
+#, python-format
+msgid "Commit %s has been unapproved."
+msgstr "Eingabe %s wurde zurückgewiesen."
+
+#: widgy/contrib/urlconf_include/models.py:24
+msgid "plugin name"
+msgstr "Pluginname"
+
+#: widgy/contrib/urlconf_include/models.py:37
+msgid "plugin"
+msgstr "Plugin"
+
+#: widgy/contrib/urlconf_include/models.py:38
+msgid "plugins"
+msgstr "Plugins"
+
+#: widgy/contrib/widgy_i18n/models.py:17
+msgid "Layout"
+msgstr "Layout"
+
+#: widgy/contrib/widgy_mezzanine/admin.py:67
+msgid ""
+"If you enter a date here, the page will not be viewable on the site until "
+"then"
+msgstr "Vor diesem Datum wird die Seite nicht sichtbar sein."
+
+#: widgy/contrib/widgy_mezzanine/admin.py:70
+msgid "If you enter a date here, the page will not be viewable after this time"
+msgstr "Nach diesem Datums wird die Seite nicht mehr sichtbar sein."
+
+#: widgy/contrib/widgy_mezzanine/admin.py:85
+#: widgy/contrib/widgy_mezzanine/admin.py:91
+#: widgy/contrib/widgy_mezzanine/admin.py:92
+#: widgy/templates/widgy/edit.html:14
+msgid "Save"
+msgstr "Speichern"
+
+#: widgy/contrib/widgy_mezzanine/admin.py:86
+#: widgy/contrib/widgy_mezzanine/admin.py:93
+#: widgy/contrib/widgy_mezzanine/admin.py:95
+msgid "Save as Draft"
+msgstr "als Entwurf speichern"
+
+#: widgy/contrib/widgy_mezzanine/admin.py:87
+#: widgy/contrib/widgy_mezzanine/admin.py:97
+msgid "Publish"
+msgstr "Veröffentlichen"
+
+#: widgy/contrib/widgy_mezzanine/admin.py:88
+#: widgy/contrib/widgy_mezzanine/admin.py:100
+msgid "Publish Changes"
+msgstr "Änderungen veröffentlichen"
+
+#: widgy/contrib/widgy_mezzanine/admin.py:94
+#: widgy/contrib/widgy_mezzanine/admin.py:96
+#: widgy/contrib/widgy_mezzanine/admin.py:98
+#: widgy/contrib/widgy_mezzanine/admin.py:99
+msgid "Submit for Review"
+msgstr "Zur Überprüfung einreichen"
+
+#: widgy/contrib/widgy_mezzanine/admin.py:129 widgy/views/versioning.py:103
+msgid "You don't have permission to commit."
+msgstr "Sie haben nicht die Rechte zur Bestätigung."
+
+#: widgy/contrib/widgy_mezzanine/admin.py:134
+msgid "There was nothing to submit for review."
+msgstr "Es gibt nichts zur Überprüfung einzureichen."
+
+#: widgy/contrib/widgy_mezzanine/admin.py:180
+#, python-brace-format
+msgid "There is one unreviewed commit for this page."
+msgid_plural "There are {count} unreviewed commits for this page."
+msgstr[0] "Es liegt eine nicht überprüfte Eingabe für diese Seite vor."
+msgstr[1] "Es liegen {count} nicht überprüfte Eingaben für diese Seite vor."
+
+#: widgy/contrib/widgy_mezzanine/admin.py:186
+#, python-brace-format
+msgid "There is one future-scheduled commit."
+msgid_plural "There are {count} future-scheduled commits."
+msgstr[0] "Eine geplante Eingabe vorhanden"
+msgstr[1] "{count} geplante Eingaben vorhanden."
+
+#: widgy/contrib/widgy_mezzanine/admin.py:240
+msgid "preview"
+msgstr "Vorschau"
+
+#: widgy/contrib/widgy_mezzanine/admin.py:253
+msgid "root node"
+msgstr "Wurzelknoten"
+
+#: widgy/contrib/widgy_mezzanine/admin.py:278
+msgid "restore deleted page"
+msgstr "Gelöschte Seite wiederherstellen"
+
+#: widgy/contrib/widgy_mezzanine/models.py:94
+msgid "widgy content"
+msgstr "Widgy Inhalt"
+
+#: widgy/contrib/widgy_mezzanine/models.py:104
+msgid "widgy page"
+msgstr "Widgy Seite"
+
+#: widgy/contrib/widgy_mezzanine/models.py:105
+msgid "widgy pages"
+msgstr "Widgy Seiten"
+
+#: widgy/contrib/widgy_mezzanine/templates/widgy/widgy_mezzanine/unpublish.html:5
+#, python-format
+msgid "Unpublishing %(page_title)s"
+msgstr "%(page_title)s verbergen"
+
+#: widgy/contrib/widgy_mezzanine/templates/widgy/widgy_mezzanine/unpublish.html:7
+msgid ""
+"\n"
+"  Unpublishing will cause this page to disappear from the live site.  Users "
+"who\n"
+"  go to this page will get a 404 (File Not Found) error page.  Are you sure "
+"you\n"
+"  want to unpublish this page?\n"
+"  "
+msgstr ""
+"\n"
+"  Die Seite wird nicht mehr öffentlich sichtbar sein. Benutzer, "
+"die\n"
+"  die Adresse der Seite aufrufen werden eine 404 (File Not Found) Fehlerseite sehen. "
+"Sind sie sicher, daß Sie die Seite aus der Veröffentlichung nehmen wollen?\n"
+"  "
+
+#: widgy/contrib/widgy_mezzanine/templates/widgy/widgy_mezzanine/unpublish.html:16
+#: widgy/templates/widgy/edit.html:13
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: widgy/contrib/widgy_mezzanine/templates/widgy/widgy_mezzanine/unpublish.html:17
+msgid "Yes, I'm sure"
+msgstr "Ja, ich bin sicher"
+
+#: widgy/contrib/widgy_mezzanine/templates/widgy/widgy_mezzanine/versioned_widgy_field.html:6
+msgid "Schedule changes"
+msgstr "Änderungen planen"
+
+#: widgy/contrib/widgy_mezzanine/templates/widgy/widgy_mezzanine/versioned_widgy_field.html:7
+#: widgy/templates/widgy/versioned_widgy_field_base.html:6
+#: widgy/views/versioning.py:150
+msgid "Reset"
+msgstr "Zurücksetzen"
+
+#: widgy/contrib/widgy_mezzanine/templates/widgy/widgy_mezzanine/widgypage_change_form.html:8
+msgid "Unpublish"
+msgstr "Nicht mehr öffentlich"
+
+#: widgy/contrib/widgy_mezzanine/templates/widgy/widgy_mezzanine/widgypage_change_form.html:15
+msgid "Clone"
+msgstr "Klonen"
+
+#: widgy/contrib/widgy_mezzanine/templates/widgy/widgy_mezzanine/widgypage_change_form.html:18
+#: widgy/templates/widgy/versioned_widgy_field_base.html:7
+msgid "History"
+msgstr "Geschichte"
+
+#: widgy/contrib/widgy_mezzanine/templates/widgy/widgy_mezzanine/widgypage_change_form.html:22
+msgid "View live version"
+msgstr "Live Version ansehen"
+
+#: widgy/contrib/widgy_mezzanine/templates/widgy/widgy_mezzanine/widgypage_change_form.html:33
+#: widgy/templates/widgy/preview.html:14
+msgid "Delete"
+msgstr "Löschen"
+
+#: widgy/contrib/widgy_mezzanine/views.py:160
+msgid "New title"
+msgstr "Neuer Titel"
+
+#: widgy/contrib/widgy_mezzanine/views.py:161
+msgid "New URL"
+msgstr "Neue URL"
+
+#: widgy/contrib/widgy_mezzanine/views.py:204
+#, python-brace-format
+msgid "'{old_title}' successfully cloned as '{new_title}'."
+msgstr "'{old_title}' erfolgreich geklont als '{new_title}'."
+
+#: widgy/forms.py:132
+msgid "You must save before you can edit this."
+msgstr "Zum Bearbeiten bitte erst speichern!"
+
+#: widgy/templates/widgy/_commit_form.html:12
+msgid "View Diff"
+msgstr "Unterschiede ansehen"
+
+#: widgy/templates/widgy/_commit_form.html:38
+#: widgy/templates/widgy/versioned_widgy_field_base.html:5
+msgid "Commit"
+msgstr "Anwenden"
+
+#: widgy/templates/widgy/commit.html:10
+msgid "Nothing has changed &mdash; no need to commit."
+msgstr "Keine Änderungen &mdash; keine Eingabe notwendig."
+
+#: widgy/templates/widgy/commit_success.html:4
+msgid "Change(s) successfully committed."
+msgstr "Änderung erfolgreich angwendet."
+
+#: widgy/templates/widgy/history.html:20
+msgid "Page History"
+msgstr "Seitenhistorie"
+
+#: widgy/templates/widgy/history.html:27
+#, python-format
+msgid " by <strong>%(author)s</strong>."
+msgstr " von <strong>%(author)s</strong>."
+
+#: widgy/templates/widgy/history.html:31
+msgid "Not live yet"
+msgstr "Noch nicht live"
+
+#: widgy/templates/widgy/history.html:32
+msgid "Scheduled to be published at"
+msgstr "Zur Veröffentlichung geplant am"
+
+#: widgy/templates/widgy/history.html:34
+msgid "Published at"
+msgstr "Veröffentlicht am"
+
+#: widgy/templates/widgy/history.html:47
+msgid "Revert to this Version"
+msgstr "Zu dieser Version zurücksetzen"
+
+#: widgy/templates/widgy/history.html:49
+msgid "Can't revert; this is the same as the current version."
+msgstr "Kein Zurücksetzen möglich; ist bereits die aktuelle Version"
+
+#: widgy/templates/widgy/history.html:52
+msgid "Diff"
+msgstr "Unterschiede"
+
+#: widgy/templates/widgy/preview.html:17
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: widgy/templates/widgy/preview.html:20
+msgid "pop out"
+msgstr "in Popup öffnen"
+
+#: widgy/templates/widgy/reset.html:6
+msgid "There are no commits yet, nothing to reset to"
+msgstr "Keine Eingaben vorhanden - nichts zurückzusetzen"
+
+#: widgy/templates/widgy/reset.html:8
+msgid "This will irrevocably destroy all uncommited changes. Are you sure?"
+msgstr "Alle nicht eingereichten Änderungen gehen verloren. Sind Sie sicher?"
+
+#: widgy/templates/widgy/reset.html:11
+msgid "Yes"
+msgstr "Ja"
+
+#: widgy/templates/widgy/reset.html:14
+msgid "Nothing has changed &mdash; no need to reset."
+msgstr "Keine Änderungen &mdash; kein Zurücksetzen nötig."
+
+#: widgy/templates/widgy/reset_success.html:5
+msgid "Your changes were successfully erased."
+msgstr "Ihre Änderungen wurden erfolgreich gelöscht."
+
+#: widgy/views/api.py:68 widgy/views/api.py:247 widgy/views/api.py:266
+msgid "You don't have permission to edit this widget."
+msgstr "Sie haben nicht die Rechte, dieses Widget zu bearbeiten."
+
+#: widgy/views/api.py:127
+msgid "You don't have permission to add this widget."
+msgstr "Sie haben nicht die Rechte, dieses Widget hinzuzufügen."
+
+#: widgy/views/api.py:149 widgy/views/api.py:278
+msgid "You don't have permission to move this widget."
+msgstr "Sie haben nicht die Rechte, dieses Widget zu verschieben."
+
+#: widgy/views/api.py:175
+msgid "You don't have permission to delete this widget."
+msgstr "Sie haben nicht die Rechte, dieses Widget zu löschen."
+
+#: widgy/views/versioning.py:31
+msgid "Immediately"
+msgstr "Sofort"
+
+#: widgy/views/versioning.py:32
+msgid "Later"
+msgstr "Später"
+
+#: widgy/views/versioning.py:36
+msgid "Notes (optional)"
+msgstr "Notiz (optional)"
+
+#: widgy/views/versioning.py:38
+msgid "Publish at"
+msgstr "Veröffentlichen am"
+
+#: widgy/views/versioning.py:108
+msgid "Commit Changes"
+msgstr "Änderungen anwenden"
+
+#: widgy/views/versioning.py:145
+msgid "You don't have permission to reset."
+msgstr "Sie haben nicht die Rechte um zurückzusetzen."
+
+#: widgy/views/versioning.py:197
+msgid "You don't have permission to revert."
+msgstr "Sie haben nicht die Rechte um zurückzusetzen."
+
+#: widgy/views/versioning.py:200
+msgid "Revert Commit"
+msgstr "Anwendung zurücknehmen"
+
+#: widgy/views/versioning.py:227
+#, python-format
+msgid "Revert to version %(version)s"
+msgstr "Zurücksetzen zu Version %(version)s"
