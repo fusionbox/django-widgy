@@ -8,6 +8,9 @@ Changelog
   ``widgy_common.scss`` this is incompatible with django storages.
 - Add ``WidgySite.valid_root_of`` method. You can override this method to
   specify which layouts will be available for new pages.
+- Django 1.9 support
+- Improved translations
+- Bugfixes
 
 
 0.7.4 (2015-11-17)
