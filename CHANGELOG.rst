@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.7.5 (unreleased)
+0.8.1 (2016-04-13)
 ------------------
 
 - **Possible Breaking Change** Remove ``node-icon-sprite`` in
