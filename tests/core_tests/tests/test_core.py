@@ -996,7 +996,11 @@ class VersioningViewsTest(SwitchUserTestCase, RootNodeTestCase):
             'commit_pk': commit.pk,
         })
 
+
         with self.as_staffuser() as user:
+            r = self.client.get(url)
+            assert r.status_code == 200
+
             r = self.client.post(url, {'publish_radio': 'now'})
             self.assertEqual(r.status_code, 403)
             self.assertEquals(len(refetch(tracker).get_history_list()), 1)
