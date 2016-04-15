@@ -196,9 +196,17 @@ class RevertView(PopupView, AuthorizedMixin, VersionTrackerMixin, FormView):
     form_class = RevertForm
     permission_error_message = _("You don't have permission to revert.")
 
-    def dispatch(self, *args, **kwargs):
+    # get_object is in post and get because it needs to be called after the
+    # authorization in dispatch. Putting it in RevertView's dispatch would
+    # mean it gets called too early.
+
+    def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return super(RevertView, self).dispatch(*args, **kwargs)
+        return super(RevertView, self).post(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(RevertView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super(RevertView, self).get_context_data(**kwargs)
