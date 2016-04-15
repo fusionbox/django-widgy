@@ -4,7 +4,7 @@ Changelog
 0.8.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fixes issue #371
 
 
 0.8.1 (2016-04-13)
