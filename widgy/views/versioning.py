@@ -196,12 +196,16 @@ class RevertView(PopupView, AuthorizedMixin, VersionTrackerMixin, FormView):
     form_class = RevertForm
     permission_error_message = _("You don't have permission to revert.")
 
+    def dispatch(self, *args, **kwargs):
+        self.object = self.get_object()
+        return super(RevertView, self).dispatch(*args, **kwargs)
+
     def get_context_data(self, **kwargs):
+        kwargs = super(RevertView, self).get_context_data(**kwargs)
         kwargs['title'] = _('Revert Commit')
         kwargs['commit'] = self.object
         kwargs['tracker'] = self.object.tracker
         kwargs['site'] = self.site
-        kwargs = super(RevertView, self).get_context_data(**kwargs)
         kwargs['revert_url'] = self.site.reverse(
             self.site.revert_view,
             kwargs={'pk': self.object.tracker.pk, 'commit_pk': self.object.pk})
@@ -221,7 +225,6 @@ class RevertView(PopupView, AuthorizedMixin, VersionTrackerMixin, FormView):
         return commit
 
     def get_form_kwargs(self):
-        self.object = self.get_object()
         kwargs = super(RevertView, self).get_form_kwargs()
         kwargs['initial'] = {
             'message': _('Revert to version %(version)s') % {'version': self.object},
@@ -233,7 +236,7 @@ class RevertView(PopupView, AuthorizedMixin, VersionTrackerMixin, FormView):
         return self.site.has_add_permission(self.request, parent, type(obj))
 
     def form_valid(self, form):
-        commit = self.get_object()
+        commit = self.object
 
         if not self.has_permission(commit):
             raise PermissionDenied(self.permission_error_message)
