@@ -42,9 +42,8 @@ define([ 'jquery' ], function(jQuery){
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
   }
   $.ajaxSetup({
-    crossDomain: false, // obviates need for sameOrigin test
     beforeSend: function(xhr, settings) {
-      if (!csrfSafeMethod(settings.type)) {
+      if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
       }
     }
