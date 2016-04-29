@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.8.3 (unreleased)
+0.8.3 (2016-04-29)
 ------------------
 
 - Fix bug in cross domain requests in admin
