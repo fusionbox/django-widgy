@@ -288,6 +288,7 @@ class Node(MP_Node):
         my_family = set(self.depth_first_order())
         return [i for i in all_nodes if validator(i.content) and i not in my_family]
 
+    @transaction.atomic(savepoint=False)
     def clone_tree(self, freeze=True):
         """
         1. new_root <- root_node
@@ -327,18 +328,22 @@ class Node(MP_Node):
         if self.is_frozen:
             raise InvalidOperation({'message': "This widget is uneditable."})
 
+    @transaction.atomic(savepoint=False)
     def delete(self, *args, **kwargs):
         self.check_frozen()
         return super(Node, self).delete(*args, **kwargs)
 
+    @transaction.atomic(savepoint=False)
     def add_child(self, *args, **kwargs):
         self.check_frozen()
         return super(Node, self).add_child(*args, **kwargs)
 
+    @transaction.atomic(savepoint=False)
     def add_sibling(self, *args, **kwargs):
         self.check_frozen()
         return super(Node, self).add_sibling(*args, **kwargs)
 
+    @transaction.atomic(savepoint=False)
     def move(self, *args, **kwargs):
         self.check_frozen()
         return super(Node, self).move(*args, **kwargs)
@@ -593,6 +598,7 @@ class Content(models.Model):
         return True
 
     @classmethod
+    @transaction.atomic
     def add_root(cls, site, **kwargs):
         """
         Creates a new Content instance, stores it in the database, and calls
@@ -603,6 +609,7 @@ class Content(models.Model):
         obj.post_create(site)
         return obj
 
+    @transaction.atomic
     def add_child(self, site, cls, **kwargs):
         self.check_frozen()
         obj = cls.objects.create(**kwargs)
@@ -617,6 +624,7 @@ class Content(models.Model):
         obj.post_create(site)
         return obj
 
+    @transaction.atomic
     def add_sibling(self, site, cls, **kwargs):
         self.check_frozen()
         if self.node.is_root():
@@ -758,6 +766,7 @@ class Content(models.Model):
             'edit_template': self.get_form_template(request),
         }
 
+    @transaction.atomic
     def reposition(self, site, right=None, parent=None):
         self.check_frozen()
         old_parent_node = self.node.get_parent()
@@ -796,6 +805,7 @@ class Content(models.Model):
             site.validate_relationship(self, c)
             c._recheck_children(site)
 
+    @transaction.atomic
     def delete(self, raw=False):
         self.check_frozen()
         pre_delete_widget.send(self.__class__, instance=self, raw=raw)
