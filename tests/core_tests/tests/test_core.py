@@ -32,14 +32,6 @@ from .base import (
     RootNodeTestCase, make_a_nice_tree, SwitchUserTestCase, refetch)
 
 
-try:
-    atomic_or_nop = transaction.atomic
-except AttributeError:
-    @contextlib.contextmanager
-    def atomic_or_nop():
-        yield
-
-
 class TestCore(RootNodeTestCase):
     widgy_site = widgy_site
 
@@ -759,7 +751,7 @@ class TestVersioning(RootNodeTestCase):
 
         # the related object must not be able to be deleted
         with self.assertRaises((ProtectedError, InvalidOperation)):
-            with atomic_or_nop():
+            with transaction.atomic():
                 related.delete()
 
         # the related object must still exist
