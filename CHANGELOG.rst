@@ -4,7 +4,7 @@ Changelog
 0.8.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add atomic blocks around multi-step operations [#376]
 
 
 0.8.3 (2016-04-29)
