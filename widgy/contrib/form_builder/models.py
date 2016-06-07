@@ -6,9 +6,11 @@ import base64
 import hashlib
 import os.path
 import six
+import uuid
+import copy
 from collections import OrderedDict
 
-from django.db import models
+from django.db import models, transaction
 from django import forms
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
@@ -28,7 +30,7 @@ import html2text
 from widgy.models import Content, Node
 from widgy.signals import pre_delete_widget
 from widgy.models.mixins import StrictDefaultChildrenMixin, DefaultChildrenMixin, TabbedContainer, StrDisplayNameMixin
-from widgy.utils import update_context, build_url, QuerySet
+from widgy.utils import update_context, build_url, QuerySet, unset_pks
 from widgy.contrib.page_builder.models import Bucket, Html
 from widgy.contrib.page_builder.forms import MiniCKEditorField, CKEditorField
 from .forms import PhoneNumberField
@@ -621,6 +623,14 @@ class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Con
         return ('admin:%s_%s_change' % (self._meta.app_label, self._meta.model_name),
                 (self.pk,),
                 {})
+
+    @transaction.atomic
+    def clone_new_page(self):
+        new = copy.copy(self)
+        unset_pks(new)
+        new.ident = uuid.uuid4()
+        new.save()
+        return new
 
 
 class BaseFormField(FormElement):

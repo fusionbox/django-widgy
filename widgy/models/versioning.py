@@ -197,9 +197,9 @@ class VersionTracker(models.Model):
                 for attr in self.get_owner_related_names()
                 for owner in getattr(self, attr).all()]
 
-    def clone(self):
+    def clone(self, new_page=False):
         vt = copy.copy(self)
-        vt.working_copy = vt.working_copy.clone_tree(freeze=False)
+        vt.working_copy = vt.working_copy.clone_tree(freeze=False, new_page=new_page)
         commits = list(self._commits_to_clone())
         unset_pks(vt)
         vt.head = None

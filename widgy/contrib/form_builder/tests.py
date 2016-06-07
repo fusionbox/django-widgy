@@ -324,6 +324,11 @@ class TestForm(TestCase):
             "%s,\N{SNOWMAN},2,3\r\n" % (now,))
         )
 
+    def test_clone_new_page(self):
+        self.submit('a', 'b', 'c')
+        new_form = self.form.node.clone_tree(freeze=False, new_page=True).content
+        assert new_form.submissions.count() == 0
+
 
 class TestFormHandler(TestCase):
     def setUp(self):

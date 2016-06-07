@@ -289,7 +289,7 @@ class Node(MP_Node):
         return [i for i in all_nodes if validator(i.content) and i not in my_family]
 
     @transaction.atomic(savepoint=False)
-    def clone_tree(self, freeze=True):
+    def clone_tree(self, freeze=True, new_page=False):
         """
         1. new_root <- root_node
         2. new_root.content <- Clone(root_node.content)
@@ -304,18 +304,23 @@ class Node(MP_Node):
         """
         # This method only supports cloning an entire tree. We don't need it
         # for versioning, and I'm not sure what the semantics would be.
+        if new_page:
+            content_clone_method = 'clone_new_page'
+        else:
+            content_clone_method = 'clone'
+
         cls = self.__class__
         assert self.depth == 1
         self.maybe_prefetch_tree()
         new_root = cls.add_root(
-            content=self.content.clone(),
+            content=getattr(self.content, content_clone_method)(),
             numchild=self.numchild,
             is_frozen=freeze,
         )
         children_to_create = []
         for child in self.depth_first_order()[1:]:
             children_to_create.append(Node(
-                content=child.content.clone(),
+                content=getattr(child.content, content_clone_method)(),
                 path=new_root.path + child.path[cls.steplen:],
                 is_frozen=freeze,
                 depth=child.depth,
@@ -813,6 +818,13 @@ class Content(models.Model):
             child.delete(raw)
         self.node.delete()
         super(Content, self).delete()
+
+    def clone_new_page(self):
+        """
+        Clone the content for the purposes of cloning an entire page. This is
+        useful to reset form submissions, for example.
+        """
+        return self.clone()
 
     @transaction.atomic
     def clone(self):
