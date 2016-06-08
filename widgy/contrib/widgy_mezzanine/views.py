@@ -195,7 +195,7 @@ class ClonePageView(AdminViewMixin, UpdateView):
     def form_valid(self, form):
         page = form.instance
         unset_pks(page)
-        page.root_node = page.root_node.clone()
+        page.root_node = page.root_node.clone(new_page=True)
         page.status = CONTENT_STATUS_DRAFT
         form.save()
 
