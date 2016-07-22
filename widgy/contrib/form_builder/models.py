@@ -267,6 +267,7 @@ class EmailSuccessHandlerBase(StrDisplayNameMixin, FormSuccessHandler):
         if self.include_form_data:
             for value in form.cleaned_data.values():
                 if isinstance(value, File):
+                    value.file.seek(0)  # The file has already been read once to save to disk.
                     msg.attach(value.name, value.read(), getattr(value, 'content_type', None))
 
         msg.send()
