@@ -4,7 +4,7 @@ jQuery(function($) {
         tabify = $(this).closest('.tabify'),
         tabContent = tabify.find(href).first();
     tabify.children('.tabs').find('a').removeClass('active'); // clear the active tabs
-    tabify.children('.tabs').find('a[href=' + href + ']').addClass('active'); // activate the clicked tab
+    tabify.children('.tabs').find('a[href="' + href + '"]').addClass('active'); // activate the clicked tab
     tabify.children('.tabContent').removeClass('active'); // clear the active content
     tabContent.addClass('active'); // show the clicked content
     // Change the hash without scrolling
