@@ -18,6 +18,7 @@ Add Mezzanine apps to ``INSTALLED_APPS`` in ``settings.py``::
         'mezzanine.core',
         'mezzanine.generic',
         'mezzanine.pages',
+        'mezzanine.boot',
         'django_comments',
         'django.contrib.sites',
         'filebrowser_safe',
@@ -39,8 +40,8 @@ add required Widgy apps to ``INSTALLED_APPS``::
         'sorl.thumbnail',
 
 
-``django.contrib.admin`` should be installed after Mezzanine and Widgy,
-so move it under them in ``INSTALLED_APPS``.
+``django.contrib.admin`` **must** be installed after Mezzanine and
+Widgy, so move it under them in ``INSTALLED_APPS``.
 
 add Mezzanine middleware to ``MIDDLEWARE_CLASSES``::
 
@@ -67,22 +68,32 @@ you can add the following line to ``settings.py``::
     )
 
 add Mezzanine's context processors. If you don't already have
-``TEMPLATE_CONTEXT_PROCESSORS`` in your settings file, you should copy the
-default before adding Mezzanine's::
+``context_processors`` in your ``TEMPLATES`` settings, you should copy
+the default before adding Mezzanine's::
 
-    TEMPLATE_CONTEXT_PROCESSORS = (
-        # Defaults
-        "django.contrib.auth.context_processors.auth",
-        "django.contrib.messages.context_processors.messages",
-        "django.core.context_processors.debug",
-        "django.core.context_processors.i18n",
-        "django.core.context_processors.static",
-        "django.core.context_processors.media",
-        "django.core.context_processors.request",
-	# Mezzanine
-        "mezzanine.conf.context_processors.settings",
-        "mezzanine.pages.context_processors.page",
-    )
+    TEMPALTES = [
+        {
+            ...
+            'OPTIONS': {
+                ...
+                'context_processors': [
+                    # Defaults
+                    "django.contrib.auth.context_processors.auth",
+                    "django.contrib.messages.context_processors.messages",
+                    "django.template.context_processors.debug",
+                    "django.template.context_processors.i18n",
+                    "django.template.context_processors.static",
+                    "django.template.context_processors.media",
+                    "django.template.context_processors.request",
+                    # Mezzanine
+                    "mezzanine.conf.context_processors.settings",
+                    "mezzanine.pages.context_processors.page",
+                ],
+                ...
+            },
+            ...
+        },
+    ]
 
 make a :class:`Widgy site <widgy.site.WidgySite>` and set it in settings::
 
