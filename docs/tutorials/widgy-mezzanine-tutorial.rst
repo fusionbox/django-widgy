@@ -71,7 +71,7 @@ add Mezzanine's context processors. If you don't already have
 ``context_processors`` in your ``TEMPLATES`` settings, you should copy
 the default before adding Mezzanine's::
 
-    TEMPALTES = [
+    TEMPLATES = [
         {
             ...
             'OPTIONS': {
