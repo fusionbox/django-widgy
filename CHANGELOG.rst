@@ -4,7 +4,7 @@ Changelog
 0.8.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix bug in tabs widget when using newer versions of jQuery 
 
 
 0.8.4 (2016-06-03)
