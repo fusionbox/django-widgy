@@ -16,19 +16,6 @@ from django.core import urlresolvers
 from .models import UrlconfIncludePage
 
 
-def uncache_urlconf(urlconf):
-    # Django's urlresolvers.get_resolver function is memoized. Since we
-    # create a new urlconf module for every request, the memoize cache
-    # keeps them all alive forever, causing a memory leak. Since we know
-    # we're never going to need to use this specific urlconf module
-    # object again, we can remove it from the cache.
-    #
-    # We could use urlresolvers.clear_url_caches to avoid using the
-    # private `_resolver_cache`, but that might affect performance
-    # because the entire cache would be cleared.
-    urlresolvers.get_resolver.cache_clear()
-
-
 class PatchUrlconfMiddleware(object):
     def process_request(self, request):
         root_urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
@@ -94,12 +81,12 @@ class PatchUrlconfMiddleware(object):
                     from django.contrib.auth.views import redirect_to_login
                     response = redirect_to_login(request.get_full_path())
                 finally:
-                    uncache_urlconf(urlconf)
+                    urlresolvers.clear_url_caches()
 
         if hasattr(request, 'urlconf'):
-            uncache_urlconf(request.urlconf)
+            urlresolvers.clear_url_caches()
         if hasattr(request, '_patch_urlconf_middleware_urlconf'):
-            uncache_urlconf(request._patch_urlconf_middleware_urlconf)
+            urlresolvers.clear_url_caches()
 
         return response
 
