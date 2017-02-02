@@ -80,7 +80,7 @@ def validators_video_url(value):
         raise forms.ValidationError(_('Not a valid YouTube or Vimeo URL'))
 
 
-class VideoField(six.with_metaclass(models.SubfieldBase, models.URLField)):
+class VideoField(models.URLField):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('help_text', _('Please enter a link to the YouTube or'
                                          ' Vimeo page for this video.  i.e.'
@@ -89,17 +89,9 @@ class VideoField(six.with_metaclass(models.SubfieldBase, models.URLField)):
         self.validators.append(validators_video_url)
 
     def from_db_value(self, value, expression, connection, context):
-        """Convert from db starting in Django 1.8"""
         if value is None:
             return value
         return self.get_url_instance(value)
-
-    def to_python(self, value):
-        """Convert from db in Django < 1.8"""
-        url = super(VideoField, self).to_python(value)
-        if url is None:
-            return url
-        return self.get_url_instance(url)
 
     def get_url_instance(cls, value):
         for pattern in VIDEO_URL_CLASSES.keys():

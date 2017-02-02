@@ -9,7 +9,7 @@ if django.VERSION < (1, 9):
 else:
     from importlib import import_module
 from django.conf import settings
-from django.conf.urls import include, url, patterns
+from django.conf.urls import include, url
 from django.conf.urls.i18n import i18n_patterns
 from django.core import urlresolvers
 
@@ -26,7 +26,7 @@ class PatchUrlconfMiddleware(object):
 
     @classmethod
     def get_pattern_for_page(cls, page):
-        return patterns('', url(r'^' + re.escape(page.slug) + '/', include(page.urlconf_name)))
+        return [url(r'^' + re.escape(page.slug) + '/', include(page.urlconf_name))]
 
     @classmethod
     def get_pages(cls, logged_in):
@@ -42,7 +42,7 @@ class PatchUrlconfMiddleware(object):
         urlconf_pages = sorted(qs, key=lambda p: len(p.slug))
 
         new_urlconf = imp.new_module('urlconf')
-        new_urlconf.urlpatterns = patterns('')
+        new_urlconf.urlpatterns = []
         for page in urlconf_pages:
             new_urlconf.urlpatterns.extend(cls.get_pattern_for_page(page))
         new_urlconf.urlpatterns.extend(root_urlconf.urlpatterns)
@@ -71,7 +71,7 @@ class PatchUrlconfMiddleware(object):
                 urlresolvers.resolve(request.get_full_path(), request.urlconf)
             except urlresolvers.Resolver404:
                 empty_urlconf = imp.new_module('urlconf')
-                empty_urlconf.urlpatterns = patterns('')
+                empty_urlconf.urlpatterns = []
                 urlconf = self.get_urlconf(empty_urlconf, self.get_pages(logged_in=True))
                 try:
                     urlresolvers.resolve(request.get_full_path(), urlconf)

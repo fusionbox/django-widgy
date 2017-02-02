@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.utils.functional import cached_property
 
 from widgy.site import WidgySite
@@ -20,11 +20,11 @@ class ReviewedWidgySite(WidgySite):
         return ReviewedVersionTracker
 
     def get_urls(self):
-        return super(ReviewedWidgySite, self).get_urls() + patterns('',
+        return super(ReviewedWidgySite, self).get_urls() + [
             url('^approve/(?P<pk>[^/]+)/(?P<commit_pk>[^/]+)/$', self.approve_view),
             url('^unapprove/(?P<pk>[^/]+)/(?P<commit_pk>[^/]+)/$', self.unapprove_view),
             url('^undo-approvals/$', self.undo_approvals_view),
-        )
+        ]
 
     @cached_property
     def commit_view(self):

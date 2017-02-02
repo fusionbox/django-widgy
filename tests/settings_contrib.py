@@ -33,7 +33,7 @@ else:
 
 
 
-TEMPLATE_CONTEXT_PROCESSORS += (
+TEMPLATES[0]['OPTIONS']['context_processors'] += [
     "mezzanine.conf.context_processors.settings",
     "mezzanine.pages.context_processors.page",
-)
+]

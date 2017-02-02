@@ -188,8 +188,6 @@ else:
         def get_queryset(self):
             return self._queryset_class(self.model, using=self.db)
 
-        get_query_set = get_queryset # BBB
-
         def __getattr__(self, name):
             try:
                 return super(Manager, self).__getattr__(name)

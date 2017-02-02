@@ -27,6 +27,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django.contrib.redirects',
 
     'mezzanine.conf',
     'mezzanine.core',
@@ -58,9 +59,6 @@ INSTALLED_APPS = (
     'demo.demo_widgets',
 )
 
-if django.VERSION < (1, 7):
-    INSTALLED_APPS+= ('south',)
-
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -73,18 +71,6 @@ MIDDLEWARE_CLASSES = (
     'mezzanine.core.request.CurrentRequestMiddleware',
     'mezzanine.core.middleware.AdminLoginInterfaceSelectorMiddleware',
     'mezzanine.pages.middleware.PageMiddleware',
-)
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    "django.contrib.auth.context_processors.auth",
-    "django.contrib.messages.context_processors.messages",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.static",
-    "django.core.context_processors.media",
-    "django.core.context_processors.request",
-    "mezzanine.conf.context_processors.settings",
-    "mezzanine.pages.context_processors.page",
 )
 
 PACKAGE_NAME_FILEBROWSER = "filebrowser_safe"
@@ -151,10 +137,6 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
-TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'demo', 'templates'),
-)
-
 WIDGY_ROOT = imp.find_module('widgy')[1]
 
 COMPRESS_ENABLED = True
@@ -204,3 +186,29 @@ WIDGY_MEZZANINE_SITE = 'demo.widgysite.widgy_site'
 
 DATABASE_ENGINE = DATABASES['default']['ENGINE']
 LOGIN_URL = '/admin/'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(BASE_DIR, 'demo', 'templates'),
+        ],
+        'OPTIONS': {
+            'context_processors': [
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "django.template.context_processors.debug",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.static",
+                "django.template.context_processors.media",
+                "django.template.context_processors.request",
+                "mezzanine.conf.context_processors.settings",
+                "mezzanine.pages.context_processors.page",
+            ],
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ],
+        },
+    },
+]

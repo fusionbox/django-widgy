@@ -64,22 +64,13 @@ class ContentTypeRadioInput(widgets.RadioChoiceInput):
         self.choice_label = format_html('<span class="label">{0}</span>', self.choice_label)
 
     def tag(self, attrs=None):
-        if attrs is None:
-            # BBB Django < 1.8 tag doesn't take any arguments
-            tag = super(ContentTypeRadioInput, self).tag()
-        else:
-            tag = super(ContentTypeRadioInput, self).tag(attrs)
+        tag = super(ContentTypeRadioInput, self).tag(attrs)
         ct = ContentType.objects.get_for_id(self.choice_value)
         return format_html('<div class="previewImage {0} {1}"></div>{2}', ct.app_label, ct.model, tag)
 
 
 class ContentTypeRadioRenderer(widgets.RadioFieldRenderer):
     choice_input_class = ContentTypeRadioInput
-
-    # BBB django < 1.7 doesn't use choice_input_class
-    def __iter__(self):
-        for i, choice in enumerate(self.choices):
-            yield self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, i)
 
     def __getitem__(self, idx):
         choice = self.choices[idx]  # Let the IndexError propogate

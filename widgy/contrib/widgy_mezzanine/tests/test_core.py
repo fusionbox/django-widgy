@@ -226,11 +226,13 @@ class UserSetup(object):
 
 
 @skipUnless(PAGE_BUILDER_INSTALLED, 'page_builder is not installed')
-@override_settings(MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + (
-    'mezzanine.pages.middleware.PageMiddleware',
-))
+@override_settings(
+    MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + (
+        'mezzanine.pages.middleware.PageMiddleware',
+    ),
+    ROOT_URLCONF='widgy.contrib.widgy_mezzanine.tests.test_core',
+)
 class TestPreviewView(UserSetup, TestCase):
-    urls = 'widgy.contrib.widgy_mezzanine.tests.test_core'
 
     def setUp(self):
         super(TestPreviewView, self).setUp()
@@ -377,7 +379,6 @@ class TestUnpublish(AdminView, TestCase):
 
 
 class AdminButtonsTestBase(PageSetup, UserSetup):
-    urls = 'widgy.contrib.widgy_mezzanine.tests.test_core'
 
     def setUp(self):
         super(AdminButtonsTestBase, self).setUp()
@@ -396,7 +397,10 @@ class AdminButtonsTestBase(PageSetup, UserSetup):
 
 
 @skipUnless(PAGE_BUILDER_INSTALLED, 'page_builder is not installed')
-@override_settings(WIDGY_MEZZANINE_SITE=widgy_site)
+@override_settings(
+    WIDGY_MEZZANINE_SITE=widgy_site,
+    ROOT_URLCONF='widgy.contrib.widgy_mezzanine.tests.test_core',
+)
 class TestAdminButtons(AdminButtonsTestBase, TestCase):
     def setUp(self):
         super(TestAdminButtons, self).setUp()
@@ -464,6 +468,7 @@ class TestAdminButtons(AdminButtonsTestBase, TestCase):
 
 
 @make_reviewed
+@override_settings(ROOT_URLCONF='widgy.contrib.widgy_mezzanine.tests.test_core')
 class TestAdminButtonsWhenReviewed(AdminButtonsTestBase, TestCase):
     def test_save_and_commit(self):
         self.page.status = CONTENT_STATUS_DRAFT
@@ -542,9 +547,8 @@ class TestAdminButtonsWhenReviewed(AdminButtonsTestBase, TestCase):
             self.assertIn('Submit for Review', response.rendered_content)
 
 
+@override_settings(ROOT_URLCONF='widgy.contrib.widgy_mezzanine.tests.test_core')
 class TestAdminMessages(PageSetup, TestCase):
-    urls = 'widgy.contrib.widgy_mezzanine.tests.test_core'
-
     def setUp(self):
         super(TestAdminMessages, self).setUp()
         self.user = User.objects.create_superuser('test', 'test@example.com', 'password')

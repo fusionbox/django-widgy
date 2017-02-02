@@ -1,7 +1,11 @@
 import django
 from django.conf import settings
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.contrib import admin
+import django.views.static
+
+import mezzanine.core.views
+import mezzanine.pages.views
 
 from demo.widgysite import widgy_site
 
@@ -12,10 +16,10 @@ if django.VERSION < (1, 7):
 # You can also change the ``home`` view to add your own functionality
 # to the project's homepage.
 
-urlpatterns = patterns("",
-    ('^admin/widgy/', include(widgy_site.urls)),
-    ("^admin/", include(admin.site.urls)),
-    ('^form/', include('widgy.contrib.widgy_mezzanine.urls')),
+urlpatterns = [
+    url('^admin/widgy/', include(widgy_site.urls)),
+    url("^admin/", include(admin.site.urls)),
+    url('^form/', include('widgy.contrib.widgy_mezzanine.urls')),
 
     # We don't want to presume how your homepage works, so here are a
     # few patterns you can use to set it up.
@@ -27,7 +31,7 @@ urlpatterns = patterns("",
     # one homepage pattern, so if you use a different one, comment this
     # one out.
 
-    url(r'^$', 'mezzanine.pages.views.page', {'slug': '/'}, name='home'),
+    url(r'^$', mezzanine.pages.views.page, {'slug': '/'}, name='home'),
 
     # HOMEPAGE AS AN EDITABLE PAGE IN THE PAGE TREE
     # ---------------------------------------------
@@ -66,17 +70,17 @@ urlpatterns = patterns("",
     # ``mezzanine.urls``, go right ahead and take the parts you want
     # from it, and use them directly below instead of using
     # ``mezzanine.urls``.
-    ("^", include("mezzanine.urls")),
+    url("^", include("mezzanine.urls")),
 
-)
+]
 
 # Adds ``STATIC_URL`` to the context of error pages, so that error
 # pages can use JS, CSS and images.
-handler500 = "mezzanine.core.views.server_error"
+handler500 = mezzanine.core.views.server_error
 
 if settings.DEBUG:
-    urlpatterns += patterns('',
-        url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {
+    urlpatterns += [
+        url(r'^media/(?P<path>.*)$', django.views.static.serve, {
             'document_root': settings.MEDIA_ROOT,
         }),
-    )
+    ]

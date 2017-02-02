@@ -839,6 +839,12 @@ class Content(models.Model):
         # See https://code.djangoproject.com/ticket/4027
         new = copy.copy(self)
         unset_pks(new)
+        try:
+            # Contents keep a cached copy of their Node. After the clone the
+            # cache is invalid.
+            del new._node
+        except AttributeError:
+            pass
         new.save()
 
         for f in self._meta.many_to_many:
@@ -846,6 +852,7 @@ class Content(models.Model):
             # have a custom through table.
             f.save_form_data(new, f.value_from_object(self))
 
+        assert new != self
         return new
 
     def save(self, *args, **kwargs):

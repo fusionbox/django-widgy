@@ -7,12 +7,14 @@ from django.utils.decorators import decorator_from_middleware
 from django.http import HttpResponse, HttpResponseNotFound
 from django.core import urlresolvers
 from django.contrib.auth.models import AnonymousUser
-from django.conf.urls import include, url, patterns
+from django.contrib.auth import get_user_model
+from django.conf.urls import include, url
 
 from widgy.contrib.urlconf_include.middleware import PatchUrlconfMiddleware
 from widgy.contrib.urlconf_include.models import UrlconfIncludePage
 
 patch_decorator = decorator_from_middleware(PatchUrlconfMiddleware)
+User = get_user_model()
 
 
 @patch_decorator
@@ -43,7 +45,7 @@ def view_that_switches_urlconf(request, login_url):
     urlresolvers.resolve(login_url, request.urlconf)
 
     new_urlconf = imp.new_module('urlconf')
-    new_urlconf.urlpatterns = patterns('', url(r'^bar/', include('django.contrib.auth.urls')))
+    new_urlconf.urlpatterns = [url(r'^bar/', include('django.contrib.auth.urls'))]
     request.urlconf = new_urlconf
 
     urlresolvers.resolve('/bar/login/', request.urlconf)
@@ -130,7 +132,7 @@ class TestMiddleware(TestCase):
             view_that_resolves(self.get_request(), login_url='404')
 
         r = self.get_request()
-        r.user.is_authenticated = lambda: True
+        r.user = User()
         view_that_resolves(r, login_url='/foo/login/')
 
     def test_login_redirect(self):

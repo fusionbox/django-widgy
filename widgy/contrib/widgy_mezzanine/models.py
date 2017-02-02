@@ -105,13 +105,14 @@ class WidgyPage(WidgyPageMixin, Page):
         verbose_name_plural = _('widgy pages')
         swappable = 'WIDGY_MEZZANINE_PAGE_MODEL'
 
-    _base_manager = UseForRelatedFieldsSelectRelatedManager(select_related=[
+    select_related_manager = UseForRelatedFieldsSelectRelatedManager(select_related=[
         'root_node',
         'root_node__head',
         # we might not need this, if head isn't published, but we
         # probably will.
         'root_node__head__root_node',
     ])
+    base_manager_name = 'select_related_manager'
     objects = PageManager()
 
 

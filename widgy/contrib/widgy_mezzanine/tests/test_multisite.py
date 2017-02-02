@@ -1,7 +1,7 @@
 from six.moves import http_client
 from unittest import skipUnless, skip
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.utils import override_settings
 from django.contrib.sites.models import Site
 from django.conf import settings
@@ -36,8 +36,6 @@ if REVIEW_QUEUE_INSTALLED:
 
 
 class PermissionMixin(UserSetup, PageSetup, JsonTestMixin):
-    urls = 'widgy.contrib.widgy_mezzanine.tests.test_multisite'
-
     def setUp(self):
         super(PermissionMixin, self).setUp()
 
@@ -191,7 +189,9 @@ class PermissionMixin(UserSetup, PageSetup, JsonTestMixin):
 
 
 @override_settings(
-    WIDGY_MEZZANINE_SITE='widgy.contrib.widgy_mezzanine.tests.test_multisite.widgy_site')
+    WIDGY_MEZZANINE_SITE='widgy.contrib.widgy_mezzanine.tests.test_multisite.widgy_site',
+    ROOT_URLCONF='widgy.contrib.widgy_mezzanine.tests.test_multisite',
+)
 @skipUnless(PAGE_BUILDER_INSTALLED, 'page builder is not installed')
 class TestPermissions(PermissionMixin, TestCase):
     pass
@@ -199,7 +199,9 @@ class TestPermissions(PermissionMixin, TestCase):
 
 @skipUnless(PAGE_BUILDER_INSTALLED and REVIEW_QUEUE_INSTALLED, 'The review queue is not installed')
 @override_settings(
-    WIDGY_MEZZANINE_SITE='widgy.contrib.widgy_mezzanine.tests.test_multisite.reviewed_widgy_site')
+    WIDGY_MEZZANINE_SITE='widgy.contrib.widgy_mezzanine.tests.test_multisite.reviewed_widgy_site',
+    ROOT_URLCONF='widgy.contrib.widgy_mezzanine.tests.test_multisite',
+)
 class TestPermissionsReviewedWidgySite(PermissionMixin, TestCase):
     pass
 

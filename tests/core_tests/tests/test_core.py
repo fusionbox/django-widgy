@@ -222,7 +222,7 @@ class TestCore(RootNodeTestCase):
         an UnknownWidget in its place
         """
         fake_ct = ContentType.objects.create(
-            name='fake',
+            model='fake',
             app_label='faaaaake',
         )
         self.root_node.content_type = fake_ct
@@ -238,7 +238,7 @@ class TestCore(RootNodeTestCase):
         """
 
         fake_ct = ContentType.objects.create(
-            name='fake',
+            model='fake',
             app_label='faaaaake',
         )
 
@@ -1216,7 +1216,7 @@ class TestFindProblems(RootNodeTestCase):
     def test_unknown_widget(self):
         left_bucket = self.root_node.content.get_children()[0]
         fake_ct = ContentType.objects.create(
-            name='fake',
+            model='fake',
             app_label='faaaaake',
         )
         left_node = left_bucket.node
