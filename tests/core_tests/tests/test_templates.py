@@ -9,7 +9,7 @@ from widgy.models import VersionTracker
 from ..widgy_config import widgy_site
 from ..models import (
     RawTextWidget, HasAWidgy, VersionedPage,
-    MyInvisibleBucket, WeirdPkBucket
+    MyInvisibleBucket, WeirdPkBucket, CompressorWidget
 )
 
 from widgy.templatetags.widgy_tags import mdown
@@ -79,6 +79,14 @@ class TestTemplate(TestCase):
         self.assertNotIn(self.string_to_look_for, rendered)
         self.assertIn(override_string, rendered)
 
+    def test_compressor_in_widget(self):
+        owner = HasAWidgy.objects.create(
+            widgy=CompressorWidget.add_root(widgy_site, text=self.string_to_look_for).node
+        )
+        self.assertIn(
+            self.string_to_look_for,
+            self.render({'owner': owner, 'field_name': 'widgy'})
+        )
 
 class TestMarkdownXss(TestCase):
     def test_it(self):

@@ -738,7 +738,7 @@ class Content(models.Model):
         with update_context(context, {'self': self}):
             return render_to_string(
                 template or self.get_render_templates(context),
-                context
+                context.flatten(),
             )
 
     def formfield_for_dbfield(self, db_field, **kwargs):

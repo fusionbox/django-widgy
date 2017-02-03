@@ -293,3 +293,8 @@ class Tag(models.Model):
 @registry.register
 class ManyToManyWidget(Content):
     tags = models.ManyToManyField(Tag)
+
+
+@registry.register
+class CompressorWidget(Content):
+    text = models.CharField(max_length=100)
