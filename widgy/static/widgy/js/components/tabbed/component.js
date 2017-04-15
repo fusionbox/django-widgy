@@ -17,6 +17,7 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'components/widget/component'
 
     showTabAfterTabDestroy: function(model, collection, options) {
       if(this.list.size() < 1) {
+        this.renderNode();
         return;
       }
 
