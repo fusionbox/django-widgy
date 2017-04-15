@@ -30,7 +30,6 @@ define(['jquery', 'underscore', 'widgy.backbone', 'geometry'], function(
         'startBeingDragged',
         'followMouse',
         'stopBeingDragged',
-        'canAcceptParent',
         'bindDragEvents',
         'unbindDocument',
         'checkDistance',
@@ -169,6 +168,10 @@ define(['jquery', 'underscore', 'widgy.backbone', 'geometry'], function(
       });
 
       this.trigger('stopDrag');
+    },
+
+    cssClasses: function() {
+      return this.model.get('css_classes') || {};
     },
 
     bumpAmount: function(clientY) {

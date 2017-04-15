@@ -172,16 +172,11 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/base',
       this.placeholder.remove();
     },
 
-    cssClasses: function() {
-      return this.model.get('css_classes');
-    },
-
     render: function() {
       DraggableView.prototype.render.apply(this, arguments);
       this.$el.attr('title', this.model.get('tooltip'));
       return this;
     }
-
   });
 
 

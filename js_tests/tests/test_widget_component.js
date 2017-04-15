@@ -4,9 +4,11 @@ var test = require('./setup').test,
 
 var _ = requirejs('underscore'),
     Q = requirejs('lib/q'),
+    $ = requirejs('jquery'),
     form = requirejs('form'),
     contents = requirejs('widgy.contents'),
-    nodes = requirejs('nodes/nodes');
+    nodes = requirejs('nodes/nodes'),
+    sinon = requirejs('sinon');
 
 var TestComponent = requirejs('components/testcomponent/component');
 
@@ -50,7 +52,7 @@ describe('FormView', function() {
       assert.include(values.checkbox, '2-c');
       assert.lengthOf(values.checkbox, 2);
     });
-    
+
     it('handles select multiple', function() {
       var form_view = new form.FormView();
 
@@ -62,6 +64,45 @@ describe('FormView', function() {
       assert.include(values.select, '3');
       assert.lengthOf(values.select, 2);
     });
+  });
+
+  it('should handleClicks', function() {
+    var form_view = new form.FormView(),
+        evt = $.Event();
+    evt.target = {disabled: true}; // prevents default if disabled
+    assert.isFalse(form_view.handleClick(evt));
+
+    evt.target = {disabled: false};
+    evt.which = 0; // falls through to prevent default
+    assert.isFalse(form_view.handleClick(evt));
+
+    evt.which = 2; // prevent default
+    assert.isFalse(form_view.handleClick(evt));
+
+    evt.which = 3; // right click to continue as normal
+    assert.isTrue(form_view.handleClick(evt));
+  });
+
+  it('should handleKeypress', function() {
+    var form_view = new form.FormView(),
+        evt = $.Event();
+    evt.which = 13;
+    assert.isFalse(form_view.handleKeypress(evt)); // prevent default
+  });
+
+  it('should close CKEDITOR', function() {
+    test.create();
+    var callback = sinon.spy();
+    var form_view = new form.FormView();
+    form_view.$el.append('<div class="widgy_ckeditor" id="0"></div>');
+    window.CKEDITOR = new Object({instances: []});
+    window.CKEDITOR.instances[0] = new Object({
+      id: '0',
+      destroy: callback
+    });
+    form_view.close();
+    assert.isTrue(callback.calledOnce);
+    test.destroy();
   });
 });
 

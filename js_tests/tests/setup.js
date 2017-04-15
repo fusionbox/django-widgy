@@ -31,6 +31,7 @@ global.location = {
 test = {
   create: function(){
     document.innerHTML = '<html><head></head><body></body></html>';
+    document.documentElement.clientHeight = 300;
   },
 
   destroy: function(){
