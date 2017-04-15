@@ -22,6 +22,12 @@ from widgy.signals import pre_delete_widget
 from widgy.utils import build_url, SelectRelatedManager
 import widgy
 
+try:
+    from django.contrib.auth import get_user_model
+except ImportError: # django < 1.5
+    from django.contrib.auth.models import User
+else:
+    User = get_user_model()
 
 class BaseLayout(StrictDefaultChildrenMixin, Content):
     """
