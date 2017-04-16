@@ -28,6 +28,7 @@ add Widgy to ``INSTALLED_APPS``::
         'widgy',
         'widgy.contrib.page_builder',
         'widgy.contrib.form_builder',
+        'widgy.contrib.review_queue',
         'widgy.contrib.widgy_mezzanine',
 
 add required Widgy apps to ``INSTALLED_APPS``::
