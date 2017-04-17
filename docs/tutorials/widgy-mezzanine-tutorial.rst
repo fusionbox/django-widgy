@@ -47,6 +47,7 @@ add Mezzanine middleware to ``MIDDLEWARE_CLASSES``::
         'mezzanine.core.request.CurrentRequestMiddleware',
         'mezzanine.core.middleware.AdminLoginInterfaceSelectorMiddleware',
         'mezzanine.pages.middleware.PageMiddleware',
+        'mezzanine.core.middleware.SitePermissionMiddleware',
 
 Mezzanine settings::
 
@@ -144,6 +145,31 @@ will not work right.
 If you are using ``GenericTemplateFinderMiddleware``, use the one from
 ``fusionbox.mezzanine.middleware``. It has been patched to
 work with Mezzanine.
+
+Mezzanine SitePermissions
+-------------------------
+
+The Mezzanine SitePermissions system requires that any staff
+users be assigned site permissions to access the admin site. As an
+alternative to using ``mezzanine.core.middleware.SitePermissionMiddleware``
+you can override the base admin template by using the ``overextends`` template
+tag.
+
+To do this you will need to remove 
+``mezzanine.core.middleware.SitePermissionMiddleware``, add::
+
+    # settings.py
+    add_to_builtins("mezzanine.template.loader_tags")
+
+to enable the ``overextends`` template tag, and then override 
+``admin/base_site.html``::
+
+    {% overextends "admin/base_site.html" %}
+    {% block before_content %}{{ block.super }}{% endblock %}
+
+This will prevent mezzanine from displaying the site dropdown. Everything else
+should work as is.
+
 
 How to edit home page
 ---------------------
