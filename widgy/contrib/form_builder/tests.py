@@ -3,10 +3,11 @@ from __future__ import unicode_literals
 import contextlib
 import unittest
 import uuid
+import os.path
 
 from six.moves import StringIO
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django import forms
 from django.utils import timezone
@@ -14,6 +15,8 @@ from django.utils.encoding import force_text
 from django.core import mail
 from django.db import connection
 from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import TemporaryUploadedFile
+from django.conf import settings
 
 import mock
 
@@ -454,3 +457,27 @@ class TestPhoneNumberField(TestCase):
     def test_phone_number_extension_error(self):
         with self.assertRaises(forms.ValidationError):
             PhoneNumberField(allow_extension=False).clean('13035555555ex123')
+
+
+class TestFileUpload(TestCase):
+    @override_settings(FILE_UPLOAD_MAX_MEMORY_SIZE=10)
+    def test_with_temporary_uploaded_file(self):
+        temp_uploaded_file = TemporaryUploadedFile(
+            name='test.jpg',
+            content_type='image/jpeg',
+            size=100,
+            charset=None,
+        )
+        with open(temp_uploaded_file.temporary_file_path(), 'wb') as f:
+            f.write(b'0'*100)
+
+        file_upload = FileUpload()
+
+        filename = file_upload.serialize_value(temp_uploaded_file)
+        self.assertEqual(filename, file_upload.serialize_value(temp_uploaded_file))
+
+        uploaded_file_path = os.path.join(
+            settings.MEDIA_ROOT,
+            file_upload.generate_filename(temp_uploaded_file.name)
+        )
+        os.remove(uploaded_file_path)
