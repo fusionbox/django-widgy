@@ -931,11 +931,17 @@ class FileUpload(FormField):
             self.storage.get_valid_name(os.path.basename(filename))
         )
 
+    def _save(self, value):
+        filename = self.generate_filename(value.name)
+        filename = self.storage.save(filename, value)
+        self.filename = self.storage.url(filename)
+
     def serialize_value(self, value):
         if value:
-            filename = self.generate_filename(value.name)
-            filename = self.storage.save(filename, value)
-            return self.storage.url(filename)
+            if not hasattr(self, 'filename'):
+                self._save(value)
+
+            return self.filename
         else:
             return ''
 
