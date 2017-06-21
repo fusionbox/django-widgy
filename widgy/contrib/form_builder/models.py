@@ -487,7 +487,9 @@ class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Con
 
     class Meta:
         verbose_name = _('form')
-        verbose_name_plural = _('forms')
+
+        # this is to set the admin page's title to 'Form Submissions'
+        verbose_name_plural = _('form submissions')
 
     def __str__(self):
         return self.name
