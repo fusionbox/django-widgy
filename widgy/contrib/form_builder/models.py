@@ -161,7 +161,7 @@ class FieldMappingValue(StrDisplayNameMixin, MappingValue):
     form = FieldMappingValueForm
     name = models.CharField(max_length=255)
 
-    field_ident = models.CharField(max_length=36)
+    field_ident = models.UUIDField(null=True)
 
     class Meta:
         verbose_name = _('mapped field')
