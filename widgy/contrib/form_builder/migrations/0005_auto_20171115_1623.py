@@ -3,11 +3,10 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models, connection
-from django.db.backends.postgresql.schema import DatabaseSchemaEditor as PostgresDatabaseSchemaEditor
 
 
 def convert_to_uuid(apps, schema_editor):
-    if not isinstance(schema_editor, PostgresDatabaseSchemaEditor):
+    if connection.vendor != 'postgresql':
         return
 
     with connection.cursor() as cursor:

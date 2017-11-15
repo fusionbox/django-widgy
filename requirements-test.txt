@@ -2,6 +2,6 @@ mock
 dj-database-url
 tox>=1.8.0
 pytest
-pytest-django
 pytest-cov
+pytest-django
 py==1.4.34
