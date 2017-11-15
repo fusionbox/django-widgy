@@ -24,7 +24,6 @@ from django.template.defaultfilters import truncatechars
 from django.core.files import File
 from django.core.files.storage import default_storage
 
-from django_extensions.db.fields import UUIDField
 import html2text
 
 from widgy.models import Content, Node
@@ -465,7 +464,7 @@ class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Con
                             help_text=_("A name to help identify this form. Only admins see this."))
 
     # associates instances of the same logical form across versions
-    ident = UUIDField()
+    ident = models.UUIDField(default=uuid.uuid4)
 
     editable = True
 
@@ -677,7 +676,7 @@ class FormField(StrDisplayNameMixin, BaseFormField):
 
     help_text = models.TextField(blank=True, verbose_name=_('help text'))
     # associates instances of the same logical field across versions
-    ident = UUIDField()
+    ident = models.UUIDField(default=uuid.uuid4)
 
     form = FormFieldForm
 
