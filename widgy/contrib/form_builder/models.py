@@ -316,7 +316,7 @@ class EmailUserHandler(EmailSuccessHandlerBase):
                 " fill out a form. You can customize the body of the email.")
 
     # an input in our form
-    to_ident = models.CharField(_('to'), max_length=36)
+    to_ident = models.UUIDField(_('to'), null=True)
 
     class Meta:
         verbose_name = _('user success email')
@@ -962,7 +962,7 @@ class FormSubmission(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     form_node = models.ForeignKey(Node, on_delete=models.PROTECT, related_name='form_submissions')
-    form_ident = models.CharField(max_length=Form._meta.get_field('ident').max_length)
+    form_ident = models.UUIDField()
 
     class FormSubmissionQuerySet(QuerySet):
         def get_formfield_labels(self):
@@ -1061,8 +1061,7 @@ class FormValue(models.Model):
     # field_name is our last resort, in case the field has been deleted.
     field_node = models.ForeignKey(Node, on_delete=models.SET_NULL, null=True)
     field_name = models.CharField(max_length=255)
-    field_ident = models.CharField(
-        max_length=FormField._meta.get_field('ident').max_length)
+    field_ident = models.UUIDField()
 
     value = models.TextField()
 
