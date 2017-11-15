@@ -127,7 +127,7 @@ def html_to_plaintext(html):
                     for t in get_text(c):
                         yield t
 
-    soup = bs4.BeautifulSoup(html)
+    soup = bs4.BeautifulSoup(html, 'html5lib')
     # This only get the element having <elem role="main">, allowing
     # to index only the main text of the page.
     main = soup.find(role='main')
