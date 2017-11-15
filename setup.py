@@ -36,6 +36,7 @@ install_requires = [
     'beautifulsoup4',
     'django-argonauts>=1.1.4',
     'Django>=1.8',
+    'html5lib',
 ]
 
 # Markdown stops support for Python 2.6 in version 2.5
