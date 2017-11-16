@@ -17,6 +17,7 @@ js_tests/node_modules: js_tests/package.json
 	cd js_tests && npm install .
 
 test-js: js_tests/node_modules
+	node -v
 	./js_tests/node_modules/mocha/bin/mocha \
 		-s 5 \
 		--reporter spec \
