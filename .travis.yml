@@ -72,7 +72,7 @@ install:
 
 before_script:
   - psql -c 'create database widgy;' -U postgres
-  - mysql -e 'create database widgy;'
+  - mysql -e 'create database widgy DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;'
 
 script:
   - tox -e $TOX_ENV
