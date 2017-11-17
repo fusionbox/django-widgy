@@ -34,8 +34,9 @@ matrix:
     - env: TOX_ENV=py34-dj110-contrib-mysql
     - env: TOX_ENV=py34-dj110-contrib-postgres
     - language: node_js
-      node_js: 8
+      node_js: "0.10.40"
       script: make test-js
+      install: echo "nothing to install"
 
 before_install:
   - cat "$TRAVIS_BUILD_DIR/travis/my.cnf" | sudo tee -a /etc/mysql/my.cnf
