@@ -378,7 +378,7 @@ class TestFormHandler(TestCase):
 
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].attachments, [
-            ('asdf.txt', 'foobar', None),
+            ('asdf.txt', 'foobar', 'text/plain'),
         ])
 
     def test_email_success_handler_to_pointer_works_after_being_committed(self):

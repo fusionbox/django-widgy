@@ -178,12 +178,8 @@ class Node(MP_Node):
 
         # Convert that mapping to content_types -> Content instances
         for content_type_id, content_ids in contents.items():
-            try:
-                ct = ContentType.objects.get_for_id(content_type_id)
-                model_class = ct.model_class()
-            except AttributeError:
-                # get_for_id raises AttributeError when there's no model_class in django < 1.6.
-                model_class = None
+            ct = ContentType.objects.get_for_id(content_type_id)
+            model_class = ct.model_class()
             if model_class:
                 contents[content_type_id] = ct.model_class().objects.in_bulk(content_ids)
             else:
@@ -716,7 +712,7 @@ class Content(models.Model):
         if not context:
             context = RequestContext(request)
         with update_context(context, {'form': self.get_form(request, prefix=self.get_form_prefix())}):
-            return render_to_string(template or self.edit_templates, context)
+            return render_to_string(template or self.edit_templates, context.flatten())
 
     def get_preview_template(self, site):
         """

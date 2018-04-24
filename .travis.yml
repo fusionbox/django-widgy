@@ -9,30 +9,18 @@ sudo: false
 
 matrix:
   include:
-    - env: TOX_ENV=py27-dj18-sqlite
-    - env: TOX_ENV=py27-dj18-mysql
-    - env: TOX_ENV=py27-dj18-postgres
-    - env: TOX_ENV=py27-dj110-sqlite
-    - env: TOX_ENV=py27-dj110-mysql
-    - env: TOX_ENV=py27-dj110-postgres
-    - env: TOX_ENV=py34-dj18-sqlite
-    - env: TOX_ENV=py34-dj18-mysql
-    - env: TOX_ENV=py34-dj18-postgres
-    - env: TOX_ENV=py34-dj110-sqlite
-    - env: TOX_ENV=py34-dj110-mysql
-    - env: TOX_ENV=py34-dj110-postgres
-    - env: TOX_ENV=py27-dj18-contrib-sqlite
-    - env: TOX_ENV=py27-dj18-contrib-mysql
-    - env: TOX_ENV=py27-dj18-contrib-postgres
-    - env: TOX_ENV=py27-dj110-contrib-sqlite
-    - env: TOX_ENV=py27-dj110-contrib-mysql
-    - env: TOX_ENV=py27-dj110-contrib-postgres
-    - env: TOX_ENV=py34-dj18-contrib-sqlite
-    - env: TOX_ENV=py34-dj18-contrib-mysql
-    - env: TOX_ENV=py34-dj18-contrib-postgres
-    - env: TOX_ENV=py34-dj110-contrib-sqlite
-    - env: TOX_ENV=py34-dj110-contrib-mysql
-    - env: TOX_ENV=py34-dj110-contrib-postgres
+    - env: TOX_ENV=py27-dj111-sqlite
+    - env: TOX_ENV=py27-dj111-mysql
+    - env: TOX_ENV=py27-dj111-postgres
+    - env: TOX_ENV=py34-dj111-sqlite
+    - env: TOX_ENV=py34-dj111-mysql
+    - env: TOX_ENV=py34-dj111-postgres
+    - env: TOX_ENV=py27-dj111-contrib-sqlite
+    - env: TOX_ENV=py27-dj111-contrib-mysql
+    - env: TOX_ENV=py27-dj111-contrib-postgres
+    - env: TOX_ENV=py34-dj111-contrib-sqlite
+    - env: TOX_ENV=py34-dj111-contrib-mysql
+    - env: TOX_ENV=py34-dj111-contrib-postgres
     - language: node_js
       node_js: "0.10.40"
       script: make test-js

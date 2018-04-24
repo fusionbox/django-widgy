@@ -11,10 +11,7 @@ from django.http import (
     HttpResponseRedirect,
 )
 from django.utils.http import is_safe_url
-try:
-    from django.contrib.admin.utils import unquote
-except ImportError:  # < Django 1.8
-    from django.contrib.admin.util import unquote
+from django.contrib.admin.utils import unquote
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, render
 from django.core.exceptions import PermissionDenied
@@ -223,9 +220,6 @@ class UnpublishView(AdminViewMixin, DetailView):
     has_change_permission = None
 
     def dispatch(self, request, *args, **kwargs):
-        # BBB django 1.4 sets args/kwargs in dispatch not as_view like later
-        # versions
-        self.args = args
         self.object = self.get_object()
         return super(UnpublishView, self).dispatch(request, *args, **kwargs)
 

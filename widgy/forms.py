@@ -4,8 +4,6 @@ import time
 from django import forms
 from django.template.loader import render_to_string
 from django.forms import widgets
-from django.contrib.contenttypes.models import ContentType
-from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import format_html
 from django.core.urlresolvers import reverse
@@ -58,33 +56,9 @@ class WidgyWidget(forms.HiddenInput):
         return render_to_string(self.template_name, defaults)
 
 
-class ContentTypeRadioInput(widgets.RadioChoiceInput):
-    def __init__(self, name, value, attrs, choice, index):
-        super(ContentTypeRadioInput, self).__init__(name, value, attrs, choice, index)
-        self.choice_label = format_html('<span class="label">{0}</span>', self.choice_label)
-
-    def tag(self, attrs=None):
-        tag = super(ContentTypeRadioInput, self).tag(attrs)
-        ct = ContentType.objects.get_for_id(self.choice_value)
-        return format_html('<div class="previewImage {0} {1}"></div>{2}', ct.app_label, ct.model, tag)
-
-
-class ContentTypeRadioRenderer(widgets.RadioFieldRenderer):
-    choice_input_class = ContentTypeRadioInput
-
-    def __getitem__(self, idx):
-        choice = self.choices[idx]  # Let the IndexError propogate
-        return self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, idx)
-
-
 class ContentTypeRadioSelect(widgets.RadioSelect):
-    renderer = ContentTypeRadioRenderer
-
-    def render(self, *args, **kwargs):
-        return (mark_safe('<div class="layoutSelect">') +
-                super(ContentTypeRadioSelect, self).render(*args, **kwargs) +
-                mark_safe('</div>') +
-                render_to_string('widgy/layout_css.html'))
+    template_name = 'widgy/forms/widgets/contenttyperadioselect.html'
+    option_template_name = 'widgy/forms/widgets/contenttyperadioselect_option.html'
 
 
 class WidgyFormField(forms.ModelChoiceField):

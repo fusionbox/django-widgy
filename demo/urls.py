@@ -6,6 +6,7 @@ import django.views.static
 
 import mezzanine.core.views
 import mezzanine.pages.views
+from mezzanine.generic.views import admin_keywords_submit
 
 from demo.widgysite import widgy_site
 
@@ -70,6 +71,9 @@ urlpatterns = [
     # ``mezzanine.urls``, go right ahead and take the parts you want
     # from it, and use them directly below instead of using
     # ``mezzanine.urls``.
+    url("^admin_keywords_submit/$", admin_keywords_submit, name="admin_keywords_submit"),
+    url("^admin_page_ordering/$", mezzanine.pages.views.admin_page_ordering,
+        name="admin_page_ordering"),
     url("^", include("mezzanine.urls")),
 
 ]

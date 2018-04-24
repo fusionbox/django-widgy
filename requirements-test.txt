@@ -4,4 +4,4 @@ tox>=1.8.0
 pytest
 pytest-cov
 pytest-django
-py==1.4.34
+py

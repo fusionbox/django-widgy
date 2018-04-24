@@ -1,7 +1,6 @@
 import os
 import sys
 import dj_database_url
-import django
 import tempfile
 
 import six
@@ -38,19 +37,6 @@ INSTALLED_APPS = [
     "widgy.contrib.review_queue",
 ]
 
-if django.VERSION < (1, 7):
-    INSTALLED_APPS.append("south")
-
-
-try:
-    import easy_thumbnails
-except ImportError:
-    pass
-else:
-    if easy_thumbnails.VERSION >= (2, 0):
-        SOUTH_MIGRATION_MODULES = {
-            'easy_thumbnails': 'easy_thumbnails.south_migrations',
-        }
 
 URLCONF_INCLUDE_CHOICES = tuple()
 
@@ -85,7 +71,6 @@ MEDIA_ROOT = os.path.join(TEMP_DIR, 'media')
 
 USE_I18N = True
 LANGUAGE_CODE = 'en'
-# BBB: Django 1.4 doesn't reverse LOGIN_URL
 LOGIN_URL = '/accounts/login/'
 
 STATICFILES_FINDERS = (
@@ -131,7 +116,3 @@ WIDGY_MEZZANINE_SITE = 'tests.core_tests.widgy_config.widgy_site'
 DAISYDIFF_JAR_PATH = os.path.join(
     os.path.dirname(__file__), '..', 'bin', 'daisydiff', 'daisydiff.jar',
 )
-
-SOUTH_MIGRATION_MODULES = {
-    'core_tests': 'ignore',
-}

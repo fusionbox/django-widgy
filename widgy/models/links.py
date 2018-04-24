@@ -9,15 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.template.defaultfilters import capfirst
 from django import forms
 from django.utils.encoding import force_text
-
-try:
-    from django.apps import apps
-    get_models = apps.get_models
-    del apps
-except ImportError:
-    # Django < 1.8
-    from django.db.models import get_models
-
+from django.apps import apps
 from widgy.generic import WidgyGenericForeignKey
 from widgy import BaseRegistry
 from widgy.utils import model_has_field
@@ -34,7 +26,7 @@ class LinkRegistry(BaseRegistry):
 
     @classmethod
     def get_all_linker_classes(cls):
-        return filter(cls.has_link, get_models())
+        return filter(cls.has_link, apps.get_models())
 
     @classmethod
     def has_link(cls, model):

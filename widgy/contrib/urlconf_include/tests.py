@@ -26,10 +26,10 @@ def plain_view(request):
 def view_that_resolves(request, login_url):
     # Use request.urlconf because we're mocking everything. BaseHandler
     # would call set_urlconf if we were making a real request.
-    from django.contrib.auth.views import login as login_view
     match = urlresolvers.resolve(login_url, request.urlconf)
-    assert match.func == login_view
+    assert 'LoginView' in match.func.__name__
     return HttpResponse('')
+
 
 @patch_decorator
 def view_that_reverses(request, desired):

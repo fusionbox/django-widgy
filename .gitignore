@@ -20,3 +20,4 @@ settings_local.py
 /.coverage
 /htmlcov/
 js_tests/node_modules
+.pytest_cache/

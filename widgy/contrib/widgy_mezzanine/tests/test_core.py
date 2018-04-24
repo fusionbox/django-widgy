@@ -83,21 +83,13 @@ def make_reviewed(fn):
     fn = skipUnless(REVIEW_QUEUE_INSTALLED, 'review_queue is not installed')(fn)
 
     def up():
-        # BBB Django 1.8 compatiblity
-        if django.VERSION < (1, 9):
-            rel.to = site.get_version_tracker_model()
-        else:
-            rel.model = site.get_version_tracker_model()
+        rel.model = site.get_version_tracker_model()
         post_save.connect(publish_page_on_approve,
                           sender=site.get_version_tracker_model().commit_model,
                           dispatch_uid=dispatch_uid)
 
     def down():
-        # BBB Django 1.8 compatiblity
-        if django.VERSION < (1, 9):
-            rel.to = old_model
-        else:
-            rel.model = old_model
+        rel.model = old_model
         post_save.disconnect(dispatch_uid=dispatch_uid)
 
     if isinstance(fn, type):

@@ -4,24 +4,9 @@ from django.db import models
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import SimpleLazyObject
+from django.db.models.fields.related import ForwardManyToOneDescriptor
 
-from django.contrib.contenttypes.models import ContentType
 from widgy.utils import fancy_import, update_context
-
-try:
-    from south.modelsinspector import add_introspection_rules
-except ImportError:  # South not installed
-    pass
-else:
-    add_introspection_rules([], ["^widgy\.db.fields\.WidgyField"])
-    add_introspection_rules([], ["^widgy\.db.fields\.VersionedWidgyField"])
-
-try:
-    from django.db.models.fields.related import ForwardManyToOneDescriptor
-except ImportError:
-    # django < 1.9
-    from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor as ForwardManyToOneDescriptor
-
 
 
 def get_site(site):

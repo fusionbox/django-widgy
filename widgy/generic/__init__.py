@@ -1,21 +1,4 @@
-import django
-from django.db import DEFAULT_DB_ALIAS, connection
-from django.contrib.contenttypes.models import ContentType
-
-try:
-    from django.contrib.contenttypes.generic import GenericForeignKey, GenericRelation
-except ImportError:
-    # django < 1.9
-    from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-
-try:
-    from south.modelsinspector import add_ignored_fields
-except ImportError:  # South not installed.
-    pass
-else:
-    add_ignored_fields(["^widgy\.generic\.ProxyGenericRelation",
-                        "^widgy\.generic\.ProxyGenericForeignKey",
-                        "^widgy\.generic\.WidgyGenericForeignKey"])
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 
 class ProxyGenericForeignKey(GenericForeignKey):

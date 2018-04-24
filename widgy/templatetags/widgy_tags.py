@@ -1,6 +1,7 @@
 from django import template
 from django.conf import settings
 from django.utils.safestring import mark_safe
+from django.contrib.contenttypes.models import ContentType
 
 from widgy.utils import fancy_import, update_context
 
@@ -100,3 +101,9 @@ def get_action_links(owner, root_node):
         return []
     else:
         return get_action_links(root_node)
+
+
+@register.simple_tag
+def content_type_classes(content_type_id):
+    ct = ContentType.objects.get_for_id(content_type_id)
+    return '{} {}'.format(ct.app_label, ct.model)
