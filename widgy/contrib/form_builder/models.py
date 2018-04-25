@@ -464,7 +464,7 @@ class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Con
                             help_text=_("A name to help identify this form. Only admins see this."))
 
     # associates instances of the same logical form across versions
-    ident = models.UUIDField(default=uuid.uuid4)
+    ident = models.UUIDField(default=uuid.uuid4, editable=False)
 
     editable = True
 
@@ -676,7 +676,7 @@ class FormField(StrDisplayNameMixin, BaseFormField):
 
     help_text = models.TextField(blank=True, verbose_name=_('help text'))
     # associates instances of the same logical field across versions
-    ident = models.UUIDField(default=uuid.uuid4)
+    ident = models.UUIDField(default=uuid.uuid4, editable=False)
 
     form = FormFieldForm
 
