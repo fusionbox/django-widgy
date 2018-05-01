@@ -122,8 +122,8 @@ class RepostHandler(BaseMappingHandler):
         abstract = True
 
     def execute(self, request, form):
-        query_string = urllib.urlencode(self.get_mapping(request, form))
-        urllib.urlopen(self.url_to_post, query_string)
+        query_string = six.moves.urllib.parse.urlencode(self.get_mapping(request, form)).encode('ascii')
+        six.moves.urllib.request.urlopen(self.url_to_post, query_string)
 
 
 class MappingValue(FormElement):
