@@ -16,6 +16,7 @@ def convert_to_uuid(apps, schema_editor):
             ALTER TABLE "form_builder_formsubmission" ALTER COLUMN "form_ident" TYPE uuid USING form_ident::uuid;
             ALTER TABLE "form_builder_formvalue" ALTER COLUMN "field_ident" TYPE uuid USING field_ident::uuid;
             ALTER TABLE "form_builder_fieldmappingvalue" ALTER COLUMN "field_ident" TYPE uuid USING field_ident::uuid;
+            ALTER TABLE "form_builder_form" ALTER COLUMN "ident" TYPE uuid USING ident::uuid;
             """
         )
 
