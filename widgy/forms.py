@@ -47,6 +47,7 @@ class WidgyWidget(forms.HiddenInput):
             'api_url': reverse(self.site.node_view),
             'site': self.site,
             'owner': self.owner,
+            'static_url': settings.STATIC_URL,
         }
 
         if settings.DEBUG:
