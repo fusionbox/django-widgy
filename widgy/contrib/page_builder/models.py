@@ -498,7 +498,7 @@ class Figure(StrDisplayNameMixin, Content):
     tooltip = _("A figure is a self-contained piece of content. It can be used"
                 " to add a caption to an image or a video for example.")
 
-    position = models.CharField(default=_('center'), verbose_name=_('position'), max_length=50, choices=[
+    position = models.CharField(default='center', verbose_name=_('position'), max_length=50, choices=[
         ('left', _('Float left')),
         ('right', _('Float right')),
         ('center', _('Center')),
