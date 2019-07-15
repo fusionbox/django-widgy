@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from django.contrib.auth.models import Permission, User
 from django.test.client import RequestFactory
+from django.test import override_settings
 
 from widgy.contrib.review_queue.site import ReviewedWidgySite
 from widgy.contrib.review_queue.models import (
@@ -34,8 +35,13 @@ def make_commit(site, delta=datetime.timedelta(0), vt_class=ReviewedVersionTrack
     return (tracker, commit)
 
 
+urls = imp.new_module('urls')
+reviewed_widgy_site = ReviewedWidgySite()
+urls.urlpatterns = reviewed_widgy_site.get_urls()
+
+@override_settings(ROOT_URLCONF=urls)
 class TestApiReviewed(TestApi):
-    widgy_site = ReviewedWidgySite()
+    widgy_site = reviewed_widgy_site
 
 
 class ReviewQueueTest(RootNodeTestCase):
@@ -94,14 +100,9 @@ class ReviewQueueTest(RootNodeTestCase):
                             tracker.head.reviewedversioncommit.pk)
 
 
+@override_settings(ROOT_URLCONF=urls)
 class ReviewQueueViewsTest(SwitchUserTestCase, RootNodeTestCase):
-    widgy_site = ReviewedWidgySite()
-
-    @cached_property
-    def urls(self):
-        urls = imp.new_module('urls')
-        urls.urlpatterns = self.widgy_site.get_urls()
-        return urls
+    widgy_site = reviewed_widgy_site
 
     def test_commit_view(self):
         tracker, first_commit = make_commit(self.widgy_site)

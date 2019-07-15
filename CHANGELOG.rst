@@ -1,10 +1,11 @@
 Changelog
 =========
 
-0.8.5 (unreleased)
+0.9.0 (unreleased)
 ------------------
 
 - Fix bug in tabs widget when using newer versions of jQuery 
+- Add support for Django 1.11 and remove support for all versions prior.
 
 
 0.8.4 (2016-06-03)

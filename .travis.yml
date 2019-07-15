@@ -7,47 +7,28 @@ cache: pip
 
 sudo: false
 
-env:
-  global:
-    - SOUTH_TESTS_MIGRATE=True
-  matrix:
-    - TOX_ENV=py27-dj19-sqlite
-    - TOX_ENV=py27-dj19-mysql
-    - TOX_ENV=py27-dj19-postgres
-    - TOX_ENV=py27-dj18-sqlite
-    - TOX_ENV=py27-dj18-mysql
-    - TOX_ENV=py27-dj18-postgres
-    - TOX_ENV=py33-dj19-sqlite
-    - TOX_ENV=py33-dj19-mysql
-    - TOX_ENV=py33-dj19-postgres
-    - TOX_ENV=py33-dj18-sqlite
-    - TOX_ENV=py33-dj18-mysql
-    - TOX_ENV=py33-dj18-postgres
-    - TOX_ENV=py34-dj19-sqlite
-    - TOX_ENV=py34-dj19-mysql
-    - TOX_ENV=py34-dj19-postgres
-    - TOX_ENV=py34-dj18-sqlite
-    - TOX_ENV=py34-dj18-mysql
-    - TOX_ENV=py34-dj18-postgres
-    - TOX_ENV=py27-dj19-contrib-sqlite
-    - TOX_ENV=py27-dj19-contrib-mysql
-    - TOX_ENV=py27-dj19-contrib-postgres
-    - TOX_ENV=py27-dj18-contrib-sqlite
-    - TOX_ENV=py27-dj18-contrib-mysql
-    - TOX_ENV=py27-dj18-contrib-postgres
-    - TOX_ENV=py33-dj19-contrib-sqlite
-    - TOX_ENV=py33-dj19-contrib-mysql
-    - TOX_ENV=py33-dj19-contrib-postgres
-    - TOX_ENV=py33-dj18-contrib-sqlite
-    - TOX_ENV=py33-dj18-contrib-mysql
-    - TOX_ENV=py33-dj18-contrib-postgres
-    - TOX_ENV=py34-dj19-contrib-sqlite
-    - TOX_ENV=py34-dj19-contrib-mysql
-    - TOX_ENV=py34-dj19-contrib-postgres
-    - TOX_ENV=py34-dj18-contrib-sqlite
-    - TOX_ENV=py34-dj18-contrib-mysql
-    - TOX_ENV=py34-dj18-contrib-postgres
-    - TOX_ENV=javascript
+matrix:
+  include:
+    - env: TOX_ENV=py27-dj111-sqlite
+    - env: TOX_ENV=py27-dj111-mysql
+    - env: TOX_ENV=py27-dj111-postgres
+    - env: TOX_ENV=py34-dj111-sqlite
+    - env: TOX_ENV=py34-dj111-mysql
+    - env: TOX_ENV=py34-dj111-postgres
+    - env: TOX_ENV=py27-dj111-contrib-sqlite
+    - env: TOX_ENV=py27-dj111-contrib-mysql
+    - env: TOX_ENV=py27-dj111-contrib-postgres
+    - env: TOX_ENV=py34-dj111-contrib-sqlite
+    - env: TOX_ENV=py34-dj111-contrib-mysql
+    - env: TOX_ENV=py34-dj111-contrib-postgres
+    - language: node_js
+      node_js: "0.10.40"
+      script: make test-js
+      install: echo "nothing to install"
+
+before_install:
+  - cat "$TRAVIS_BUILD_DIR/travis/my.cnf" | sudo tee -a /etc/mysql/my.cnf
+  - sudo service mysql restart
 
 install:
   - pip install --upgrade pip

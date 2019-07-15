@@ -5,10 +5,7 @@ from django.conf import settings
 from django.conf.urls import url
 from django import forms
 from django.core.urlresolvers import reverse
-try:
-    from django.contrib.admin.utils import quote
-except ImportError:  # < Django 1.8
-    from django.contrib.admin.util import quote
+from django.contrib.admin.utils import quote
 from django.utils.translation import ugettext_lazy as _, ugettext, ungettext
 from django.utils.html import format_html
 from django.utils import timezone
@@ -160,6 +157,7 @@ class WidgyPageAdmin(PageAdmin):
             self._save_and_commit(request, obj)
         elif '_save_and_approve' in request.POST and self.has_review_queue:
             self._save_and_approve(request, obj)
+        request.POST = request.POST.copy()
         request.POST['_continue'] = True
         super(WidgyPageAdmin, self).save_model(request, obj, form, change)
 

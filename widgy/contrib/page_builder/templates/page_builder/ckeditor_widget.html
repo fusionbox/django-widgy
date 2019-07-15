@@ -5,6 +5,9 @@
 <script>
   {# this tells CKEditor where to find its static assets #}
   CKEDITOR_BASEPATH = {{ ckeditor_path|json }};
+  if(window.CKEDITOR)
+    CKEDITOR.basePath = CKEDITOR_BASEPATH;
+
   (function (load) {
     {# only require CKEDITOR if it hasn't already be loaded. This allows loading your own ckeditor. #}
     if ( typeof CKEDITOR === 'object' )

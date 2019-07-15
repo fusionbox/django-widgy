@@ -125,7 +125,7 @@ define([
         if ( field_name === '__all__' ) {
           this.$el.prepend(error_list);
         } else {
-          this.$('[name="'+ this.getPrefixedFieldName(field_name) +'"]').parent()
+          this.$('[name="'+ this.getPrefixedFieldName(field_name) +'"]').parents('.formField')
             .addClass('error')
             .append(error_list);
         }

@@ -6,7 +6,6 @@ from django.contrib.staticfiles import finders
 
 from debug_toolbar.panels import DebugPanel
 
-from widgy.models import Content
 
 template_hierarchy_called = Signal(providing_args=['cls', 'kwargs', 'templates', 'used'])
 
@@ -27,6 +26,7 @@ def monkey_patch():
     Monkey patch in our own, instrumented, get_templates_hierarchy. Make
     sure to keep it a classmethod.
     """
+    from widgy.models import Content
     # We need to get the unbound class method here. The bound method will use
     # the MRO of Content, which might not be the same as subclasses of Content.
     # The MRO above Content doesn't actually matter (it currently doesn't call

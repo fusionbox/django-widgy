@@ -178,12 +178,8 @@ class Node(MP_Node):
 
         # Convert that mapping to content_types -> Content instances
         for content_type_id, content_ids in contents.items():
-            try:
-                ct = ContentType.objects.get_for_id(content_type_id)
-                model_class = ct.model_class()
-            except AttributeError:
-                # get_for_id raises AttributeError when there's no model_class in django < 1.6.
-                model_class = None
+            ct = ContentType.objects.get_for_id(content_type_id)
+            model_class = ct.model_class()
             if model_class:
                 contents[content_type_id] = ct.model_class().objects.in_bulk(content_ids)
             else:
@@ -716,7 +712,7 @@ class Content(models.Model):
         if not context:
             context = RequestContext(request)
         with update_context(context, {'form': self.get_form(request, prefix=self.get_form_prefix())}):
-            return render_to_string(template or self.edit_templates, context)
+            return render_to_string(template or self.edit_templates, context.flatten())
 
     def get_preview_template(self, site):
         """
@@ -738,7 +734,7 @@ class Content(models.Model):
         with update_context(context, {'self': self}):
             return render_to_string(
                 template or self.get_render_templates(context),
-                context
+                context.flatten(),
             )
 
     def formfield_for_dbfield(self, db_field, **kwargs):
@@ -839,6 +835,12 @@ class Content(models.Model):
         # See https://code.djangoproject.com/ticket/4027
         new = copy.copy(self)
         unset_pks(new)
+        try:
+            # Contents keep a cached copy of their Node. After the clone the
+            # cache is invalid.
+            del new._node
+        except AttributeError:
+            pass
         new.save()
 
         for f in self._meta.many_to_many:
@@ -846,6 +848,7 @@ class Content(models.Model):
             # have a custom through table.
             f.save_form_data(new, f.value_from_object(self))
 
+        assert new != self
         return new
 
     def save(self, *args, **kwargs):

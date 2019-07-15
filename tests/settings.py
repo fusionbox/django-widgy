@@ -1,7 +1,6 @@
 import os
 import sys
 import dj_database_url
-import django
 import tempfile
 
 import six
@@ -38,21 +37,6 @@ INSTALLED_APPS = [
     "widgy.contrib.review_queue",
 ]
 
-if django.VERSION < (1, 7):
-    INSTALLED_APPS.append("south")
-
-
-SOUTH_TESTS_MIGRATE = os.environ.get('SOUTH_TESTS_MIGRATE', 'False').lower() in ('true', 'yes', 'y', '1')
-
-try:
-    import easy_thumbnails
-except ImportError:
-    pass
-else:
-    if easy_thumbnails.VERSION >= (2, 0):
-        SOUTH_MIGRATION_MODULES = {
-            'easy_thumbnails': 'easy_thumbnails.south_migrations',
-        }
 
 URLCONF_INCLUDE_CHOICES = tuple()
 
@@ -85,10 +69,8 @@ STATIC_ROOT = os.path.join(TEMP_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(TEMP_DIR, 'media')
 
-TEMPLATE_DIRS = (os.path.join(RUNTESTS_DIR, TEST_TEMPLATE_DIR),)
 USE_I18N = True
 LANGUAGE_CODE = 'en'
-# BBB: Django 1.4 doesn't reverse LOGIN_URL
 LOGIN_URL = '/accounts/login/'
 
 STATICFILES_FINDERS = (
@@ -104,15 +86,29 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    "django.contrib.auth.context_processors.auth",
-    "django.contrib.messages.context_processors.messages",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.static",
-    "django.core.context_processors.media",
-    "django.core.context_processors.request",
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(RUNTESTS_DIR, TEST_TEMPLATE_DIR),
+        ],
+        'OPTIONS': {
+            'context_processors': [
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "django.template.context_processors.debug",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.static",
+                "django.template.context_processors.media",
+                "django.template.context_processors.request",
+            ],
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ],
+        },
+    },
+]
 
 # Widgy Settings
 WIDGY_MEZZANINE_SITE = 'tests.core_tests.widgy_config.widgy_site'
@@ -120,7 +116,3 @@ WIDGY_MEZZANINE_SITE = 'tests.core_tests.widgy_config.widgy_site'
 DAISYDIFF_JAR_PATH = os.path.join(
     os.path.dirname(__file__), '..', 'bin', 'daisydiff', 'daisydiff.jar',
 )
-
-SOUTH_MIGRATION_MODULES = {
-    'core_tests': 'ignore',
-}

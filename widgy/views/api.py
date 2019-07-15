@@ -13,14 +13,7 @@ from django.views.generic import DetailView
 from django.views.generic.detail import SingleObjectMixin
 from django.db.models import ProtectedError
 from django.utils.translation import ugettext as _
-
-try:
-    from django.apps import apps
-    get_model = apps.get_model
-    del apps
-except ImportError:
-    # Django < 1.8
-    from django.db.models import get_model
+from django.apps import apps
 
 from argonauts.views import RestView
 
@@ -111,7 +104,7 @@ class NodeView(WidgyView):
         data = self.data()
         app_label, model = data['__class__'].split('.')
         try:
-            content_class = get_model(app_label, model)
+            content_class = apps.get_model(app_label, model)
         except LookupError:
             raise Http404
 

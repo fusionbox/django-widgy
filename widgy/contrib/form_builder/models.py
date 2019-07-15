@@ -24,7 +24,6 @@ from django.template.defaultfilters import truncatechars
 from django.core.files import File
 from django.core.files.storage import default_storage
 
-from django_extensions.db.fields import UUIDField
 import html2text
 
 from widgy.models import Content, Node
@@ -162,7 +161,7 @@ class FieldMappingValue(StrDisplayNameMixin, MappingValue):
     form = FieldMappingValueForm
     name = models.CharField(max_length=255)
 
-    field_ident = models.CharField(max_length=36)
+    field_ident = models.UUIDField(null=True)
 
     class Meta:
         verbose_name = _('mapped field')
@@ -317,7 +316,7 @@ class EmailUserHandler(EmailSuccessHandlerBase):
                 " fill out a form. You can customize the body of the email.")
 
     # an input in our form
-    to_ident = models.CharField(_('to'), max_length=36)
+    to_ident = models.UUIDField(_('to'), null=True)
 
     class Meta:
         verbose_name = _('user success email')
@@ -465,7 +464,7 @@ class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Con
                             help_text=_("A name to help identify this form. Only admins see this."))
 
     # associates instances of the same logical form across versions
-    ident = UUIDField()
+    ident = models.UUIDField(default=uuid.uuid4, editable=False)
 
     editable = True
 
@@ -487,7 +486,9 @@ class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Con
 
     class Meta:
         verbose_name = _('form')
-        verbose_name_plural = _('forms')
+
+        # this is to set the admin page's title to 'Form Submissions'
+        verbose_name_plural = _('form submissions')
 
     def __str__(self):
         return self.name
@@ -675,7 +676,7 @@ class FormField(StrDisplayNameMixin, BaseFormField):
 
     help_text = models.TextField(blank=True, verbose_name=_('help text'))
     # associates instances of the same logical field across versions
-    ident = UUIDField()
+    ident = models.UUIDField(default=uuid.uuid4, editable=False)
 
     form = FormFieldForm
 
@@ -961,7 +962,7 @@ class FormSubmission(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     form_node = models.ForeignKey(Node, on_delete=models.PROTECT, related_name='form_submissions')
-    form_ident = models.CharField(max_length=Form._meta.get_field('ident', False).max_length)
+    form_ident = models.UUIDField()
 
     class FormSubmissionQuerySet(QuerySet):
         def get_formfield_labels(self):
@@ -1060,8 +1061,7 @@ class FormValue(models.Model):
     # field_name is our last resort, in case the field has been deleted.
     field_node = models.ForeignKey(Node, on_delete=models.SET_NULL, null=True)
     field_name = models.CharField(max_length=255)
-    field_ident = models.CharField(
-        max_length=FormField._meta.get_field('ident', False).max_length)
+    field_ident = models.UUIDField()
 
     value = models.TextField()
 

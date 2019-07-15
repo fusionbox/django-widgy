@@ -1,7 +1,6 @@
 import json
 
 from django import forms
-from django.template import RequestContext
 from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 
@@ -33,7 +32,7 @@ class UndoApprovalsForm(forms.Form):
                     'form': self,
                     'site': site,
                 },
-                RequestContext(request),
+                request=request,
             )
         )
 

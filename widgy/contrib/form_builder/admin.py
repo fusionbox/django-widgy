@@ -1,8 +1,5 @@
 from django.contrib import admin
-try:
-    from django.contrib.admin.utils import unquote
-except ImportError:  # < Django 1.8
-    from django.contrib.admin.util import unquote
+from django.contrib.admin.utils import unquote
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import render

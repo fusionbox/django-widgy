@@ -58,8 +58,11 @@ class VersionTracker(models.Model):
             """
 
             filters = {}
-            for rel_obj in (self.model._meta.get_all_related_objects() +
-                            self.model._meta.get_all_related_many_to_many_objects()):
+            rel_objs = [
+                f for f in self.model._meta.get_fields(include_hidden=True)
+                if (f.many_to_many or f.one_to_many or f.one_to_one) and f.auto_created
+            ]
+            for rel_obj in rel_objs:
                 if not issubclass(rel_obj.field.model, VersionCommit):
                     name = rel_obj.field.related_query_name()
                     filters[name + '__isnull'] = True
@@ -187,7 +190,12 @@ class VersionTracker(models.Model):
         """
         Names of reverse relationships of WidgyFields that point to us.
         """
-        for rel_obj in cls._meta.get_all_related_objects():
+        rel_objs = [
+            f for f in cls._meta.get_fields()
+            if (f.one_to_many or f.one_to_one)
+            and f.auto_created and not f.concrete
+        ]
+        for rel_obj in rel_objs:
             if isinstance(rel_obj.field, WidgyField):
                 yield rel_obj.get_accessor_name()
 

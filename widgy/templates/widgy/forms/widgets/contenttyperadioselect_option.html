@@ -1,0 +1,6 @@
+{% load widgy_tags %}
+<label for="{{ widget.attrs.id }}">
+  <div class="previewImage {% content_type_classes widget.value %}"></div>
+  {% include "django/forms/widgets/input.html" %}
+  <span class="label">{{ widget.label }}</span>
+</label>

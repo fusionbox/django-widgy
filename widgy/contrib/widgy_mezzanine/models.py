@@ -105,13 +105,14 @@ class WidgyPage(WidgyPageMixin, Page):
         verbose_name_plural = _('widgy pages')
         swappable = 'WIDGY_MEZZANINE_PAGE_MODEL'
 
-    _base_manager = UseForRelatedFieldsSelectRelatedManager(select_related=[
+    select_related_manager = UseForRelatedFieldsSelectRelatedManager(select_related=[
         'root_node',
         'root_node__head',
         # we might not need this, if head isn't published, but we
         # probably will.
         'root_node__head__root_node',
     ])
+    base_manager_name = 'select_related_manager'
     objects = PageManager()
 
 
@@ -133,40 +134,3 @@ class PathRoot(models.Transform):
         return 'SUBSTR(%s, %%s, %%s)' % lhs, (params + [1, self.steplen])
 
 models.Field.register_lookup(PathRoot)
-
-
-# Django < 1.9 workaround. (Remove this when support for Django < 1.9 is dropped)
-def _create_permissions_for_mezzaninecalloutwidget(sender, **kwargs):
-    """
-    This works around this bug which has been fixed in Django 1.9:
-    <https://github.com/django/django/pull/4681>
-    """
-    PERMISSIONS = {'add_mezzaninecalloutwidget': 'Can add Callout Widget',
-                   'change_mezzaninecalloutwidget': 'Can change Callout Widget',
-                   'delete_mezzaninecalloutwidget': 'Can delete Callout Widget'}
-
-    from django.contrib.auth.models import Permission
-    from django.contrib.contenttypes.models import ContentType
-
-    ct = ContentType.objects.get_for_model(MezzanineCalloutWidget, for_concrete_model=False)
-
-    permissions = Permission.objects.filter(
-        codename__in=PERMISSIONS.keys()
-    ).select_related('content_type')
-
-    # Delete permission with the wrong content type (these are created by Django < 1.9)
-    to_delete = set(p.pk for p in permissions if p.content_type != ct)
-
-    permissions_set = set(p.codename for p in permissions if p.pk not in to_delete)
-    to_create = [Permission(codename=k, name=v, content_type=ct)
-                 for k, v in PERMISSIONS.items()
-                 if k not in permissions_set]
-
-    with transaction.atomic():
-        if to_delete:
-            Permission.objects.filter(pk__in=to_delete).delete()
-
-        if to_create:
-            Permission.objects.bulk_create(to_create)
-
-post_migrate.connect(_create_permissions_for_mezzaninecalloutwidget)

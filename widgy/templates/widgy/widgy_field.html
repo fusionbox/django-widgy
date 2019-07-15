@@ -57,14 +57,7 @@ the admin center.
       '*': { 'jquery': 'jquery-private' },
       'jquery-private': { 'jquery': 'jquery' }
     },
-    {% comment %}
-    This looks like it might not work on paths with quotes in them, but
-    the output of staticfiles.static [static.static DOES NOT, fyi] does
-    get escaped. It still doesn't work because you're not supposed to
-    use entities inside of raw text elements, but short of our own tag
-    just for this purpose there's nothing we can do about it.
-    {% endcomment %}
-    baseUrl: "{% static 'widgy/js' %}",
+    baseUrl: "{{ static_url|escapejs }}" + 'widgy/js',
     urlArgs: {{ cachebust|json }}
   };
 </script>

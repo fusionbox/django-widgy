@@ -5,7 +5,6 @@ from django.db import models, migrations
 import django.db.models.deletion
 import widgy.models.mixins
 import widgy.contrib.form_builder.models
-import django_extensions.db.fields
 
 
 class Migration(migrations.Migration):
@@ -22,7 +21,7 @@ class Migration(migrations.Migration):
                 ('label', models.CharField(max_length=255, verbose_name='label')),
                 ('required', models.BooleanField(default=True, verbose_name='required')),
                 ('help_text', models.TextField(verbose_name='help text', blank=True)),
-                ('ident', django_extensions.db.fields.UUIDField(editable=False, blank=True)),
+                ('ident', models.UUIDField(editable=False, blank=True)),
                 ('choices', models.TextField(help_text='Place each choice on a separate line.')),
                 ('type', models.CharField(max_length=25, verbose_name='type', choices=[('select', 'Dropdown'), ('radios', 'Radio buttons')])),
             ],
@@ -81,7 +80,7 @@ class Migration(migrations.Migration):
                 ('label', models.CharField(max_length=255, verbose_name='label')),
                 ('required', models.BooleanField(default=True, verbose_name='required')),
                 ('help_text', models.TextField(verbose_name='help text', blank=True)),
-                ('ident', django_extensions.db.fields.UUIDField(editable=False, blank=True)),
+                ('ident', models.UUIDField(editable=False, blank=True)),
             ],
             options={
                 'abstract': False,
@@ -93,7 +92,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(help_text='A name to help identify this form. Only admins see this.', max_length=255, verbose_name='Name')),
-                ('ident', django_extensions.db.fields.UUIDField(editable=False, blank=True)),
+                ('ident', models.UUIDField(editable=False, blank=True)),
             ],
             options={
                 'verbose_name': 'form',
@@ -119,7 +118,7 @@ class Migration(migrations.Migration):
                 ('label', models.CharField(max_length=255, verbose_name='label')),
                 ('required', models.BooleanField(default=True, verbose_name='required')),
                 ('help_text', models.TextField(verbose_name='help text', blank=True)),
-                ('ident', django_extensions.db.fields.UUIDField(editable=False, blank=True)),
+                ('ident', models.UUIDField(editable=False, blank=True)),
                 ('type', models.CharField(max_length=255, verbose_name='type', choices=[('text', 'Text'), ('number', 'Number'), ('email', 'Email'), ('tel', 'Telephone'), ('checkbox', 'Checkbox'), ('date', 'Date')])),
             ],
             options={
@@ -174,7 +173,7 @@ class Migration(migrations.Migration):
                 ('label', models.CharField(max_length=255, verbose_name='label')),
                 ('required', models.BooleanField(default=True, verbose_name='required')),
                 ('help_text', models.TextField(verbose_name='help text', blank=True)),
-                ('ident', django_extensions.db.fields.UUIDField(editable=False, blank=True)),
+                ('ident', models.UUIDField(editable=False, blank=True)),
                 ('choices', models.TextField(help_text='Place each choice on a separate line.')),
                 ('type', models.CharField(max_length=25, verbose_name='type', choices=[('checkboxes', 'Checkboxes'), ('select', 'Multi-select')])),
             ],
@@ -235,7 +234,7 @@ class Migration(migrations.Migration):
                 ('label', models.CharField(max_length=255, verbose_name='label')),
                 ('required', models.BooleanField(default=True, verbose_name='required')),
                 ('help_text', models.TextField(verbose_name='help text', blank=True)),
-                ('ident', django_extensions.db.fields.UUIDField(editable=False, blank=True)),
+                ('ident', models.UUIDField(editable=False, blank=True)),
             ],
             options={
                 'verbose_name': 'text area',

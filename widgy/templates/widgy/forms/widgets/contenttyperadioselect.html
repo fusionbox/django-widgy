@@ -1,0 +1,7 @@
+{% load compress static %}
+<div class="layoutSelect">
+  {% include 'django/forms/widgets/radio.html' %}
+</div>
+{% compress css %}
+<link type="text/x-scss" rel="stylesheet" href="{% static 'widgy/css/layout_select.scss' %}">
+{% endcompress %}

@@ -311,7 +311,7 @@ def daisydiff(before, after):
                 diff_html = f_out.read().decode('utf-8')
 
                 # remove the daisydiff chrome so we can add our own
-                parsed = BeautifulSoup(diff_html)
+                parsed = BeautifulSoup(diff_html, 'html5lib')
                 body = parsed.find('body')
                 for i in body.find_all(recursive=False)[:6]:
                     i.extract()
