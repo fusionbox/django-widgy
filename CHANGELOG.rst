@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.9.0 (unreleased)
+0.9.0 (2019-07-15)
 ------------------
 
 - Fix bug in tabs widget when using newer versions of jQuery 
