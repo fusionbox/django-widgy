@@ -4,9 +4,7 @@ from setuptools.command.test import test as TestCommand
 import os
 import sys
 
-__doc__ = """
-A CMS framework for Django built on a heterogenous tree editor.
-"""
+__doc__ = "A CMS framework for Django built on a heterogenous tree editor."
 
 
 class PyTest(TestCommand):
