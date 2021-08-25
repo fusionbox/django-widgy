@@ -1040,6 +1040,7 @@ class FormSubmission(models.Model):
     class Meta:
         verbose_name = _('form submission')
         verbose_name_plural = _('form submissions')
+        ordering = ['-created_at']
 
     def as_dict(self):
         ret = {'created_at': self.created_at}
