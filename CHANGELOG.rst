@@ -1,16 +1,16 @@
 Changelog
 =========
 
-0.9.1 (unreleased)
+0.9.1 (2021-08-25)
 ------------------
 
-- Nothing changed yet.
+- Order form submissions by latest created_at date
 
 
 0.9.0 (2019-07-15)
 ------------------
 
-- Fix bug in tabs widget when using newer versions of jQuery 
+- Fix bug in tabs widget when using newer versions of jQuery
 - Add support for Django 1.11 and remove support for all versions prior.
 
 
