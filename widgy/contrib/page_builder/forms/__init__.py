@@ -102,7 +102,7 @@ class CKEditorField(forms.CharField):
         '*': ['class', 'dir', 'title'],
         'a': ['href', 'target', 'rel', 'name'],
         'time': ['datetime', 'pubdate'],
-        'img': ['src'],
+        'img': ['src', 'alt'],
 
         'table': ['border'],
         'colgroup': ['span'],

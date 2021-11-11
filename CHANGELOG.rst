@@ -4,7 +4,7 @@ Changelog
 0.9.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Allow alt attributes on images in CKEditorField
 
 
 0.9.1 (2021-08-25)
