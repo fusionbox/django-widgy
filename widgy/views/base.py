@@ -21,7 +21,7 @@ class AuthorizedMixin(WidgyViewMixin):
         try:
             self.auth(request, *args, **kwargs)
         except PermissionDenied:
-            if request.user.is_authenticated():
+            if request.user.is_authenticated:
                 raise
             else:
                 return redirect_to_login(request.get_full_path())

@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
 from django.conf import settings
-from django.core import urlresolvers
+from django import urls
 from django.db.models.signals import post_migrate
 from django.db import transaction
 
@@ -31,7 +31,7 @@ class WidgyPageMixin(object):
         return ', '.join(force_text(keyword) for keyword in self.keywords.all())
 
     def get_form_action_url(self, form, widgy):
-        return urlresolvers.reverse(
+        return urls.reverse(
             'widgy.contrib.widgy_mezzanine.views.handle_form',
             kwargs={
                 'form_node_pk': form.node.pk,
@@ -43,7 +43,7 @@ class WidgyPageMixin(object):
             {
                 'type': 'preview',
                 'text': _('Preview'),
-                'url': urlresolvers.reverse(
+                'url': urls.reverse(
                     'widgy.contrib.widgy_mezzanine.views.preview',
                     kwargs={'page_pk': self.pk, 'node_pk': root_node.pk}
                 )

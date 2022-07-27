@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ForeignKeyWidget',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True, on_delete=models.deletion.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -180,7 +180,7 @@ class Migration(migrations.Migration):
             name='VersionPageThrough',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('page', models.ForeignKey(to='core_tests.VersionedPage4')),
+                ('page', models.ForeignKey(to='core_tests.VersionedPage4', on_delete=models.deletion.CASCADE)),
                 ('widgy', widgy.db.fields.VersionedWidgyField(related_name='+', to='widgy.VersionTracker')),
             ],
         ),
@@ -200,7 +200,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AnotherLayout',
             fields=[
-                ('layout_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.Layout')),
+                ('layout_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.Layout', on_delete=models.deletion.CASCADE)),
             ],
             options={
                 'verbose_name': '\xc0\xf1\xf6th\xe9r L\xe0y\xf6\xf9t',
@@ -211,49 +211,49 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ChildThingWithLink',
             fields=[
-                ('thingwithlink_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.ThingWithLink')),
+                ('thingwithlink_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.ThingWithLink', on_delete=models.deletion.CASCADE)),
             ],
             bases=('core_tests.thingwithlink',),
         ),
         migrations.CreateModel(
             name='CssClassesWidgetProperty',
             fields=[
-                ('cssclasseswidget_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.CssClassesWidget')),
+                ('cssclasseswidget_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.CssClassesWidget', on_delete=models.deletion.CASCADE)),
             ],
             bases=('core_tests.cssclasseswidget',),
         ),
         migrations.CreateModel(
             name='ImmovableBucket',
             fields=[
-                ('bucket_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.Bucket')),
+                ('bucket_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.Bucket', on_delete=models.deletion.CASCADE)),
             ],
             bases=('core_tests.bucket',),
         ),
         migrations.CreateModel(
             name='PickyBucket',
             fields=[
-                ('bucket_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.Bucket')),
+                ('bucket_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.Bucket', on_delete=models.deletion.CASCADE)),
             ],
             bases=('core_tests.bucket',),
         ),
         migrations.CreateModel(
             name='UnnestableWidget',
             fields=[
-                ('bucket_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.Bucket')),
+                ('bucket_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.Bucket', on_delete=models.deletion.CASCADE)),
             ],
             bases=('core_tests.bucket',),
         ),
         migrations.CreateModel(
             name='UnregisteredLayout',
             fields=[
-                ('layout_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.Layout')),
+                ('layout_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.Layout', on_delete=models.deletion.CASCADE)),
             ],
             bases=('core_tests.layout',),
         ),
         migrations.CreateModel(
             name='VerboseNameLayoutChild',
             fields=[
-                ('verbosenamelayout_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.VerboseNameLayout')),
+                ('verbosenamelayout_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.VerboseNameLayout', on_delete=models.deletion.CASCADE)),
             ],
             options={
                 'verbose_name': 'Foobar',
@@ -263,7 +263,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='WeirdPkBucketBase',
             fields=[
-                ('weirdpkbase_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.WeirdPkBase')),
+                ('weirdpkbase_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.WeirdPkBase', on_delete=models.deletion.CASCADE)),
             ],
             bases=('core_tests.weirdpkbase',),
         ),
@@ -275,12 +275,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='thingwithlink',
             name='linkable_content_type',
-            field=models.ForeignKey(related_name='+', editable=False, to='contenttypes.ContentType'),
+            field=models.ForeignKey(related_name='+', editable=False, to='contenttypes.ContentType', on_delete=models.deletion.CASCADE),
         ),
         migrations.AddField(
             model_name='foreignkeywidget',
             name='foo',
-            field=models.ForeignKey(to='core_tests.Related'),
+            field=models.ForeignKey(to='core_tests.Related', on_delete=models.deletion.CASCADE),
         ),
         migrations.CreateModel(
             name='CssClassesWidgetSubclass',
@@ -312,7 +312,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='WeirdPkBucket',
             fields=[
-                ('weirdpkbucketbase_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.WeirdPkBucketBase')),
+                ('weirdpkbucketbase_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core_tests.WeirdPkBucketBase', on_delete=models.deletion.CASCADE)),
             ],
             bases=('core_tests.weirdpkbucketbase',),
         ),

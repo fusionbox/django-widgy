@@ -15,7 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.utils.encoding import force_text
 from django.core.exceptions import PermissionDenied
-from django.core import urlresolvers
+from django import urls
 from django.http import Http404
 
 from bs4 import BeautifulSoup
@@ -262,7 +262,7 @@ class DiffView(AuthorizedMixin, TemplateView):
     template_name = 'widgy/diff.html'
 
     def call_view_from_url(self, url):
-        view, args, kwargs = urlresolvers.resolve(url)
+        view, args, kwargs = urls.resolve(url)
         return view(self.request, *args, **kwargs).rendered_content
 
     def get_context_data(self, **kwargs):

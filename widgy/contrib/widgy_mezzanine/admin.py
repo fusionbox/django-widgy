@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls import url
 from django import forms
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.admin.utils import quote
 from django.utils.translation import ugettext_lazy as _, ugettext, ungettext
 from django.utils.html import format_html

@@ -3,7 +3,6 @@ import copy
 from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.encoding import python_2_unicode_compatible
 from django.db.models.deletion import ProtectedError
 from django.conf import settings
 from django.template.defaultfilters import date as date_format
@@ -13,9 +12,8 @@ from widgy.models.base import Node
 from widgy.utils import QuerySet, unset_pks
 
 
-@python_2_unicode_compatible
 class VersionCommit(models.Model):
-    tracker = models.ForeignKey('VersionTracker', related_name='commits')
+    tracker = models.ForeignKey('VersionTracker', related_name='commits', on_delete=models.CASCADE)
     parent = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT)
     root_node = WidgyField(on_delete=models.PROTECT)
     author = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),

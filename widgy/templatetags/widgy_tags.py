@@ -77,23 +77,23 @@ def reverse_site_url(site, view_string, *args, **kwargs):
     return site.reverse(view, args=args, kwargs=kwargs)
 
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def has_change_permission(context, site, obj):
     return site.has_change_permission(context['request'], obj)
 
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def has_add_permission(context, site, parent, obj):
     created_obj_cls = type(obj)
     return site.has_add_permission(context['request'], parent, created_obj_cls)
 
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def has_delete_permission(context, site, obj):
     return site.has_delete_permission(context['request'], obj)
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_action_links(owner, root_node):
     try:
         get_action_links = owner.get_action_links

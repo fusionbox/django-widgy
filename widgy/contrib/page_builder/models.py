@@ -2,7 +2,6 @@ from django import forms
 from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _, ugettext
-from django.utils.encoding import python_2_unicode_compatible
 from django.dispatch import receiver
 from django.template.defaultfilters import truncatechars
 from django.contrib.sites.models import Site
@@ -160,10 +159,9 @@ class CalloutBucket(Bucket):
         verbose_name_plural = _('callout buckets')
 
 
-@python_2_unicode_compatible
 class Callout(models.Model):
     name = models.CharField(max_length=255, verbose_name=_('name'))
-    site = models.ForeignKey(Site, null=True, blank=True)
+    site = models.ForeignKey(Site, null=True, blank=True, on_delete=models.PROTECT)
     root_node = WidgyField(
         site=settings.WIDGY_MEZZANINE_SITE,
         null=True,
@@ -182,7 +180,6 @@ class Callout(models.Model):
 
 
 @widgy.register
-@python_2_unicode_compatible
 class CalloutWidget(StrDisplayNameMixin, Content):
     callout = models.ForeignKey(Callout, null=True, blank=True,
                                 on_delete=models.PROTECT)
@@ -250,7 +247,6 @@ class Tabs(TabbedContainer, Accordion):
 
 
 @widgy.register
-@python_2_unicode_compatible
 class Section(StrDisplayNameMixin, Content):
     title = models.CharField(max_length=1023, verbose_name=_('title'),
                              help_text=_("Use a unique title for each section."))
@@ -491,7 +487,6 @@ class Table(StrictDefaultChildrenMixin, TableElement):
 
 
 @widgy.register
-@python_2_unicode_compatible
 class Figure(StrDisplayNameMixin, Content):
     editable = True
     accepting_children = True
@@ -516,7 +511,6 @@ class Figure(StrDisplayNameMixin, Content):
 
 
 @widgy.register
-@python_2_unicode_compatible
 class Video(StrDisplayNameMixin, Content):
     video = VideoField(verbose_name=_('video'))
 
@@ -537,7 +531,6 @@ class ButtonForm(LinkFormMixin, forms.ModelForm):
 
 
 @widgy.register
-@python_2_unicode_compatible
 class Button(StrDisplayNameMixin, Content):
     text = models.CharField(max_length=255, verbose_name=_('text'), null=True, blank=True)
 
@@ -561,7 +554,6 @@ class Button(StrDisplayNameMixin, Content):
 
 
 @widgy.register
-@python_2_unicode_compatible
 class GoogleMap(StrDisplayNameMixin, Content):
     MAP_CHOICES = (
         ('roadmap', _('Road map')),

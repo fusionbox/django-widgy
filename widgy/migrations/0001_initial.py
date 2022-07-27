@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                 ('numchild', models.PositiveIntegerField(default=0)),
                 ('content_id', models.PositiveIntegerField()),
                 ('is_frozen', models.BooleanField(default=False)),
-                ('content_type', models.ForeignKey(to='contenttypes.ContentType')),
+                ('content_type', models.ForeignKey(to='contenttypes.ContentType', on_delete=models.deletion.CASCADE)),
             ],
             options={
             },
@@ -70,7 +70,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='versioncommit',
             name='tracker',
-            field=models.ForeignKey(related_name='commits', to='widgy.VersionTracker'),
+            field=models.ForeignKey(related_name='commits', to='widgy.VersionTracker', on_delete=models.deletion.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(

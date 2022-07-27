@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='WidgyPage',
             fields=[
-                ('page_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='pages.Page')),
+                ('page_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='pages.Page', on_delete=models.deletion.CASCADE)),
                 ('root_node', widgy.db.fields.VersionedWidgyField(on_delete=django.db.models.deletion.SET_NULL, verbose_name='widgy content', to='widgy.VersionTracker', null=True)),
             ],
             options={

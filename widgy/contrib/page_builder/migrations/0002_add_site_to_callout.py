@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='callout',
             name='site',
-            field=models.ForeignKey(blank=True, to='sites.Site', null=True),
+            field=models.ForeignKey(blank=True, to='sites.Site', null=True, on_delete=models.deletion.CASCADE),
         ),
     ]

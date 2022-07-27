@@ -16,7 +16,7 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.contrib.admin import widgets
 from django.template.defaultfilters import capfirst
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 
 from treebeard.mp_tree import MP_Node
 
@@ -44,7 +44,6 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 }
 
 
-@python_2_unicode_compatible
 class Node(MP_Node):
     """
     Instances of this class maintain the Materialized Path tree structure that
@@ -61,7 +60,7 @@ class Node(MP_Node):
 
     .. _Treebeard: https://tabo.pe/projects/django-treebeard/docs/1.61/index.html
     """
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     content_id = models.PositiveIntegerField()
     content = WidgyGenericForeignKey('content_type', 'content_id')
     is_frozen = models.BooleanField(default=False)

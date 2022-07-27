@@ -82,7 +82,8 @@ class LinkField(WidgyGenericForeignKey):
         # _meta.get_all_field_names, or you'll cause a circular import.
         if not model_has_field(cls, self.ct_field):
             ct_field = models.ForeignKey(ContentType, related_name='+',
-                                         null=self.null, editable=False)
+                                         null=self.null, editable=False,
+                                         on_delete=models.CASCADE)
             cls.add_to_class(self.ct_field, ct_field)
 
         if not model_has_field(cls, self.fk_field):
@@ -118,7 +119,7 @@ def convert_linkable_to_choice(linkable):
 class LinkFormField(forms.ChoiceField):
     def __init__(self, choices=(), empty_label="---------", *args, **kwargs):
         self.empty_label = empty_label
-        super(LinkFormField, self).__init__(choices, *args, **kwargs)
+        super(LinkFormField, self).__init__(choices=choices, *args, **kwargs)
 
     def clean(self, value):
         content_type_pk, _, object_pk = value.partition('-')

@@ -160,7 +160,7 @@ class Migration(migrations.Migration):
                 ('field_ident', models.CharField(max_length=36)),
                 ('value', models.TextField()),
                 ('field_node', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, to='widgy.Node', null=True)),
-                ('submission', models.ForeignKey(related_name='values', to='form_builder.FormSubmission')),
+                ('submission', models.ForeignKey(related_name='values', to='form_builder.FormSubmission', on_delete=models.deletion.CASCADE)),
             ],
             options={
             },

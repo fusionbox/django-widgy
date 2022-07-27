@@ -1,6 +1,6 @@
 from importlib import import_module
 
-from django.core.urlresolvers import set_urlconf
+from django.urls import set_urlconf
 from django.dispatch import receiver
 from django.conf import settings
 

@@ -15,7 +15,7 @@ from django.contrib.admin.utils import unquote
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, render
 from django.core.exceptions import PermissionDenied
-from django.core import urlresolvers
+from django import urls
 from django import forms
 from django.utils.translation import ugettext as _
 
@@ -59,7 +59,7 @@ Using slug when reversing widgy.contrib.widgy_mezzanine.views.handle_form or
 widgy.contrib.widgy_mezzanine.preview is deprecated. You should update your
 code to look like this:
 
-    url = urlresolvers.reverse('widgy.contrib.widgy_mezzanine.views.preview', kwargs={
+    url = urls.reverse('widgy.contrib.widgy_mezzanine.views.preview', kwargs={
         'node_pk': node.pk,
         'page_pk': page.pk,
     })
@@ -132,7 +132,7 @@ class PreviewView(AuthorizedMixin, SingleObjectMixin, PageViewMixin, View):
         node = self.get_object()
         page = self.get_page()
         if 'slug' in self.kwargs:
-            return HttpResponsePermanentRedirect(urlresolvers.reverse(
+            return HttpResponsePermanentRedirect(urls.reverse(
                 preview, kwargs={'page_pk': page.pk, 'node_pk': node.pk}
             ))
 
@@ -169,7 +169,7 @@ class AdminViewMixin(object):
         return super(AdminViewMixin, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return urlresolvers.reverse('admin:{0}_{1}_change'.format(
+        return urls.reverse('admin:{0}_{1}_change'.format(
             self.object._meta.app_label,
             self.object._meta.model_name), args=(self.object.pk,))
 

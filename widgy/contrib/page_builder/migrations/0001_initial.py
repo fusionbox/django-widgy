@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('text', models.CharField(max_length=255, null=True, verbose_name='text', blank=True)),
                 ('link_object_id', models.PositiveIntegerField(null=True, editable=False)),
-                ('link_content_type', models.ForeignKey(related_name='+', editable=False, to='contenttypes.ContentType', null=True)),
+                ('link_content_type', models.ForeignKey(related_name='+', editable=False, to='contenttypes.ContentType', null=True, on_delete=models.deletion.CASCADE)),
             ],
             options={
                 'verbose_name': 'button',

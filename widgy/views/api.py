@@ -6,7 +6,7 @@ from functools import partial
 
 from django.http import Http404
 from django.core.exceptions import ValidationError, PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 from django.views.generic import DetailView

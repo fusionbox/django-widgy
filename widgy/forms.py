@@ -6,7 +6,7 @@ from django.template.loader import render_to_string
 from django.forms import widgets
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import format_html
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.template.defaultfilters import capfirst

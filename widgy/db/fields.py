@@ -50,6 +50,7 @@ class WidgyField(models.ForeignKey):
             to = 'widgy.Node'
 
         self.root_choices = root_choices
+        kwargs.setdefault('on_delete', models.CASCADE)
 
         self.site = get_site(site)
 

@@ -23,6 +23,7 @@ from django.utils.encoding import python_2_unicode_compatible, force_bytes, forc
 from django.template.defaultfilters import truncatechars
 from django.core.files import File
 from django.core.files.storage import default_storage
+from django.urls import reverse
 
 import html2text
 
@@ -620,11 +621,10 @@ class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Con
     def submission_count(self, value):
         self._submission_count = value
 
-    @models.permalink
     def submission_url(self):
-        return ('admin:%s_%s_change' % (self._meta.app_label, self._meta.model_name),
-                (self.pk,),
-                {})
+        return reverse('admin:%s_%s_change' % (self._meta.app_label, self._meta.model_name),
+                       args=(self.pk,),
+                       )
 
     @transaction.atomic
     def clone_new_page(self):
@@ -1054,7 +1054,7 @@ class FormValue(models.Model):
     Holds a datum from a form submission, EAV style.
     """
 
-    submission = models.ForeignKey(FormSubmission, related_name='values')
+    submission = models.ForeignKey(FormSubmission, related_name='values', on_delete=models.CASCADE)
 
     # three references to the form field! field_node is a foreign key to the
     # field at the time of submission, field_ident is the field's uuid to

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin.utils import unquote
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _

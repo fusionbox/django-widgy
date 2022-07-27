@@ -1,4 +1,6 @@
-Django>=1.11
+Django>=1.11,<=2.2.28
+django-filer==2.2.1
+mezzanine==5.0.0
 Werkzeug
 django-debug-toolbar>=1.0.0
 django-extensions
