@@ -6,7 +6,7 @@ from importlib import import_module
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.i18n import i18n_patterns
-from django.core import urlresolvers
+from django import urls
 
 from .models import UrlconfIncludePage
 
@@ -63,25 +63,25 @@ class PatchUrlconfMiddleware(object):
                 # Only do something if it's a resolver 404 (the path doesn't
                 # resolve originally). BBB In django >= 1.5 we can use
                 # request.resolver_match.
-                urlresolvers.resolve(request.get_full_path(), request.urlconf)
-            except urlresolvers.Resolver404:
+                urls.resolve(request.get_full_path(), request.urlconf)
+            except urls.Resolver404:
                 empty_urlconf = imp.new_module('urlconf')
                 empty_urlconf.urlpatterns = []
                 urlconf = self.get_urlconf(empty_urlconf, self.get_pages(logged_in=True))
                 try:
-                    urlresolvers.resolve(request.get_full_path(), urlconf)
-                except urlresolvers.Resolver404:
+                    urls.resolve(request.get_full_path(), urlconf)
+                except urls.Resolver404:
                     pass
                 else:
                     from django.contrib.auth.views import redirect_to_login
                     response = redirect_to_login(request.get_full_path())
                 finally:
-                    urlresolvers.clear_url_caches()
+                    urls.clear_url_caches()
 
         if hasattr(request, 'urlconf'):
-            urlresolvers.clear_url_caches()
+            urls.clear_url_caches()
         if hasattr(request, '_patch_urlconf_middleware_urlconf'):
-            urlresolvers.clear_url_caches()
+            urls.clear_url_caches()
 
         return response
 

@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.decorators import decorator_from_middleware
 from django.http import HttpResponse, HttpResponseNotFound
-from django.core import urlresolvers
+from django import urls
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import get_user_model
 from django.conf.urls import include, url
@@ -26,14 +26,14 @@ def plain_view(request):
 def view_that_resolves(request, login_url):
     # Use request.urlconf because we're mocking everything. BaseHandler
     # would call set_urlconf if we were making a real request.
-    match = urlresolvers.resolve(login_url, request.urlconf)
+    match = urls.resolve(login_url, request.urlconf)
     assert 'LoginView' in match.func.__name__
     return HttpResponse('')
 
 
 @patch_decorator
 def view_that_reverses(request, desired):
-    assert urlresolvers.reverse('login', request.urlconf) == desired
+    assert urls.reverse('login', request.urlconf) == desired
     return HttpResponse('')
 
 @patch_decorator
@@ -42,13 +42,13 @@ def view_not_found(request):
 
 @patch_decorator
 def view_that_switches_urlconf(request, login_url):
-    urlresolvers.resolve(login_url, request.urlconf)
+    urls.resolve(login_url, request.urlconf)
 
     new_urlconf = imp.new_module('urlconf')
     new_urlconf.urlpatterns = [url(r'^bar/', include('django.contrib.auth.urls'))]
     request.urlconf = new_urlconf
 
-    urlresolvers.resolve('/bar/login/', request.urlconf)
+    urls.resolve('/bar/login/', request.urlconf)
 
     return HttpResponse('')
 
@@ -59,10 +59,10 @@ class TestMiddleware(TestCase):
 
     if django.VERSION > (1, 7):
         def resolver_cache_size(self):
-            return urlresolvers.get_resolver.cache_info().currsize
+            return urls.get_resolver.cache_info().currsize
     else:
         def resolver_cache_size(self):
-            return len(urlresolvers._resolver_cache)
+            return len(urls._resolver_cache)
 
     def get_request(self, path='/'):
         r = self.factory.get(path)
@@ -128,7 +128,7 @@ class TestMiddleware(TestCase):
             login_required=True,
         )
 
-        with self.assertRaises(urlresolvers.Resolver404):
+        with self.assertRaises(urls.Resolver404):
             view_that_resolves(self.get_request(), login_url='404')
 
         r = self.get_request()

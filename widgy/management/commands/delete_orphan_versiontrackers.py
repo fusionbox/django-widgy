@@ -1,7 +1,7 @@
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
-from django.core import urlresolvers
+from django import urls
 from django.contrib.sites.models import Site
 
 from widgy.models import VersionTracker
@@ -47,9 +47,9 @@ class Command(BaseCommand):
 
     def format_tracker(self, tracker):
         try:
-            url = urlresolvers.reverse('widgy.contrib.widgy_mezzanine.views.preview',
+            url = urls.reverse('widgy.contrib.widgy_mezzanine.views.preview',
                                        kwargs={'node_pk': tracker.working_copy.pk})
             return 'http://%s%s' % (Site.objects.get_current().domain, url)
-        except urlresolvers.NoReverseMatch:
+        except urls.NoReverseMatch:
             # maybe widgy_mezzanine isn't installed
             return repr(tracker)

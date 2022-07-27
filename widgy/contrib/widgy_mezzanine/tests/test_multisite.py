@@ -6,7 +6,7 @@ from django.test.utils import override_settings
 from django.contrib.sites.models import Site
 from django.conf import settings
 from django.conf.urls import url, include
-from django.core.urlresolvers import get_resolver
+from django.urls import get_resolver
 
 from argonauts.testutils import JsonTestMixin
 from mezzanine.core.models import SitePermission

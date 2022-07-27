@@ -6,7 +6,7 @@ import imp
 
 import mock
 
-from django.core import urlresolvers
+from django import urls
 from django.utils.functional import cached_property
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
@@ -264,7 +264,7 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         # this is a template view, so there's not much we can test.
         decoded_content = r.content.decode(settings.DEFAULT_CHARSET)
         self.assertIn('new Widgy', decoded_content)
-        self.assertIn(urlresolvers.reverse(self.widgy_site.node_view), decoded_content)
+        self.assertIn(urls.reverse(self.widgy_site.node_view), decoded_content)
 
     def test_node_404(self):
         left, right = make_a_nice_tree(self.root_node, self.widgy_site)
@@ -373,7 +373,7 @@ class PermissionsTest(SwitchUserTestCase, RootNodeTestCase, HttpTestCase):
 
     def test_add_node(self):
         def doit():
-            url = urlresolvers.reverse(self.widgy_site.node_view)
+            url = urls.reverse(self.widgy_site.node_view)
             return self.post(url, {
                 '__class__': 'core_tests.bucket',
                 'right_id': None,

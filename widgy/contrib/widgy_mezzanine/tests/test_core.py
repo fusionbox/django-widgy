@@ -13,14 +13,14 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
-from django.core import urlresolvers
+from django import urls
 from django.contrib.auth.models import Permission, AnonymousUser
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import admin
 from django.db.models.signals import post_save
 from django.conf.urls import url, include
-from django.core.urlresolvers import get_resolver
+from django.urls import get_resolver
 
 from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
@@ -259,13 +259,13 @@ class TestPreviewView(UserSetup, TestCase):
         page = WidgyPage.objects.create(title='Foo')
         root_node = Button.add_root(widgy_site, text='Foo').node
         with self.as_user('superuser'):
-            r = self.client.get(urlresolvers.reverse(
+            r = self.client.get(urls.reverse(
                 'widgy.contrib.widgy_mezzanine.views.preview',
                 kwargs={'slug': page.slug, 'node_pk': root_node.pk}
             ))
             self.assertRedirects(
                 response=r,
-                expected_url= urlresolvers.reverse(
+                expected_url= urls.reverse(
                     'widgy.contrib.widgy_mezzanine.views.preview',
                     kwargs={'page_pk': page.pk, 'node_pk': root_node.pk}
                 ),
@@ -281,7 +281,7 @@ class TestPreviewView(UserSetup, TestCase):
         request = self.factory.get('/')
         request.user = AnonymousUser()
         resp = self.preview_view(request, node_pk=button.node.pk)
-        self.assertEqual(resp['Location'], urlresolvers.reverse('login') + '?next=' + request.get_full_path())
+        self.assertEqual(resp['Location'], urls.reverse('login') + '?next=' + request.get_full_path())
 
 
 @skipUnless(PAGE_BUILDER_INSTALLED, 'page_builder is not installed')
@@ -399,12 +399,12 @@ class TestAdminButtons(AdminButtonsTestBase, TestCase):
         self.client.login(username='superuser', password='password')
 
     def test_status_embryo(self):
-        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_add')
+        url = urls.reverse('admin:widgy_mezzanine_widgypage_add')
         response = self.client.get(url)
         self.assertIn('Save', response.rendered_content)
 
     def test_status_embryo_save(self):
-        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_add')
+        url = urls.reverse('admin:widgy_mezzanine_widgypage_add')
         response = self.client.get(url)
         data = {
             '_continue': '',
@@ -440,21 +440,21 @@ class TestAdminButtons(AdminButtonsTestBase, TestCase):
     def test_status_draft(self):
         self.page.status = CONTENT_STATUS_DRAFT
         self.page.save()
-        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        url = urls.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
         response = self.client.get(url)
         self.assertIn('Save as Draft', response.rendered_content)
         self.assertIn('Publish', response.rendered_content)
 
     def test_status_published(self):
-        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        url = urls.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
         response = self.client.get(url)
         self.assertIn('Publish Changes', response.rendered_content)
 
     def test_delete_button(self):
-        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_add')
+        url = urls.reverse('admin:widgy_mezzanine_widgypage_add')
         response = self.client.get(url)
         self.assertNotIn('Delete', response.rendered_content)
-        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        url = urls.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
         response = self.client.get(url)
         self.assertIn('Delete', response.rendered_content)
 
@@ -505,7 +505,7 @@ class TestAdminButtonsWhenReviewed(AdminButtonsTestBase, TestCase):
         warning_mock.assert_called_with(mock.ANY, mock.ANY)
 
     def test_status_embryo(self):
-        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_add')
+        url = urls.reverse('admin:widgy_mezzanine_widgypage_add')
         # same for staff or superuser
         with self.as_user('staffuser'):
             response = self.client.get(url)
@@ -514,7 +514,7 @@ class TestAdminButtonsWhenReviewed(AdminButtonsTestBase, TestCase):
     def test_status_draft(self):
         self.page.status = CONTENT_STATUS_DRAFT
         self.page.save()
-        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        url = urls.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
         with self.as_user('staffuser'):
             response = self.client.get(url)
             self.assertIn('Save as Draft', response.rendered_content)
@@ -527,7 +527,7 @@ class TestAdminButtonsWhenReviewed(AdminButtonsTestBase, TestCase):
             self.assertIn('_save_and_approve', response.rendered_content)
 
     def test_status_published(self):
-        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        url = urls.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
         with self.as_user('staffuser'):
             response = self.client.get(url)
             self.assertNotIn('Save as Draft', response.rendered_content)
@@ -547,7 +547,7 @@ class TestAdminMessages(PageSetup, TestCase):
         self.client.login(username='test', password='password')
 
     def test_future_schedule_message(self):
-        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        url = urls.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
         self.page.root_node.commit(publish_at=timezone.now() + datetime.timedelta(days=1))
         response = self.client.get(url)
         self.assertIn('one future-scheduled commit', response.rendered_content)
@@ -559,7 +559,7 @@ class TestAdminMessages(PageSetup, TestCase):
     @make_reviewed
     def test_unapproved_commit_message(self):
         self.page = refetch(self.page)
-        url = urlresolvers.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
+        url = urls.reverse('admin:widgy_mezzanine_widgypage_change', args=(self.page.pk,))
         self.page.root_node.commit()
         response = self.client.get(url)
         self.assertIn('one unreviewed commit', response.rendered_content)
