@@ -198,7 +198,7 @@ class VersionedPage4(models.Model):
 class VersionPageThrough(models.Model):
     widgy = VersionedWidgyField(
         site='tests.core_tests.widgy_config.widgy_site', related_name='+')
-    page = models.ForeignKey(VersionedPage4)
+    page = models.ForeignKey(VersionedPage4, on_delete=models.CASCADE)
 
 
 class Related(models.Model):
