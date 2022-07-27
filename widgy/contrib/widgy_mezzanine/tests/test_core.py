@@ -75,7 +75,7 @@ def make_reviewed(fn):
     from widgy.contrib.widgy_mezzanine.admin import publish_page_on_approve
 
     site = reviewed_widgy_site
-    rel = WidgyPage._meta.get_field('root_node').rel
+    rel = WidgyPage._meta.get_field('root_node').remote_field
     old_model = rel.model
     dispatch_uid = str(uuid.uuid4())
 
