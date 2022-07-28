@@ -108,7 +108,7 @@ class TestApi(RootNodeTestCase, HttpTestCase):
             'right_id': None,
             'parent_id': right.get_api_url(self.widgy_site),
         })
-        self.assertEquals(resp.status_code, 409)
+        self.assertEqual(resp.status_code, 409)
 
     def test_available_children(self):
         left, right = make_a_nice_tree(self.root_node, self.widgy_site)
@@ -152,7 +152,7 @@ class TestApi(RootNodeTestCase, HttpTestCase):
         test has failed already.
         """
         for url_obj in self.widgy_site.get_urls():
-            regex = url_obj.regex
+            regex = url_obj.pattern.regex
 
             # Creates as many positional arguments as needed.
             args = ('a',) * (regex.groups - len(regex.groupindex))
