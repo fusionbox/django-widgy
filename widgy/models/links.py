@@ -31,7 +31,7 @@ class LinkRegistry(BaseRegistry):
     @classmethod
     def has_link(cls, model):
         return any(isinstance(field, LinkField)
-                   for field in model._meta.virtual_fields)
+                   for field in model._meta.private_fields)
 
 
 
@@ -48,7 +48,7 @@ def points_to_links(linker, linkable):
     content_type = ContentType.objects.get_for_model(linkable)
     return reduce(or_, (models.Q(**{field.ct_field: content_type,
                                     field.fk_field: linkable.pk})
-                        for field in linker._meta.virtual_fields
+                        for field in linker._meta.private_fields
                         if isinstance(field, LinkField)))
 
 
@@ -144,7 +144,7 @@ class LinkFormField(forms.ChoiceField):
 
 
 def get_link_field_from_model(model, name):
-    for field in model._meta.virtual_fields:
+    for field in model._meta.private_fields:
         if isinstance(field, LinkField) and field.name == name:
             return field
 
