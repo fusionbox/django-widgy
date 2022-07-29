@@ -31,7 +31,7 @@ class WidgyWidget(forms.HiddenInput):
     template_name = 'widgy/widgy_field.html'
     is_hidden = False
 
-    def render(self, name, value, attrs=None, context={}):
+    def render(self, name, value, renderer=None, attrs=None, context={}):
         # If this fails, perhaps they aren't using the WidgyFormMixin.  If you
         # can't use the WidgyFormMixin (report it) and make sure that you call
         # conform_to_value on the WidgyFormField.
@@ -133,7 +133,7 @@ class VersionedWidgyWidget(WidgyWidget):
     template_name = ['widgy/versioned_widgy_field.html',
                      'widgy/versioned_widgy_field_base.html']
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, renderer=None, attrs=None):
         context = {
             'commit_url': self.site.reverse(self.site.commit_view, kwargs={'pk': value}),
             'reset_url': self.site.reverse(self.site.reset_view, kwargs={'pk': value}),
