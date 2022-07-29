@@ -350,8 +350,8 @@ class TestFormHandler(TestCase):
             self.to_field.get_formfield_name(): '1@example.com',
         }))
 
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals(mail.outbox[0].to, ['1@example.com'])
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ['1@example.com'])
 
     def test_admin_email_success_handler(self):
         email_handler = self.form.children['meta'].children['handlers'].add_child(widgy_site, EmailSuccessHandler)
@@ -362,8 +362,8 @@ class TestFormHandler(TestCase):
             self.to_field.get_formfield_name(): 'ignore@example.com',
         }))
 
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals(mail.outbox[0].to, ['2@example.com'])
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ['2@example.com'])
 
     def test_email_success_handler_include_attachments(self):
         email_handler = self.form.children['meta'].children['handlers'].add_child(widgy_site, EmailSuccessHandler)
@@ -376,8 +376,8 @@ class TestFormHandler(TestCase):
         form_obj.cleaned_data['file'] = ContentFile('foobar', name='asdf.txt')
         email_handler.execute(request, form_obj)
 
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals(mail.outbox[0].attachments, [
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].attachments, [
             ('asdf.txt', 'foobar', 'text/plain'),
         ])
 
@@ -404,7 +404,7 @@ class TestFormHandler(TestCase):
         email_handler.to = ''
         email_handler.save()
 
-        self.assertEquals(email_handler.get_to_emails(self.form), [])
+        self.assertEqual(email_handler.get_to_emails(self.form), [])
 
     def get_execute_args(self, form, data):
         request_factory = RequestFactory()

@@ -497,7 +497,7 @@ class TestVersioning(RootNodeTestCase):
         with self.assertRaises(InvalidOperation):
             widget.save()
 
-        self.assertEquals(Node.objects.get(pk=commit.root_node.pk).content.text, 'first')
+        self.assertEqual(Node.objects.get(pk=commit.root_node.pk).content.text, 'first')
 
         with self.assertRaises(InvalidOperation):
             widget.delete()
@@ -947,14 +947,14 @@ class VersioningViewsTest(SwitchUserTestCase, RootNodeTestCase):
         with self.as_staffuser() as user:
             r = self.client.post(url, {'publish_radio': 'now'})
             self.assertEqual(r.status_code, 403)
-            self.assertEquals(len(refetch(tracker).get_history_list()), 1)
+            self.assertEqual(len(refetch(tracker).get_history_list()), 1)
             self.assertEqual(refetch(tracker).head, first_commit)
 
         with self.as_staffuser() as user:
             with self.with_permission(user, 'add', VersionCommit):
                 r = self.client.post(url, {'publish_radio': 'now'})
                 self.assertEqual(r.status_code, 200)
-                self.assertEquals(len(refetch(tracker).get_history_list()), 2)
+                self.assertEqual(len(refetch(tracker).get_history_list()), 2)
 
     def test_reset_view(self):
         tracker, commit = make_commit(self.widgy_site)
@@ -995,14 +995,14 @@ class VersioningViewsTest(SwitchUserTestCase, RootNodeTestCase):
 
             r = self.client.post(url, {'publish_radio': 'now'})
             self.assertEqual(r.status_code, 403)
-            self.assertEquals(len(refetch(tracker).get_history_list()), 1)
+            self.assertEqual(len(refetch(tracker).get_history_list()), 1)
             self.assertEqual(refetch(tracker).head, commit)
 
         with self.as_staffuser() as user:
             with self.with_permission(user, 'add', VersionCommit):
                 r = self.client.post(url, {'publish_radio': 'now'})
                 self.assertEqual(r.status_code, 200)
-                self.assertEquals(len(refetch(tracker).get_history_list()), 2)
+                self.assertEqual(len(refetch(tracker).get_history_list()), 2)
 
 
     def test_published_versiontrackers(self):
