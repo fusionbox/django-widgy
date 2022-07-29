@@ -43,7 +43,7 @@ add required Widgy apps to ``INSTALLED_APPS``::
 ``django.contrib.admin`` should be installed after Mezzanine and Widgy,
 so move it under them in ``INSTALLED_APPS``.
 
-add Mezzanine middleware to ``MIDDLEWARE_CLASSES``::
+add Mezzanine middleware to ``MIDDLEWARE``::
 
         'mezzanine.core.request.CurrentRequestMiddleware',
         'mezzanine.core.middleware.AdminLoginInterfaceSelectorMiddleware',

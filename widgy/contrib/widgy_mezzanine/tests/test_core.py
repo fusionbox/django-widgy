@@ -173,7 +173,7 @@ class TestFormHandler(TestCase):
         self.assertIsInstance(django_form, forms.BaseForm)
         self.assertTrue(django_form.errors)
 
-    @override_settings(MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + (
+    @override_settings(MIDDLEWARE=settings.MIDDLEWARE + (
         'mezzanine.pages.middleware.PageMiddleware',
     ))
     def test_post_no_404(self):
@@ -219,7 +219,7 @@ class UserSetup(object):
 
 @skipUnless(PAGE_BUILDER_INSTALLED, 'page_builder is not installed')
 @override_settings(
-    MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + (
+    MIDDLEWARE=settings.MIDDLEWARE + (
         'mezzanine.pages.middleware.PageMiddleware',
     ),
     ROOT_URLCONF='widgy.contrib.widgy_mezzanine.tests.test_core',
