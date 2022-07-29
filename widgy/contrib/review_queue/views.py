@@ -103,7 +103,7 @@ class UndoApprovalsView(AuthorizedMixin, FormView):
         for c in commits:
             c.unapprove(self.request.user)
         url = form.cleaned_data['referer']
-        if not is_safe_url(url=url, host=self.request.get_host()):
+        if not is_safe_url(url=url, allowed_hosts=self.request.get_host()):
             url = '/'
         return redirect(url)
 
