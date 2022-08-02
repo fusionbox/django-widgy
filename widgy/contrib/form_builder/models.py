@@ -550,9 +550,10 @@ class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Con
             form = self.build_form_class()()
 
         request = context.get('request')
+        from_url = (request.GET.get('from') or request.path) if request else ''
         action_url = build_url(
             self.action_url(context['widgy']),
-            **{'from': request and (request.GET.get('from') or request.path)}
+            **{'from': from_url},
         )
         ctx = {
             'form': form,
