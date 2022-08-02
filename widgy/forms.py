@@ -128,6 +128,17 @@ class WidgyFormField(forms.ModelChoiceField):
         else:
             return super(WidgyFormField, self).label_from_instance(obj)
 
+    def _get_queryset(self):
+        return self._queryset
+
+    def _set_queryset(self, queryset):
+        # base ModelChoiceField calls .all() on the queryset, forcing evaluation of lazy objects
+        # See ticket: https://code.djangoproject.com/ticket/29158
+        self._queryset = queryset
+        self.widget.choices = self.choices
+
+    queryset = property(_get_queryset, _set_queryset)
+
 
 class VersionedWidgyWidget(WidgyWidget):
     template_name = ['widgy/versioned_widgy_field.html',
