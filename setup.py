@@ -33,7 +33,7 @@ install_requires = [
     'django-compressor>=1.3',
     'beautifulsoup4',
     'django-argonauts>=1.1.4',
-    'Django>=1.11',
+    'Django~=2.2',
     'html5lib',
 ]
 
