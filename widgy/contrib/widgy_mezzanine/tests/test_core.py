@@ -206,9 +206,10 @@ class UserSetup(object):
         self.staffuser = User.objects.create_user('staffuser', 'test@example.com', 'password')
         self.staffuser.is_staff = True
         self.staffuser.save()
-        self.staffuser.user_permissions = Permission.objects.filter(
+        user_permissions = Permission.objects.filter(
             content_type__app_label__in=['pages', 'widgy_mezzanine', 'review_queue', 'page_builder']
         ).exclude(codename='change_reviewedversioncommit')
+        self.staffuser.user_permissions.set(user_permissions)
 
     @contextmanager
     def as_user(self, username):
