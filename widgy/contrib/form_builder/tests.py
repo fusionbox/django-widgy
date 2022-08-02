@@ -225,7 +225,8 @@ class TestForm(TestCase):
         letters = self.submit('a', 'b', 'c')
         numbers = self.submit('1', '2', '3')
 
-        letters_dict, numbers_dict = FormSubmission.objects.as_dictionaries()
+        # Form submissions are ordered by most recently created.
+        numbers_dict, letters_dict = FormSubmission.objects.as_dictionaries()
 
         # Mysql doesn't have millisecond precision for DateTimes, so refetch
         # these objects to portably do it.
@@ -306,9 +307,10 @@ class TestForm(TestCase):
 
         serialized_values = [s[file_field.ident] for s in form.submissions.as_dictionaries()]
 
+        # Form submissions are ordered by most recently created.
         self.assertEqual(serialized_values, [
-            '/media/form-uploads/asdf.txt',
             '',
+            '/media/form-uploads/asdf.txt',
         ])
 
     def test_csv_unicode(self):
