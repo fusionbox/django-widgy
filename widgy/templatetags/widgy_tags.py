@@ -3,6 +3,9 @@ from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.contrib.contenttypes.models import ContentType
 
+import bleach
+from bleach_whitelist import markdown_tags, markdown_attrs
+
 from widgy.utils import fancy_import, update_context
 
 register = template.Library()
@@ -45,8 +48,9 @@ def mdown(value):
         extensions=['sane_lists'],
         safe_mode='escape',
     )
+    cleaned_value = bleach.clean(markdown.markdown(value), markdown_tags, markdown_attrs)
 
-    return mark_safe(value)
+    return mark_safe(cleaned_value)
 
 
 @register.simple_tag(takes_context=True)

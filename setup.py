@@ -52,6 +52,7 @@ extras_require = {
         'django-filer>=0.9.10',
         'markdown',
         'bleach',
+        'bleach-whitelist',
         'sorl-thumbnail>=11.12',
     ],
     'form_builder': [
