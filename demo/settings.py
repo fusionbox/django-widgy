@@ -90,7 +90,6 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.signals.SignalsPanel',
     'debug_toolbar.panels.logging.LoggingPanel',
-    'widgy.debugtoolbar.templates.TemplatePanel',
 )
 
 ROOT_URLCONF = 'demo.urls'

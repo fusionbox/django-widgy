@@ -1,3 +1,6 @@
+"""
+This requires django-debug-toolbar <= 1.11.
+"""
 import six
 
 from django.dispatch import Signal
