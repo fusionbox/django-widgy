@@ -19,7 +19,7 @@ if django.VERSION < (1, 7):
 
 urlpatterns = [
     url('^admin/widgy/', include(widgy_site.urls)),
-    url("^admin/", include(admin.site.urls)),
+    url("^admin/", admin.site.urls),
     url('^form/', include('widgy.contrib.widgy_mezzanine.urls')),
 
     # We don't want to presume how your homepage works, so here are a
