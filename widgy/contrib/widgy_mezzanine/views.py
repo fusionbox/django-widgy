@@ -104,7 +104,7 @@ code to look like this:
 class HandleFormView(HandleFormMixin, PageViewMixin, View):
     def get(self, request, *args, **kwargs):
         try:
-            if not is_safe_url(request.GET['from']):
+            if not is_safe_url(request.GET['from'], allowed_hosts=request.get_host()):
                 return HttpResponseForbidden()
             return HttpResponsePermanentRedirect(request.GET['from'])
         except KeyError:

@@ -271,7 +271,7 @@ class TestCore(RootNodeTestCase):
         tag = Tag.objects.create(name='foo')
         widget.tags.add(tag)
         widget.save()
-        self.assertEqual(widget.get_attributes(), {'tags': [tag.pk]})
+        self.assertEqual(widget.get_attributes(), {'tags': [tag]})
 
 
 class TestRegistry(RootNodeTestCase):

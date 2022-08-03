@@ -193,7 +193,8 @@ class Node(MP_Node):
         """
         Given a list of nodes, attach each one's Content. Efficiently.
         """
-        needed_nodes = [i for i in nodes if '_content_cache' not in i.__dict__]
+        field = cls._meta.get_field('content')
+        needed_nodes = [i for i in nodes if not field.is_cached(i)]
         contents = cls.fetch_content_instances(needed_nodes)
         for node in needed_nodes:
             node.content = contents[node.content_type_id][node.content_id]
@@ -468,20 +469,11 @@ class Content(models.Model):
         return data
 
     def get_attributes(self):
+        # this is copied from django.forms.models.model_to_dict
         model_data = {}
-        for field in self._meta.concrete_fields:
+        for field in itertools.chain(self._meta.concrete_fields, self._meta.many_to_many):
             if field.serialize:
                 model_data[field.attname] = field.value_from_object(self)
-        for field in self._meta.many_to_many:
-            # this is copied from django.forms.models.model_to_dict
-            if self.pk is None:
-                model_data[field.name] = []
-            else:
-                qs = field.value_from_object(self)
-                if qs._result_cache is not None:
-                    model_data[field.name] = [item.pk for item in qs]
-                else:
-                    model_data[field.name] = list(qs.values_list('pk', flat=True))
         return model_data
 
     @classmethod

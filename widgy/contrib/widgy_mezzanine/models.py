@@ -3,8 +3,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
 from django.conf import settings
 from django import urls
-from django.db.models.signals import post_migrate
-from django.db import transaction
 
 from mezzanine.pages.managers import PageManager
 from mezzanine.pages.models import Link, Page
@@ -62,14 +60,6 @@ class WidgyPageMixin(object):
         return self
 
 
-class UseForRelatedFieldsSelectRelatedManager(SelectRelatedManager):
-    """
-    We use this to optimize page rendering. This is the manager that will be
-    used to select the WidgyPage when mezzanine does `page.widgypage`.
-    """
-    use_for_related_fields = True
-
-
 widgy.unregister(CalloutWidget)
 
 
@@ -104,15 +94,15 @@ class WidgyPage(WidgyPageMixin, Page):
         verbose_name = _('widgy page')
         verbose_name_plural = _('widgy pages')
         swappable = 'WIDGY_MEZZANINE_PAGE_MODEL'
+        base_manager_name = 'select_related_manager'
 
-    select_related_manager = UseForRelatedFieldsSelectRelatedManager(select_related=[
+    select_related_manager = SelectRelatedManager(select_related=[
         'root_node',
         'root_node__head',
         # we might not need this, if head isn't published, but we
         # probably will.
         'root_node__head__root_node',
     ])
-    base_manager_name = 'select_related_manager'
     objects = PageManager()
 
 
