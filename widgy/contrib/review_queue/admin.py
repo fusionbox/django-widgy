@@ -69,11 +69,6 @@ class VersionCommitAdminBase(AuthorizedAdminMixin, ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    def get_actions(self, request):
-        actions = super(VersionCommitAdminBase, self).get_actions(request)
-        del actions['delete_selected']
-        return actions
-
     def approve_selected(self, request, queryset):
         for c in queryset:
             c.approve(request.user)
