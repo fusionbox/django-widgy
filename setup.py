@@ -35,6 +35,8 @@ install_requires = [
     'django-argonauts>=1.1.4',
     'Django~=2.2',
     'html5lib',
+    'bleach',
+    'bleach-whitelist',
 ]
 
 # Markdown stops support for Python 2.6 in version 2.5
@@ -51,8 +53,6 @@ extras_require = {
     'page_builder': [
         'django-filer>=0.9.10',
         'markdown',
-        'bleach',
-        'bleach-whitelist',
         'sorl-thumbnail>=11.12',
     ],
     'form_builder': [
