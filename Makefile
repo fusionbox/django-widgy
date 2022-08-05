@@ -1,4 +1,3 @@
-JS_FILES?=`find ./js_tests/tests -type f -name '*.js'`
 DJANGO_SETTINGS_MODULE?=tests.settings_contrib
 
 test: test-py test-js
@@ -18,10 +17,7 @@ js_tests/node_modules: js_tests/package.json
 
 test-js: js_tests/node_modules
 	node -v
-	./js_tests/node_modules/mocha/bin/mocha \
-		-s 5 \
-		--reporter spec \
-		$(JS_FILES)
+	cd js_tests && npm test tests
 
 widgy/locale/en/LC_MESSAGES/django.po: $(shell find . -type f -iregex '.*\.\(html\|py\|md\)$$' | grep -v .tox)
 

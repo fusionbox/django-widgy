@@ -1,11 +1,10 @@
 var path = require('path'),
     requirejs = require('requirejs'),
-    jsdom = require('jsdom').jsdom;
+    { JSDOM } = require('jsdom');
 
-require('mocha-as-promised')();
 
-global.document = global.document || jsdom();
-global.window = global.window = global.document.parentWindow;
+global.window = global.window || new JSDOM().window;
+global.document = global.document || global.window.document;
 
 requirejs.config({
   baseUrl: path.join(__dirname, "../../widgy/static/widgy/js/"),
