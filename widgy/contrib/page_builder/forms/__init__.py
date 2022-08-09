@@ -85,7 +85,7 @@ class CKEditorWidget(forms.Textarea):
         super(CKEditorWidget, self).__init__(*args, **kwargs)
         self.attrs['class'] = 'widgy_ckeditor'
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, **kwargs):
         textarea = super(CKEditorWidget, self).render(name, value, attrs)
         return render_to_string('page_builder/ckeditor_widget.html', {
             'html_id': attrs['id'],
