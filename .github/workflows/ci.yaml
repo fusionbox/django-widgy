@@ -8,8 +8,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Dhango 1.11
-          -django-version: '1.11.0'
+          # Django 1.11
+          - django-version: '1.11.0'
             python-version: '3.7'
 
           # Django 2.2
