@@ -13,7 +13,7 @@ browser: coverage
 	sensible-browser ./htmlcov/index.html
 
 js_tests/node_modules: js_tests/package.json
-	cd js_tests && npm install .
+	cd js_tests && npm install --no-package-lock .
 
 test-js: js_tests/node_modules
 	node -v
