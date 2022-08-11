@@ -27,7 +27,7 @@ def read(fname):
 # django should come after django-treebeard). See
 # <https://bitbucket.org/pypa/setuptools/issue/196/tests_require-pytest-pytest-cov-breaks>.
 install_requires = [
-    'django-treebear~=4.3',
+    'django-treebeard~=4.3',
     'django-pyscss>=2.0.0',
     'six',
     'django-compressor>=1.3',
