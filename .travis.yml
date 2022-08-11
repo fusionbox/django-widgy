@@ -22,7 +22,7 @@ matrix:
     - env: TOX_ENV=py34-dj111-contrib-mysql
     - env: TOX_ENV=py34-dj111-contrib-postgres
     - language: node_js
-      node_js: "0.10.40"
+      node_js: "14.20.0"
       script: make test-js
       install: echo "nothing to install"
 
