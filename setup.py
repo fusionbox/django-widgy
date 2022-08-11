@@ -37,6 +37,7 @@ install_requires = [
     'html5lib',
     'bleach',
     'bleach-whitelist',
+    'django-polymorphic==1.3',
 ]
 
 # Markdown stops support for Python 2.6 in version 2.5
