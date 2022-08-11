@@ -10,6 +10,12 @@ jobs:
         include:
           # Django 2.2
           - django-version: '2.2.0'
+            python-version: '3.6'
+          - django-version: '2.2.0'
+            python-version: '3.7'
+          - django-version: '2.2.0'
+            python-version: '3.8'
+          - django-version: '2.2.0'
             python-version: '3.9'
 
     steps:
