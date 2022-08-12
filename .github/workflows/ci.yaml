@@ -15,6 +15,8 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       mysql:
         image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: mysql
         ports:
           - 3306:3306
         options: >-
@@ -35,7 +37,7 @@ jobs:
           - db: postgres
             db_url: postgres:///widgy
           - db: mysql
-            db_url: mysql://root:@127.0.0.1:3306/widgy
+            db_url: mysql://root:mysql@127.0.0.1:3306/widgy
 
     steps:
       - uses: actions/checkout@v3
