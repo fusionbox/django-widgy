@@ -5,7 +5,7 @@ django-widgy is a heterogeneous tree editor for Django that is
 well-suited for use as a CMS. A heterogeneous tree is a tree where
 each node can be a different type---just like HTML. Widgy provides
 the representation for heterogeneous trees as well as an interactive
-JavaScript editor for them. Widgy supports Django 1.4+.
+JavaScript editor for them. Widgy supports Django 2.2.
 
 Widgy was originally created for powerful content management, but it can
 have many different uses.
