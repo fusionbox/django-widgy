@@ -10,9 +10,13 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: widgy
-        ports: ['5432:5432']
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+          POSTGRES_DB: postgres
+        ports: 5432:5432
+        options: >-
+        --health-cmd pg_isready 
+        --health-interval 10s 
+        --health-timeout 5s 
+        --health-retries 5
       mysql:
         image: mysql:latest
         env:
@@ -35,7 +39,7 @@ jobs:
           - db: sqlite
             db_url: sqlite:///test_db.sqlite3
           - db: postgres
-            db_url: postgres:///widgy
+            db_url: postgres://postgres:postgres@localhost:5432/postgres'
           - db: mysql
             db_url: mysql://root:mysql@127.0.0.1:3306/widgy
 
