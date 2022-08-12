@@ -14,7 +14,7 @@ class PyTest(TestCommand):
         self.test_suite = True
 
     def run_tests(self):
-        #import here, cause outside the eggs aren't loaded
+        # import here, cause outside the eggs aren't loaded
         import pytest
         pytest.main(self.test_args)
 
@@ -38,13 +38,8 @@ install_requires = [
     'bleach',
     'bleach-whitelist',
     'django-polymorphic==1.3',
+    'markdown',
 ]
-
-# Markdown stops support for Python 2.6 in version 2.5
-if sys.version_info < (2, 7):
-    install_requires.append('markdown<2.5')
-else:
-    install_requires.append('markdown')
 
 
 extras_require = {
@@ -77,13 +72,14 @@ extras_require['all'] = set(j for i in extras_require.values() for j in i)
 
 setup(
     name='django-widgy',
-    version='0.9.3.dev0',
+    version='0.10.0',
     author='Fusionbox, Inc.',
     author_email='programmers@fusionbox.com',
     description=__doc__,
     long_description=read('README.rst') + '\n\n' + read('CHANGELOG.rst'),
     url='http://docs.wid.gy/',
-    packages=[package for package in find_packages() if package.startswith('widgy')],
+    packages=[package for package in find_packages()
+              if package.startswith('widgy')],
     install_requires=install_requires,
     extras_require=extras_require,
     zip_safe=False,
@@ -102,7 +98,9 @@ setup(
         'Natural Language :: English',
         'Programming Language :: JavaScript',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
 )
