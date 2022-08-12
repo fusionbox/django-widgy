@@ -4,19 +4,27 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     strategy:
       fail-fast: false
       matrix:
+        db: [sqlite, postgres]
+        python-version: [3.6, 3.7, 3.8, 3.9]
+        django-version: [2.22]
         include:
-          # Django 2.2
-          - django-version: '2.2.0'
-            python-version: '3.6'
-          - django-version: '2.2.0'
-            python-version: '3.7'
-          - django-version: '2.2.0'
-            python-version: '3.8'
-          - django-version: '2.2.0'
-            python-version: '3.9'
+          - db: postgres
+            db_url: postgres://postgres:@127.0.0.1:5432/widgy
+          - db: sqlite
+            db_url: sqlite:///test_db.sqlite3
 
     steps:
       - uses: actions/checkout@v3
@@ -44,6 +52,14 @@ jobs:
           python --version
           echo "Django: `django-admin --version`"
 
+      - name: Start PostgreSQL
+        if: matrix.db == 'postgres'
+        run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres createuser -s runner
+
       - name: Run Tests
+        env:
+          DATABASE_URL: ${{ matrix.db_url }}
         run: |
           make test
