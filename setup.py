@@ -14,7 +14,7 @@ class PyTest(TestCommand):
         self.test_suite = True
 
     def run_tests(self):
-        # import here, cause outside the eggs aren't loaded
+        #import here, cause outside the eggs aren't loaded
         import pytest
         pytest.main(self.test_args)
 
@@ -27,17 +27,17 @@ def read(fname):
 # django should come after django-treebeard). See
 # <https://bitbucket.org/pypa/setuptools/issue/196/tests_require-pytest-pytest-cov-breaks>.
 install_requires = [
-    'django-treebeard~=4.3',
+    'django-treebeard',
     'django-pyscss>=2.0.0',
     'six',
     'django-compressor>=1.3',
     'beautifulsoup4',
     'django-argonauts>=1.1.4',
-    'Django>=1.1,<3.0',
+    'Django~=2.2',
     'html5lib',
     'bleach',
     'bleach-whitelist',
-    'django-polymorphic==1.3',
+    'django-polymorphic',
     'markdown',
 ]
 
