@@ -37,7 +37,6 @@ install_requires = [
     'html5lib',
     'bleach',
     'bleach-whitelist',
-    'django-polymorphic',
     'markdown',
 ]
 
