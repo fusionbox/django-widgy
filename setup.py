@@ -77,8 +77,7 @@ setup(
     description=__doc__,
     long_description=read('README.rst') + '\n\n' + read('CHANGELOG.rst'),
     url='http://docs.wid.gy/',
-    packages=[package for package in find_packages()
-              if package.startswith('widgy')],
+    packages=[package for package in find_packages() if package.startswith('widgy')],
     install_requires=install_requires,
     extras_require=extras_require,
     zip_safe=False,
