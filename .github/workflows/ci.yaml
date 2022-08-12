@@ -9,7 +9,6 @@ jobs:
         image: postgres:latest
         env:
           POSTGRES_USER: postgres
-          POSTGRES_ROLE: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: widgy
         ports: ['5432:5432']
@@ -23,7 +22,7 @@ jobs:
         django-version: [2.2]
         include:
           - db: postgres
-            db_url: postgres://postgres:@127.0.0.1:5432/widgy
+            db_url: postgres:///widgy
           - db: sqlite
             db_url: sqlite:///test_db.sqlite3
 
