@@ -37,13 +37,8 @@ install_requires = [
     'html5lib',
     'bleach',
     'bleach-whitelist',
+    'markdown',
 ]
-
-# Markdown stops support for Python 2.6 in version 2.5
-if sys.version_info < (2, 7):
-    install_requires.append('markdown<2.5')
-else:
-    install_requires.append('markdown')
 
 
 extras_require = {
@@ -76,7 +71,7 @@ extras_require['all'] = set(j for i in extras_require.values() for j in i)
 
 setup(
     name='django-widgy',
-    version='0.9.3.dev0',
+    version='0.10.0',
     author='Fusionbox, Inc.',
     author_email='programmers@fusionbox.com',
     description=__doc__,
@@ -101,7 +96,9 @@ setup(
         'Natural Language :: English',
         'Programming Language :: JavaScript',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
 )
