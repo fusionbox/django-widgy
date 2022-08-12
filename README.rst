@@ -1,8 +1,10 @@
 Widgy: Tree Editor for Django
 =============================
 
-.. image:: https://travis-ci.org/fusionbox/django-widgy.png?branch=master
-   :target: http://travis-ci.org/fusionbox/django-widgy
+|Build status|
+
+.. |Build status| image:: https://github.com/fusionbox/django-widgy/actions/workflows/ci.yaml/badge.svg
+   :target: https://github.com/fusionbox/django-widgy/actions/workflows/ci.yaml
    :alt: Build Status
 
 Widgy is a content editor somewhat in the line of CKEditor. It is not a

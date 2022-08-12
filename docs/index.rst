@@ -28,8 +28,10 @@ developers mailing list available at `widgy@fusionbox.com
 <https://groups.google.com/a/fusionbox.com/forum/#!forum/widgy>`_
 
 
-.. image:: https://travis-ci.org/fusionbox/django-widgy.png?branch=master
-   :target: http://travis-ci.org/fusionbox/django-widgy
+|Build status|
+
+.. |Build status| image:: https://github.com/fusionbox/django-widgy/actions/workflows/ci.yaml/badge.svg
+   :target: https://github.com/fusionbox/django-widgy/actions/workflows/ci.yaml
    :alt: Build Status
 
 .. _GitHub: https://github.com/fusionbox/django-widgy
