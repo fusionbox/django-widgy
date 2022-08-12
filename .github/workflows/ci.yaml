@@ -19,7 +19,7 @@ jobs:
       matrix:
         db: [sqlite, postgres]
         python-version: [3.6, 3.7, 3.8, 3.9]
-        django-version: [2.22]
+        django-version: [2.2]
         include:
           - db: postgres
             db_url: postgres://postgres:@127.0.0.1:5432/widgy
