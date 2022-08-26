@@ -740,11 +740,11 @@ class Content(models.Model):
 
         if formfield and isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
             from django.contrib.admin import site as admin_site
-            related_modeladmin = admin_site._registry.get(db_field.rel.to)
+            related_modeladmin = admin_site._registry.get(db_field.remote_field.model)
             can_add_related = bool(related_modeladmin and
                                    related_modeladmin.has_add_permission(request))
             formfield.widget = widgets.RelatedFieldWidgetWrapper(
-                formfield.widget, db_field.rel, admin_site,
+                formfield.widget, db_field.remote_field, admin_site,
                 can_add_related=can_add_related)
         else:
             for klass in db_field.__class__.mro():
