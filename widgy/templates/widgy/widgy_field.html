@@ -64,11 +64,13 @@ the admin center.
 {% compress js %}
 <script src="{% static 'widgy/js/require/require.js' %}"></script>
 <script src="{% static 'widgy/js/widgy-main.js' %}"></script>
+<script src="{% static 'widgy/js/lib/jquery.js' %}"></script>
 <script src="{% static 'widgy/fancybox/jquery.fancybox-1.3.4.js' %}"></script>
 <script src="{% static 'widgy/js/widgy.admin.js' %}"></script>
 {% endcompress %}
 
 <script>
+  jQuery.noConflict();
   require([ 'widgy' ], function(Widgy) {
     window.widgy = new Widgy('#' + {{ html_id|json }}, {{ node_dict|json }}, {{ api_url|json }});
   });
