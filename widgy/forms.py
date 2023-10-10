@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.html import format_html
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
+from django.core import serializers
 from django.conf import settings
 from django.template.defaultfilters import capfirst
 
@@ -38,11 +39,16 @@ class WidgyWidget(forms.HiddenInput):
         assert hasattr(self, 'node'), "You must set the node on a WidgyWidget prior to rendering it."
 
         self.node.maybe_prefetch_tree()
+        node_dict = self.node.to_json(self.site)
+        if 'tags' in node_dict['content']['attributes']:
+            tag_queryset_json = serializers.serialize('json', node_dict['content']['attributes']['tags'])
+            node_dict['content']['attributes']['tags'] = tag_queryset_json
+
         defaults = {
             'html_name': name,
             'value': value,
             'html_id': attrs['id'],
-            'node_dict': self.node.to_json(self.site),
+            'node_dict': node_dict,
             'node': self.node,
             'api_url': reverse(self.site.node_view),
             'site': self.site,
