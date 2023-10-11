@@ -8,8 +8,10 @@ import logging
 import itertools
 import copy
 
+from django.core import serializers
 from django.db import models, transaction
 from django import forms
+from django.db.models import ManyToManyField
 from django.forms.models import modelform_factory, ModelForm
 from django.contrib.contenttypes.models import ContentType
 from django.template import RequestContext
@@ -473,7 +475,10 @@ class Content(models.Model):
         model_data = {}
         for field in itertools.chain(self._meta.concrete_fields, self._meta.many_to_many):
             if field.serialize:
-                model_data[field.attname] = field.value_from_object(self)
+                if isinstance(field, ManyToManyField):
+                    model_data[field.attname] = serializers.serialize('json', field.value_from_object(self))
+                else:
+                    model_data[field.attname] = field.value_from_object(self)
         return model_data
 
     @classmethod
