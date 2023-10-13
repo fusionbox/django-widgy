@@ -1,4 +1,6 @@
 from __future__ import absolute_import
+
+import json
 from pprint import pprint
 import datetime
 import time
@@ -6,6 +8,7 @@ import mock
 import unittest
 import contextlib
 
+from django.core import serializers
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User
@@ -271,7 +274,9 @@ class TestCore(RootNodeTestCase):
         tag = Tag.objects.create(name='foo')
         widget.tags.add(tag)
         widget.save()
-        self.assertEqual(widget.get_attributes(), {'tags': [tag]})
+        attributes = json.loads(widget.get_attributes()['tags'])
+        self.assertEqual(len(attributes), 1)
+        self.assertEqual(attributes[0]['fields']['name'], 'foo')
 
 
 class TestRegistry(RootNodeTestCase):
