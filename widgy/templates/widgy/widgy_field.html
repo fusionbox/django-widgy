@@ -15,10 +15,12 @@ the admin center.
 <link type="text/css" rel="stylesheet" href="{% static 'widgy/css/font-awesome.css' %}">
 <link type="text/x-scss" rel="stylesheet" href="{% static 'widgy/css/widgy.scss' %}">
 <link rel="stylesheet" href="{% static 'widgy/fancybox/jquery.fancybox-1.3.4.css' %}">
+{% endcompress %}
+
 {% for scss_file in site.admin_scss_files %}
 <link type="text/x-scss" href="{% static scss_file %}" rel="stylesheet">
 {% endfor %}
-{% endcompress %}
+
 {% if html_name %}
 <input type="hidden" name="{{ html_name }}" value="{{ value }}">
 {% endif %}
