@@ -18,7 +18,7 @@ from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.conf import settings
 
-import mock
+from unittest import mock
 
 from widgy.contrib.form_builder.forms import PhoneNumberField
 from widgy.contrib.form_builder.models import (

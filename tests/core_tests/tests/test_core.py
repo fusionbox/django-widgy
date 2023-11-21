@@ -4,7 +4,7 @@ import json
 from pprint import pprint
 import datetime
 import time
-import mock
+from unittest import mock
 import unittest
 import contextlib
 

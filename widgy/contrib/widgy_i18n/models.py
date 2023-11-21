@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import (
-    ugettext_lazy as _, ugettext, get_language, get_language_info
+    gettext_lazy as _, gettext, get_language, get_language_info
 )
 from django.conf import settings
 
@@ -25,7 +25,7 @@ class I18NChild(models.Model):
     @property
     def language_name(self):
         info = get_language_info(self.language_code)
-        return ugettext(info['name'])
+        return gettext(info['name'])
 
     @property
     def display_name(self):

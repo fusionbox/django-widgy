@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
 from django.contrib import messages
-from django.utils.translation import ugettext_lazy as _, ungettext
+from django.utils.translation import gettext_lazy as _, ungettext
 from django.utils.html import format_html
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe

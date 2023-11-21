@@ -3,7 +3,7 @@ from django.contrib.admin.utils import unquote
 from django.urls import reverse
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.conf.urls import url
 from django.template.defaultfilters import slugify
 from django.http import Http404

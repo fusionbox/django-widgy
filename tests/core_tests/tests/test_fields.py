@@ -7,7 +7,7 @@ from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.template import Context
 
-import mock
+from unittest import mock
 
 from widgy.forms import WidgyFormMixin, WidgyFormField
 from widgy.models import Node, VersionTracker

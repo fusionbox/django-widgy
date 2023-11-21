@@ -6,6 +6,7 @@ from django.test.client import RequestFactory
 from django.utils.decorators import decorator_from_middleware
 from django.http import HttpResponse, HttpResponseNotFound
 from django import urls
+from django.urls.resolvers import _get_cached_resolver
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import get_user_model
 from django.conf.urls import include, url
@@ -57,12 +58,8 @@ class TestMiddleware(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
 
-    if django.VERSION > (1, 7):
-        def resolver_cache_size(self):
-            return urls.get_resolver.cache_info().currsize
-    else:
-        def resolver_cache_size(self):
-            return len(urls._resolver_cache)
+    def resolver_cache_size(self):
+        return _get_cached_resolver.cache_info().currsize
 
     def get_request(self, path='/'):
         r = self.factory.get(path)

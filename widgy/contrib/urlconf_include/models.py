@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
 from mezzanine.pages.models import Page

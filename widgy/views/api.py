@@ -12,7 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.views.generic import DetailView
 from django.views.generic.detail import SingleObjectMixin
 from django.db.models import ProtectedError
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.apps import apps
 
 from argonauts.views import RestView

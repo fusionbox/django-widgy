@@ -6,7 +6,7 @@ import six
 
 from django import forms
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from filer.fields.file import FilerFileField
 from filer.models.filemodels import File
@@ -79,7 +79,7 @@ class VideoField(models.URLField):
         super(VideoField, self).__init__(*args, **kwargs)
         self.validators.append(validators_video_url)
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection):
         if value is None:
             return value
         return self.get_url_instance(value)

@@ -11,7 +11,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.contrib.admin.widgets import AdminSplitDateTime
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.utils.encoding import force_text
 from django.core.exceptions import PermissionDenied

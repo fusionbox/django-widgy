@@ -4,7 +4,7 @@ import time
 from django import forms
 from django.template.loader import render_to_string
 from django.forms import widgets
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
@@ -93,7 +93,7 @@ class WidgyFormField(forms.ModelChoiceField):
             # remove the empty choice
             choices = [c for c in self.choices if c[0]]
             if len(choices) == 1:
-                self._value = choices[0][0]
+                self._value = choices[0][0].value
                 self.widget = DisplayWidget(display_name=choices[0][1])
                 self.help_text = _('You must save before you can edit this.')
             else:

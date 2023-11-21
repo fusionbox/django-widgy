@@ -14,12 +14,12 @@ from django.db import models, transaction
 from django import forms
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import gettext_lazy as _, gettext
 from django.shortcuts import redirect
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils.functional import cached_property
-from django.utils.encoding import python_2_unicode_compatible, force_bytes, force_text
+from django.utils.encoding import force_bytes, force_text
 from django.template.defaultfilters import truncatechars
 from django.core.files import File
 from django.core.files.storage import default_storage
@@ -154,7 +154,6 @@ class FieldMappingValueForm(forms.ModelForm):
 
 
 @widgy.register
-@python_2_unicode_compatible
 class FieldMappingValue(StrDisplayNameMixin, MappingValue):
     """
     MappingValue that maps a form field to another value.
@@ -222,7 +221,6 @@ class EmailSuccessHandlerBaseForm(forms.ModelForm):
     content = CKEditorField()
 
 
-@python_2_unicode_compatible
 class EmailSuccessHandlerBase(StrDisplayNameMixin, FormSuccessHandler):
     subject = models.CharField(max_length=255, verbose_name=_('subject'))
     content = models.TextField(blank=True, verbose_name=_('content'))
@@ -345,7 +343,6 @@ class EmailUserHandler(EmailSuccessHandlerBase):
 
 
 @widgy.register
-@python_2_unicode_compatible
 class SubmitButton(StrDisplayNameMixin, FormElement):
     text = models.CharField(max_length=255, default=_('submit'), verbose_name=_('text'))
 
@@ -364,7 +361,7 @@ class SubmitButton(StrDisplayNameMixin, FormElement):
 
 
 def untitled_form():
-    untitled = ugettext('Untitled form')
+    untitled = gettext('Untitled form')
     n = Form.objects.filter(name__startswith=untitled + ' ').exclude(
         _nodes__is_frozen=True
     ).count() + 1
@@ -457,7 +454,6 @@ def friendly_uuid(uuid):
 
 
 @widgy.register
-@python_2_unicode_compatible
 class Form(TabbedContainer, StrDisplayNameMixin, StrictDefaultChildrenMixin, Content):
     name = models.CharField(verbose_name=_('Name'),
                             max_length=255,
@@ -668,7 +664,6 @@ class FormFieldForm(forms.ModelForm):
     help_text = MiniCKEditorField(label=_('help text'), required=False)
 
 
-@python_2_unicode_compatible
 class FormField(StrDisplayNameMixin, BaseFormField):
     widget = None
 
@@ -978,7 +973,7 @@ class FormSubmission(models.Model):
             ).values('field_ident').distinct().order_by('field_node__path').values_list('field_ident', flat=True)
 
             ret = OrderedDict([
-                ('created_at', ugettext('Created at')),
+                ('created_at', gettext('Created at')),
             ])
             for field_uuid in uuids:
                 latest_value = FormValue.objects.filter(

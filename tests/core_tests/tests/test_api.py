@@ -4,7 +4,7 @@ from itertools import chain
 import json
 import imp
 
-import mock
+from unittest import mock
 
 from django import urls
 from django.utils.functional import cached_property

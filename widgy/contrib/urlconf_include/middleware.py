@@ -7,11 +7,12 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.i18n import i18n_patterns
 from django import urls
+from django.utils.deprecation import MiddlewareMixin
 
 from .models import UrlconfIncludePage
 
 
-class PatchUrlconfMiddleware(object):
+class PatchUrlconfMiddleware(MiddlewareMixin):
     def process_request(self, request):
         root_urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
         if isinstance(root_urlconf, six.string_types):

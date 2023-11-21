@@ -6,7 +6,7 @@ from django.conf.urls import url
 from django import forms
 from django.urls import reverse
 from django.contrib.admin.utils import quote
-from django.utils.translation import ugettext_lazy as _, ugettext, ungettext
+from django.utils.translation import gettext_lazy as _, gettext, ungettext
 from django.utils.html import format_html
 from django.utils import timezone
 from django.contrib import messages
@@ -235,7 +235,7 @@ class UndeleteField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         url = reverse('widgy.contrib.widgy_mezzanine.views.preview',
                       kwargs={'node_pk': obj.working_copy.pk})
-        return format_html('<a href="{url}">{preview}</a>', url=url, preview=ugettext('preview'))
+        return format_html('<a href="{url}">{preview}</a>', url=url, preview=gettext('preview'))
 
 
 class UndeletePageAdminMixin(object):
