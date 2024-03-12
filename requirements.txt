@@ -1,5 +1,5 @@
 -e git://github.com/fusionbox/django-fusionbox.git#egg=django_fusionbox
-Django==1.4.2
+Django==3.2.24
 South
 Werkzeug
 django-cachebuster
