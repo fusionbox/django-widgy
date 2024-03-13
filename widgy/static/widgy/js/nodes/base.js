@@ -11,10 +11,10 @@ define(['jquery', 'underscore', 'widgy.backbone', 'geometry'], function(
 
   /**
    * Provides an interface for a draggable NodeView.  See NodeView for more
-   * specific Node functionality related definition.  DraggablewView is exposed
+   * specific Node functionality related definition.  DraggableView is exposed
    * for subclassing by a NodePreviewView and NodeView.
    */
-  var DraggablewView = Backbone.View.extend({
+  var DraggableView = Backbone.View.extend({
     tagName: 'li',
     className: 'node',
     distanceTrigger: 5,
@@ -30,7 +30,6 @@ define(['jquery', 'underscore', 'widgy.backbone', 'geometry'], function(
         'startBeingDragged',
         'followMouse',
         'stopBeingDragged',
-        'canAcceptParent',
         'bindDragEvents',
         'unbindDocument',
         'checkDistance',
@@ -171,6 +170,10 @@ define(['jquery', 'underscore', 'widgy.backbone', 'geometry'], function(
       this.trigger('stopDrag');
     },
 
+    cssClasses: function() {
+      return this.model.get('css_classes') || {};
+    },
+
     bumpAmount: function(clientY) {
       var direction,
           distance;
@@ -221,5 +224,5 @@ define(['jquery', 'underscore', 'widgy.backbone', 'geometry'], function(
   });
 
 
-  return DraggablewView;
+  return DraggableView;
 });

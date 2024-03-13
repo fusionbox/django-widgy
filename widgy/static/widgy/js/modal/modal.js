@@ -77,7 +77,6 @@ define([ 'jquery',
     } else if ( failure ) {
       failure();
     }
-
   }
 
   return {

@@ -4,9 +4,11 @@ var test = require('./setup').test,
 
 var _ = requirejs('underscore'),
     Q = requirejs('lib/q'),
+    $ = requirejs('jquery'),
     form = requirejs('form'),
     contents = requirejs('widgy.contents'),
-    nodes = requirejs('nodes/nodes');
+    nodes = requirejs('nodes/nodes'),
+    sinon = requirejs('sinon');
 
 var TestComponent = requirejs('components/testcomponent/component');
 
@@ -50,7 +52,7 @@ describe('FormView', function() {
       assert.include(values.checkbox, '2-c');
       assert.lengthOf(values.checkbox, 2);
     });
-    
+
     it('handles select multiple', function() {
       var form_view = new form.FormView();
 
@@ -63,25 +65,47 @@ describe('FormView', function() {
       assert.lengthOf(values.select, 2);
     });
   });
+
+  it('should not submit if the submit button is disabled', function() {
+    var form_view = new form.FormView(),
+        evt = $.Event();
+    evt.target = { disabled: true };
+    evt.which = 1;
+    assert.isFalse(form_view.handleClick(evt));
+  });
+
+  it('should close CKEDITOR', function() {
+    test.create();
+    var callback = sinon.spy();
+    var form_view = new form.FormView();
+    form_view.$el.append('<div class="widgy_ckeditor" id="0"></div>');
+    window.CKEDITOR = { instances: [{ id: '0', destroy: callback }] };
+    form_view.close();
+    assert.isTrue(callback.calledOnce);
+    test.destroy();
+  });
 });
 
 describe('Editor', function() {
-  describe('knows how to deal with prefixes', function() {
-    beforeEach(function() {
-      this.node = new nodes.Node({
-        content: {
-          component: 'testcomponent',
-          form_prefix: '23'
-        }
-      });
+  beforeEach(function() {
+    this.node = new nodes.Node({
+      content: {
+        component: 'testcomponent',
+        form_prefix: '23'
+      }
     });
+  });
 
+  var createEditor = function(node) {
+    return new node.component.View.prototype.editorClass({
+      'model': node.content
+    });
+  };
+
+  describe('knows how to deal with prefixes', function() {
     it('field name method', function() {
       return this.node.ready(function(node) {
-        var cls = node.component.View.prototype.editorClass,
-            edit_view = new cls({
-              'model': node.content
-            });
+        var edit_view = createEditor(node);
 
         assert.equal(edit_view.getPrefixedFieldName('xxx'), '23-xxx');
         assert.equal(edit_view.removeFieldNamePrefix('23-xxx'), 'xxx');
@@ -91,10 +115,7 @@ describe('Editor', function() {
 
     it('in form hydration', function() {
       return this.node.ready(function(node) {
-        var cls = node.component.View.prototype.editorClass,
-            edit_view = new cls({
-              'model': node.content
-            });
+        var edit_view = createEditor(node);
 
         edit_view.$el.html('<input name="23-foo" value="1">' +
                            '<input name="24-bar" value="2">' +
