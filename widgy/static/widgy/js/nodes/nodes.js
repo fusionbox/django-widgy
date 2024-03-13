@@ -286,9 +286,13 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       }
 
       if (this.canAcceptChild(view)) {
-        $children.prepend(this.createDropTarget(view).el);
+        this.createDropTarget(view).then(function(drop_target) {
+          $children.prepend(drop_target.el);
+        }).done();
         this.list.each(function(node_view) {
-          var drop_target = that.createDropTarget(view).$el.insertAfter(node_view.el);
+          that.createDropTarget(view).then(function(that_drop_target) {
+            var drop_target = that_drop_target.$el.insertAfter(node_view.el);
+          }).done();
         }, this);
         this.refreshDropTargetVisibility();
 
@@ -331,7 +335,7 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
         }
       }
 
-      return drop_target.render();
+      return drop_target.renderPromise();
     },
 
     clearDropTargets: function() {
@@ -442,12 +446,14 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
       // this must happen after shelf.$el is in the dom so fixto can
       // find the .node element
       if ( this.isRootNode() ) {
-        this.shelf.$el.fixTo('.node', {
-          // mezzanine header
-          mind: '#container > .breadcrumbs, #container > #header',
-          // XXX: move this to css
-          zIndex: 50
-        });
+        this.shelf.shelf_promise.then(function(shelf) {
+          shelf.$el.fixTo('.node', {
+            // mezzanine header
+            mind: '#container > .breadcrumbs, #container > #header',
+            // XXX: move this to css
+            zIndex: 50
+          });
+        }).done();
       }
     },
 
@@ -472,10 +478,15 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
 
       var shelf = this.shelf = this.makeShelf();
 
+      var children = this.$children;
+
       this.listenTo(shelf, 'startDrag', this.startDrag)
           .listenTo(shelf, 'stopDrag', this.stopDrag);
 
-      this.$children.before(shelf.render().el);
+      shelf.shelf_promise = shelf.renderPromise()
+      shelf.shelf_promise.then(function(rendered_shelf) {
+        children.before(rendered_shelf.el);
+      }).done();
       return shelf;
     },
 
