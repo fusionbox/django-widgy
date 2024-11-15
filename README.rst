@@ -17,7 +17,7 @@ Widgy is available under the Apache Version 2.0 license. Contribute on github.
 Documentation
 -------------
 
-Read Widgy's documentation at http://docs.wid.gy.
+Read Widgy's documentation at https://django-widgy.readthedocs.io/.
 
 Installation
 ------------
@@ -37,7 +37,7 @@ Design Philosophy
 -----------------
 
 Read about Widgy's data model at
-http://docs.wid.gy/en/latest/design/data-model.html.
+https://django-widgy.readthedocs.io/en/latest/design/data-model.html.
 
 
 Contributing
