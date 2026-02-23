@@ -13,14 +13,6 @@ define([
   var Template = Backbone.Model.extend({
     initialize: function() {
       Backbone.Model.prototype.initialize.apply(this, arguments);
-
-      _.bindAll(this,
-        'render'
-      );
-    },
-
-    render: function(type, context) {
-      return Backbone.renderTemplate(this.get(type), context);
     }
   });
 

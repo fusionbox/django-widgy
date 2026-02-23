@@ -20,7 +20,6 @@ define([ 'jquery', 'underscore', 'backbone', 'lib/mustache', 'lib/q', 'geometry'
     initialize: function() {
       _.bindAll(this,
         'close',
-        'render',
         'renderPromise',
         'renderHTML',
         'getTemplate',
@@ -89,9 +88,9 @@ define([ 'jquery', 'underscore', 'backbone', 'lib/mustache', 'lib/q', 'geometry'
     onClose: function() {},
 
     /**
-     * If your subclass has a template property, render will use Mustache to
-     * render the template and passes in a context that is retrieved using
-     * `View.toJSON`.
+     * If your subclass has a template property, renderPromise will use
+     * Mustache to render the template and passes in a context that is
+     * retrieved using `View.toJSON`.
      */
     template: false,
 
@@ -100,17 +99,6 @@ define([ 'jquery', 'underscore', 'backbone', 'lib/mustache', 'lib/q', 'geometry'
      */
     getTemplate: function() {
       return this.template;
-    },
-
-    render: function() {
-      var context = this.toJSON(),
-          template = this.getTemplate();
-
-      if (template) {
-        this.$el.html(this.renderTemplate(template, context));
-      }
-
-      return this;
     },
 
     renderPromise: function() {

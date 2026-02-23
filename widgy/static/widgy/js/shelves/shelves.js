@@ -63,19 +63,24 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/base',
 
     },
 
-    render: function() {
-      Backbone.View.prototype.render.apply(this, arguments);
-      this.$scroll = this.$el.find('> .scroll');
-      var $list = this.$list = this.$scroll.find('> .list');
-      this.collection.on('sort', this.resort);
+    renderPromise: function() {
+      var promise = Backbone.View.prototype.renderPromise.apply(this, arguments);
+      return promise.then(function(shelf) {
+        shelf.$scroll = shelf.$el.find('> .scroll');
+        var $list = shelf.$list = shelf.$scroll.find('> .list');
 
-      this.list.on('push', function(view) {
-        $list.append(view.render().el);
+        shelf.collection.on('sort', this.resort);
+
+        shelf.list.on('push', function(view) {
+          view.renderPromise().then(function(promise_view) {
+            $list.append(promise_view.el);
+          });
+        });
+
+        shelf.resizeShelf();
+        $(window).resize(shelf.resizeShelf);
+        return shelf;
       });
-
-      this.resizeShelf();
-      $(window).resize(this.resizeShelf);
-      return this;
     },
 
     resizeShelf: function() {
@@ -176,10 +181,12 @@ define([ 'jquery', 'underscore', 'widgy.backbone', 'nodes/base',
       return this.model.get('css_classes');
     },
 
-    render: function() {
-      DraggableView.prototype.render.apply(this, arguments);
-      this.$el.attr('title', this.model.get('tooltip'));
-      return this;
+    renderPromise: function() {
+      var promise = DraggableView.prototype.renderPromise.apply(this, arguments);
+      return promise.then(function(shelf_view) {
+        shelf_view.$el.attr('title', shelf_view.model.get('tooltip'));
+        return shelf_view;
+      });
     }
 
   });
