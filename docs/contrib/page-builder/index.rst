@@ -21,6 +21,52 @@ package::
     $ pip install django-widgy[page_builder]
 
 
+add Widgy to ``INSTALLED_APPS``::
+
+        'widgy',
+        'widgy.contrib.page_builder',
+
+add required Widgy apps to ``INSTALLED_APPS``::
+
+        'filer',
+        'easy_thumbnails',
+        'compressor',
+        'argonauts',
+        'sorl.thumbnail',
+
+``django.contrib.admin`` should be installed after Mezzanine and Widgy,
+so move it under them in ``INSTALLED_APPS``.
+
+make a :class:`Widgy site <widgy.site.WidgySite>` and set it in settings (note that it doesn't require Mezzanine)::
+
+    # demo/widgy_site.py
+    from widgy.site import WidgySite
+
+    class WidgySite(WidgySite):
+        pass
+
+    site = WidgySite()
+
+    # settings.py
+    WIDGY_MEZZANINE_SITE = 'demo.widgy_site.site'
+
+
+Configure django-compressor::
+
+    # settings.py
+    STATICFILES_FINDERS = (
+        'compressor.finders.CompressorFinder',
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    )
+
+    COMPRESS_ENABLED = True
+
+    COMPRESS_PRECOMPILERS = (
+        ('text/x-scss', 'django_pyscss.compressor.DjangoScssFilter'),
+    )
+
+
 Widgets
 -------
 
