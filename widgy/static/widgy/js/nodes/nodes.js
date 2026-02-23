@@ -308,8 +308,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
           visible++;
         }
       });
-
-      debug('refreshDropTargetVisibility', visible + ' of ' + this.drop_targets_list.size() + ' visible');
     },
 
     createDropTarget: function(view) {
@@ -359,8 +357,6 @@ define([ 'exports', 'jquery', 'underscore', 'widgy.backbone', 'lib/q', 'shelves/
      * dragged is dropped on one of my drop targets.
      */
     receiveChildView: function(index, dragged_view) {
-      debug('receiveChildView');
-
       var node = dragged_view.model;
 
       // It's already mine and it was dragged into its own drop target.

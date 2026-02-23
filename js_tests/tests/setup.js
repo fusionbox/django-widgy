@@ -2,8 +2,6 @@ var path = require('path'),
     requirejs = require('requirejs'),
     jsdom = require('jsdom').jsdom;
 
-require('mocha-as-promised')();
-
 global.document = global.document || jsdom();
 global.window = global.window = global.document.parentWindow;
 
@@ -31,6 +29,7 @@ global.location = {
 test = {
   create: function(){
     document.innerHTML = '<html><head></head><body></body></html>';
+    document.documentElement.clientHeight = 300;
   },
 
   destroy: function(){
@@ -43,7 +42,8 @@ requirejs.define('components/testcomponent/component', ['widgy.contents'], funct
   var EditorView = contents.EditorView.extend();
 
   var WidgetView = contents.View.extend({
-    editorClass: EditorView
+    editorClass: EditorView,
+    makeSticky: function() {},
   });
 
   return _.extend({}, contents, {

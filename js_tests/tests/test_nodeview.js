@@ -4,6 +4,7 @@ var test = require('./setup').test,
     sinon = require('sinon');
 
 var nodes = requirejs('nodes/nodes'),
+    widgy = requirejs('widgy'),
     shelves = requirejs('shelves/shelves'),
     _ = requirejs('underscore'),
     Q = requirejs('lib/q');
@@ -33,6 +34,45 @@ describe('ShelfView', function() {
       assert.isFalse(callback.called);
       shelf_item.trigger('foo');
       assert.isTrue(callback.called);
+    });
+  });
+});
+
+describe('NodeView', function() {
+  beforeEach(function() {
+    test.create();
+
+    var root_node = {
+      content: {
+        preview_template: '<span><%author%><span>',
+        component: 'testcomponent',
+      },
+      title: 'Test Title',
+      author: 'Test Author'
+    };
+
+    this.node = new nodes.Node({
+      content: {
+        preview_template: '<span><%title%><span>',
+        component: 'testcomponent',
+      },
+      title: 'Node Title',
+      author: 'Node Author'
+    });
+
+
+    this.app_view = new widgy.AppView({ root_node: root_node });
+  });
+
+  afterEach(function() {
+    test.destroy();
+  });
+
+
+  it('should return if it is the root node', function(done) {
+    this.app_view.root_node_promise.then(function (root_node_view) {
+      assert.isTrue(root_node_view.isRootNode());
+      done();
     });
   });
 });
