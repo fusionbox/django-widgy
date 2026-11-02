@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from operator import itemgetter
 from itertools import chain
 import json
-import imp
+import types
 
 from unittest import mock
 
@@ -31,7 +31,7 @@ class TestApi(RootNodeTestCase, HttpTestCase):
 
     @cached_property
     def urls(self):
-        urls = imp.new_module('urls')
+        urls = types.ModuleType('urls')
         urls.urlpatterns = self.widgy_site.get_urls()
         return urls
 

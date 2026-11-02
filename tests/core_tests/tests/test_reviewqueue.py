@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 import datetime
-import imp
+import types
 import json
 
 import django
@@ -35,7 +35,7 @@ def make_commit(site, delta=datetime.timedelta(0), vt_class=ReviewedVersionTrack
     return (tracker, commit)
 
 
-urls = imp.new_module('urls')
+urls = types.ModuleType('urls')
 reviewed_widgy_site = ReviewedWidgySite()
 urls.urlpatterns = reviewed_widgy_site.get_urls()
 
