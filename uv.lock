@@ -351,6 +351,7 @@ dependencies = [
     { name = "django-pyscss" },
     { name = "django-treebeard" },
     { name = "html2text" },
+    { name = "html5lib" },
     { name = "legacy-cgi" },
     { name = "markdown" },
     { name = "mezzanine" },
@@ -379,13 +380,14 @@ requires-dist = [
     { name = "django-pyscss", specifier = ">=2.0.3" },
     { name = "django-treebeard", specifier = ">=4.7.1" },
     { name = "html2text", specifier = ">=2025.4.15" },
+    { name = "html5lib", specifier = ">=1.1" },
     { name = "legacy-cgi", specifier = ">=2.6.4" },
     { name = "markdown", specifier = ">=3.11.2" },
     { name = "mezzanine", specifier = ">=6.1.1" },
     { name = "phonenumbers", specifier = ">=9.0.42" },
     { name = "pyscss", git = "https://github.com/Kronuz/pyScss.git" },
     { name = "six", specifier = ">=1.17.0" },
-    { name = "sorl-thumbnail", specifier = ">=13.4.0" },
+    { name = "sorl-thumbnail", specifier = "==12.10.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -446,6 +448,19 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f8/27/e158d86ba1e82967cc2f790b0cb02030d4a8bef58e0c79a8590e9678107f/html2text-2025.4.15.tar.gz", hash = "sha256:948a645f8f0bc3abe7fd587019a2197a12436cd73d0d4908af95bfc8da337588", size = 64316, upload-time = "2025-04-15T04:02:30.045Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1d/84/1a0f9555fd5f2b1c924ff932d99b40a0f8a6b12f6dd625e2a47f415b00ea/html2text-2025.4.15-py3-none-any.whl", hash = "sha256:00569167ffdab3d7767a4cdf589b7f57e777a5ed28d12907d8c58769ec734acc", size = 34656, upload-time = "2025-04-15T04:02:28.44Z" },
+]
+
+[[package]]
+name = "html5lib"
+version = "1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "six" },
+    { name = "webencodings" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ac/b6/b55c3f49042f1df3dcd422b7f224f939892ee94f22abcf503a9b7339eaf2/html5lib-1.1.tar.gz", hash = "sha256:b2e5b40261e20f354d198eae92afc10d750afb487ed5e50f9c4eaf07c184146f", size = 272215, upload-time = "2020-06-22T23:32:38.834Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6c/dd/a834df6482147d48e225a49515aabc28974ad5a4ca3215c18a882565b028/html5lib-1.1-py2.py3-none-any.whl", hash = "sha256:0d78f8fde1c230e99fe37986a60526d7049ed4bf8a9fadbad5f00e22e58e041d", size = 112173, upload-time = "2020-06-22T23:32:36.781Z" },
 ]
 
 [[package]]
@@ -837,11 +852,11 @@ wheels = [
 
 [[package]]
 name = "sorl-thumbnail"
-version = "13.4.0"
+version = "12.10.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e2/eb/c82291c848d41fef671b754943c00cfba3cd94ad138b22738368a93768d5/sorl_thumbnail-13.4.0.tar.gz", hash = "sha256:9eafa7be3c6785b06750633a36b20111005b7e3efda735f770e0ee101908ed3b", size = 791417, upload-time = "2026-10-25T18:29:21.067Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/cb/84/96a5915a42a8f1c189131da2f40638bd85c5bfc87937417a4e4ae81f33ca/sorl-thumbnail-12.10.0.tar.gz", hash = "sha256:de95a49217fdfeced222fa3ceaa01d312ee2f8aad56ba34d6c70f2dee9a84938", size = 665255, upload-time = "2023-10-05T09:31:54.339Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/96/f8/fb13cef9e0cbff62c0cf037903820a81f38f75b7e7d2333d8124170f6574/sorl_thumbnail-13.4.0-py3-none-any.whl", hash = "sha256:375c7c8760424aeec6d8c394d158b2390afd0129c61ad73e90b6766cea88d600", size = 46956, upload-time = "2026-10-25T18:29:19.264Z" },
+    { url = "https://files.pythonhosted.org/packages/0f/3d/464f51555b21e22ef656d0d855718d9729785c8bad6420f8e0620968bf02/sorl_thumbnail-12.10.0-py3-none-any.whl", hash = "sha256:733eb2eee392d4a874f88fb3ed6f0572fa9c361b06e0411b83e435ba69c51f52", size = 41802, upload-time = "2023-10-05T09:31:20.662Z" },
 ]
 
 [[package]]
