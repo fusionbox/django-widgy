@@ -357,6 +357,7 @@ dependencies = [
     { name = "phonenumbers" },
     { name = "pyscss" },
     { name = "six" },
+    { name = "sorl-thumbnail" },
 ]
 
 [package.dev-dependencies]
@@ -384,6 +385,7 @@ requires-dist = [
     { name = "phonenumbers", specifier = ">=9.0.42" },
     { name = "pyscss", git = "https://github.com/Kronuz/pyScss.git" },
     { name = "six", specifier = ">=1.17.0" },
+    { name = "sorl-thumbnail", specifier = ">=13.4.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -831,6 +833,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031, upload-time = "2024-12-04T17:35:28.174Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050, upload-time = "2024-12-04T17:35:26.475Z" },
+]
+
+[[package]]
+name = "sorl-thumbnail"
+version = "13.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e2/eb/c82291c848d41fef671b754943c00cfba3cd94ad138b22738368a93768d5/sorl_thumbnail-13.4.0.tar.gz", hash = "sha256:9eafa7be3c6785b06750633a36b20111005b7e3efda735f770e0ee101908ed3b", size = 791417, upload-time = "2026-10-25T18:29:21.067Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/96/f8/fb13cef9e0cbff62c0cf037903820a81f38f75b7e7d2333d8124170f6574/sorl_thumbnail-13.4.0-py3-none-any.whl", hash = "sha256:375c7c8760424aeec6d8c394d158b2390afd0129c61ad73e90b6766cea88d600", size = 46956, upload-time = "2026-10-25T18:29:19.264Z" },
 ]
 
 [[package]]

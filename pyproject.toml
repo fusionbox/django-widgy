@@ -25,6 +25,7 @@ dependencies = [
     "phonenumbers>=9.0.42",
     "pyscss",
     "six>=1.17.0",
+    "sorl-thumbnail>=12.10.0",
 ]
 
 [project.scripts]
