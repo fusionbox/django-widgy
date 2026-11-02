@@ -18,6 +18,7 @@ dependencies = [
     "django-filer>=3.6.0",
     "django-pyscss>=2.0.3",
     "django-treebeard>=4.7.1",
+    "html2text>=2025.4.15",
     "legacy-cgi>=2.6.4",
     "markdown>=3.11.2",
     "mezzanine>=6.1.1",

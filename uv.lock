@@ -350,6 +350,7 @@ dependencies = [
     { name = "django-filer" },
     { name = "django-pyscss" },
     { name = "django-treebeard" },
+    { name = "html2text" },
     { name = "legacy-cgi" },
     { name = "markdown" },
     { name = "mezzanine" },
@@ -375,6 +376,7 @@ requires-dist = [
     { name = "django-filer", specifier = ">=3.6.0" },
     { name = "django-pyscss", specifier = ">=2.0.3" },
     { name = "django-treebeard", specifier = ">=4.7.1" },
+    { name = "html2text", specifier = ">=2025.4.15" },
     { name = "legacy-cgi", specifier = ">=2.6.4" },
     { name = "markdown", specifier = ">=3.11.2" },
     { name = "mezzanine", specifier = ">=6.1.1" },
@@ -431,6 +433,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/8f/1d/cde5f83966ce98ab8588c9ce9da8aef844ae7bbef42071d2ae60aecc4564/grappelli_safe-1.1.1.tar.gz", hash = "sha256:ee34b3e2a3711498b1f8da3d9daa8a1239efdf255a212181742b6a5890fac039", size = 88015, upload-time = "2022-01-05T17:21:20.388Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/74/bd/670f29b094f0f7257626858b265533667c3c0059f5faed6bc10b927b9431/grappelli_safe-1.1.1-py2.py3-none-any.whl", hash = "sha256:6249972e6fd3dd4835032236ffd0e8e80fc514bc647a24ae8d9517efad3dfd35", size = 163299, upload-time = "2022-01-05T17:21:18.876Z" },
+]
+
+[[package]]
+name = "html2text"
+version = "2025.4.15"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f8/27/e158d86ba1e82967cc2f790b0cb02030d4a8bef58e0c79a8590e9678107f/html2text-2025.4.15.tar.gz", hash = "sha256:948a645f8f0bc3abe7fd587019a2197a12436cd73d0d4908af95bfc8da337588", size = 64316, upload-time = "2025-04-15T04:02:30.045Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1d/84/1a0f9555fd5f2b1c924ff932d99b40a0f8a6b12f6dd625e2a47f415b00ea/html2text-2025.4.15-py3-none-any.whl", hash = "sha256:00569167ffdab3d7767a4cdf589b7f57e777a5ed28d12907d8c58769ec734acc", size = 34656, upload-time = "2025-04-15T04:02:28.44Z" },
 ]
 
 [[package]]
