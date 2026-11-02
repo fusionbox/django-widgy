@@ -28,4 +28,5 @@ django-widgy = "django_widgy:main"
 [dependency-groups]
 dev = [
     "pytest>=9.2.0",
+    "python-lsp-server>=1.15.0",
 ]
