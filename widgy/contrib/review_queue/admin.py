@@ -3,11 +3,11 @@ from __future__ import unicode_literals
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
 from django.contrib import messages
-from django.utils.translation import gettext_lazy as _, ungettext
+from django.utils.translation import gettext_lazy as _, ngettext
 from django.utils.html import format_html
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from widgy.admin import AuthorizedAdminMixin
 
@@ -75,7 +75,7 @@ class VersionCommitAdminBase(AuthorizedAdminMixin, ModelAdmin):
 
         commit_count = queryset.count()
 
-        message = ungettext(
+        message = ngettext(
             '%d commit has been approved.',
             '%d commits have been approved.',
             commit_count
@@ -108,7 +108,7 @@ class VersionCommitAdminBase(AuthorizedAdminMixin, ModelAdmin):
             "We rely on the VersionCommitChangeList to set commit.tracker"
             " to a ReviewedVersionTracker."
         )
-        return ', '.join(force_text(owner) for owner in commit.tracker.owners)
+        return ', '.join(force_str(owner) for owner in commit.tracker.owners)
     commit_name.short_description = _("Commit name")
 
     def commit_preview(self, commit):

@@ -11,7 +11,7 @@ from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django import forms
 from django.utils import timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.core import mail
 from django.db import connection
 from django.core.files.base import ContentFile
@@ -324,7 +324,7 @@ class TestForm(TestCase):
         csv_output = StringIO()
         self.form.submissions.to_csv(csv_output)
 
-        self.assertEqual(force_text(csv_output.getvalue()), (
+        self.assertEqual(force_str(csv_output.getvalue()), (
             "Created at,\N{INTERROBANG},field 2,field 3\r\n"
             "%s,\N{SNOWMAN},2,3\r\n" % (now,))
         )

@@ -8,7 +8,7 @@ from django.db.models.fields import Field
 from django.contrib.contenttypes.models import ContentType
 from django.template.defaultfilters import capfirst
 from django import forms
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.apps import apps
 from widgy.generic import WidgyGenericForeignKey
 from widgy import BaseRegistry
@@ -109,9 +109,9 @@ def convert_linkable_to_choice(linkable):
     key = get_composite_key(linkable)
 
     try:
-        value = u'%s (%s)' % (force_text(linkable), linkable.get_absolute_url())
+        value = u'%s (%s)' % (force_str(linkable), linkable.get_absolute_url())
     except AttributeError:
-        value = force_text(linkable)
+        value = force_str(linkable)
 
     return (key, value)
 

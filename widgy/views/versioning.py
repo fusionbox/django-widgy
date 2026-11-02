@@ -13,7 +13,7 @@ from django.conf import settings
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.core.exceptions import PermissionDenied
 from django import urls
 from django.http import Http404
@@ -315,4 +315,4 @@ def daisydiff(before, after):
                 body = parsed.find('body')
                 for i in body.find_all(recursive=False)[:6]:
                     i.extract()
-                return force_text(body)
+                return force_str(body)

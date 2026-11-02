@@ -10,7 +10,7 @@ from django.http import (
     HttpResponsePermanentRedirect,
     HttpResponseRedirect,
 )
-from django.utils.http import is_safe_url
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib.admin.utils import unquote
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, render
@@ -104,7 +104,7 @@ code to look like this:
 class HandleFormView(HandleFormMixin, PageViewMixin, View):
     def get(self, request, *args, **kwargs):
         try:
-            if not is_safe_url(request.GET['from'], allowed_hosts=request.get_host()):
+            if not url_has_allowed_host_and_scheme(request.GET['from'], allowed_hosts=request.get_host()):
                 return HttpResponseForbidden()
             return HttpResponsePermanentRedirect(request.GET['from'])
         except KeyError:

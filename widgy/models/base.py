@@ -17,7 +17,7 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.contrib.admin import widgets
 from django.template.defaultfilters import capfirst
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from treebeard.mp_tree import MP_Node
 
@@ -71,7 +71,7 @@ class Node(MP_Node):
         unique_together = [('content_type', 'content_id')]
 
     def __str__(self):
-        return force_text(self.content)
+        return force_str(self.content)
 
     def to_json(self, site):
         children = [c.to_json(site) for c in self.get_children()]
@@ -489,12 +489,12 @@ class Content(models.Model):
             '__class__': "%s.%s" % (cls._meta.app_label, cls._meta.model_name),
             'title': capfirst(cls._meta.verbose_name),
             'css_classes': cls.get_class_css_classes(),
-            'tooltip': cls.tooltip and force_text(cls.tooltip),
+            'tooltip': cls.tooltip and force_str(cls.tooltip),
         }
 
     @property
     def display_name(self):
-        return force_text(self._meta.verbose_name)
+        return force_str(self._meta.verbose_name)
 
     @property
     def class_name(self):

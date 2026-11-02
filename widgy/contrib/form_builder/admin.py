@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.template.defaultfilters import slugify
 from django.http import Http404
 from django.utils.html import escape
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from .models import Form
 
@@ -43,13 +43,13 @@ class FormAdmin(admin.ModelAdmin):
 
         if obj is None:
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
-                'name': force_text(opts.verbose_name), 'key': escape(object_id)})
+                'name': force_str(opts.verbose_name), 'key': escape(object_id)})
 
 
         headers = obj.submissions.get_formfield_labels()
         rows = obj.submissions.as_ordered_dictionaries(headers.keys())
         return render(request, 'admin/form_builder/form/change_form.html', {
-            'title': _('View %s submissions') % force_text(opts.verbose_name),
+            'title': _('View %s submissions') % force_str(opts.verbose_name),
             'object_id': object_id,
             'original': obj,
             'is_popup': ('_popup' in request.POST or

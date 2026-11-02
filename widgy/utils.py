@@ -17,7 +17,7 @@ from django.http.request import QueryDict
 
 from django.contrib.auth import get_user_model
 from django.utils.html import format_html
-from django.utils.encoding import force_text, force_bytes
+from django.utils.encoding import force_str, force_bytes
 
 
 def deprecate(fn):
@@ -36,7 +36,7 @@ def deprecate(fn):
 
 get_user_model = deprecate(get_user_model)
 format_html = deprecate(format_html)
-force_text = deprecate(force_text)
+force_text = deprecate(force_str)
 force_bytes = deprecate(force_bytes)
 
 

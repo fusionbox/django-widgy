@@ -5,7 +5,7 @@ from django.conf import settings
 from django import forms
 from django.urls import re_path, reverse
 from django.contrib.admin.utils import quote
-from django.utils.translation import gettext_lazy as _, gettext, ungettext
+from django.utils.translation import gettext_lazy as _, gettext, ngettext
 from django.utils.html import format_html
 from django.utils import timezone
 from django.contrib import messages
@@ -173,13 +173,13 @@ class WidgyPageAdmin(PageAdmin):
                 if not commit.is_published:
                     future += 1
             if unapproved:
-                messages.warning(request, ungettext(
+                messages.warning(request, ngettext(
                     "There is one unreviewed commit for this page.",
                     "There are {count} unreviewed commits for this page.",
                     unapproved
                 ).format(count=unapproved))
             if future:
-                messages.warning(request, ungettext(
+                messages.warning(request, ngettext(
                     "There is one future-scheduled commit.",
                     "There are {count} future-scheduled commits.",
                     future

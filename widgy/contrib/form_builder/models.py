@@ -19,7 +19,7 @@ from django.shortcuts import redirect
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils.functional import cached_property
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
 from django.template.defaultfilters import truncatechars
 from django.core.files import File
 from django.core.files.storage import default_storage
@@ -698,7 +698,7 @@ class FormField(StrDisplayNameMixin, BaseFormField):
         to store in the db. The return value with also be used in the
         CSV download of form data.
         """
-        return force_text(value)
+        return force_str(value)
 
     @property
     def widget_attrs(self):

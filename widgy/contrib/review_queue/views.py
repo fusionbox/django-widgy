@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.utils.translation import gettext as _
-from django.utils.http import is_safe_url
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.html import format_html
 from django.views.generic import RedirectView, FormView
 from django.core.exceptions import PermissionDenied
@@ -103,7 +103,7 @@ class UndoApprovalsView(AuthorizedMixin, FormView):
         for c in commits:
             c.unapprove(self.request.user)
         url = form.cleaned_data['referer']
-        if not is_safe_url(url=url, allowed_hosts=self.request.get_host()):
+        if not url_has_allowed_host_and_scheme(url=url, allowed_hosts=self.request.get_host()):
             url = '/'
         return redirect(url)
 
