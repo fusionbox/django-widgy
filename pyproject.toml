@@ -28,5 +28,14 @@ django-widgy = "django_widgy:main"
 [dependency-groups]
 dev = [
     "pytest>=9.2.0",
+    "pytest-django>=4.14.0",
     "python-lsp-server>=1.15.0",
 ]
+
+# Redundant with Makefile test-py target
+[tool.pytest]
+DJANGO_SETTINGS_MODULE = "tests.settings_contrib"
+
+[tool.uv.sources]
+pyscss = { git = "https://github.com/Kronuz/pyScss.git" }
+

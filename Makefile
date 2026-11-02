@@ -3,7 +3,7 @@ DJANGO_SETTINGS_MODULE?=tests.settings_contrib
 test: test-py test-js
 
 test-py:
-	DJANGO_SETTINGS_MODULE=$(DJANGO_SETTINGS_MODULE) py.test $(PYTEST_OPTIONS)
+	DJANGO_SETTINGS_MODULE=$(DJANGO_SETTINGS_MODULE) pytest $(PYTEST_OPTIONS)
 
 coverage:
 	+make test-py PYTEST_OPTIONS='--cov widgy'
