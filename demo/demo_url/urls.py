@@ -1,9 +1,9 @@
-from django.conf.urls import patterns, include, re_path
+from django.urls import re_path
 from django.views.generic import RedirectView
 
 from . import views
 
-urlpatterns = patterns('',
-    (r'^$', RedirectView.as_view(url='hello/')),
-    (r'^hello/', views.hello),
-)
+urlpatterns = [
+    re_path(r'^$', RedirectView.as_view(url='hello/')),
+    re_path(r'^hello/', views.hello),
+]

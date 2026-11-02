@@ -1,5 +1,5 @@
 import os
-import imp
+import importlib.util
 import django
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -79,6 +79,14 @@ GRAPPELLI_INSTALLED = True
 ADMIN_MEDIA_PREFIX = STATIC_URL + "grappelli/"
 SITE_ID = 1
 
+# Match the AutoField primary keys in the existing migrations.
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+# easy_thumbnails (required by django-filer) and sorl.thumbnail both ship a
+# template tag library named 'thumbnail'. widgy never loads the bare name;
+# it uses its own thumbnail_libs module, so the ambiguity is harmless.
+SILENCED_SYSTEM_CHECKS = ['templates.E003']
+
 DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.versions.VersionsPanel',
     'debug_toolbar.panels.timer.TimerPanel',
@@ -109,7 +117,15 @@ DATABASES = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.5/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
+
+# widgy_i18n stores language codes in a 2-character field, so keep the
+# demo to two-letter codes rather than Django's full default list.
+LANGUAGES = [
+    ('en', 'English'),
+    ('es', 'Spanish'),
+    ('fr', 'French'),
+]
 
 TIME_ZONE = 'UTC'
 
@@ -135,7 +151,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
-WIDGY_ROOT = imp.find_module('widgy')[1]
+WIDGY_ROOT = os.path.dirname(importlib.util.find_spec('widgy').origin)
 
 COMPRESS_ENABLED = True
 
@@ -174,13 +190,6 @@ URLCONF_INCLUDE_CHOICES = (
 )
 
 DAISYDIFF_JAR_PATH = os.path.join(WIDGY_ROOT, '..', 'bin', 'daisydiff', 'daisydiff.jar')
-
-REQUIRE_BUILD_PROFILE = 'widgy.build.js'
-REQUIRE_BASE_URL = 'widgy/js'
-STORAGES = {
-    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
-    'staticfiles': {'BACKEND': 'require.storage.OptimizedStaticFilesStorage'},
-}
 
 WIDGY_MEZZANINE_SITE = 'demo.widgysite.widgy_site'
 

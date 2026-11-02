@@ -38,6 +38,12 @@ dev = [
     "pytest-django>=4.14.0",
     "python-lsp-server>=1.15.0",
 ]
+demo = [
+    "werkzeug",
+    "django-debug-toolbar",
+    "django-extensions",
+    "django-contrib-comments",
+]
 
 # Redundant with Makefile test-py target
 [tool.pytest]

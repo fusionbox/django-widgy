@@ -1,6 +1,5 @@
-import django
 from django.conf import settings
-from django.conf.urls import include, re_path
+from django.urls import include, re_path
 from django.contrib import admin
 import django.views.static
 
@@ -9,9 +8,6 @@ import mezzanine.pages.views
 from mezzanine.generic.views import admin_keywords_submit
 
 from demo.widgysite import widgy_site
-
-if django.VERSION < (1, 7):
-    admin.autodiscover()
 
 # Add the urlpatterns for any custom Django applications here.
 # You can also change the ``home`` view to add your own functionality

@@ -20,3 +20,4 @@ None of that should error. Everything else is out of scope for now.
 * Remove legacy-cgi package, this was removed in Python 3.13 and only
   needed by earlier versions of django.
 * Remove six
+* widgy_i18n I18NChild.language_code needs to be longer than max_length=2.
