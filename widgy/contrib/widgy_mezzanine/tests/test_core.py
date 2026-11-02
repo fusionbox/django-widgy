@@ -19,8 +19,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import admin
 from django.db.models.signals import post_save
-from django.conf.urls import url, include
-from django.urls import get_resolver
+from django.urls import get_resolver, include, re_path
 
 from mezzanine.core.models import (CONTENT_STATUS_PUBLISHED,
                                    CONTENT_STATUS_DRAFT)
@@ -40,8 +39,8 @@ WidgyPage = get_widgypage_model()
 # XXX: Let django import the urlconf module. Django does it smarter
 urlpatterns = get_resolver(None).url_patterns
 urlpatterns = urlpatterns + [
-    url('^widgy_site/', include(widgy_site.urls)),
-    url('^accounts/', include('django.contrib.auth.urls')),
+    re_path('^widgy_site/', include(widgy_site.urls)),
+    re_path('^accounts/', include('django.contrib.auth.urls')),
 ]
 
 FORM_BUILDER_INSTALLED = 'widgy.contrib.form_builder' in settings.INSTALLED_APPS
@@ -61,7 +60,7 @@ REVIEW_QUEUE_INSTALLED = 'widgy.contrib.review_queue' in settings.INSTALLED_APPS
 if REVIEW_QUEUE_INSTALLED:
     from widgy.contrib.review_queue.site import ReviewedWidgySite
     reviewed_widgy_site = ReviewedWidgySite()
-    urlpatterns += [url('^reviewed_widgy_site/', include(reviewed_widgy_site.urls))]
+    urlpatterns += [re_path('^reviewed_widgy_site/', include(reviewed_widgy_site.urls))]
 
 
 def make_reviewed(fn):

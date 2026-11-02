@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import re_path
 from django.utils.functional import cached_property
 
 from widgy.site import WidgySite
@@ -21,9 +21,9 @@ class ReviewedWidgySite(WidgySite):
 
     def get_urls(self):
         return super(ReviewedWidgySite, self).get_urls() + [
-            url('^approve/(?P<pk>[^/]+)/(?P<commit_pk>[^/]+)/$', self.approve_view),
-            url('^unapprove/(?P<pk>[^/]+)/(?P<commit_pk>[^/]+)/$', self.unapprove_view),
-            url('^undo-approvals/$', self.undo_approvals_view),
+            re_path('^approve/(?P<pk>[^/]+)/(?P<commit_pk>[^/]+)/$', self.approve_view),
+            re_path('^unapprove/(?P<pk>[^/]+)/(?P<commit_pk>[^/]+)/$', self.unapprove_view),
+            re_path('^undo-approvals/$', self.undo_approvals_view),
         ]
 
     @cached_property

@@ -1,5 +1,4 @@
-from django.conf.urls import url
-from django.urls import reverse
+from django.urls import re_path, reverse
 from django.core.exceptions import PermissionDenied
 from django.contrib.staticfiles import finders
 from django.contrib.auth import get_permission_codename
@@ -35,20 +34,20 @@ class WidgySite(object):
 
     def get_urls(self):
         urlpatterns = [
-            url('^node/$', self.node_view),
-            url('^node/(?P<node_pk>[^/]+)/$', self.node_view),
-            url('^node/(?P<node_pk>[^/]+)/available-children-recursive/$', self.shelf_view),
-            url('^node/(?P<node_pk>[^/]+)/edit/$', self.node_edit_view),
-            url('^node/(?P<node_pk>[^/]+)/templates/$', self.node_templates_view),
-            url('^node/(?P<node_pk>[^/]+)/possible-parents/$', self.node_parents_view),
-            url('^contents/(?P<app_label>[A-z_][\w_]*)/(?P<object_name>[A-z_][\w_]*)/(?P<object_pk>[^/]+)/$', self.content_view),
+            re_path('^node/$', self.node_view),
+            re_path('^node/(?P<node_pk>[^/]+)/$', self.node_view),
+            re_path('^node/(?P<node_pk>[^/]+)/available-children-recursive/$', self.shelf_view),
+            re_path('^node/(?P<node_pk>[^/]+)/edit/$', self.node_edit_view),
+            re_path('^node/(?P<node_pk>[^/]+)/templates/$', self.node_templates_view),
+            re_path('^node/(?P<node_pk>[^/]+)/possible-parents/$', self.node_parents_view),
+            re_path(r'^contents/(?P<app_label>[A-z_][\w_]*)/(?P<object_name>[A-z_][\w_]*)/(?P<object_pk>[^/]+)/$', self.content_view),
 
             # versioning
-            url('^revert/(?P<pk>[^/]+)/(?P<commit_pk>[^/]+)/$', self.revert_view),
-            url('^commit/(?P<pk>[^/]+)/$', self.commit_view),
-            url('^history/(?P<pk>[^/]+)/$', self.history_view),
-            url('^reset/(?P<pk>[^/]+)/$', self.reset_view),
-            url('^diff/$', self.diff_view),
+            re_path('^revert/(?P<pk>[^/]+)/(?P<commit_pk>[^/]+)/$', self.revert_view),
+            re_path('^commit/(?P<pk>[^/]+)/$', self.commit_view),
+            re_path('^history/(?P<pk>[^/]+)/$', self.history_view),
+            re_path('^reset/(?P<pk>[^/]+)/$', self.reset_view),
+            re_path('^diff/$', self.diff_view),
         ]
         return urlpatterns
 

@@ -5,8 +5,7 @@ from django.test import TestCase, override_settings
 from django.test.utils import override_settings
 from django.contrib.sites.models import Site
 from django.conf import settings
-from django.conf.urls import url, include
-from django.urls import get_resolver
+from django.urls import get_resolver, include, re_path
 
 from mezzanine.core.models import SitePermission
 
@@ -29,9 +28,9 @@ reviewed_widgy_site = ReviewedMultiSiteWidgySite()
 PAGE_BUILDER_INSTALLED = 'widgy.contrib.page_builder' in settings.INSTALLED_APPS
 REVIEW_QUEUE_INSTALLED = 'widgy.contrib.review_queue' in settings.INSTALLED_APPS
 
-urlpatterns = get_resolver(None).url_patterns + [url('^widgy_site/', include(widgy_site.urls))]
+urlpatterns = get_resolver(None).url_patterns + [re_path('^widgy_site/', include(widgy_site.urls))]
 if REVIEW_QUEUE_INSTALLED:
-    urlpatterns += [url('^reviewed_widgy_site/', include(reviewed_widgy_site.urls))]
+    urlpatterns += [re_path('^reviewed_widgy_site/', include(reviewed_widgy_site.urls))]
 
 
 class PermissionMixin(UserSetup, PageSetup):

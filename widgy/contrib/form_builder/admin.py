@@ -1,10 +1,9 @@
 from django.contrib import admin
 from django.contrib.admin.utils import unquote
-from django.urls import reverse
+from django.urls import re_path, reverse
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
-from django.conf.urls import url
 from django.template.defaultfilters import slugify
 from django.http import Http404
 from django.utils.html import escape
@@ -32,7 +31,7 @@ class FormAdmin(admin.ModelAdmin):
     def get_urls(self, *args, **kwargs):
         urls = super(FormAdmin, self).get_urls(*args, **kwargs)
         return urls + [
-            url(r'^(.+).csv$',
+            re_path(r'^(.+).csv$',
                 self.admin_site.admin_view(self.download_view),
                 name=self.download_url_name,
                 ),

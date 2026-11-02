@@ -2,9 +2,8 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 from django.conf import settings
-from django.conf.urls import url
 from django import forms
-from django.urls import reverse
+from django.urls import re_path, reverse
 from django.contrib.admin.utils import quote
 from django.utils.translation import gettext_lazy as _, gettext, ungettext
 from django.utils.html import format_html
@@ -107,12 +106,12 @@ class WidgyPageAdmin(PageAdmin):
             has_change_permission=self.has_change_permission,
         )
         return [
-            url(
+            re_path(
                 '^(.+)/clone/$',
                 self.admin_site.admin_view(clone_view),
                 name='widgy_mezzanine_widgypage_clone',
             ),
-            url(
+            re_path(
                 '^(.+)/unpublish/$',
                 self.admin_site.admin_view(unpublish_view),
                 name='widgy_mezzanine_widgypage_unpublish',

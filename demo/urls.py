@@ -1,6 +1,6 @@
 import django
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import include, re_path
 from django.contrib import admin
 import django.views.static
 
@@ -18,9 +18,9 @@ if django.VERSION < (1, 7):
 # to the project's homepage.
 
 urlpatterns = [
-    url('^admin/widgy/', include(widgy_site.urls)),
-    url("^admin/", admin.site.urls),
-    url('^form/', include('widgy.contrib.widgy_mezzanine.urls')),
+    re_path('^admin/widgy/', include(widgy_site.urls)),
+    re_path("^admin/", admin.site.urls),
+    re_path('^form/', include('widgy.contrib.widgy_mezzanine.urls')),
 
     # We don't want to presume how your homepage works, so here are a
     # few patterns you can use to set it up.
@@ -32,7 +32,7 @@ urlpatterns = [
     # one homepage pattern, so if you use a different one, comment this
     # one out.
 
-    url(r'^$', mezzanine.pages.views.page, {'slug': '/'}, name='home'),
+    re_path(r'^$', mezzanine.pages.views.page, {'slug': '/'}, name='home'),
 
     # HOMEPAGE AS AN EDITABLE PAGE IN THE PAGE TREE
     # ---------------------------------------------
@@ -71,10 +71,10 @@ urlpatterns = [
     # ``mezzanine.urls``, go right ahead and take the parts you want
     # from it, and use them directly below instead of using
     # ``mezzanine.urls``.
-    url("^admin_keywords_submit/$", admin_keywords_submit, name="admin_keywords_submit"),
-    url("^admin_page_ordering/$", mezzanine.pages.views.admin_page_ordering,
+    re_path("^admin_keywords_submit/$", admin_keywords_submit, name="admin_keywords_submit"),
+    re_path("^admin_page_ordering/$", mezzanine.pages.views.admin_page_ordering,
         name="admin_page_ordering"),
-    url("^", include("mezzanine.urls")),
+    re_path("^", include("mezzanine.urls")),
 
 ]
 
@@ -84,7 +84,7 @@ handler500 = mezzanine.core.views.server_error
 
 if settings.DEBUG:
     urlpatterns += [
-        url(r'^media/(?P<path>.*)$', django.views.static.serve, {
+        re_path(r'^media/(?P<path>.*)$', django.views.static.serve, {
             'document_root': settings.MEDIA_ROOT,
         }),
     ]

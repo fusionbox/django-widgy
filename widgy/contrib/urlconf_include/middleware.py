@@ -4,7 +4,7 @@ import six
 
 from importlib import import_module
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls import include, re_path
 from django.conf.urls.i18n import i18n_patterns
 from django import urls
 from django.utils.deprecation import MiddlewareMixin
@@ -22,7 +22,7 @@ class PatchUrlconfMiddleware(MiddlewareMixin):
 
     @classmethod
     def get_pattern_for_page(cls, page):
-        return [url(r'^' + re.escape(page.slug) + '/', include(page.urlconf_name))]
+        return [re_path(r'^' + re.escape(page.slug) + '/', include(page.urlconf_name))]
 
     @classmethod
     def get_pages(cls, logged_in):
@@ -90,4 +90,4 @@ class PatchUrlconfMiddleware(MiddlewareMixin):
 class I18nPatchUrlconfMiddleware(PatchUrlconfMiddleware):
     @classmethod
     def get_pattern_for_page(cls, page):
-        return i18n_patterns('', url(r'^' + re.escape(page.slug) + '/', include(page.urlconf_name)))
+        return i18n_patterns(re_path(r'^' + re.escape(page.slug) + '/', include(page.urlconf_name)))

@@ -9,7 +9,7 @@ from django import urls
 from django.urls.resolvers import _get_cached_resolver
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import get_user_model
-from django.conf.urls import include, url
+from django.urls import include, re_path
 
 from widgy.contrib.urlconf_include.middleware import PatchUrlconfMiddleware
 from widgy.contrib.urlconf_include.models import UrlconfIncludePage
@@ -46,7 +46,7 @@ def view_that_switches_urlconf(request, login_url):
     urls.resolve(login_url, request.urlconf)
 
     new_urlconf = imp.new_module('urlconf')
-    new_urlconf.urlpatterns = [url(r'^bar/', include('django.contrib.auth.urls'))]
+    new_urlconf.urlpatterns = [re_path(r'^bar/', include('django.contrib.auth.urls'))]
     request.urlconf = new_urlconf
 
     urls.resolve('/bar/login/', request.urlconf)
