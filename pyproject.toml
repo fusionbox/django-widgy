@@ -19,6 +19,7 @@ dependencies = [
     "django-treebeard>=4.7.1",
     "legacy-cgi>=2.6.4",
     "markdown>=3.11.2",
+    "mezzanine>=6.1.1",
     "six>=1.17.0",
 ]
 
