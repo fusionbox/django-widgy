@@ -7,7 +7,7 @@ authors = [
     { email = "gwahl@fusionbox.com" },
     { email = "eabrahamsen@fusionbox.com" }
 ]
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = [
     "beautifulsoup4>=4.15.0",
     "bleach>=6.4.0",
