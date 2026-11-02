@@ -13,7 +13,6 @@ SECRET_KEY = "widgy_tests_secret_key"
 # is only marginal there.
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',
-    'django.contrib.auth.hashers.SHA1PasswordHasher',
 )
 
 INSTALLED_APPS = [
