@@ -16,11 +16,12 @@ dependencies = [
     "django>=3.1,<3.3",
     "django-compressor>=1.3",
     "django-filer>=3.6.0",
-    "django-pyscss>=2.0.0",
+    "django-pyscss>=2.0.3",
     "django-treebeard>=4.7.1",
     "legacy-cgi>=2.6.4",
     "markdown>=3.11.2",
     "mezzanine>=6.1.1",
+    "pyscss",
     "six>=1.17.0",
 ]
 
@@ -36,6 +37,7 @@ dev = [
 
 # Redundant with Makefile test-py target
 [tool.pytest]
+
 DJANGO_SETTINGS_MODULE = "tests.settings_contrib"
 
 [tool.uv.sources]

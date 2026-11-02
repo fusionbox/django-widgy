@@ -353,6 +353,7 @@ dependencies = [
     { name = "legacy-cgi" },
     { name = "markdown" },
     { name = "mezzanine" },
+    { name = "pyscss" },
     { name = "six" },
 ]
 
@@ -372,11 +373,12 @@ requires-dist = [
     { name = "django", specifier = ">=3.1,<3.3" },
     { name = "django-compressor", specifier = ">=1.3" },
     { name = "django-filer", specifier = ">=3.6.0" },
-    { name = "django-pyscss", specifier = ">=2.0.0" },
+    { name = "django-pyscss", specifier = ">=2.0.3" },
     { name = "django-treebeard", specifier = ">=4.7.1" },
     { name = "legacy-cgi", specifier = ">=2.6.4" },
     { name = "markdown", specifier = ">=3.11.2" },
     { name = "mezzanine", specifier = ">=6.1.1" },
+    { name = "pyscss", git = "https://github.com/Kronuz/pyScss.git" },
     { name = "six", specifier = ">=1.17.0" },
 ]
 
@@ -670,11 +672,10 @@ wheels = [
 [[package]]
 name = "pyscss"
 version = "1.4.0"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/Kronuz/pyScss.git#73559d047706ccd4593cf6aa092de71f35164723" }
 dependencies = [
     { name = "six" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/92/30/64c818fd317e03138f98ca67800edb6a916f59fc07b3d7e535e84c3c333a/pyScss-1.4.0.tar.gz", hash = "sha256:8f35521ffe36afa8b34c7d6f3195088a7057c185c2b8f15ee459ab19748669ff", size = 122100, upload-time = "2022-02-23T12:53:39.735Z" }
 
 [[package]]
 name = "pytest"
