@@ -4,7 +4,7 @@ from django.utils.safestring import mark_safe
 from django.contrib.contenttypes.models import ContentType
 
 import bleach
-from bleach_whitelist import markdown_tags, markdown_attrs
+from bleach_allowlist import markdown_tags, markdown_attrs
 
 from widgy.utils import fancy_import, update_context
 

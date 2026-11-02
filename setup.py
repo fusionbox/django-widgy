@@ -35,7 +35,7 @@ install_requires = [
     'Django>=3.1,<3.3',
     'html5lib',
     'bleach',
-    'bleach-whitelist',
+    'bleach-allowlist',
     'markdown',
 ]
 

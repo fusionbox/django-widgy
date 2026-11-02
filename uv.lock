@@ -37,6 +37,15 @@ wheels = [
 ]
 
 [[package]]
+name = "bleach-allowlist"
+version = "1.0.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/04/6d/039eca1770f7667d0967d299a1e6d47ad88acde03fcd2076a11e57ff51b4/bleach-allowlist-1.0.3.tar.gz", hash = "sha256:56e22086079a0e6a3100ae99e4dbaf20eb2585486598eb0e994008a11428da9b", size = 7669, upload-time = "2020-08-13T15:15:26.342Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e8/6b/927c955e350468e4c1a2a7fc73ef2d6197f66ab88f21fc259f3b543db3ed/bleach_allowlist-1.0.3-py2.py3-none-any.whl", hash = "sha256:6427a3ac0baddf549703f1003ea53f411f3d7888524c94c00eb6ef1deb378899", size = 9637, upload-time = "2020-08-13T15:15:22.614Z" },
+]
+
+[[package]]
 name = "django"
 version = "3.2.25"
 source = { registry = "https://pypi.org/simple" }
@@ -105,6 +114,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "bleach" },
+    { name = "bleach-allowlist" },
     { name = "django" },
     { name = "django-compressor" },
     { name = "django-pyscss" },
@@ -117,12 +127,13 @@ dependencies = [
 requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.15.0" },
     { name = "bleach", specifier = ">=6.4.0" },
+    { name = "bleach-allowlist", specifier = ">=1.0.3" },
     { name = "django", specifier = ">=3.1,<3.3" },
     { name = "django-compressor", specifier = ">=1.3" },
     { name = "django-pyscss", specifier = ">=2.0.0" },
     { name = "django-treebeard", specifier = ">=4.7.1" },
     { name = "markdown", specifier = ">=3.11.2" },
-    { name = "six", specifier = ">=1.16.0" },
+    { name = "six", specifier = ">=1.17.0" },
 ]
 
 [[package]]
