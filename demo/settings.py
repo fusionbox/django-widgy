@@ -177,7 +177,10 @@ DAISYDIFF_JAR_PATH = os.path.join(WIDGY_ROOT, '..', 'bin', 'daisydiff', 'daisydi
 
 REQUIRE_BUILD_PROFILE = 'widgy.build.js'
 REQUIRE_BASE_URL = 'widgy/js'
-STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {'BACKEND': 'require.storage.OptimizedStaticFilesStorage'},
+}
 
 WIDGY_MEZZANINE_SITE = 'demo.widgysite.widgy_site'
 
