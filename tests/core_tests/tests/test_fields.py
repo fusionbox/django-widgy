@@ -176,7 +176,7 @@ class TestModelForm(TestCase):
         self.assertFalse(x.is_valid())
 
     def test_second_render(self):
-        from argonauts.templatetags.argonauts import json as json_tag
+        from django.utils.html import json_script
         instance = HasAWidgy.objects.create(
             widgy=Layout.add_root(widgy_site).node
         )
@@ -187,7 +187,7 @@ class TestModelForm(TestCase):
                       rendered)
         self.assertIn('new Widgy',
                       rendered)
-        self.assertIn(json_tag(instance.widgy.to_json(widgy_site)),
+        self.assertIn(json_script(instance.widgy.to_json(widgy_site), 'id_widgy_data'),
                       rendered)
 
     def test_second_save(self):

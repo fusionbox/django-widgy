@@ -1,10 +1,9 @@
-{% load argonauts %}
-
 {{ textarea }}
 
+{% with html_id|add:"_config" as config_id %}{{ config|json_script:config_id }}{% endwith %}
 <script>
   {# this tells CKEditor where to find its static assets #}
-  CKEDITOR_BASEPATH = {{ ckeditor_path|json }};
+  CKEDITOR_BASEPATH = "{{ ckeditor_path|escapejs }}";
   if(window.CKEDITOR)
     CKEDITOR.basePath = CKEDITOR_BASEPATH;
 
@@ -15,6 +14,7 @@
     else
       require(['lib/ckeditor/ckeditor'], load);
   })(function() {
-    CKEDITOR.replace({{ html_id|json }}, {{ config|json }});
+    var html_id = "{{ html_id|escapejs }}";
+    CKEDITOR.replace(html_id, JSON.parse(document.getElementById(html_id + "_config").textContent));
   });
 </script>

@@ -27,7 +27,6 @@ INSTALLED_APPS = [
     "widgy",
     "treebeard",
     "compressor",
-    "argonauts",
     # tests modules
     "tests.core_tests",
     "tests.utilstests",

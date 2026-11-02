@@ -1,7 +1,6 @@
 <!doctype HTML>
-{% load argonauts %}
 
 <script>
   var w = window.parent || window;
-  w.location = {{ success_url|json }};
+  w.location = "{{ success_url|escapejs }}";
 </script>

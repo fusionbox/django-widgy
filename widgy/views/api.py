@@ -15,12 +15,10 @@ from django.db.models import ProtectedError
 from django.utils.translation import gettext as _
 from django.apps import apps
 
-from argonauts.views import RestView
-
 from widgy.models import Node
 from widgy.exceptions import InvalidTreeMovement
 from widgy.utils import extract_id
-from widgy.views.base import WidgyViewMixin, AuthorizedMixin
+from widgy.views.base import WidgyViewMixin, AuthorizedMixin, RestView
 
 
 class WidgyView(WidgyViewMixin, RestView):

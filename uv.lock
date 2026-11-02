@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.14"
 
 [[package]]
@@ -101,7 +101,7 @@ wheels = [
 [[package]]
 name = "django-widgy"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "bleach" },
@@ -122,7 +122,7 @@ requires-dist = [
     { name = "django-pyscss", specifier = ">=2.0.0" },
     { name = "django-treebeard", specifier = ">=4.7.1" },
     { name = "markdown", specifier = ">=3.11.2" },
-    { name = "six", specifier = ">=1.17.0" },
+    { name = "six", specifier = ">=1.16.0" },
 ]
 
 [[package]]

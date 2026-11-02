@@ -36,7 +36,6 @@ add required Widgy apps to ``INSTALLED_APPS``::
         'filer',
         'easy_thumbnails',
         'compressor',
-        'argonauts',
         'sorl.thumbnail',
 
 

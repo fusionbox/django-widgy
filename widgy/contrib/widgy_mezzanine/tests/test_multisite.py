@@ -8,7 +8,6 @@ from django.conf import settings
 from django.conf.urls import url, include
 from django.urls import get_resolver
 
-from argonauts.testutils import JsonTestMixin
 from mezzanine.core.models import SitePermission
 
 from widgy.site import WidgySite
@@ -35,7 +34,7 @@ if REVIEW_QUEUE_INSTALLED:
     urlpatterns += [url('^reviewed_widgy_site/', include(reviewed_widgy_site.urls))]
 
 
-class PermissionMixin(UserSetup, PageSetup, JsonTestMixin):
+class PermissionMixin(UserSetup, PageSetup):
     def setUp(self):
         super(PermissionMixin, self).setUp()
 
@@ -67,6 +66,7 @@ class PermissionMixin(UserSetup, PageSetup, JsonTestMixin):
                 'parent_id': parent['url'],
                 'right_id': None,
             },
+            content_type='application/json',
             HTTP_HOST=self.main_site.domain,
         )
 
@@ -80,6 +80,7 @@ class PermissionMixin(UserSetup, PageSetup, JsonTestMixin):
                 'parent_id': parent['url'],
                 'right_id': None
             },
+            content_type='application/json',
             HTTP_HOST=self.other_site.domain,
         )
 
@@ -102,6 +103,7 @@ class PermissionMixin(UserSetup, PageSetup, JsonTestMixin):
                 'parent_id': parent.node.get_api_url(self.widgy_site),
                 'right_id': button.node.get_api_url(self.widgy_site),
             },
+            content_type='application/json',
             HTTP_HOST=self.main_site.domain,
         )
 
@@ -120,6 +122,7 @@ class PermissionMixin(UserSetup, PageSetup, JsonTestMixin):
                 'parent_id': parent.node.get_api_url(self.widgy_site),
                 'right_id': button.node.get_api_url(self.widgy_site),
             },
+            content_type='application/json',
             HTTP_HOST=self.other_site.domain,
         )
 
@@ -141,6 +144,7 @@ class PermissionMixin(UserSetup, PageSetup, JsonTestMixin):
                     link='',
                 ),
             },
+            content_type='application/json',
             HTTP_HOST=self.main_site.domain,
         )
 
@@ -158,6 +162,7 @@ class PermissionMixin(UserSetup, PageSetup, JsonTestMixin):
                     link='',
                 ),
             },
+            content_type='application/json',
             HTTP_HOST=self.main_site.domain,
         )
 
