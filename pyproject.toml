@@ -22,3 +22,8 @@ dependencies = [
 
 [project.scripts]
 django-widgy = "django_widgy:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
