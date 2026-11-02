@@ -68,6 +68,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(TEMP_DIR, 'media')
 
 USE_I18N = True
+USE_TZ = True
 LANGUAGE_CODE = 'en'
 LOGIN_URL = '/accounts/login/'
 
