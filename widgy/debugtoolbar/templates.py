@@ -10,7 +10,7 @@ from django.contrib.staticfiles import finders
 from debug_toolbar.panels import DebugPanel
 
 
-template_hierarchy_called = Signal(providing_args=['cls', 'kwargs', 'templates', 'used'])
+template_hierarchy_called = Signal()
 
 
 def unique_list(lst):
