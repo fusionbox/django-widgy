@@ -1,4 +1,3 @@
-/sqlite_database
 *.pyc
 /src/
 /static/*

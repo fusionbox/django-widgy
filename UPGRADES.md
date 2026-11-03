@@ -12,9 +12,13 @@ should look like:
 2. Create a virtual environment
 3. Install packages from pyproject.toml
 4. `pytest`
+5. Run the demo site: `python manage.py runserver` (admin login
+   demo:demo)
 
 None of that should error. Everything else is out of scope for now.
 
 ## Post-upgrade cleanups
 
 * widgy_i18n I18NChild.language_code needs to be longer than max_length=2.
+* sorl.thumbnail and django-filer thumbnail are redundant, amke some
+  kind of decision there.
