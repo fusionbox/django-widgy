@@ -15,7 +15,7 @@ class I18NChild(models.Model):
     Mixin for Contents that go directly inside I18NTabbedContainers.
     """
     language_code = models.CharField(verbose_name=_('Layout'),
-                                     max_length=2,
+                                     max_length=10,
                                      choices=settings.LANGUAGES,
                                      )
 

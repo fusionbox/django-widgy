@@ -17,7 +17,6 @@ The steps to success should look like:
 
 ## Post-upgrade cleanups and questions
 
-* widgy_i18n I18NChild.language_code needs to be longer than max_length=2.
 * sorl.thumbnail and django-filer thumbnail are redundant, makeke some
   kind of decision there.
 * The Github action recipe now installs everything (including Django

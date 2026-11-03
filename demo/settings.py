@@ -119,14 +119,6 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en'
 
-# widgy_i18n stores language codes in a 2-character field, so keep the
-# demo to two-letter codes rather than Django's full default list.
-LANGUAGES = [
-    ('en', 'English'),
-    ('es', 'Spanish'),
-    ('fr', 'French'),
-]
-
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
