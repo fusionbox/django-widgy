@@ -34,8 +34,8 @@ jobs:
       fail-fast: false
       matrix:
         db: [sqlite, postgres, mysql]
-        python-version: ["3.9", "3.10"]
-        django-version: [3.2]
+        python-version: ["3.12"]
+        django-version: [4.2]
         include:
           - db: sqlite
             db_url: sqlite:///test_db.sqlite3
