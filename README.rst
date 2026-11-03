@@ -59,12 +59,6 @@ Running the Tests
 ``make test`` will run both the JavaScript and Python tests. To test one
 or the other, use ``make test-js`` or ``make test-py``.
 
-::
-
-    $ tox
-
-``$ tox`` will run the full test suite across all of the supported versions of
-Django and Python.
 
 Coverage
 ********

@@ -24,7 +24,7 @@ None of that should error. Everything else is out of scope for now.
 ## Post-upgrade cleanups
 
 * widgy_i18n I18NChild.language_code needs to be longer than max_length=2.
-* sorl.thumbnail and django-filer thumbnail are redundant, amke some
+* sorl.thumbnail and django-filer thumbnail are redundant, makeke some
   kind of decision there.
 * The Github action recipe now installs everything (including Django
   and the widgy project itself) from the requirements-test.txt
@@ -32,3 +32,8 @@ None of that should error. Everything else is out of scope for now.
   Django version is currently a no-op. When we re-add multiple Django
   versions into the matrix the Django dependency may have to be broken
   back out of the requirements file.
+* Correlary to the above: tox was originally used to replicate
+  Github's multi-version testing in the local environment. Since we
+  don't currently support multiple versions, and it could be a while
+  before we do, the tox setup has been removed pending future
+  re-evaluation.

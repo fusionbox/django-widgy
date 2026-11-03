@@ -19,7 +19,7 @@ test-js: js_tests/node_modules
 	node -v
 	cd js_tests && npm test tests
 
-widgy/locale/en/LC_MESSAGES/django.po: $(shell find . -type f -iregex '.*\.\(html\|py\|md\)$$' | grep -v .tox)
+widgy/locale/en/LC_MESSAGES/django.po: $(shell find . -type f -iregex '.*\.\(html\|py\|md\)$$')
 
 	cd widgy && django-admin.py makemessages -l en
 
