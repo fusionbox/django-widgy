@@ -2,7 +2,6 @@ import shutil
 import os
 
 import pytest
-import six
 
 # This is here instead of pytest.ini because it can't be overridden from the
 # environ if specified there.
@@ -12,11 +11,7 @@ from django.conf import settings
 
 
 def teardown_assets_directory():
-    # Removing the temporary TEMP_DIR. Ensure we pass in unicode
-    # so that it will successfully remove temp trees containing
-    # non-ASCII filenames on Windows. (We're assuming the temp dir
-    # name itself does not contain non-ASCII characters.)
-    shutil.rmtree(six.text_type(settings.TEMP_DIR))
+    shutil.rmtree(settings.TEMP_DIR)
 
 
 @pytest.fixture(scope="session", autouse=True)

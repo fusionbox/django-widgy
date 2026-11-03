@@ -1,7 +1,7 @@
 import copy
 from operator import or_
 import itertools
-from six.moves import reduce
+from functools import reduce
 
 from django.db import models
 from django.db.models.fields import Field

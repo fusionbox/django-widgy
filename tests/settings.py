@@ -1,9 +1,6 @@
 import os
-import sys
 import dj_database_url
 import tempfile
-
-import six
 
 DATABASES = {'default': dj_database_url.config(default='sqlite:///test_db.sqlite3')}
 
@@ -43,17 +40,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 TESTING = False
 SITE_ID = 1
 
-
-def upath(path):
-    """
-    Always return a unicode path.
-    """
-    if not six.PY3:
-        fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
-        return path.decode(fs_encoding)
-    return path
-
-RUNTESTS_DIR = os.path.dirname(upath(__file__))
+RUNTESTS_DIR = os.path.dirname(__file__)
 TEST_TEMPLATE_DIR = 'templates'
 
 # This directory is removed by /conftest.py

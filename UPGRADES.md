@@ -17,5 +17,4 @@ None of that should error. Everything else is out of scope for now.
 
 ## Post-upgrade cleanups
 
-* Remove six
 * widgy_i18n I18NChild.language_code needs to be longer than max_length=2.

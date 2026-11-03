@@ -1,4 +1,4 @@
-from six.moves import zip_longest
+from itertools import zip_longest
 
 from django.test import TestCase
 from django.db import models

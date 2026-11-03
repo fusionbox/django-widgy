@@ -1,5 +1,3 @@
-import six
-
 from django.db import models
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
@@ -10,7 +8,7 @@ from widgy.utils import fancy_import, update_context
 
 
 def get_site(site):
-    if isinstance(site, six.string_types):
+    if isinstance(site, str):
         return fancy_import(site)
     else:
         return site

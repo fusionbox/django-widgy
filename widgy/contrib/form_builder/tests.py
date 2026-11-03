@@ -5,7 +5,7 @@ import unittest
 import uuid
 import os.path
 
-from six.moves import StringIO
+from io import StringIO
 
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory

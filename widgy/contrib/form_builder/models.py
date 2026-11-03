@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
 import csv
-import urllib
 import base64
 import hashlib
 import os.path
-import six
+from urllib.parse import urlencode
+from urllib.request import urlopen
 import uuid
 import copy
 from collections import OrderedDict
@@ -122,8 +122,8 @@ class RepostHandler(BaseMappingHandler):
         abstract = True
 
     def execute(self, request, form):
-        query_string = six.moves.urllib.parse.urlencode(self.get_mapping(request, form)).encode('ascii')
-        six.moves.urllib.request.urlopen(self.url_to_post, query_string)
+        query_string = urlencode(self.get_mapping(request, form)).encode('ascii')
+        urlopen(self.url_to_post, query_string)
 
 
 class MappingValue(FormElement):
@@ -1000,20 +1000,10 @@ class FormSubmission(models.Model):
 
             writer = csv.DictWriter(output, list(headers))
 
-            # python2 csv expects bytes, but python3's works in unicode
-            if six.PY2:
-                def encode(d):
-                    return dict(
-                        (k, force_bytes(v)) for k, v in d.items()
-                    )
-            else:
-                def encode(d):
-                    return d
-
-            writer.writerow(encode(headers))
+            writer.writerow(headers)
 
             for row in values:
-                writer.writerow(encode(row))
+                writer.writerow(row)
 
         def submit(self, form, data):
             submission = self.create(

@@ -440,7 +440,6 @@ dependencies = [
     { name = "mezzanine" },
     { name = "phonenumbers" },
     { name = "pyscss" },
-    { name = "six" },
     { name = "sorl-thumbnail" },
 ]
 
@@ -474,7 +473,6 @@ requires-dist = [
     { name = "mezzanine", specifier = ">=6.1.1" },
     { name = "phonenumbers", specifier = ">=9.0.42" },
     { name = "pyscss", git = "https://github.com/Kronuz/pyScss.git" },
-    { name = "six", specifier = ">=1.17.0" },
     { name = "sorl-thumbnail", specifier = "==12.10.0" },
 ]
 

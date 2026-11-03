@@ -29,7 +29,6 @@ def read(fname):
 install_requires = [
     'django-treebeard',
     'django-pyscss>=2.0.0',
-    'six',
     'django-compressor>=1.3',
     'beautifulsoup4',
     'Django>=3.1,<3.3',

@@ -1,4 +1,4 @@
-from six.moves import http_client
+from http import client as http_client
 from unittest import skipUnless, skip
 
 from django.test import TestCase, override_settings

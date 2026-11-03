@@ -2,8 +2,6 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-import six
-
 
 class DefaultChildrenMixin(object):
     """
@@ -123,7 +121,7 @@ def DisplayNameMixin(fn):
 
 
 TitleDisplayNameMixin = DisplayNameMixin(attrgetter('title'))
-StrDisplayNameMixin = DisplayNameMixin(six.text_type)
+StrDisplayNameMixin = DisplayNameMixin(str)
 
 # for migration serialization
 TitleDisplayNameMixin.__name__ = str('TitleDisplayNameMixin')

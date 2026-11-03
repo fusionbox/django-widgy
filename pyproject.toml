@@ -24,7 +24,6 @@ dependencies = [
     "mezzanine>=6.1.1",
     "phonenumbers>=9.0.42",
     "pyscss",
-    "six>=1.17.0",
     "sorl-thumbnail==12.10.0",
 ]
 

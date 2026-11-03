@@ -2,10 +2,9 @@
 Some utility functions used throughout the project.
 """
 import warnings
-from six.moves import filterfalse
+from itertools import filterfalse
 from contextlib import contextmanager
 from functools import wraps
-import six
 
 import bs4
 
@@ -117,7 +116,7 @@ def html_to_plaintext(html):
             pass
         else:
             for c in node.children:
-                if isinstance(c, six.string_types):
+                if isinstance(c, str):
                     if not isinstance(c, bs4.Comment):
                         yield c.strip()
                 elif isinstance(c, bs4.Tag):
