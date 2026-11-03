@@ -26,3 +26,9 @@ None of that should error. Everything else is out of scope for now.
 * widgy_i18n I18NChild.language_code needs to be longer than max_length=2.
 * sorl.thumbnail and django-filer thumbnail are redundant, amke some
   kind of decision there.
+* The Github action recipe now installs everything (including Django
+  and the widgy project itself) from the requirements-test.txt
+  file. Because Django is installed from there, the strategy.matrix
+  Django version is currently a no-op. When we re-add multiple Django
+  versions into the matrix the Django dependency may have to be broken
+  back out of the requirements file.

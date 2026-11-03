@@ -1,11 +1,34 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "django-widgy"
-version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
+version = "0.10.0"
+description = "A CMS framework for Django built on a heterogenous tree editor."
+readme = "README.rst"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 authors = [
+    { name = "Fusionbox, Inc.", email = "programmers@fusionbox.com" },
+]
+maintainers = [
     { email = "gwahl@fusionbox.com" },
-    { email = "eabrahamsen@fusionbox.com" }
+    { email = "eabrahamsen@fusionbox.com" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Intended Audience :: Developers",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Internet :: WWW/HTTP :: Site Management",
+    "Natural Language :: English",
+    "Programming Language :: JavaScript",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
 ]
 requires-python = ">=3.12"
 dependencies = [
@@ -27,8 +50,21 @@ dependencies = [
     "sorl-thumbnail==12.10.0",
 ]
 
-[project.scripts]
-django-widgy = "django_widgy:main"
+[project.urls]
+Homepage = "http://docs.wid.gy/"
+Source = "https://github.com/fusionbox/django-widgy"
+
+# Every contrib app's requirements are now hard dependencies. The extras are
+# kept as empty aliases so that `pip install django-widgy[all]` and the
+# per-app spellings used in older docs and tox.ini keep working.
+[project.optional-dependencies]
+all = []
+widgy_mezzanine = []
+page_builder = []
+form_builder = []
+
+[tool.setuptools.packages.find]
+include = ["widgy*"]
 
 [dependency-groups]
 dev = [
@@ -45,7 +81,6 @@ demo = [
 
 # Redundant with Makefile test-py target
 [tool.pytest]
-
 DJANGO_SETTINGS_MODULE = "tests.settings_contrib"
 
 [tool.uv.sources]

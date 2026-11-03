@@ -422,8 +422,8 @@ wheels = [
 
 [[package]]
 name = "django-widgy"
-version = "0.1.0"
-source = { virtual = "." }
+version = "0.10.0"
+source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "bleach" },
@@ -475,6 +475,7 @@ requires-dist = [
     { name = "pyscss", git = "https://github.com/Kronuz/pyScss.git" },
     { name = "sorl-thumbnail", specifier = "==12.10.0" },
 ]
+provides-extras = ["all", "widgy-mezzanine", "page-builder", "form-builder"]
 
 [package.metadata.requires-dev]
 demo = [
