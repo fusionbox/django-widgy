@@ -1,6 +1,10 @@
-# Notes on attempting to upgrade to Python 3.14 and Django 5.2
+# Notes on attempting to upgrade to Python and Django
 
 ## Initial Premise
+
+I thought we'd be able to go straight to Django 5.2 and Python 3.14,
+but we're currently stuck at Django 4.2 and Python 3.12, pending
+updates of the Mezzanine dependency.
 
 We're going to start by ignoring everything in this repository except
 what's required to load the basic Python packages, to start with, and
@@ -8,7 +12,7 @@ then run local tests. This means we're disregarding Github, and Tox,
 and Javascript, and what's in the ./demo folder. The steps to success
 should look like:
 
-1. Have python3.14 available
+1. Have python3.12 available
 2. Create a virtual environment
 3. Install packages from pyproject.toml
 4. `pytest`
