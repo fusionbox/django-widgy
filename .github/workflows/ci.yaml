@@ -45,10 +45,10 @@ jobs:
             db_url: mysql://root:mysql@127.0.0.1:3306/widgy
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
 
