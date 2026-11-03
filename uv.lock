@@ -446,11 +446,11 @@ dependencies = [
 [package.dev-dependencies]
 demo = [
     { name = "django-contrib-comments" },
-    { name = "django-debug-toolbar" },
-    { name = "django-extensions" },
     { name = "werkzeug" },
 ]
 dev = [
+    { name = "django-debug-toolbar" },
+    { name = "django-extensions" },
     { name = "pytest" },
     { name = "pytest-django" },
     { name = "python-lsp-server" },
@@ -479,11 +479,11 @@ requires-dist = [
 [package.metadata.requires-dev]
 demo = [
     { name = "django-contrib-comments" },
-    { name = "django-debug-toolbar" },
-    { name = "django-extensions" },
     { name = "werkzeug" },
 ]
 dev = [
+    { name = "django-debug-toolbar" },
+    { name = "django-extensions" },
     { name = "pytest", specifier = ">=9.2.0" },
     { name = "pytest-django", specifier = ">=4.14.0" },
     { name = "python-lsp-server", specifier = ">=1.15.0" },

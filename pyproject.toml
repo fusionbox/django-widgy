@@ -34,12 +34,12 @@ django-widgy = "django_widgy:main"
 dev = [
     "pytest>=9.2.0",
     "pytest-django>=4.14.0",
+    "django-debug-toolbar",
+    "django-extensions",
     "python-lsp-server>=1.15.0",
 ]
 demo = [
     "werkzeug",
-    "django-debug-toolbar",
-    "django-extensions",
     "django-contrib-comments",
 ]
 
