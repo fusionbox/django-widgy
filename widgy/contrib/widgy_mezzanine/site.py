@@ -5,7 +5,7 @@ from widgy.models import Content
 class MultiSitePermissionMixin(object):
     def _can_edit_content(self, request, obj):
         if isinstance(obj, Content):
-            owners = obj.get_root().node.versiontracker_set.get().owners
+            owners = obj.get_root().node.versiontracker.owners
             any_owner_in_current_site = any(current_site_id() == o.site_id for o in owners)
             return has_site_permission(request.user) and any_owner_in_current_site
         else:

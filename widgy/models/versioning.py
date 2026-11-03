@@ -41,8 +41,8 @@ class VersionCommit(models.Model):
 class VersionTracker(models.Model):
     commit_model = VersionCommit
 
-    head = models.ForeignKey('VersionCommit', null=True, on_delete=models.PROTECT, unique=True)
-    working_copy = models.ForeignKey(Node, on_delete=models.PROTECT, unique=True)
+    head = models.OneToOneField('VersionCommit', null=True, on_delete=models.PROTECT)
+    working_copy = models.OneToOneField(Node, on_delete=models.PROTECT)
 
     class Meta:
         app_label = 'widgy'
