@@ -137,8 +137,6 @@ six==1.17.0
     # via
     #   html5lib
     #   pyscss
-sorl-thumbnail==12.10.0
-    # via django-widgy
 soupsieve==3.0.4
     # via beautifulsoup4
 sqlparse==0.6.1

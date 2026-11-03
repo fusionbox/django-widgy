@@ -17,8 +17,6 @@ The steps to success should look like:
 
 ## Post-upgrade cleanups and questions
 
-* sorl.thumbnail and django-filer thumbnail are redundant, makeke some
-  kind of decision there.
 * The Github action recipe now installs everything (including Django
   and the widgy project itself) from the requirements-test.txt
   file. Because Django is installed from there, the strategy.matrix

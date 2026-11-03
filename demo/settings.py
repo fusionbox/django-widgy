@@ -51,7 +51,6 @@ INSTALLED_APPS = (
     'easy_thumbnails',
     'compressor',
     'scss',
-    'sorl.thumbnail',
     'debug_toolbar',
     'django_extensions',
 
@@ -81,11 +80,6 @@ SITE_ID = 1
 
 # Match the AutoField primary keys in the existing migrations.
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
-
-# easy_thumbnails (required by django-filer) and sorl.thumbnail both ship a
-# template tag library named 'thumbnail'. widgy never loads the bare name;
-# it uses its own thumbnail_libs module, so the ambiguity is harmless.
-SILENCED_SYSTEM_CHECKS = ['templates.E003']
 
 DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.versions.VersionsPanel',

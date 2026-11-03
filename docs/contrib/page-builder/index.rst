@@ -13,7 +13,7 @@ Page builder depends on the following packages:
 * django-filer
 * markdown
 * bleach
-* sorl-thumbnail
+* easy-thumbnails
 
 You can install them manually, or you can install them using the django-widgy
 package::

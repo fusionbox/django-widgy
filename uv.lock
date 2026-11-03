@@ -440,7 +440,6 @@ dependencies = [
     { name = "mezzanine" },
     { name = "phonenumbers" },
     { name = "pyscss" },
-    { name = "sorl-thumbnail" },
 ]
 
 [package.dev-dependencies]
@@ -473,7 +472,6 @@ requires-dist = [
     { name = "mezzanine", specifier = ">=6.1.1" },
     { name = "phonenumbers", specifier = ">=9.0.42" },
     { name = "pyscss", git = "https://github.com/Kronuz/pyScss.git" },
-    { name = "sorl-thumbnail", specifier = "==12.10.0" },
 ]
 provides-extras = ["all", "widgy-mezzanine", "page-builder", "form-builder"]
 
@@ -1117,15 +1115,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031, upload-time = "2024-12-04T17:35:28.174Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050, upload-time = "2024-12-04T17:35:26.475Z" },
-]
-
-[[package]]
-name = "sorl-thumbnail"
-version = "12.10.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/cb/84/96a5915a42a8f1c189131da2f40638bd85c5bfc87937417a4e4ae81f33ca/sorl-thumbnail-12.10.0.tar.gz", hash = "sha256:de95a49217fdfeced222fa3ceaa01d312ee2f8aad56ba34d6c70f2dee9a84938", size = 665255, upload-time = "2023-10-05T09:31:54.339Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/0f/3d/464f51555b21e22ef656d0d855718d9729785c8bad6420f8e0620968bf02/sorl_thumbnail-12.10.0-py3-none-any.whl", hash = "sha256:733eb2eee392d4a874f88fb3ed6f0572fa9c361b06e0411b83e435ba69c51f52", size = 41802, upload-time = "2023-10-05T09:31:20.662Z" },
 ]
 
 [[package]]

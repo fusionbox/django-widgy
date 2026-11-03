@@ -36,7 +36,6 @@ add required Widgy apps to ``INSTALLED_APPS``::
         'filer',
         'easy_thumbnails',
         'compressor',
-        'sorl.thumbnail',
 
 
 ``django.contrib.admin`` should be installed after Mezzanine and Widgy,

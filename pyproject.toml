@@ -47,7 +47,6 @@ dependencies = [
     "mezzanine>=6.1.1",
     "phonenumbers>=9.0.42",
     "pyscss",
-    "sorl-thumbnail==12.10.0",
 ]
 
 [project.urls]

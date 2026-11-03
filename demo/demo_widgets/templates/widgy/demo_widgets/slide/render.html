@@ -1,7 +1,8 @@
 {% load thumbnail_libs %}
 {% load widgy_tags %}
 
-<div class="slide" {% sorl_thumbnail self.background_image.file "640x300" as im %} style="background-image: url('{{ im.url }}')" {% endthumbnail %}>
+{% easy_thumbnail self.background_image.file 640x300 as im %}
+<div class="slide" {% if im %}style="background-image: url('{{ im.url }}')"{% endif %}>
 
   <h1>{{ self.tagline }}</h1>
 
