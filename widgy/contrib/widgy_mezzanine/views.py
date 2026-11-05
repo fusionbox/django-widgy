@@ -11,6 +11,7 @@ from django.http import (
     HttpResponseRedirect,
 )
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.module_loading import import_string
 from django.contrib.admin.utils import unquote
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, render
@@ -27,7 +28,7 @@ from widgy.contrib.form_builder.views import HandleFormMixin
 from widgy.contrib.widgy_mezzanine import get_widgypage_model
 from widgy.models import Node
 from widgy.views.base import AuthorizedMixin
-from widgy.utils import fancy_import, unset_pks
+from widgy.utils import unset_pks
 
 WidgyPage = get_widgypage_model()
 
@@ -143,7 +144,7 @@ class PreviewView(AuthorizedMixin, SingleObjectMixin, PageViewMixin, View):
         return self.page_view(request, page, context)
 
 preview = PreviewView.as_view(
-    site=fancy_import(settings.WIDGY_MEZZANINE_SITE),
+    site=import_string(settings.WIDGY_MEZZANINE_SITE),
 )
 
 

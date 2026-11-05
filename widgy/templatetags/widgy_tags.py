@@ -2,11 +2,12 @@ from django import template
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.contrib.contenttypes.models import ContentType
+from django.utils.module_loading import import_string
 
 import bleach
 from bleach_allowlist import markdown_tags, markdown_attrs
 
-from widgy.utils import fancy_import, update_context
+from widgy.utils import update_context
 
 register = template.Library()
 
@@ -23,7 +24,7 @@ def scss_files(site):
     except AttributeError:
         pass
 
-    site = fancy_import(site)
+    site = import_string(site)
 
     return site.scss_files
 
@@ -35,7 +36,7 @@ def js_files(site):
     except AttributeError:
         pass
 
-    site = fancy_import(site)
+    site = import_string(site)
 
     return site.js_files
 

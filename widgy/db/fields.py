@@ -3,13 +3,14 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import SimpleLazyObject
 from django.db.models.fields.related import ForwardManyToOneDescriptor
+from django.utils.module_loading import import_string
 
-from widgy.utils import fancy_import, update_context
+from widgy.utils import update_context
 
 
 def get_site(site):
     if isinstance(site, str):
-        return fancy_import(site)
+        return import_string(site)
     else:
         return site
 

@@ -17,6 +17,7 @@ from django.http.request import QueryDict
 from django.contrib.auth import get_user_model
 from django.utils.html import format_html
 from django.utils.encoding import force_str, force_bytes
+from django.utils.module_loading import import_string
 
 
 def deprecate(fn):
@@ -68,12 +69,15 @@ def exception_to_bool(fn, exception=Exception):
 
 def fancy_import(name):
     """
-    This takes a fully qualified object name, like 'accounts.models.ProxyUser'
-    and turns it into the accounts.models.ProxyUser object.
+    Deprecated. Use django.utils.module_loading.import_string instead.
     """
-    import_path, import_me = name.rsplit('.', 1)
-    imported = __import__(import_path, globals(), locals(), [import_me])
-    return getattr(imported, import_me)
+    warnings.warn(
+        "widgy.utils.fancy_import is deprecated. Use "
+        "django.utils.module_loading.import_string instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return import_string(name)
 
 
 @contextmanager
