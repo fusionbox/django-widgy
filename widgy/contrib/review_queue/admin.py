@@ -4,7 +4,7 @@ from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _, ngettext
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.encoding import force_str
@@ -112,14 +112,14 @@ class VersionCommitAdminBase(AuthorizedAdminMixin, ModelAdmin):
     commit_name.short_description = _("Commit name")
 
     def commit_preview(self, commit):
-        res = []
-        for owner in commit.tracker.owners:
-            if hasattr(owner, 'get_action_links'):
-                for link in owner.get_action_links(commit.root_node):
-                    res.append(format_html('<a href="{url}">{text}</a>', **link))
-        return ' '.join(res)
+        links = (
+            (link['url'], link['text'])
+            for owner in commit.tracker.owners
+            if hasattr(owner, 'get_action_links')
+            for link in owner.get_action_links(commit.root_node)
+        )
+        return format_html_join(' ', '<a href="{}">{}</a>', links)
     commit_preview.short_description = ''
-    commit_preview.allow_tags = True
 
     def preview(self, commit):
         context = {
