@@ -1,0 +1,98 @@
+/*
+ * Common SCSS File - SCSS v1.0
+ * last edited 02/17/12
+ * @author Justin Stollsteimer - Fusionbox, Inc.
+ * http://www.fusionbox.com
+ *
+ *
+ * Lists: Line
+ * HR: Line
+ * Table: Line
+ * Form Elements: Line
+ *
+ */
+/* SASS Mixins
+--------------------------------------------------*/
+/* Variables
+-----------------------------------------------*/
+.form-row .layoutSelect {
+  display: inline;
+  float: left;
+  width: auto;
+}
+.form-row .layoutSelect ul {
+  display: inline;
+  float: left;
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+  width: auto;
+}
+.form-row .layoutSelect ul li h1, .form-row .layoutSelect ul li h2, .form-row .layoutSelect ul li h3, .form-row .layoutSelect ul li h4, .form-row .layoutSelect ul li h5, .form-row .layoutSelect ul li h6, .form-row .layoutSelect ul li p, .form-row .layoutSelect ul li blockquote, .form-row .layoutSelect ul li ol, .form-row .layoutSelect ul li ul, .form-row .layoutSelect ul li hgroup, .form-row .layoutSelect ul li hr {
+  display: block !important;
+  float: none !important;
+  margin: 0px 0px 15px 0px !important;
+  width: auto !important;
+}
+.form-row .layoutSelect ul li .fl {
+  float: left;
+  margin: 0px 25px 15px 0px;
+}
+.form-row .layoutSelect ul li .fr {
+  float: right;
+  margin: 0px 0px 15px 25px;
+}
+.form-row .layoutSelect ul li img {
+  border-radius: 2px;
+  -o-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+}
+.form-row .layoutSelect ul li img.left {
+  float: left;
+  margin: 5px 20px 15px 0px;
+}
+.form-row .layoutSelect ul li img.right {
+  float: right;
+  margin: 5px 0px 15px 20px;
+}
+.form-row .layoutSelect ul li table {
+  display: table;
+  width: 100% !important;
+}
+.form-row .layoutSelect ul li {
+  display: inline;
+  float: left;
+  height: auto;
+  margin: 0px 10px 0px 0px;
+  padding: 10px;
+  text-align: center;
+  width: 110px;
+}
+.form-row .layoutSelect ul li label {
+  display: block;
+  float: none;
+  margin: 0px;
+  padding: 0px;
+  width: auto;
+}
+.form-row .layoutSelect ul li div.previewImage {
+  border-radius: 4px;
+  -o-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  background: url("../image/layout-sprite.png") no-repeat 0px -400px;
+  border: 1px solid #cccccc;
+  height: 100px;
+}
+.form-row .layoutSelect ul li div.previewImage.defaultlayout {
+  background-position: 0px 0px;
+}
+.form-row .layoutSelect ul li input {
+  margin: 5px auto;
+}
+.form-row .layoutSelect ul li span.label {
+  display: block;
+}

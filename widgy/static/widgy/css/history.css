@@ -1,0 +1,251 @@
+/*
+ * Common SCSS File - SCSS v1.0
+ * last edited 02/17/12
+ * @author Justin Stollsteimer - Fusionbox, Inc.
+ * http://www.fusionbox.com
+ *
+ *
+ * Lists: Line
+ * HR: Line
+ * Table: Line
+ * Form Elements: Line
+ *
+ */
+/* SASS Mixins
+--------------------------------------------------*/
+/* Variables
+-----------------------------------------------*/
+section.main ol.history li form input.button[type=submit].loading, section.main ol.history li a.loading {
+  background: url("../../widgy/image/loading.gif") center no-repeat !important;
+  color: transparent !important;
+}
+
+/* History/Basic Page Styles
+--------------------------------------------------*/
+section.main:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html section.main {
+  height: 1px;
+}
+section.main {
+  display: inline;
+  float: left;
+  height: auto;
+  width: 100%;
+}
+section.main h1, section.main h2, section.main h3, section.main h4, section.main h5, section.main h6, section.main p, section.main blockquote, section.main ol, section.main ul, section.main hgroup, section.main hr {
+  display: block !important;
+  float: none !important;
+  margin: 0px 0px 15px 0px !important;
+  width: auto !important;
+}
+section.main .fl {
+  float: left;
+  margin: 0px 25px 15px 0px;
+}
+section.main .fr {
+  float: right;
+  margin: 0px 0px 15px 25px;
+}
+section.main img {
+  border-radius: 2px;
+  -o-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+}
+section.main img.left {
+  float: left;
+  margin: 5px 20px 15px 0px;
+}
+section.main img.right {
+  float: right;
+  margin: 5px 0px 15px 20px;
+}
+section.main table {
+  display: table;
+  width: 100% !important;
+}
+section.main ol.history {
+  list-style: none;
+  padding: 0px !important;
+}
+section.main ol.history li {
+  background-color: #eeeeee;
+  background-image: -o-linear-gradient(center bottom, #eeeeee 1%, #fafafa 100%);
+  background-image: -ms-linear-gradient(center bottom, #eeeeee 1%, #fafafa 100%);
+  background-image: -moz-linear-gradient(center bottom, #eeeeee 1%, #fafafa 100%);
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, #eeeeee), color-stop(1, #fafafa));
+  border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.3);
+  -ms-box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.3);
+}
+section.main ol.history li:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html section.main ol.history li {
+  height: 1px;
+}
+section.main ol.history li {
+  margin: 0px 0px 15px 0px;
+  padding: 0px;
+}
+section.main ol.history li div.top {
+  border-bottom: 1px solid #cccccc;
+  display: block;
+  float: none;
+  height: auto;
+  line-height: 26px;
+  margin: 0px !important;
+  padding: 5px 10px 5px 10px;
+  width: auto;
+}
+section.main ol.history li div.top div.actions {
+  float: right;
+}
+section.main ol.history li a {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  background: transparent;
+  border: 1px solid #309BBF;
+  color: #309BBF;
+  display: inline-block;
+  height: auto;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 18px;
+  padding: 4px 8px;
+  width: auto;
+}
+section.main ol.history li a:hover {
+  background-color: rgb(71.0107473952%, 87.2507999016%, 92.7147428009%);
+  color: #309BBF;
+}
+section.main ol.history li a.cancel {
+  border-color: #999999;
+  color: #999999;
+}
+section.main ol.history li a.cancel:hover {
+  background: rgb(88.3333333333%, 88.3333333333%, 88.3333333333%);
+}
+section.main ol.history li a.delete {
+  border-color: #BF3030;
+  color: #BF3030;
+}
+section.main ol.history li a.delete:hover {
+  background: rgb(92.7147428009%, 71.0107473952%, 71.0107473952%);
+}
+section.main ol.history li a[type=submit] {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-color: #559911;
+  color: #559911;
+  height: auto;
+  font-weight: bold;
+  line-height: 16px;
+  padding: 5px !important;
+  position: relative;
+  top: -1px;
+}
+section.main ol.history li a[type=submit]:hover {
+  background: rgb(83.3333333333%, 96.6666666667%, 70%);
+}
+section.main ol.history li form {
+  display: inline;
+}
+section.main ol.history li form input.button[type=submit] {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  background: transparent;
+  border: 1px solid #309BBF;
+  color: #309BBF;
+  display: inline-block;
+  height: auto;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 18px;
+  padding: 4px 8px;
+  width: auto;
+}
+section.main ol.history li form input.button[type=submit]:hover {
+  background-color: rgb(71.0107473952%, 87.2507999016%, 92.7147428009%);
+  color: #309BBF;
+}
+section.main ol.history li form input.button[type=submit].cancel {
+  border-color: #999999;
+  color: #999999;
+}
+section.main ol.history li form input.button[type=submit].cancel:hover {
+  background: rgb(88.3333333333%, 88.3333333333%, 88.3333333333%);
+}
+section.main ol.history li form input.button[type=submit].delete {
+  border-color: #BF3030;
+  color: #BF3030;
+}
+section.main ol.history li form input.button[type=submit].delete:hover {
+  background: rgb(92.7147428009%, 71.0107473952%, 71.0107473952%);
+}
+section.main ol.history li form input.button[type=submit][type=submit] {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-color: #559911;
+  color: #559911;
+  height: auto;
+  font-weight: bold;
+  line-height: 16px;
+  padding: 5px !important;
+  position: relative;
+  top: -1px;
+}
+section.main ol.history li form input.button[type=submit][type=submit]:hover {
+  background: rgb(83.3333333333%, 96.6666666667%, 70%);
+}
+section.main ol.history li form input.button[type=submit].unapprove {
+  border-color: #BF3030;
+  color: #BF3030;
+}
+section.main ol.history li form input.button[type=submit].unapprove:hover {
+  background: rgb(92.7147428009%, 71.0107473952%, 71.0107473952%);
+}
+section.main ol.history li blockquote {
+  border: 0px;
+  margin: 0px;
+  padding: 5px 10px 5px 10px;
+}
+section.main ol.history li blockquote p {
+  margin: 0px !important;
+}
+
+/* Message List Form Fix
+--------------------------------------------------*/
+ul.messagelist li form {
+  display: inline;
+}

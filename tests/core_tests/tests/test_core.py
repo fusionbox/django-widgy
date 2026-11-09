@@ -1202,6 +1202,44 @@ class TestSite(TestCase):
 
         self.assertNotIn('widgy/models/content.scss', files)
 
+    def test_css_files(self):
+        files = self.widgy_site.css_files
+        self.assertIn('widgy/core_tests/compressorwidget.css', files)
+        self.assertIn('widgy/core_tests/manytomanywidget.css', files)
+        self.assertNotIn('widgy/core_tests/compressorwidget.admin.css', files)
+        self.assertNotIn('widgy/models/content.css', files)
+
+    def test_admin_css_files(self):
+        files = self.widgy_site.admin_css_files
+        self.assertIn('widgy/core_tests/compressorwidget.admin.css', files)
+        self.assertIn('widgy/core_tests/manytomanywidget.admin.css', files)
+        self.assertNotIn('widgy/core_tests/compressorwidget.css', files)
+
+    def test_scss_files_unchanged_for_old_templates(self):
+        # Templates written before widgy shipped CSS loop over scss_files
+        # alone, so it must keep returning .scss files that have a .css twin.
+        self.assertIn('widgy/core_tests/manytomanywidget.scss',
+                      self.widgy_site.scss_files)
+        self.assertIn('widgy/core_tests/manytomanywidget.admin.scss',
+                      self.widgy_site.admin_scss_files)
+        self.assertIn('widgy/page_builder/accordion.scss', self.widgy_site.scss_files)
+
+    def test_uncompiled_scss_files(self):
+        # A .scss with a compiled .css next to it is served as CSS only.
+        files = self.widgy_site.uncompiled_scss_files
+        self.assertIn('widgy/core_tests/rawtextwidget.scss', files)
+        self.assertNotIn('widgy/core_tests/manytomanywidget.scss', files)
+        files = self.widgy_site.admin_uncompiled_scss_files
+        self.assertIn('widgy/core_tests/rawtextwidget.admin.scss', files)
+        self.assertNotIn('widgy/core_tests/manytomanywidget.admin.scss', files)
+
+    def test_widgy_ships_no_uncompiled_scss(self):
+        # Widgy's own widgets must not require a SCSS precompiler.
+        for files in (self.widgy_site.uncompiled_scss_files,
+                      self.widgy_site.admin_uncompiled_scss_files):
+            self.assertEqual(
+                [f for f in files if not f.startswith('widgy/core_tests/')], [])
+
 
 class TestFindProblems(RootNodeTestCase):
     widgy_site = widgy_site

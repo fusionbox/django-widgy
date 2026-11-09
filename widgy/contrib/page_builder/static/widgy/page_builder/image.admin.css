@@ -1,0 +1,24 @@
+.widgy .node.image .widget_editor .formField.image {
+  position: relative;
+}
+.widgy .node.image .widget_editor .formField.image label {
+  display: none;
+}
+.widgy .node.image .widget_editor .formField.image a img {
+  float: left;
+  margin-right: 10px;
+}
+.widgy .node.image .widget_editor .formField.image span {
+  float: left;
+}
+.widgy .node.image .widget_editor .formField.image a.related-lookup {
+  position: absolute;
+  height: 10px;
+  left: 53px;
+  top: 25px;
+}
+.widgy .node.image .widget_editor .formField.image input {
+  float: left;
+  margin-top: 6px;
+  width: 86%;
+}

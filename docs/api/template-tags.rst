@@ -19,13 +19,15 @@ Example:
       {% render child %}
     {% endfor %}
 
+.. function:: css_files(site)
+.. function:: uncompiled_scss_files(site)
 .. function:: scss_files(site)
 .. function:: js_files(site)
 
-These template tags provide a way to extract the :attr:`WidgySite.scss_files
-<widgy.site.WidgySite.scss_files>` off of a site. This is required if you don't
-have access to the site in the context, but do have a reference to it in your
-settings file.  :func:`scss_files` and :func:`js_files` can also accept an
+These template tags provide a way to extract the :attr:`WidgySite.css_files
+<widgy.site.WidgySite.css_files>` (and the other file lists) off of a
+site. This is required if you don't have access to the site in the context,
+but do have a reference to it in your settings file. They can also accept an
 import path to the site.
 
 .. code-block:: html+django

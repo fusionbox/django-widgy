@@ -33,7 +33,7 @@
       
       div.previewImage {
         @include rounded(4px);
-        background: url('/static/widgy/image/layout-sprite.png') no-repeat 0px -400px;
+        background: url('../image/layout-sprite.png') no-repeat 0px -400px;
         border: 1px solid #cccccc;
         height: 100px;
         

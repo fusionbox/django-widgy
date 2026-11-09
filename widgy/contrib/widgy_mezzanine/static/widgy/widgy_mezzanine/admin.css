@@ -1,0 +1,21 @@
+/*
+ * Common SCSS File - SCSS v1.0
+ * last edited 02/17/12
+ * @author Justin Stollsteimer - Fusionbox, Inc.
+ * http://www.fusionbox.com
+ *
+ *
+ * Lists: Line
+ * HR: Line
+ * Table: Line
+ * Form Elements: Line
+ *
+ */
+/* SASS Mixins
+--------------------------------------------------*/
+/* Variables
+-----------------------------------------------*/
+li.node.widgy_mezzanine.mezzaninecalloutwidget > span.title:before,
+li.shelfItem.widgy_mezzanine.mezzaninecalloutwidget > span.title:before {
+  background-image: url("../../widgy/image/widget-callout.png");
+}

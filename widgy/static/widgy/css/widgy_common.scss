@@ -205,14 +205,17 @@ $orange:      #FF9900;
 $inputFields: "input[type='text'], input[type='password'], input[type='email'], input[type='search'], input[type='number'], textarea";
 
 
+// $img is a path relative to the static root, e.g. "widgy/image/foo.png".
+// Compiled stylesheets live at <static>/widgy/<dir>/<file>.css, so "../../"
+// points back at the static root.
 @mixin node-icon ($class, $img) {
   &.#{$class} > span.title:before {
-    background-image: inline-image($img);
+    background-image: url("../../#{$img}");
   }
 }
 
 %loading {
-  background: inline-image('widgy/image/loading.gif') center no-repeat !important;
+  background: url("../../widgy/image/loading.gif") center no-repeat !important;
   color: transparent !important;
 }
 

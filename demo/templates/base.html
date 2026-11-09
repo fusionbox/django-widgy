@@ -19,8 +19,11 @@
   {% compress css %}
     {% block css %}
     <link rel="stylesheet" href="{% static 'css/reset.css' %}">
-    <link rel="stylesheet" href="{% static 'css/demo.scss' %}" type="text/x-scss">
-    {% for scss_file in 'WIDGY_MEZZANINE_SITE'|scss_files %}
+    <link rel="stylesheet" href="{% static 'css/demo.css' %}" type="text/css">
+    {% for css_file in 'WIDGY_MEZZANINE_SITE'|css_files %}
+    <link rel="stylesheet" href="{% static css_file %}" type="text/css">
+    {% endfor %}
+    {% for scss_file in 'WIDGY_MEZZANINE_SITE'|uncompiled_scss_files %}
     <link rel="stylesheet" href="{% static scss_file %}" type="text/x-scss">
     {% endfor %}
     {% endblock %}

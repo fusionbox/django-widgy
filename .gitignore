@@ -19,3 +19,4 @@ settings_local.py
 /htmlcov/
 js_tests/node_modules
 .pytest_cache/
+/node_modules/

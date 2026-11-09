@@ -35,5 +35,21 @@ t10n: widgy/locale/xx_pseudo/LC_MESSAGES/django.mo
 docs:
 	cd docs && $(MAKE) html
 
+# Stylesheets. Widgy ships compiled CSS (committed to the repo) so that
+# projects using it need no Sass compiler. See bin/build-css.mjs for the list
+# of entry points. Run `make css` after editing SCSS, and commit the result.
+node_modules: package.json
+	npm install --no-package-lock
+	touch $@
 
-.PHONY: test coverage browser test-py test-js docs
+css: node_modules
+	node bin/build-css.mjs
+
+# Fails if the committed CSS is out of date with the SCSS sources.
+css-check: css
+	git diff --exit-code -- '*.css'
+	@test -z "$$(git ls-files --others --exclude-standard -- '*.css')" || \
+		{ echo "Untracked compiled CSS; run make css and commit."; exit 1; }
+
+
+.PHONY: test coverage browser test-py test-js docs css css-check

@@ -1,0 +1,27 @@
+.cke_editable .align-left, .htmlOutput .align-left {
+  text-align: left;
+}
+.cke_editable .align-center, .htmlOutput .align-center {
+  text-align: center;
+}
+.cke_editable .align-right, .htmlOutput .align-right {
+  text-align: right;
+}
+.cke_editable .align-justify, .htmlOutput .align-justify {
+  text-align: justify;
+}
+.cke_editable .text-indent-1, .htmlOutput .text-indent-1 {
+  text-indent: 10px;
+}
+.cke_editable .text-indent-2, .htmlOutput .text-indent-2 {
+  text-indent: 20px;
+}
+.cke_editable .text-indent-3, .htmlOutput .text-indent-3 {
+  text-indent: 30px;
+}
+.cke_editable .text-indent-4, .htmlOutput .text-indent-4 {
+  text-indent: 40px;
+}
+.cke_editable .text-indent-5, .htmlOutput .text-indent-5 {
+  text-indent: 50px;
+}

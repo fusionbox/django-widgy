@@ -1,0 +1,245 @@
+/*
+ * Common SCSS File - SCSS v1.0
+ * last edited 02/17/12
+ * @author Justin Stollsteimer - Fusionbox, Inc.
+ * http://www.fusionbox.com
+ *
+ *
+ * Lists: Line
+ * HR: Line
+ * Table: Line
+ * Form Elements: Line
+ *
+ */
+/* SASS Mixins
+--------------------------------------------------*/
+/* Variables
+-----------------------------------------------*/
+.widgy .node.tableheader > .widget > .drag-row span.title, .widgy .node.tablerow > .widget > .drag-row span.title {
+  display: none;
+}
+.widgy .node.tableheader > .widget > .nodeChildren, .widgy .node.tablerow > .widget > .nodeChildren {
+  display: table;
+  width: 100%;
+}
+.widgy .node.tableheader > .widget > .nodeChildren > li, .widgy .node.tablerow > .widget > .nodeChildren > li {
+  display: table-cell;
+  width: auto;
+}
+.widgy .node.tableheader > .widget > .nodeChildren > li > .widget > .drag-row span.title, .widgy .node.tablerow > .widget > .nodeChildren > li > .widget > .drag-row span.title,
+.widgy .node.tableheader > .widget > .nodeChildren > li > .widget > .drag-row .delete span,
+.widgy .node.tablerow > .widget > .nodeChildren > li > .widget > .drag-row .delete span {
+  display: none;
+}
+.widgy .node.tableheader > .widget > .nodeChildren > li.node_drop_target, .widgy .node.tablerow > .widget > .nodeChildren > li.node_drop_target {
+  width: 50px;
+}
+
+.widgy .table {
+  overflow: visible;
+}
+.widgy .table > .widget > .nodeChildren {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.widgy .tableheaderdata, .widgy .tabledata {
+  min-width: 120px;
+}
+.widgy .tableheaderdata .nodeChildren, .widgy .tabledata .nodeChildren {
+  width: auto !important;
+}
+
+.widgy .table .invisibleBucket > .widget > .nodeChildren > .node_drop_target {
+  margin-left: 60px;
+  margin-right: 0;
+}
+.widgy .table .node.tablerow,
+.widgy .table .node.tableheader {
+  border: 0px;
+  padding: 0px 0px 0px 60px;
+  overflow: visible;
+}
+.widgy .table .node.tablerow > .widget > .nodeChildren,
+.widgy .table .node.tableheader > .widget > .nodeChildren {
+  border: 0px;
+}
+.widgy .table .node.tablerow > .widget > .nodeChildren > .tabledata,
+.widgy .table .node.tablerow > .widget > .nodeChildren > .node.tableheaderdata,
+.widgy .table .node.tableheader > .widget > .nodeChildren > .tabledata,
+.widgy .table .node.tableheader > .widget > .nodeChildren > .node.tableheaderdata {
+  border-radius: 0px;
+  -o-border-radius: 0px;
+  -ms-border-radius: 0px;
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+}
+.widgy .table .node.tablerow > .widget > .nodeChildren > .tabledata > div.widget,
+.widgy .table .node.tablerow > .widget > .nodeChildren > .node.tableheaderdata > div.widget,
+.widgy .table .node.tableheader > .widget > .nodeChildren > .tabledata > div.widget,
+.widgy .table .node.tableheader > .widget > .nodeChildren > .node.tableheaderdata > div.widget {
+  min-height: 20px;
+}
+.widgy .table .node.tablerow > .widget > .nodeChildren > .tabledata > div.widget > p.drag-row,
+.widgy .table .node.tablerow > .widget > .nodeChildren > .node.tableheaderdata > div.widget > p.drag-row,
+.widgy .table .node.tableheader > .widget > .nodeChildren > .tabledata > div.widget > p.drag-row,
+.widgy .table .node.tableheader > .widget > .nodeChildren > .node.tableheaderdata > div.widget > p.drag-row {
+  display: none;
+}
+.widgy .table .node.tablerow > .widget > .nodeChildren li div.widget p.drag-row span.dragHandle,
+.widgy .table .node.tableheader > .widget > .nodeChildren li div.widget p.drag-row span.dragHandle {
+  font-size: 13px;
+  left: 2px;
+  position: absolute;
+  top: 3px;
+}
+.widgy .table .node.tablerow > .widget > .nodeChildren li div.widget p.drag-row span.title,
+.widgy .table .node.tableheader > .widget > .nodeChildren li div.widget p.drag-row span.title {
+  display: none;
+}
+.widgy .table .node.tablerow > .widget > .nodeChildren li div.widget p.drag-row button,
+.widgy .table .node.tableheader > .widget > .nodeChildren li div.widget p.drag-row button {
+  font-size: 9px;
+  line-height: 9px;
+  height: 15px;
+  margin: 2px 3px 0px 0px;
+  padding: 0px;
+  width: 15px;
+}
+.widgy .table .node.tablerow > .widget > .nodeChildren li div.widget p.drag-row button i,
+.widgy .table .node.tableheader > .widget > .nodeChildren li div.widget p.drag-row button i {
+  width: 1em;
+}
+.widgy .table .node.tablerow > .widget > .nodeChildren li div.widget p.drag-row button.edit,
+.widgy .table .node.tableheader > .widget > .nodeChildren li div.widget p.drag-row button.edit {
+  right: 22px;
+}
+.widgy .table .node.tablerow > .widget > .nodeChildren li div.widget p.drag-row button span,
+.widgy .table .node.tableheader > .widget > .nodeChildren li div.widget p.drag-row button span {
+  display: none;
+}
+.widgy .table .node.tablerow > .widget > .nodeChildren li div.widget textarea,
+.widgy .table .node.tableheader > .widget > .nodeChildren li div.widget textarea {
+  height: 40px;
+}
+.widgy .table .node.tablerow {
+  margin: 0px;
+}
+.widgy .table .node.tablerow > div.widget > p.drag-row {
+  height: 0px;
+  min-height: 0px;
+  padding: 0px;
+}
+.widgy .table .node.tablerow > div.widget > p.drag-row span.dragHandle {
+  font-size: 14px;
+  left: -20px;
+  position: absolute;
+  top: 3px;
+}
+.widgy .table .node.tablerow > div.widget > p.drag-row button.delete {
+  font-size: 9px;
+  line-height: 9px;
+  height: 15px;
+  padding: 0px;
+  position: absolute;
+  top: 3px;
+  left: -40px;
+  width: 15px;
+  z-index: 10;
+}
+.widgy .table .node.tablerow > div.widget > p.drag-row button.delete i {
+  width: 1em;
+}
+.widgy .table .node.tablerow > div.widget > p.drag-row button.delete span {
+  display: none;
+}
+.widgy .table .node.tablerow > div.widget > p.drag-row button.edit {
+  font-size: 9px;
+  line-height: 9px;
+  height: 15px;
+  padding: 0px;
+  position: absolute;
+  top: 3px;
+  left: -60px;
+  width: 15px;
+  z-index: 10;
+}
+.widgy .table .node.tablerow > div.widget > p.drag-row button.edit i {
+  width: 1em;
+}
+.widgy .table .node.tablerow > div.widget > p.drag-row button.edit span {
+  display: none;
+}
+.widgy .table .node.tableheader {
+  margin: 0;
+}
+.widgy .table .node.tableheader > div.widget > p.drag-row {
+  background: white;
+  padding: 0px;
+  position: relative;
+}
+.widgy .table .node.tableheader > div.widget > p.drag-row span.dragHandle {
+  font-size: 15px;
+  left: 0px;
+  top: 2px;
+}
+.widgy .table .node.tableheader > div.widget > p.drag-row span.title {
+  display: block;
+  font-size: 13px;
+  line-height: 22px;
+  padding: 0px;
+}
+.widgy .table .node.tableheader > div.widget > p.drag-row button.delete {
+  font-size: 9px;
+  line-height: 1em;
+  padding: 1px;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 15px;
+  z-index: 10;
+}
+.widgy .table .node.tableheader > div.widget > p.drag-row button.delete i {
+  width: 1em;
+}
+.widgy .table .node.tableheader > div.widget .nodeChildren .tableheaderdata {
+  border-radius: 0px;
+  -o-border-radius: 0px;
+  -ms-border-radius: 0px;
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  min-width: 120px;
+}
+.widgy .table .node.tableheader > div.widget .nodeChildren .tableheaderdata > div.widget > p.drag-row {
+  background: white;
+  padding: 0px;
+  position: relative;
+}
+.widgy .table .node.tableheader > div.widget .nodeChildren .tableheaderdata > div.widget > p.drag-row span.dragHandle {
+  font-size: 15px;
+  left: 0px;
+  top: 2px;
+}
+.widgy .table .node.tableheader > div.widget .nodeChildren .tableheaderdata > div.widget > p.drag-row span.title {
+  color: #999999;
+  display: block;
+  font-size: 11px;
+  line-height: 22px;
+  padding: 0px;
+}
+.widgy .table .node.tableheader > div.widget .nodeChildren .tableheaderdata > div.widget > p.drag-row button.delete {
+  font-size: 9px;
+  line-height: 9px;
+  padding: 0px;
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  height: 15px;
+  width: 15px;
+  z-index: 10;
+}
+.widgy .table .node.tableheader > div.widget .nodeChildren .tableheaderdata > div.widget > p.drag-row button.delete i {
+  width: 1em;
+}
+.widgy .table .node.tableheader > div.widget .nodeChildren .tableheaderdata > div.widget ul.nodeChildren {
+  width: auto !important;
+}

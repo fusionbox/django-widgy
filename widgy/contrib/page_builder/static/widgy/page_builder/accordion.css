@@ -1,0 +1,19 @@
+@charset "UTF-8";
+.no-details details > * {
+  position: absolute;
+  visibility: hidden;
+}
+.no-details details > summary, .no-details details[open] > * {
+  position: static;
+  visibility: visible;
+}
+.no-details details > summary {
+  display: block;
+}
+.no-details details > summary:before {
+  content: "►";
+  padding-right: 5px;
+}
+.no-details details[open] > summary:before {
+  content: "▼";
+}

@@ -17,28 +17,33 @@ def render(context, node):
     return node.render(context)
 
 
-@register.filter
-def scss_files(site):
+def _get_site(site):
     try:
         site = getattr(settings, site)
     except AttributeError:
         pass
 
-    site = import_string(site)
+    return import_string(site)
 
-    return site.scss_files
+
+@register.filter
+def css_files(site):
+    return _get_site(site).css_files
+
+
+@register.filter
+def scss_files(site):
+    return _get_site(site).scss_files
+
+
+@register.filter
+def uncompiled_scss_files(site):
+    return _get_site(site).uncompiled_scss_files
 
 
 @register.filter
 def js_files(site):
-    try:
-        site = getattr(settings, site)
-    except AttributeError:
-        pass
-
-    site = import_string(site)
-
-    return site.js_files
+    return _get_site(site).js_files
 
 
 @register.filter(name='markdown')

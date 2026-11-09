@@ -50,7 +50,6 @@ INSTALLED_APPS = (
     'filer',
     'easy_thumbnails',
     'compressor',
-    'scss',
     'debug_toolbar',
     'django_extensions',
 
@@ -140,10 +139,6 @@ STATICFILES_FINDERS = (
 WIDGY_ROOT = os.path.dirname(importlib.util.find_spec('widgy').origin)
 
 COMPRESS_ENABLED = True
-
-COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', 'django_pyscss.compressor.DjangoScssFilter'),
-)
 
 INTERNAL_IPS = (
     '127.0.0.1',

@@ -185,22 +185,49 @@ class WidgySite(object):
             ))
         return sorted(filter(self.filter_existing_staticfiles, files))
 
+    ADMIN_MEDIA_HIERARCHY = [
+        'widgy/{app_label}/{model_name}.admin{extension}',
+        'widgy/{app_label}/admin{extension}',
+    ]
+
+    @cached_property
+    def css_files(self):
+        return self.find_media_files('.css')
+
+    @cached_property
+    def admin_css_files(self):
+        return self.find_media_files('.css', hierarchy=self.ADMIN_MEDIA_HIERARCHY)
+
+    # All .scss files, including widgy's own (which also ship compiled .css).
+    # Kept unchanged for templates written before widgy shipped CSS; those
+    # need a text/x-scss precompiler. New templates should use css_files
+    # together with uncompiled_scss_files instead.
     @cached_property
     def scss_files(self):
         return self.find_media_files('.scss')
 
     @cached_property
-    def js_files(self):
-        return self.find_media_files('.js')
+    def admin_scss_files(self):
+        return self.find_media_files('.scss', hierarchy=self.ADMIN_MEDIA_HIERARCHY)
+
+    # .scss files with no compiled .css next to them, i.e. widgets from other
+    # projects that ship only SCSS. Use alongside css_files.
+    @staticmethod
+    def _uncompiled(scss_files, css_files):
+        css_files = set(css_files)
+        return [f for f in scss_files if f[:-len('.scss')] + '.css' not in css_files]
 
     @cached_property
-    def admin_scss_files(self):
-        return self.find_media_files(
-            extension='.scss',
-            hierarchy=[
-                'widgy/{app_label}/{model_name}.admin{extension}',
-                'widgy/{app_label}/admin{extension}',
-            ])
+    def uncompiled_scss_files(self):
+        return self._uncompiled(self.scss_files, self.css_files)
+
+    @cached_property
+    def admin_uncompiled_scss_files(self):
+        return self._uncompiled(self.admin_scss_files, self.admin_css_files)
+
+    @cached_property
+    def js_files(self):
+        return self.find_media_files('.js')
 
     def valid_root_of(self, owner_field, root_class, root_choices):
         return issubclass(root_class, root_choices)

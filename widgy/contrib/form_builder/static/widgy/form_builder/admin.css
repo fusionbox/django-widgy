@@ -1,0 +1,65 @@
+/*
+ * Common SCSS File - SCSS v1.0
+ * last edited 02/17/12
+ * @author Justin Stollsteimer - Fusionbox, Inc.
+ * http://www.fusionbox.com
+ *
+ *
+ * Lists: Line
+ * HR: Line
+ * Table: Line
+ * Form Elements: Line
+ *
+ */
+/* SASS Mixins
+--------------------------------------------------*/
+/* Variables
+-----------------------------------------------*/
+li.node.form_builder.choicefield > span.title:before,
+li.shelfItem.form_builder.choicefield > span.title:before {
+  background-image: url("../../widgy/image/widget-radio.png");
+}
+li.node.form_builder.emailsuccesshandler > span.title:before,
+li.shelfItem.form_builder.emailsuccesshandler > span.title:before {
+  background-image: url("../../widgy/image/widget-email.gif");
+}
+li.node.form_builder.emailuserhandler > span.title:before,
+li.shelfItem.form_builder.emailuserhandler > span.title:before {
+  background-image: url("../../widgy/image/widget-email.gif");
+}
+li.node.form_builder.form > span.title:before,
+li.shelfItem.form_builder.form > span.title:before {
+  background-image: url("../../widgy/image/widget-form.gif");
+}
+li.node.form_builder.forminput > span.title:before,
+li.shelfItem.form_builder.forminput > span.title:before {
+  background-image: url("../../widgy/image/widget-form.gif");
+}
+li.node.form_builder.multiplechoicefield > span.title:before,
+li.shelfItem.form_builder.multiplechoicefield > span.title:before {
+  background-image: url("../../widgy/image/widget-checkbox.png");
+}
+li.node.form_builder.savedatahandler > span.title:before,
+li.shelfItem.form_builder.savedatahandler > span.title:before {
+  background-image: url("../../widgy/image/widget-save-data.png");
+}
+li.node.form_builder.submitbutton > span.title:before,
+li.shelfItem.form_builder.submitbutton > span.title:before {
+  background-image: url("../../widgy/image/widget-button.png");
+}
+li.node.form_builder.textarea > span.title:before,
+li.shelfItem.form_builder.textarea > span.title:before {
+  background-image: url("../../widgy/image/widget-textarea.gif");
+}
+li.node.form_builder.uncaptcha > span.title:before,
+li.shelfItem.form_builder.uncaptcha > span.title:before {
+  background-image: url("../../widgy/image/widget-hidden-field.png");
+}
+li.node.form_builder.webtoleadmapperhandler > span.title:before,
+li.shelfItem.form_builder.webtoleadmapperhandler > span.title:before {
+  background-image: url("../../widgy/image/widget-salesforce.png");
+}
+li.node.form_builder.fieldmappingvalue > span.title:before,
+li.shelfItem.form_builder.fieldmappingvalue > span.title:before {
+  background-image: url("../../widgy/image/widget-icon-mapped-field.png");
+}

@@ -1,0 +1,130 @@
+/*
+ * Common SCSS File - SCSS v1.0
+ * last edited 02/17/12
+ * @author Justin Stollsteimer - Fusionbox, Inc.
+ * http://www.fusionbox.com
+ *
+ *
+ * Lists: Line
+ * HR: Line
+ * Table: Line
+ * Form Elements: Line
+ *
+ */
+/* SASS Mixins
+--------------------------------------------------*/
+/* Variables
+-----------------------------------------------*/
+.popUp .loading {
+  background: url("../../widgy/image/loading.gif") center no-repeat !important;
+  color: transparent !important;
+}
+
+.popup .breadcrumbs,
+.popup #footer {
+  display: none;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.popup #container {
+  min-width: 660px;
+}
+.popup #content {
+  margin: 0 15px !important;
+}
+
+.popUp {
+  background: white;
+  display: block;
+}
+.popUp .denied {
+  color: #BF3030;
+}
+.popUp .formField:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html .popUp .formField {
+  height: 1px;
+}
+.popUp .formField {
+  margin-bottom: 1em;
+}
+.popUp .formField > label {
+  display: block;
+  float: left;
+  width: 150px;
+}
+.popUp .formField input[type=text], .popUp .formField input[type=password], .popUp .formField input[type=email], .popUp .formField input[type=search], .popUp .formField input[type=number], .popUp .formField textarea,
+.popUp .formField textarea {
+  width: 500px;
+}
+.popUp .formField textarea {
+  height: 100px;
+}
+.popUp .formField input.vDateField, .popUp .formField input.vTimeField {
+  width: 100px;
+}
+.popUp .formField p.help_text {
+  color: #999999;
+  font-size: 11px;
+  font-style: italic;
+  margin-top: 10px;
+}
+.popUp .formField ul li label {
+  margin: 0 10px;
+  width: auto;
+}
+.popUp .formField ul li label input {
+  margin: 0;
+}
+.popUp .formField.publish_at li {
+  display: inline-block;
+}
+.popUp .formField.publish_at ul {
+  display: inline-block;
+  margin-bottom: 1em;
+}
+.popUp .formField.publish_at .publish_at_container:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html .popUp .formField.publish_at .publish_at_container {
+  height: 1px;
+}
+.popUp .formField.publish_at .publish_at_container {
+  margin-left: 150px;
+}
+.popUp .submitRow {
+  margin-left: 5px;
+  float: right;
+  font-size: 11px;
+  text-transform: capitalize;
+  line-height: 13px;
+  padding: 6px 10px !important;
+}
+.popUp .submitRow input[type=submit] {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  background: #309BBF;
+  border: 0px;
+  margin-left: 5px;
+  float: right;
+  font-size: 11px;
+  text-transform: capitalize;
+  line-height: 13px;
+  padding: 6px 10px !important;
+}
+.popUp .submitRow input[type=submit]:hover {
+  background: rgb(31.0525883994%, 69.6775781442%, 82.6729017967%);
+  color: white;
+}

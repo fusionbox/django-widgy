@@ -1,0 +1,77 @@
+/*
+ * Common SCSS File - SCSS v1.0
+ * last edited 02/17/12
+ * @author Justin Stollsteimer - Fusionbox, Inc.
+ * http://www.fusionbox.com
+ *
+ *
+ * Lists: Line
+ * HR: Line
+ * Table: Line
+ * Form Elements: Line
+ *
+ */
+/* SASS Mixins
+--------------------------------------------------*/
+/* Variables
+-----------------------------------------------*/
+li.node.page_builder.accordion > span.title:before,
+li.shelfItem.page_builder.accordion > span.title:before {
+  background-image: url("../../widgy/image/widget-accordion.png");
+}
+li.node.page_builder.buttonwidget > span.title:before,
+li.shelfItem.page_builder.buttonwidget > span.title:before {
+  background-image: url("../../widgy/image/widget-button.png");
+}
+li.node.page_builder.calloutwidget > span.title:before,
+li.shelfItem.page_builder.calloutwidget > span.title:before {
+  background-image: url("../../widgy/image/widget-callout.png");
+}
+li.node.page_builder.figure > span.title:before,
+li.shelfItem.page_builder.figure > span.title:before {
+  background-image: url("../../widgy/image/widget-figure.png");
+}
+li.node.page_builder.googlemap > span.title:before,
+li.shelfItem.page_builder.googlemap > span.title:before {
+  background-image: url("../../widgy/image/widget-google-map.png");
+}
+li.node.page_builder.html > span.title:before,
+li.shelfItem.page_builder.html > span.title:before {
+  background-image: url("../../widgy/image/widget-html.png");
+}
+li.node.page_builder.image > span.title:before,
+li.shelfItem.page_builder.image > span.title:before {
+  background-image: url("../../widgy/image/widget-image.gif");
+}
+li.node.page_builder.markdown > span.title:before,
+li.shelfItem.page_builder.markdown > span.title:before {
+  background-image: url("../../widgy/image/widget-code.gif");
+}
+li.node.page_builder.section > span.title:before,
+li.shelfItem.page_builder.section > span.title:before {
+  background-image: url("../../widgy/image/widget-section.png");
+}
+li.node.page_builder.tableheaderdata > span.title:before,
+li.shelfItem.page_builder.tableheaderdata > span.title:before {
+  background-image: url("../../widgy/image/widget-tablecolumn.png");
+}
+li.node.page_builder.table > span.title:before,
+li.shelfItem.page_builder.table > span.title:before {
+  background-image: url("../../widgy/image/widget-table.gif");
+}
+li.node.page_builder.tablerow > span.title:before,
+li.shelfItem.page_builder.tablerow > span.title:before {
+  background-image: url("../../widgy/image/widget-tablerow.png");
+}
+li.node.page_builder.tabs > span.title:before,
+li.shelfItem.page_builder.tabs > span.title:before {
+  background-image: url("../../widgy/image/widget-tab.png");
+}
+li.node.page_builder.video > span.title:before,
+li.shelfItem.page_builder.video > span.title:before {
+  background-image: url("../../widgy/image/widget-video.gif");
+}
+li.node.page_builder.unsafehtml > span.title:before,
+li.shelfItem.page_builder.unsafehtml > span.title:before {
+  background-image: url("../../widgy/image/widget-skull-and-crossbones.png");
+}

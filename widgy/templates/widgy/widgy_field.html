@@ -13,9 +13,12 @@ the admin center.
 
 {% compress css %}
 <link type="text/css" rel="stylesheet" href="{% static 'widgy/css/font-awesome.css' %}">
-<link type="text/x-scss" rel="stylesheet" href="{% static 'widgy/css/widgy.scss' %}">
+<link type="text/css" rel="stylesheet" href="{% static 'widgy/css/widgy.css' %}">
 <link rel="stylesheet" href="{% static 'widgy/fancybox/jquery.fancybox-1.3.4.css' %}">
-{% for scss_file in site.admin_scss_files %}
+{% for css_file in site.admin_css_files %}
+<link type="text/css" href="{% static css_file %}" rel="stylesheet">
+{% endfor %}
+{% for scss_file in site.admin_uncompiled_scss_files %}
 <link type="text/x-scss" href="{% static scss_file %}" rel="stylesheet">
 {% endfor %}
 {% endcompress %}

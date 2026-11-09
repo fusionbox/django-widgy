@@ -1,0 +1,9 @@
+.googleMap iframe {
+  display: block;
+  width: 100%;
+  height: 400px;
+}
+.googleMap a {
+  color: #0000ff;
+  font-size: 75%;
+}

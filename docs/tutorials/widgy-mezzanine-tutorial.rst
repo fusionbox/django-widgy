@@ -117,15 +117,13 @@ Configure django-compressor::
 
     COMPRESS_ENABLED = True
 
-    COMPRESS_PRECOMPILERS = (
-        ('text/x-scss', 'django_pyscss.compressor.DjangoScssFilter'),
-    )
-
 .. note::
 
-    Widgy requires that django-compressor be configured with a precompiler
-    for ``text/x-scss``.  Widgy uses the django-pyscss_ package for easily
-    integrating the pyScss_ library with Django.
+    Widgy ships compiled CSS, so no SCSS precompiler is needed. If your own
+    widgets ship ``.scss`` files (see :attr:`WidgySite.uncompiled_scss_files
+    <widgy.site.WidgySite.uncompiled_scss_files>`), configure a ``text/x-scss``
+    precompiler in ``COMPRESS_PRECOMPILERS``, or compile them to ``.css``
+    yourself.
 
 Then run the following command::
 
@@ -250,5 +248,3 @@ file in your directory and add this code::
     admin.site.unregister(RichTextPage)
 
 
-.. _django-pyscss: https://github.com/fusionbox/django-pyscss
-.. _pyScss: https://github.com/Kronuz/pyScss

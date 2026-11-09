@@ -1,0 +1,78 @@
+/*
+ * Common SCSS File - SCSS v1.0
+ * last edited 02/17/12
+ * @author Justin Stollsteimer - Fusionbox, Inc.
+ * http://www.fusionbox.com
+ *
+ *
+ * Lists: Line
+ * HR: Line
+ * Table: Line
+ * Form Elements: Line
+ *
+ */
+/* SASS Mixins
+--------------------------------------------------*/
+/* Variables
+-----------------------------------------------*/
+.widgy .node.html .htmlOutput h1, .widgy .node.html .htmlOutput h2, .widgy .node.html .htmlOutput h3, .widgy .node.html .htmlOutput h4, .widgy .node.html .htmlOutput h5, .widgy .node.html .htmlOutput h6, .widgy .node.html .htmlOutput p, .widgy .node.html .htmlOutput blockquote, .widgy .node.html .htmlOutput ol, .widgy .node.html .htmlOutput ul, .widgy .node.html .htmlOutput hgroup, .widgy .node.html .htmlOutput hr {
+  display: block !important;
+  float: none !important;
+  margin: 0px 0px 15px 0px !important;
+  width: auto !important;
+}
+.widgy .node.html .htmlOutput .fl {
+  float: left;
+  margin: 0px 25px 15px 0px;
+}
+.widgy .node.html .htmlOutput .fr {
+  float: right;
+  margin: 0px 0px 15px 25px;
+}
+.widgy .node.html .htmlOutput img {
+  border-radius: 2px;
+  -o-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+}
+.widgy .node.html .htmlOutput img.left {
+  float: left;
+  margin: 5px 20px 15px 0px;
+}
+.widgy .node.html .htmlOutput img.right {
+  float: right;
+  margin: 5px 0px 15px 20px;
+}
+.widgy .node.html .htmlOutput table {
+  display: table;
+  width: 100% !important;
+}
+.widgy .node.html .htmlOutput {
+  display: block !important;
+  float: none !important;
+  width: auto !important;
+}
+.widgy .node.html .htmlOutput code {
+  font-family: monospace;
+}
+.widgy .node.html .htmlOutput ul {
+  list-style: disc;
+  padding: 0px 0px 0px 30px !important;
+}
+.widgy .node.html .htmlOutput ul li {
+  list-style-type: disc;
+}
+.widgy .node.html .htmlOutput ul ol, .widgy .node.html .htmlOutput ul ol li {
+  list-style-type: decimal;
+}
+.widgy .node.html .htmlOutput ol {
+  list-style: decimal;
+  padding: 0px 0px 0px 30px !important;
+}
+.widgy .node.html .htmlOutput ol li {
+  list-style-type: decimal;
+}
+.widgy .node.html .htmlOutput ol ul, .widgy .node.html .htmlOutput ol ul li {
+  list-style-type: disc;
+}

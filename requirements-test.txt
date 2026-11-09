@@ -36,7 +36,6 @@ django==4.2.30
     #   django-extensions
     #   django-filer
     #   django-polymorphic
-    #   django-pyscss
     #   django-treebeard
     #   django-widgy
     #   easy-thumbnails
@@ -53,8 +52,6 @@ django-filer==3.6.0
     # via django-widgy
 django-polymorphic==4.1.0
     # via django-filer
-django-pyscss==2.0.3
-    # via django-widgy
 django-treebeard==4.7.1
     # via django-widgy
 docstring-to-markdown==0.17
@@ -109,10 +106,6 @@ py-svg-hush==0.3.0
     # via django-filer
 pygments==2.21.0
     # via pytest
-pyscss @ git+https://github.com/Kronuz/pyScss.git@73559d047706ccd4593cf6aa092de71f35164723
-    # via
-    #   django-pyscss
-    #   django-widgy
 pytest==9.2.0
     # via pytest-django
 pytest-django==4.14.0
@@ -134,9 +127,7 @@ requests-oauthlib==2.0.0
 rjsmin==1.2.1
     # via django-compressor
 six==1.17.0
-    # via
-    #   html5lib
-    #   pyscss
+    # via html5lib
 soupsieve==3.0.4
     # via beautifulsoup4
 sqlparse==0.6.1

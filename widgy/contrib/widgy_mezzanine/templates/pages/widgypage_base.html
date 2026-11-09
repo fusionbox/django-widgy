@@ -16,7 +16,10 @@ defaultlayout templating. See https://github.com/fusionbox/django-widgy/pull/41
 {% block css %}
 {{ block.super }}
 {% compress css %}
-{% for scss_file in 'WIDGY_MEZZANINE_SITE'|scss_files %}
+{% for css_file in 'WIDGY_MEZZANINE_SITE'|css_files %}
+<link rel="stylesheet" href="{% static css_file %}" type="text/css">
+{% endfor %}
+{% for scss_file in 'WIDGY_MEZZANINE_SITE'|uncompiled_scss_files %}
 <link rel="stylesheet" href="{% static scss_file %}" type="text/x-scss">
 {% endfor %}
 {% endcompress %}

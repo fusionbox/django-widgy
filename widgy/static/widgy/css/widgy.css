@@ -1,0 +1,928 @@
+/*
+ * Common SCSS File - SCSS v1.0
+ * last edited 02/17/12
+ * @author Justin Stollsteimer - Fusionbox, Inc.
+ * http://www.fusionbox.com
+ *
+ *
+ * Lists: Line
+ * HR: Line
+ * Table: Line
+ * Form Elements: Line
+ *
+ */
+/* SASS Mixins
+--------------------------------------------------*/
+/* Variables
+-----------------------------------------------*/
+ul.widgy-tools li a.loading, .widgy button.loading,
+.widgy input[type=submit].loading,
+.widgy a.pop_out.loading, .widgy .widget_editor input[type=submit].loading, .widgy:empty, .widgy > .editor:empty {
+  background: url("../../widgy/image/loading.gif") center no-repeat !important;
+  color: transparent !important;
+}
+
+body.page_builder-callout #container {
+  overflow: hidden;
+}
+
+.field-root_node .related-widget-wrapper {
+  width: calc(100% - 170px);
+}
+
+.widgy:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html .widgy {
+  height: 1px;
+}
+.widgy:empty, .widgy > .editor:empty {
+  height: 100px;
+}
+.widgy .editor {
+  display: inline-block;
+  width: 100%;
+}
+.widgy .nodeChildren {
+  clear: both;
+  display: block;
+  margin: 0 !important;
+  padding: 0;
+}
+.widgy .nodeChildren li {
+  list-style: none;
+}
+.widgy .node:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html .widgy .node {
+  height: 1px;
+}
+.widgy .node {
+  margin-left: 1em;
+  margin-right: 1em;
+  padding: 0px;
+}
+.widgy .node.invisibleBucket {
+  background-color: inherit;
+  border: 0 none;
+  margin: 0 !important;
+  padding: 0;
+}
+.widgy .node.invisibleBucket > .widget > .nodeChildren > .node {
+  margin-left: 0;
+  margin-right: 0;
+}
+.widgy .node.invisibleBucket > .widget > .nodeChildren:empty {
+  display: none;
+}
+.widgy .node.being_dragged {
+  margin: 0;
+}
+.widgy .widget {
+  padding: 0px;
+}
+.widgy .widget .drag-row {
+  display: block;
+  float: none;
+  height: auto;
+  position: relative;
+  width: auto;
+}
+.widgy .widget .drag-row button.edit,
+.widgy .widget .drag-row button.delete {
+  float: right;
+}
+.widgy .widget .drag-row .dragHandle {
+  left: 0px;
+  float: left;
+  position: relative;
+  top: 3px;
+}
+.widgy .preview {
+  padding: 1em;
+}
+.widgy .preview:empty {
+  padding: 0;
+}
+
+.widgy .being_dragged {
+  position: fixed;
+}
+.widgy .node {
+  margin-bottom: 1em;
+}
+.widgy .node:first-child {
+  margin-top: 1em;
+}
+.widgy .node_drop_target {
+  height: 1em;
+  margin-bottom: 0;
+  margin-top: -1em;
+  padding: 0;
+}
+.widgy .node_drop_target:first-child {
+  margin-top: 0;
+}
+.widgy .node_drop_target:last-child, .widgy .node_drop_target.previous.nm {
+  margin-bottom: 0;
+  margin-top: -1em;
+}
+.widgy .node_drop_target:only-child {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+.widgy .node_drop_target:not(.active) span {
+  display: none;
+}
+.widgy .node_drop_target.active {
+  height: 3em;
+  padding: 1em;
+}
+
+.widgy section.node {
+  margin-left: 0;
+  margin-right: 0;
+}
+.widgy section.node > .widget > .nodeChildren {
+  clear: left;
+  float: left;
+  width: 63% !important;
+}
+.widgy section.node > .widget > .nodeChildren > .node {
+  margin-left: 0;
+  margin-right: 0;
+}
+.widgy section.node > .widget > .shelf {
+  display: inline;
+  float: right;
+  position: relative;
+  width: 35%;
+}
+
+.widgy .shelf {
+  clear: both;
+  display: block;
+  float: none;
+  width: auto;
+}
+.widgy .shelf .scroll {
+  overflow-y: auto;
+}
+.widgy .shelfItem {
+  display: inline-block;
+  height: auto;
+  vertical-align: top;
+}
+
+.popOut .widgy section.node {
+  margin-left: 0;
+  margin-right: 0;
+}
+.popOut .widgy section.node > .widget > .nodeChildren {
+  padding-left: 0;
+  width: 63%;
+}
+.popOut .widgy section.node > .widget > .shelf {
+  width: 35%;
+}
+
+/*
+ * Common SCSS File - SCSS v1.0
+ * last edited 02/17/12
+ * @author Justin Stollsteimer - Fusionbox, Inc.
+ * http://www.fusionbox.com
+ *
+ *
+ * Lists: Line
+ * HR: Line
+ * Table: Line
+ * Form Elements: Line
+ *
+ */
+/* SASS Mixins
+--------------------------------------------------*/
+/* Variables
+-----------------------------------------------*/
+ul.widgy-tools li a.loading, .widgy button.loading,
+.widgy input[type=submit].loading,
+.widgy a.pop_out.loading, .widgy .widget_editor input[type=submit].loading, .widgy:empty, .widgy > .editor:empty {
+  background: url("../../widgy/image/loading.gif") center no-repeat !important;
+  color: transparent !important;
+}
+
+.ajax-loading * {
+  cursor: progress !important;
+}
+
+.widgy {
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
+.widgy .editor {
+  background: #fafafa;
+}
+.widgy .node {
+  border-radius: 4px;
+  -o-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+  -o-box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+  -ms-box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0px 0px 0px transparent;
+  -o-box-shadow: inset 0px 0px 0px transparent;
+  -ms-box-shadow: inset 0px 0px 0px transparent;
+  -moz-box-shadow: inset 0px 0px 0px transparent;
+  -webkit-box-shadow: inset 0px 0px 0px transparent;
+  list-style: none;
+  padding: 0px;
+}
+.widgy .node.deleting {
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+  -o-box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+  -ms-box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+  border-color: #BF3030;
+}
+.widgy .node.deleting div.widget p.drag-row span.title {
+  color: #BF3030;
+}
+.widgy .preview {
+  padding: 0;
+}
+.widgy .preview:not(:empty) {
+  padding: 1em;
+}
+.widgy .node:not(section) {
+  background: white;
+  border: 1px solid #E0E0E0;
+}
+.widgy .node:not(section) .draggable > .drag-row {
+  cursor: pointer;
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+.widgy .node:not(section) .being_dragged .drag-row {
+  cursor: pointer;
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
+.widgy .node:not(section) .drag-row {
+  border-radius: 4px 4px 0px 0px;
+  -o-border-radius: 4px 4px 0px 0px;
+  -ms-border-radius: 4px 4px 0px 0px;
+  -moz-border-radius: 4px 4px 0px 0px;
+  -webkit-border-radius: 4px 4px 0px 0px;
+}
+.widgy .node:not(section) .drag-row:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html .widgy .node:not(section) .drag-row {
+  height: 1px;
+}
+.widgy .node:not(section) .drag-row {
+  background-color: #eee;
+  background-image: -o-linear-gradient(center bottom, #eee 1%, #fff 100%);
+  background-image: -ms-linear-gradient(center bottom, #eee 1%, #fff 100%);
+  background-image: -moz-linear-gradient(center bottom, #eee 1%, #fff 100%);
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, #eee), color-stop(1, #fff));
+  display: block;
+  float: none;
+  height: auto;
+  min-height: 20px;
+  margin: 0px;
+  padding: 2px;
+  position: relative;
+  width: auto;
+}
+.widgy .node:not(section) .drag-row span.title {
+  color: #666;
+  font-size: 13px;
+  font-weight: normal;
+  line-height: 20px;
+}
+.widgy .node:not(section) .drag-row button.edit,
+.widgy .node:not(section) .drag-row button.delete {
+  float: right;
+  margin: 1px 1px 0px 3px;
+}
+.widgy .node:not(section) .drag-row .dragHandle {
+  left: 0px;
+  float: left;
+  font-size: 14px;
+  position: relative;
+  top: 3px;
+}
+
+.widgy section.node > .widget > .drag-row > .title {
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  font-size: 2.4em;
+  padding: 5px 0 5px 10px;
+}
+.widgy section.node > .widget > .nodeChildren {
+  padding-left: 1em;
+}
+.widgy section.node:first-child > .widget > p.drag-row button {
+  float: none;
+  position: relative;
+  top: -5px;
+}
+
+.widgy .node_drop_target {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  transition: all 0.25s ease 0s;
+  -o-transition: all 0.25s ease 0s;
+  -ms-transition: all 0.25s ease 0s;
+  -moz-transition: all 0.25s ease 0s;
+  -webkit-transition: all 0.25s ease 0s;
+  border: none;
+  background: rgb(58.3333333333%, 91.6666666667%, 25%);
+  font-size: 1em;
+  font-style: italic;
+  margin-left: 1em;
+  margin-right: 1em;
+  text-align: center;
+}
+.widgy .node_drop_target.active {
+  border: 1px dashed #559911;
+  background: rgb(73.3333333333%, 94.6666666667%, 52%);
+  color: rgb(23.3333333333%, 42%, 4.6666666667%);
+}
+.widgy .node_drop_target.previous {
+  background: #FF9900;
+}
+
+.widgy .shelf > .title {
+  display: none;
+}
+.widgy .shelfItem {
+  background-color: #eeeeee;
+  background-image: -o-linear-gradient(center bottom, #eeeeee 1%, #ffffff 100%);
+  background-image: -ms-linear-gradient(center bottom, #eeeeee 1%, #ffffff 100%);
+  background-image: -moz-linear-gradient(center bottom, #eeeeee 1%, #ffffff 100%);
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, #eeeeee), color-stop(1, #ffffff));
+  border-radius: 4px;
+  -o-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+  -o-box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+  -ms-box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+  box-shadow: inset -1px 1px 0px #ffffff;
+  -o-box-shadow: inset -1px 1px 0px #ffffff;
+  -ms-box-shadow: inset -1px 1px 0px #ffffff;
+  -moz-box-shadow: inset -1px 1px 0px #ffffff;
+  -webkit-box-shadow: inset -1px 1px 0px #ffffff;
+  cursor: pointer;
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+  border: 1px solid #E0E0E0;
+  margin: 0 4px 4px 0;
+  padding: 1px 1px 1px 1px;
+  vertical-align: top;
+  width: 215px !important;
+}
+.widgy .shelfItem span.title {
+  font-size: 11px;
+  max-width: 160px;
+  padding: 4px 0 2px 0;
+  text-transform: capitalize;
+  width: 160px;
+}
+.widgy .shelfItem span.title:before {
+  background-repeat: no-repeat;
+  content: "";
+  float: left;
+  height: 16px;
+  margin: 4px 5px 2px 5px;
+  width: 16px;
+}
+.widgy .shelfItem span.icon-move {
+  float: right;
+  margin-top: 4px;
+}
+.widgy .shelfItem.being_dragged {
+  cursor: pointer;
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
+.widgy section.node > .widget > .shelf > .title {
+  display: block;
+  margin-bottom: 10px;
+}
+.widgy section.node > .widget > .shelf .shelfItem {
+  padding: 0px 5px 0px 5px;
+  width: 190px;
+}
+.widgy section.node > .widget > .shelf span.icon-move {
+  color: #999999;
+  font-size: 20px;
+  margin-top: 8px;
+}
+.widgy section.node > .widget > .shelf span.title {
+  display: inline;
+  float: left;
+  font-size: 14px;
+  line-height: 22px;
+  padding: 5px 0 5px 0;
+  max-width: 130px;
+}
+.widgy section.node > .widget > .shelf span.title:before {
+  margin: 5px 6px;
+}
+.widgy .node:not(section) .shelf {
+  border-bottom: 2px solid #bbbbbb;
+  padding: 10px 0 5px 1em;
+}
+.widgy .node:not(section) .shelf.empty {
+  display: none;
+}
+
+.widgy .widget_editor:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html .widgy .widget_editor {
+  height: 1px;
+}
+.widgy .widget_editor {
+  display: inline;
+  float: left;
+  height: auto;
+  width: 100%;
+  padding-bottom: 15px;
+}
+.widgy .widget_editor form > div:after,
+.widgy .widget_editor > div:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html .widgy .widget_editor form > div,
+* html .widgy .widget_editor > div {
+  height: 1px;
+}
+.widgy .widget_editor form > div,
+.widgy .widget_editor > div {
+  display: inline;
+  float: left;
+  height: auto;
+  width: 100%;
+  clear: both;
+  padding: 0px;
+  position: relative;
+}
+.widgy .widget_editor .formField {
+  margin-bottom: 10px;
+}
+.widgy .widget_editor .formField > div:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html .widgy .widget_editor .formField > div {
+  height: 1px;
+}
+.widgy .widget_editor .formField > div {
+  display: inline;
+  float: left;
+  height: auto;
+  width: 100%;
+  clear: both;
+}
+.widgy .widget_editor .formField > div.pagedown-buttonbar {
+  padding: 0px 0px 10px 0px;
+}
+.widgy .widget_editor .formField > div.pagedown-preview {
+  border-top: 1px dotted #bbbbbb;
+  margin-top: 15px;
+  padding: 10px 0px 0px 0px;
+}
+.widgy .widget_editor .formField > div:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html .widgy .widget_editor .formField > div {
+  height: 1px;
+}
+.widgy .widget_editor .formField > div {
+  display: inline;
+  float: left;
+  height: auto;
+  width: 100%;
+  clear: both;
+}
+.widgy .widget_editor .formField > div.pagedown-buttonbar {
+  padding: 0px 0px 10px 0px;
+}
+.widgy .widget_editor .formField > div.pagedown-preview {
+  border-top: 1px dotted #bbbbbb;
+  margin-top: 15px;
+  padding: 10px 0px 0px 0px;
+}
+.widgy .widget_editor .formField select {
+  width: 50%;
+}
+.widgy .widget_editor .formField.required label:after {
+  content: "*";
+  color: #BF3030;
+}
+.widgy .widget_editor .formField.error input[type=text], .widgy .widget_editor .formField.error input[type=password], .widgy .widget_editor .formField.error input[type=email], .widgy .widget_editor .formField.error input[type=search], .widgy .widget_editor .formField.error input[type=number], .widgy .widget_editor .formField.error textarea,
+.widgy .widget_editor .formField.error textarea {
+  border-color: #BF3030;
+}
+.widgy .widget_editor .formField.error ul.errorlist li.error {
+  padding-left: 115px;
+}
+.widgy .widget_editor .formField p.datetime {
+  display: inline;
+  float: left;
+  width: 50%;
+}
+.widgy .widget_editor .formField p.datetime br {
+  display: inline;
+}
+.widgy .widget_editor .formField p.datetime input[type=text] {
+  margin: 0px 5px;
+  width: 100px;
+}
+.widgy .widget_editor input[type=text]:focus, .widgy .widget_editor input[type=password]:focus, .widgy .widget_editor input[type=email]:focus, .widgy .widget_editor input[type=search]:focus, .widgy .widget_editor input[type=number]:focus, .widgy .widget_editor textarea:focus,
+.widgy .widget_editor button:focus {
+  box-shadow: inset 0px 1px 3px rgb(78.9915966387%, 66.1531279178%, 89.7292250233%);
+  -o-box-shadow: inset 0px 1px 3px rgb(78.9915966387%, 66.1531279178%, 89.7292250233%);
+  -ms-box-shadow: inset 0px 1px 3px rgb(78.9915966387%, 66.1531279178%, 89.7292250233%);
+  -moz-box-shadow: inset 0px 1px 3px rgb(78.9915966387%, 66.1531279178%, 89.7292250233%);
+  -webkit-box-shadow: inset 0px 1px 3px rgb(78.9915966387%, 66.1531279178%, 89.7292250233%);
+  border-color: #A56ED3;
+}
+.widgy .widget_editor input[type=text], .widgy .widget_editor input[type=password], .widgy .widget_editor input[type=email], .widgy .widget_editor input[type=search], .widgy .widget_editor input[type=number], .widgy .widget_editor textarea {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.1);
+  -o-box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.1);
+  -ms-box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.1);
+  border: 1px solid #bbbbbb;
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-weight: normal !important;
+  height: auto;
+  padding: 5px 1%;
+  width: 48%;
+}
+.widgy .widget_editor input[type=checkbox], .widgy .widget_editor input[type=radio] {
+  margin-left: 0px;
+}
+.widgy .widget_editor input[type=submit] {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  background: #309BBF;
+  border: 0px;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  height: auto;
+  font-weight: bold;
+  font-size: 11px;
+  line-height: 12px;
+  text-decoration: none;
+  text-transform: capitalize;
+  padding: 2px 4px;
+  width: auto;
+}
+.widgy .widget_editor input[type=submit]:hover {
+  background: rgb(31.0525883994%, 69.6775781442%, 82.6729017967%);
+  color: white;
+}
+.widgy .widget_editor input[type=submit].cancel {
+  background: #999999;
+  color: white;
+}
+.widgy .widget_editor input[type=submit].cancel:hover {
+  background: rgb(70%, 70%, 70%);
+}
+.widgy .widget_editor input[type=submit].delete {
+  background: #BF3030;
+  color: white;
+}
+.widgy .widget_editor input[type=submit].delete:hover {
+  background: rgb(82.6729017967%, 31.0525883994%, 31.0525883994%);
+}
+.widgy .widget_editor input[type=submit][type=submit] {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  background: #559911;
+  color: white;
+  height: auto;
+  line-height: 15px;
+  font-weight: bold;
+  padding: 0px 4px 1px !important;
+}
+.widgy .widget_editor input[type=submit][type=submit]:hover {
+  background: rgb(43.3333333333%, 78%, 8.6666666667%);
+}
+.widgy .widget_editor input[type=submit] {
+  float: right;
+}
+.widgy .widget_editor input[type=submit] {
+  float: right;
+}
+.widgy .widget_editor label {
+  clear: left;
+  padding: 0 10px 10px 0;
+}
+.widgy .widget_editor textarea {
+  clear: both;
+  max-width: 98.5%;
+  height: 120px;
+  width: 98.5%;
+}
+.widgy .widget_editor textarea + span.cke {
+  clear: both !important;
+}
+.widgy .widget_editor select {
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-weight: normal;
+}
+.widgy .widget_editor select {
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-weight: normal;
+}
+.widgy .widget_editor .cancel {
+  position: absolute;
+  right: 55px;
+  top: 0px;
+}
+
+.widgy button,
+.widgy input[type=submit],
+.widgy a.pop_out {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  background: #309BBF;
+  border: 0px;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  height: auto;
+  font-weight: bold;
+  font-size: 11px;
+  line-height: 12px;
+  text-decoration: none;
+  text-transform: capitalize;
+  padding: 2px 4px;
+  width: auto;
+}
+.widgy button:hover,
+.widgy input[type=submit]:hover,
+.widgy a.pop_out:hover {
+  background: rgb(31.0525883994%, 69.6775781442%, 82.6729017967%);
+  color: white;
+}
+.widgy button.cancel,
+.widgy input[type=submit].cancel,
+.widgy a.pop_out.cancel {
+  background: #999999;
+  color: white;
+}
+.widgy button.cancel:hover,
+.widgy input[type=submit].cancel:hover,
+.widgy a.pop_out.cancel:hover {
+  background: rgb(70%, 70%, 70%);
+}
+.widgy button.delete,
+.widgy input[type=submit].delete,
+.widgy a.pop_out.delete {
+  background: #BF3030;
+  color: white;
+}
+.widgy button.delete:hover,
+.widgy input[type=submit].delete:hover,
+.widgy a.pop_out.delete:hover {
+  background: rgb(82.6729017967%, 31.0525883994%, 31.0525883994%);
+}
+.widgy button[type=submit],
+.widgy input[type=submit][type=submit],
+.widgy a.pop_out[type=submit] {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  background: #559911;
+  color: white;
+  height: auto;
+  line-height: 15px;
+  font-weight: bold;
+  padding: 0px 4px 1px !important;
+}
+.widgy button[type=submit]:hover,
+.widgy input[type=submit][type=submit]:hover,
+.widgy a.pop_out[type=submit]:hover {
+  background: rgb(43.3333333333%, 78%, 8.6666666667%);
+}
+.widgy button,
+.widgy input[type=submit],
+.widgy a.pop_out {
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  margin-left: 10px;
+  font-size: 11px;
+  text-decoration: none;
+  text-transform: capitalize;
+}
+.widgy h1 {
+  color: #535353;
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 38px;
+}
+.widgy h2 {
+  color: #535353;
+  font-size: 22px;
+  line-height: 28px;
+}
+.widgy h3 {
+  color: #535353;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 20px;
+}
+.widgy h4 {
+  color: #535353;
+  font-size: 18px;
+  font-weight: bold;
+}
+.widgy h5 {
+  color: #535353;
+  margin: 0px 0px 4px 0px;
+}
+.widgy p {
+  margin: 0;
+}
+.widgy p.title {
+  color: #353535;
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 28px;
+  margin: 0 0 10px 0;
+}
+.widgy span.title {
+  color: #353535;
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+}
+
+input.cke_dialog_ui_input_text, input.cke_dialog_ui_input_password, textarea.cke_dialog_ui_input_textarea {
+  height: auto !important;
+}
+
+.change-form div.submit-row {
+  z-index: 100;
+}
+
+/* Widgy Tools Buttons
+--------------------------------------------------*/
+ul.widgy-tools:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html ul.widgy-tools {
+  height: 1px;
+}
+ul.widgy-tools {
+  margin-bottom: 15px;
+}
+ul.widgy-tools li {
+  display: inline;
+  float: left;
+  margin-right: 5px;
+}
+ul.widgy-tools li a {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  background: transparent;
+  border: 1px solid #309BBF;
+  color: #309BBF;
+  display: inline-block;
+  height: auto;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 18px;
+  padding: 4px 8px;
+  width: auto;
+}
+ul.widgy-tools li a:hover {
+  background-color: rgb(71.0107473952%, 87.2507999016%, 92.7147428009%);
+  color: #309BBF;
+}
+ul.widgy-tools li a.cancel {
+  border-color: #999999;
+  color: #999999;
+}
+ul.widgy-tools li a.cancel:hover {
+  background: rgb(88.3333333333%, 88.3333333333%, 88.3333333333%);
+}
+ul.widgy-tools li a.delete {
+  border-color: #BF3030;
+  color: #BF3030;
+}
+ul.widgy-tools li a.delete:hover {
+  background: rgb(92.7147428009%, 71.0107473952%, 71.0107473952%);
+}
+ul.widgy-tools li a[type=submit] {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-color: #559911;
+  color: #559911;
+  height: auto;
+  font-weight: bold;
+  line-height: 16px;
+  padding: 5px !important;
+  position: relative;
+  top: -1px;
+}
+ul.widgy-tools li a[type=submit]:hover {
+  background: rgb(83.3333333333%, 96.6666666667%, 70%);
+}
+ul.widgy-tools li a {
+  font-size: 13px;
+  font-weight: bold;
+  padding: 2px 8px !important;
+}
+ul.widgy-tools li a.commit {
+  border-color: #559911;
+  color: #559911;
+}
+ul.widgy-tools li a.commit:hover {
+  background-color: rgb(83.3333333333%, 96.6666666667%, 70%);
+}
+ul.widgy-tools li a.reset {
+  border-color: #BF3030;
+  color: #BF3030;
+}
+ul.widgy-tools li a.reset:hover {
+  background-color: rgb(92.7147428009%, 71.0107473952%, 71.0107473952%);
+}

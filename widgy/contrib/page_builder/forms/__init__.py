@@ -7,7 +7,6 @@ from django.template.loader import render_to_string
 from django.conf import settings
 
 import bleach
-from django_pyscss import DjangoScssCompiler
 
 
 PAGEDOWN_EDITOR_TEMPLATE = u'''
@@ -15,12 +14,6 @@ PAGEDOWN_EDITOR_TEMPLATE = u'''
 {textarea}
 <div class="pagedown-preview"></div>
 '''
-
-
-def scss_compile(scss_filename):
-    scss = DjangoScssCompiler()
-    css_content = scss.compile(scss_filename)
-    return css_content
 
 
 class MarkdownWidget(forms.Textarea):
@@ -40,6 +33,10 @@ class MarkdownField(forms.CharField):
 
 
 class CKEditorWidget(forms.Textarea):
+    # Static path of the stylesheet applied inside the editor. Resolved to a
+    # URL at render time unless CONFIG sets 'contentsCss' itself.
+    CONTENTS_CSS = 'widgy/page_builder/html.css'
+
     CONFIG = {
         'toolbar': [
             {'name': 'clipboard', 'groups': ['clipboard', 'undo'], 'items': ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']},
@@ -78,7 +75,6 @@ class CKEditorWidget(forms.Textarea):
         'extraPlugins': 'justify',
         'justifyClasses': ['align-left', 'align-center', 'align-right', 'align-justify'],
         'indentClasses': ['text-indent-%d' % i for i in range(1,6)],
-        'contentsCss': scss_compile('/widgy/page_builder/html.scss'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -91,8 +87,13 @@ class CKEditorWidget(forms.Textarea):
             'html_id': attrs['id'],
             'textarea': textarea,
             'ckeditor_path': staticfiles_storage.url('widgy/js/lib/ckeditor/'),
-            'config': self.CONFIG,
+            'config': self.get_config(),
         })
+
+    def get_config(self):
+        config = dict(self.CONFIG)
+        config.setdefault('contentsCss', staticfiles_storage.url(self.CONTENTS_CSS))
+        return config
 
 
 class CKEditorField(forms.CharField):
@@ -146,7 +147,6 @@ class MiniCKEditorWidget(CKEditorWidget):
             {'name': 'mode', 'groups': ['mode'], 'items': ['Source']},
             {'name': 'editing', 'groups': ['find', 'selection', 'spellchecker'], 'items': ['Scayt']},
         ],
-        'contentsCss': scss_compile('/widgy/page_builder/html.scss')
     }
 
 

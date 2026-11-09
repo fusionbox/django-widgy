@@ -1,0 +1,148 @@
+/*
+ * Common SCSS File - SCSS v1.0
+ * last edited 02/17/12
+ * @author Justin Stollsteimer - Fusionbox, Inc.
+ * http://www.fusionbox.com
+ *
+ *
+ * Lists: Line
+ * HR: Line
+ * Table: Line
+ * Form Elements: Line
+ *
+ */
+/* SASS Mixins
+--------------------------------------------------*/
+/* Variables
+-----------------------------------------------*/
+.widgy .tabbed > .widget > .nodeChildren {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+.widgy .tabbed > .widget > .nodeChildren:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html .widgy .tabbed > .widget > .nodeChildren {
+  height: 1px;
+}
+.widgy .tabbed > .widget > .nodeChildren {
+  width: 100% !important;
+}
+.widgy .tabbed > .widget > .nodeChildren > li {
+  display: inline-block;
+  float: left;
+}
+.widgy .tabbed > .widget > .nodeChildren > li:not(.active) .edit, .widgy .tabbed > .widget > .nodeChildren > li:not(.active) .delete {
+  display: none;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node_drop_target {
+  margin-bottom: 0;
+  width: 50px;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node_drop_target.active {
+  width: 100px;
+}
+.widgy .tabbed > .widget > .nodeChildren > li .drag-row {
+  cursor: pointer;
+  cursor: -moz-pointer;
+  cursor: -webkit-pointer;
+}
+.widgy .tabbed > .widget > .nodeChildren > li .draggable > .drag-row {
+  cursor: pointer;
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.being_dragged .drag-row {
+  cursor: pointer;
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
+.widgy .tabbed .current {
+  clear: both;
+  width: 100%;
+}
+.widgy section.tabbed > .widget > .current {
+  float: left;
+  width: 63%;
+}
+
+.widgy .tabbed > .widget > .nodeChildren {
+  margin-top: 1em !important;
+  padding-left: 1em;
+}
+.widgy .tabbed > .widget > .nodeChildren > li {
+  margin: 0;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node {
+  border-radius: 4px 4px 0px 0px;
+  -o-border-radius: 4px 4px 0px 0px;
+  -ms-border-radius: 4px 4px 0px 0px;
+  -moz-border-radius: 4px 4px 0px 0px;
+  -webkit-border-radius: 4px 4px 0px 0px;
+  background: #dddddd !important;
+  border-color: #cccccc;
+  border-width: 1px 1px 0px 1px;
+  color: #999999;
+  margin-right: -1px;
+  padding: 0 5px;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node.active {
+  background-color: #f8f8f8 !important;
+  color: #555555;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node.active.section > .widget > .drag-row {
+  padding: 2px 60px 2px 2px;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node.active.section > .widget > .drag-row button {
+  position: absolute;
+  top: 3px;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node.active.section > .widget > .drag-row button.delete {
+  right: 3px;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node.active.section > .widget > .drag-row button.edit {
+  right: 29px;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node:hover {
+  background-color: white !important;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node .widget {
+  background: transparent !important;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node .widget .drag-row {
+  border-radius: 0px;
+  -o-border-radius: 0px;
+  -ms-border-radius: 0px;
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  background: transparent !important;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node .widget .drag-row span.title {
+  color: inherit;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node .widget .drag-row .edit span,
+.widgy .tabbed > .widget > .nodeChildren > li.node .widget .drag-row .delete span {
+  display: none;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node .widget .drag-row .preview {
+  background: transparent;
+  display: inline;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node_drop_target {
+  height: 24px !important;
+  overflow: hidden;
+}
+.widgy .tabbed > .widget > .nodeChildren > li.node_drop_target.active {
+  padding: 0 1em;
+}
+.widgy .tabbed > .widget > .current {
+  border-top: 2px solid #cccccc;
+  clear: left;
+  float: left;
+}

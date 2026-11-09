@@ -4,7 +4,36 @@ Changelog
 0.9.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- **Breaking Change** Widgy now ships compiled CSS and no longer depends on
+  pyScss or django-pyscss, which are unmaintained.
+
+  - Widgy's own templates no longer need a ``text/x-scss`` entry in
+    ``COMPRESS_PRECOMPILERS``. Projects that still link widgy's ``.scss``
+    files (see below) or ship their own must keep it, and must now depend on
+    django-pyscss themselves.
+  - New ``WidgySite.css_files``, ``admin_css_files``,
+    ``uncompiled_scss_files`` and ``admin_uncompiled_scss_files``, plus
+    ``css_files`` and ``uncompiled_scss_files`` template filters.
+    ``scss_files`` and ``admin_scss_files`` are unchanged, so templates that
+    loop over ``scss_files`` keep working with a SCSS precompiler. To stop
+    compiling widgy's SCSS at runtime, replace such a loop with a
+    ``css_files`` loop (``text/css``) plus an ``uncompiled_scss_files`` loop
+    (``text/x-scss``).
+  - **Offline compression:** ``widgy/widgy_field.html`` now uses
+    ``site.admin_css_files`` and ``site.admin_uncompiled_scss_files``. If your
+    ``COMPRESS_OFFLINE_CONTEXT`` passes a stand-in dict for ``site`` (for
+    example ``{'site': {'admin_scss_files': ...}}``), the widgy editor raises
+    ``OfflineGenerationError``. Pass the real site object instead:
+    ``{'site': site}``.
+  - Widgy's ``.scss`` sources are still shipped and still compile with
+    django-pyscss, so overridden templates that link them (such as a copy of
+    ``widgy/history.html``) keep working. If you themed widgy by overriding
+    its ``.scss`` static files, override the ``.css`` files instead.
+  - ``CKEditorWidget`` now passes CKEditor a stylesheet URL
+    (``CKEditorWidget.CONTENTS_CSS``) instead of CSS compiled at import time.
+
+  Widgy's SCSS sources are still included. Contributors: run ``make css``
+  after editing them, and commit the compiled ``.css``.
 
 
 0.9.2 (2021-11-11)

@@ -1,0 +1,1541 @@
+@charset "UTF-8";
+/*
+ * Common SCSS File - SCSS v1.0
+ * last edited 02/17/12
+ * @author Justin Stollsteimer - Fusionbox, Inc.
+ * http://www.fusionbox.com
+ *
+ *
+ * Lists: Line
+ * HR: Line
+ * Table: Line
+ * Form Elements: Line
+ *
+ */
+/* SASS Mixins
+--------------------------------------------------*/
+/* Common Classes
+------------------------------------------------------*/
+strong,
+.strong {
+  font-weight: bold;
+}
+
+em,
+.em {
+  font-style: italic;
+}
+
+sup {
+  bottom: 0.8em;
+  font-size: 60% !important;
+  position: relative;
+}
+
+sub {
+  font-size: 60% !important;
+  position: relative;
+  bottom: -0.2em;
+}
+
+/* Block Elements
+------------------------------------------------------*/
+pre {
+  font-style: monospace;
+}
+
+code {
+  font-style: monospace;
+}
+
+/* Misc CKEditor Styles Tags
+------------------------------------------------------*/
+tt, kbd, samp, code {
+  font-family: monospace;
+}
+
+cite {
+  font-style: italic;
+  padding: 10px;
+}
+
+small {
+  font-size: 70%;
+}
+
+big {
+  font-size: 150%;
+}
+
+address {
+  display: inline;
+  font-style: italic;
+}
+
+q {
+  font-style: italic;
+}
+
+var {
+  font-weight: bold;
+}
+
+del {
+  text-decoration: line-through;
+}
+
+.error, .errors li {
+  color: #A53A3A;
+}
+
+label.required {
+  font-weight: bold;
+}
+
+label.required:after {
+  content: "*";
+  color: #cc2222;
+}
+
+/* Fonts & Colors
+------------------------------------------------------*/
+/* Mixins
+------------------------------------------------------*/
+/* Tags
+------------------------------------------------------*/
+p, h1, h2, h3, h4, h5, h6 {
+  display: inline;
+  float: left;
+  height: auto;
+  width: 100%;
+}
+
+h1 {
+  border-bottom: 2px solid #F26304;
+  font-size: 40px;
+  font-weight: 200;
+  line-height: 42px;
+  letter-spacing: -1px;
+  margin: 0px 0px 15px 0px;
+  padding: 0px 0px 5px 0px;
+}
+
+h2 {
+  color: #424242;
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: bold;
+  letter-spacing: -1px;
+  margin: 0px 0px 5px 0px;
+}
+
+h3 {
+  border-bottom: 1px dotted #babbbb;
+  color: #F26304;
+  font-size: 16px;
+  font-weight: normal;
+  line-height: 22px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0px 0px 5px 0px;
+  padding: 0px 0px 3px 0px;
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0px 0px 5px 0px;
+}
+
+p {
+  margin: 0px 0px 15px 0px;
+}
+
+ol, ul {
+  padding-left: 20px;
+}
+
+blockquote {
+  background: transparent;
+  padding: 5px 10px;
+  position: relative;
+}
+blockquote p {
+  color: #7a7b7b;
+  quotes: "“" "”" "‘" "’";
+  margin: 0 !important;
+  font-style: italic;
+}
+blockquote p:before {
+  color: #F26304;
+  content: open-quote;
+  font-family: serif;
+  font-size: 30px;
+  left: -10px;
+  position: absolute;
+  top: 5px;
+}
+blockquote p:after {
+  color: #F26304;
+  content: close-quote;
+  font-family: serif;
+  font-size: 30px;
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.align-center {
+  text-align: center;
+}
+
+.align-justify {
+  text-align: justify;
+}
+
+/* Forms
+------------------------------------------------------*/
+form:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html form {
+  height: 1px;
+}
+form {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border: 1px dashed #e5e5e5;
+  clear: both;
+  margin-bottom: 20px;
+  padding: 20px;
+}
+form div.formField:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html form div.formField {
+  height: 1px;
+}
+form div.formField {
+  clear: both;
+  margin-bottom: 15px;
+}
+form div.formField.required label {
+  font-weight: bold;
+}
+form div.formField.required label:after {
+  color: #b8292f;
+  content: "*";
+}
+form div.formField.required ul label {
+  font-weight: normal;
+}
+form div.formField.required ul label:after {
+  content: "";
+}
+form div.formField label {
+  clear: both;
+  display: inline-block;
+  margin: 0px 0px 4px 0px;
+}
+form div.formField input[type=text], form div.formField input[type=password], form div.formField input[type=email], form div.formField input[type=tel], form div.formField input[type=number], form div.formField textarea {
+  border-radius: 2px;
+  -o-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -o-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -ms-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #babbbb;
+  margin: 0px;
+  padding: 5px;
+  width: 97.5%;
+}
+form div.formField select {
+  border-radius: 2px;
+  -o-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -o-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -ms-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 5px;
+  width: 100%;
+}
+form div.formField ul, form div.formField ol {
+  list-style: none;
+  padding: 0px;
+}
+form div.formField ul li input, form div.formField ol li input {
+  float: left;
+  margin: 3px 4px 0px 0px;
+}
+form div.formField div.help_text p {
+  color: #7a7b7b;
+  font-size: 11px;
+  margin: 0 !important;
+}
+form input[type=submit] {
+  margin-bottom: 0 !important;
+}
+
+a.button, button, input[type=submit], input[type=button] {
+  background-color: #babbbb;
+  background-image: -o-linear-gradient(center bottom, #babbbb 1%, #e5e5e5 100%);
+  background-image: -ms-linear-gradient(center bottom, #babbbb 1%, #e5e5e5 100%);
+  background-image: -moz-linear-gradient(center bottom, #babbbb 1%, #e5e5e5 100%);
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, #babbbb), color-stop(1, #e5e5e5));
+  border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  box-shadow: 0px 2px 1px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0px 2px 1px rgba(0, 0, 0, 0.3);
+  -ms-box-shadow: 0px 2px 1px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 2px 1px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0px 2px 1px rgba(0, 0, 0, 0.3);
+  text-shadow: 0px 1px 0px white;
+  -o-text-shadow: 0px 1px 0px white;
+  -moz-text-shadow: 0px 1px 0px white;
+  -webkit-text-shadow: 0px 1px 0px white;
+  transition: all 0.25s ease 0s;
+  -o-transition: all 0.25s ease 0s;
+  -ms-transition: all 0.25s ease 0s;
+  -moz-transition: all 0.25s ease 0s;
+  -webkit-transition: all 0.25s ease 0s;
+  border: 0px;
+  border-top: 1px solid white;
+  border-bottom: 1px solid rgb(37.8839535814%, 38.1944777911%, 38.1944777911%);
+  color: black;
+  display: inline-block;
+  font-family: "Lato", "Arial Black", Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  line-height: 20px;
+  height: auto;
+  letter-spacing: 2px;
+  margin: 0px;
+  outline: 0px;
+  padding: 12px 18px;
+  position: relative;
+  top: 0px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  width: auto;
+}
+a.button:hover, button:hover, input[type=submit]:hover, input[type=button]:hover {
+  box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.1);
+  -o-box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.1);
+  -ms-box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.1);
+  background: #e5e5e5;
+  position: relative;
+  top: -3px;
+}
+a.button.block, button.block, input[type=submit].block, input[type=button].block {
+  display: block;
+}
+a.button.big, button.big, input[type=submit].big, input[type=button].big {
+  font-size: 24px;
+  line-height: 24px;
+  padding: 18px 24px;
+}
+
+/* Body
+------------------------------------------------------*/
+html, body {
+  background: #e5e5e5 url("../img/grunge.jpg");
+  color: #424242;
+  font-size: 13px;
+  font-family: "Roboto", Helvetica, Arial, sans-serif;
+  line-height: 18px;
+}
+
+body {
+  padding-top: 98px;
+}
+body.bop-it header a.logo {
+  height: 33px;
+  top: 13px;
+  width: 91px;
+}
+body.bop-it header nav > ul > li > a {
+  padding-bottom: 20px;
+  padding-top: 20px;
+}
+body.bop-it header nav > ul > li ul {
+  top: 68px;
+}
+body.bop-it header nav > ul > li:hover ul {
+  top: 58px;
+}
+
+div.adapt {
+  transition: all 0.25s ease 0s;
+  -o-transition: all 0.25s ease 0s;
+  -ms-transition: all 0.25s ease 0s;
+  -moz-transition: all 0.25s ease 0s;
+  -webkit-transition: all 0.25s ease 0s;
+  left: 0px;
+  position: relative;
+  top: 0px;
+}
+
+/* Mobile Menu
+------------------------------------------------------*/
+section.mobile {
+  display: none;
+  height: auto;
+  width: auto;
+}
+section.mobile a {
+  transition: all 0.25s ease 0s;
+  -o-transition: all 0.25s ease 0s;
+  -ms-transition: all 0.25s ease 0s;
+  -moz-transition: all 0.25s ease 0s;
+  -webkit-transition: all 0.25s ease 0s;
+  background: #78E3C6 url("../img/bg.jpg");
+  color: #152030;
+  display: block;
+  padding: 10px 3%;
+  font-weight: bold;
+  text-align: left;
+  text-decoration: none;
+}
+section.mobile a:hover {
+  background: #78E3C6;
+}
+
+/* Header
+------------------------------------------------------*/
+header:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html header {
+  height: 1px;
+}
+header {
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -ms-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  transition: all 0.5s ease 0s;
+  -o-transition: all 0.5s ease 0s;
+  -ms-transition: all 0.5s ease 0s;
+  -moz-transition: all 0.5s ease 0s;
+  -webkit-transition: all 0.5s ease 0s;
+  display: block;
+  height: auto;
+  min-width: 960px;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+  background: #78E3C6 url("../img/bg.jpg");
+  left: 0px;
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  z-index: 3000;
+}
+header a.logo {
+  transition: all 0.5s ease 0s;
+  -o-transition: all 0.5s ease 0s;
+  -ms-transition: all 0.5s ease 0s;
+  -moz-transition: all 0.5s ease 0s;
+  -webkit-transition: all 0.5s ease 0s;
+  background: #F26304;
+  color: white;
+  display: inline-block;
+  float: none;
+  font-family: "Lato", "Arial Black", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  font-size: 30px;
+  height: 67px;
+  left: 0px;
+  letter-spacing: 7px;
+  line-height: 30px;
+  margin: 0;
+  overflow: hidden;
+  position: absolute;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  top: 15px;
+  width: 184px;
+  z-index: 3000;
+}
+header a.logo > img {
+  transition: all 0.5s ease 0s;
+  -o-transition: all 0.5s ease 0s;
+  -ms-transition: all 0.5s ease 0s;
+  -moz-transition: all 0.5s ease 0s;
+  -webkit-transition: all 0.5s ease 0s;
+  display: block;
+  height: auto;
+  left: 0px;
+  position: absolute;
+  top: 0px;
+  width: 100%;
+}
+header a.logo > img.logo {
+  z-index: 20;
+}
+header a.logo > img.frame {
+  z-index: 15;
+}
+header a.logo > img.fill {
+  z-index: 10;
+}
+header > div:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html header > div {
+  height: 1px;
+}
+header > div {
+  display: block;
+  margin: 0 auto;
+  padding: 0px;
+  text-align: left;
+  width: 960px;
+  color: white;
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  padding: 0;
+  position: relative;
+  max-width: 960px;
+}
+header > div nav {
+  display: inline;
+  float: right;
+  position: relative;
+  right: 0px;
+  text-align: right;
+}
+header > div nav ul {
+  display: block;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+}
+header > div nav ul li {
+  display: inline;
+}
+header > div nav ul li a {
+  transition: all 0.5s ease 0s;
+  -o-transition: all 0.5s ease 0s;
+  -ms-transition: all 0.5s ease 0s;
+  -moz-transition: all 0.5s ease 0s;
+  -webkit-transition: all 0.5s ease 0s;
+  color: #152030;
+  display: inline;
+  font-family: "Lato", "Arial Black", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  float: right;
+  padding: 40px 30px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+header > div nav ul li a:hover, header > div nav ul li a.here {
+  background: rgba(0, 0, 0, 0.1);
+  padding-left: 40px;
+  padding-right: 40px;
+}
+header > div nav ul li:hover > a {
+  background: rgba(0, 0, 0, 0.1);
+  padding-left: 40px;
+  padding-right: 40px;
+}
+header > div nav ul li:hover > ul {
+  display: block;
+  max-height: 1000px;
+  opacity: 1;
+  overflow: visible;
+  top: 98px;
+}
+header > div nav ul li ul {
+  transition: all 0.25s ease 0.35s;
+  -o-transition: all 0.25s ease 0.35s;
+  -ms-transition: all 0.25s ease 0.35s;
+  -moz-transition: all 0.25s ease 0.35s;
+  -webkit-transition: all 0.25s ease 0.35s;
+  background: #F26304;
+  display: block;
+  height: auto;
+  list-style: none;
+  margin: 0;
+  max-height: 0;
+  left: 0px;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  text-align: left;
+  top: 108px;
+  width: 100%;
+}
+header > div nav ul li ul li {
+  display: block;
+  margin: 0;
+  padding: 0;
+  width: auto;
+}
+header > div nav ul li ul li a {
+  color: white;
+  display: block;
+  float: none;
+  font-size: 11px;
+  line-height: 16px;
+  padding: 8px 12px;
+  text-align: left;
+}
+header > div nav ul li ul li a:hover {
+  padding: 12px 12px;
+}
+header > div nav ul li ul li ul {
+  display: none !important;
+}
+
+/* Content
+------------------------------------------------------*/
+section.content:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html section.content {
+  height: 1px;
+}
+section.content {
+  display: block;
+  height: auto;
+  min-width: 960px;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+  padding: 30px 0px;
+}
+section.content > div:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html section.content > div {
+  height: 1px;
+}
+section.content > div {
+  display: block;
+  margin: 0 auto;
+  padding: 0px;
+  text-align: left;
+  width: 960px;
+}
+section.content nav {
+  display: inline;
+  height: auto;
+  float: left;
+  margin-top: 15px;
+  width: 160px;
+}
+section.content nav p.title {
+  color: #424242;
+  font-size: 18px;
+  line-height: 26px;
+  margin-bottom: 15px;
+}
+section.content nav p.title a {
+  transition: all 0.25s ease 0s;
+  -o-transition: all 0.25s ease 0s;
+  -ms-transition: all 0.25s ease 0s;
+  -moz-transition: all 0.25s ease 0s;
+  -webkit-transition: all 0.25s ease 0s;
+  color: #243854;
+  text-decoration: none;
+}
+section.content nav p.title a:hover {
+  color: rgb(23.1176470588%, 35.9607843137%, 53.9411764706%);
+}
+section.content nav ul {
+  border-top: 1px dotted #babbbb;
+  clear: both;
+  list-style: none;
+  padding: 0px;
+}
+section.content nav ul li {
+  border-bottom: 1px dotted #babbbb;
+  padding: 8px 0px;
+}
+section.content nav ul li a {
+  color: #424242;
+  display: inline;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  line-height: 14px;
+  padding: 1px 2px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+section.content nav ul li a:hover {
+  background: #F26304;
+  color: white;
+}
+section.content nav ul li ul {
+  border-top: 0px;
+  padding: 0 0 0 15px;
+}
+section.content nav ul li ul li {
+  border-bottom: 0px;
+  padding: 0;
+}
+section.content nav ul li ul li a {
+  font-size: 11px;
+  letter-spacing: 0px;
+}
+section.content nav ul li ul li ul {
+  padding: 0 0 0 30px;
+}
+section.content nav ul li ul li ul li {
+  padding: 0;
+}
+section.content nav ul li ul li ul li a {
+  font-size: 10px;
+  letter-spacing: 0px;
+}
+section.content article {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -ms-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  background: white;
+  display: inline;
+  height: auto;
+  float: right;
+  min-height: 300px;
+  padding: 25px;
+  width: 750px;
+}
+section.content article section.main h1, section.content article section.main h2, section.content article section.main h3, section.content article section.main h4, section.content article section.main h5, section.content article section.main h6, section.content article section.main p, section.content article section.main blockquote, section.content article section.main ol, section.content article section.main ul, section.content article section.main hgroup, section.content article section.main hr {
+  display: block !important;
+  float: none !important;
+  margin: 0px 0px 15px 0px !important;
+  width: auto !important;
+}
+section.content article section.main .fl {
+  float: left;
+  margin: 0px 25px 15px 0px;
+}
+section.content article section.main .fr {
+  float: right;
+  margin: 0px 0px 15px 25px;
+}
+section.content article section.main img.left {
+  float: left;
+  margin: 5px 20px 15px 0px;
+}
+section.content article section.main img.right {
+  float: right;
+  margin: 5px 0px 15px 20px;
+}
+section.content article section.main table {
+  display: table;
+  width: 100% !important;
+}
+section.content article section.main {
+  display: inline;
+  float: left;
+  height: auto;
+  width: 525px;
+}
+section.content article section.sidebar h1, section.content article section.sidebar h2, section.content article section.sidebar h3, section.content article section.sidebar h4, section.content article section.sidebar h5, section.content article section.sidebar h6, section.content article section.sidebar p, section.content article section.sidebar blockquote, section.content article section.sidebar ol, section.content article section.sidebar ul, section.content article section.sidebar hgroup, section.content article section.sidebar hr {
+  display: block !important;
+  float: none !important;
+  margin: 0px 0px 15px 0px !important;
+  width: auto !important;
+}
+section.content article section.sidebar .fl {
+  float: left;
+  margin: 0px 25px 15px 0px;
+}
+section.content article section.sidebar .fr {
+  float: right;
+  margin: 0px 0px 15px 25px;
+}
+section.content article section.sidebar img.left {
+  float: left;
+  margin: 5px 20px 15px 0px;
+}
+section.content article section.sidebar img.right {
+  float: right;
+  margin: 5px 0px 15px 20px;
+}
+section.content article section.sidebar table {
+  display: table;
+  width: 100% !important;
+}
+section.content article section.sidebar {
+  display: inline;
+  float: right;
+  height: auto;
+  width: 200px;
+}
+section.content article section.sidebar div.callout {
+  border-radius: 2px;
+  -o-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  box-shadow: inset 0px 2px 2px rgba(0, 0, 0, 0.1);
+  -o-box-shadow: inset 0px 2px 2px rgba(0, 0, 0, 0.1);
+  -ms-box-shadow: inset 0px 2px 2px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: inset 0px 2px 2px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: inset 0px 2px 2px rgba(0, 0, 0, 0.1);
+  background: rgb(92.8039215686%, 92.8039215686%, 92.8039215686%);
+  margin: 0px 0px 15px 0px;
+  padding: 15px;
+}
+section.content article section.sidebar div.callout h1 {
+  border: 0px;
+  color: #424242;
+  font-size: 1.4em;
+  letter-spacing: 0px;
+  line-height: 24px;
+  margin: 0px 0px 5px 0px !important;
+  font-weight: bold;
+  padding: 0px;
+}
+section.content article section.sidebar div.callout h2 {
+  font-size: 1.3em;
+}
+section.content article section.sidebar div.callout h3 {
+  font-size: 1.2em;
+}
+section.content article section.sidebar div.callout h4 {
+  font-size: 1.1em;
+}
+section.content article section.sidebar div.callout p:last-child {
+  margin-bottom: 0 !important;
+}
+section.content article section.sidebar div.callout a.button {
+  display: block;
+  margin-top: 10px;
+  text-align: center;
+}
+section.content article {
+  /* HTML Fixes */
+}
+section.content article section.main th h1, section.content article section.main th h2, section.content article section.main th h3, section.content article section.main th h4, section.content article section.main th ul, section.content article section.main th p, section.content article section.main td h1, section.content article section.main td h2, section.content article section.main td h3, section.content article section.main td h4, section.content article section.main td ul, section.content article section.main td p,
+section.content article section.sidebar th h1,
+section.content article section.sidebar th h2,
+section.content article section.sidebar th h3,
+section.content article section.sidebar th h4,
+section.content article section.sidebar th ul,
+section.content article section.sidebar th p,
+section.content article section.sidebar td h1,
+section.content article section.sidebar td h2,
+section.content article section.sidebar td h3,
+section.content article section.sidebar td h4,
+section.content article section.sidebar td ul,
+section.content article section.sidebar td p {
+  margin: 0 !important;
+}
+section.content article section.main blockquote p,
+section.content article section.sidebar blockquote p {
+  margin: 0 !important;
+}
+section.content article section.main iframe,
+section.content article section.sidebar iframe {
+  margin: 0 0 15px 0;
+  max-width: 100%;
+}
+section.content article section.main img,
+section.content article section.sidebar img {
+  height: auto;
+  max-width: 100%;
+}
+section.content article section.main > a.button:after,
+section.content article section.sidebar > a.button:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html section.content article section.main > a.button,
+* html section.content article section.sidebar > a.button {
+  height: 1px;
+}
+section.content article section.main > a.button,
+section.content article section.sidebar > a.button {
+  float: right;
+  margin: 0 0 15px 15px;
+}
+
+/* Homepage Content
+------------------------------------------------------*/
+body.home {
+  padding-top: 0;
+}
+body.home section.content {
+  padding: 0 0 50px 0;
+}
+body.home section.content .inner {
+  width: 100%;
+}
+body.home section.content .inner article {
+  box-shadow: 0 0 0 transparent;
+  -o-box-shadow: 0 0 0 transparent;
+  -ms-box-shadow: 0 0 0 transparent;
+  -moz-box-shadow: 0 0 0 transparent;
+  -webkit-box-shadow: 0 0 0 transparent;
+  border-radius: 0px;
+  -o-border-radius: 0px;
+  -ms-border-radius: 0px;
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  background: transparent;
+  padding: 0;
+  width: 100%;
+}
+body.home section.content .inner article div.cycle-slideshow {
+  height: 498px;
+  margin: 0 0 25px 0;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+body.home section.content .inner article div.cycle-slideshow div.slide h1, body.home section.content .inner article div.cycle-slideshow div.slide h2, body.home section.content .inner article div.cycle-slideshow div.slide h3, body.home section.content .inner article div.cycle-slideshow div.slide h4, body.home section.content .inner article div.cycle-slideshow div.slide h5, body.home section.content .inner article div.cycle-slideshow div.slide h6, body.home section.content .inner article div.cycle-slideshow div.slide p, body.home section.content .inner article div.cycle-slideshow div.slide blockquote, body.home section.content .inner article div.cycle-slideshow div.slide ol, body.home section.content .inner article div.cycle-slideshow div.slide ul, body.home section.content .inner article div.cycle-slideshow div.slide hgroup, body.home section.content .inner article div.cycle-slideshow div.slide hr {
+  display: block !important;
+  float: none !important;
+  margin: 0px 0px 15px 0px !important;
+  width: auto !important;
+}
+body.home section.content .inner article div.cycle-slideshow div.slide .fl {
+  float: left;
+  margin: 0px 25px 15px 0px;
+}
+body.home section.content .inner article div.cycle-slideshow div.slide .fr {
+  float: right;
+  margin: 0px 0px 15px 25px;
+}
+body.home section.content .inner article div.cycle-slideshow div.slide img.left {
+  float: left;
+  margin: 5px 20px 15px 0px;
+}
+body.home section.content .inner article div.cycle-slideshow div.slide img.right {
+  float: right;
+  margin: 5px 0px 15px 20px;
+}
+body.home section.content .inner article div.cycle-slideshow div.slide table {
+  display: table;
+  width: 100% !important;
+}
+body.home section.content .inner article div.cycle-slideshow div.slide {
+  text-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+  -o-text-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+  -moz-text-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+  -webkit-text-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+  background-size: cover !important;
+  color: white;
+  height: 400px;
+  padding-top: 98px;
+  text-align: center;
+  width: 100%;
+}
+body.home section.content .inner article div.cycle-slideshow div.slide h1 {
+  font-family: "Lato", "Arial Black", Helvetica, Arial, sans-serif;
+  font-size: 50px;
+  font-weight: bold;
+  line-height: 60px;
+  margin: 75px auto 15px auto !important;
+  padding-bottom: 15px;
+  max-width: 960px;
+}
+body.home section.content .inner article div.cycle-slideshow div.slide p {
+  font-size: 18px;
+  line-height: 24px;
+}
+body.home section.content .inner article section.homeBoxes:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html body.home section.content .inner article section.homeBoxes {
+  height: 1px;
+}
+body.home section.content .inner article section.homeBoxes {
+  display: block;
+  margin: 0 auto;
+  padding: 0px;
+  text-align: left;
+  width: 960px;
+  width: 960px;
+}
+body.home section.content .inner article section.homeBoxes div.homeBox {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -ms-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  background: white;
+  display: inline;
+  height: auto;
+  margin: 0 0 0 30px;
+  float: left;
+  padding: 25px;
+  width: 250px;
+}
+body.home section.content .inner article section.homeBoxes div.homeBox p.title {
+  border-bottom: 2px solid #F26304;
+  font-size: 24px;
+  padding-bottom: 15px;
+}
+body.home section.content .inner article section.homeBoxes div.homeBox:first-child, body.home section.content .inner article section.homeBoxes div.homeBox:nth-child(3n+1) {
+  margin-left: 0;
+}
+body.home section.content .inner article section.homeBoxes div.homeBox a.button {
+  clear: both;
+  display: block;
+}
+
+/* Footer
+------------------------------------------------------*/
+footer {
+  box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.1);
+  -o-box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.1);
+  -ms-box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 30px 0px;
+  text-align: center;
+}
+footer a {
+  color: #7a7b7b;
+  margin: 0 10px;
+  text-decoration: none;
+}
+
+/* Accordion
+------------------------------------------------------*/
+div.accordion {
+  clear: both;
+}
+div.accordion details {
+  clear: both;
+  margin: 0px 0px 10px 0px;
+}
+div.accordion details summary {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -o-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -ms-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  background: #F26304;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 20px;
+  margin-bottom: 3px;
+  padding: 8px 10px;
+}
+div.accordion details summary:hover {
+  background: rgb(98.6417981827%, 50.0860832138%, 17.8287900526%);
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+  -ms-box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+}
+div.accordion details div.accordionContent:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html div.accordion details div.accordionContent {
+  height: 1px;
+}
+div.accordion details div.accordionContent h1, div.accordion details div.accordionContent h2, div.accordion details div.accordionContent h3, div.accordion details div.accordionContent h4, div.accordion details div.accordionContent h5, div.accordion details div.accordionContent h6, div.accordion details div.accordionContent p, div.accordion details div.accordionContent blockquote, div.accordion details div.accordionContent ol, div.accordion details div.accordionContent ul, div.accordion details div.accordionContent hgroup, div.accordion details div.accordionContent hr {
+  display: block !important;
+  float: none !important;
+  margin: 0px 0px 15px 0px !important;
+  width: auto !important;
+}
+div.accordion details div.accordionContent .fl {
+  float: left;
+  margin: 0px 25px 15px 0px;
+}
+div.accordion details div.accordionContent .fr {
+  float: right;
+  margin: 0px 0px 15px 25px;
+}
+div.accordion details div.accordionContent img.left {
+  float: left;
+  margin: 5px 20px 15px 0px;
+}
+div.accordion details div.accordionContent img.right {
+  float: right;
+  margin: 5px 0px 15px 20px;
+}
+div.accordion details div.accordionContent table {
+  display: table;
+  width: 100% !important;
+}
+div.accordion details div.accordionContent {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -o-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -ms-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgb(99.2922046868%, 73.9885222382%, 57.1783835485%);
+  padding: 8px 10px;
+}
+
+/* Tabify
+------------------------------------------------------*/
+div.tabify:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+* html div.tabify {
+  height: 1px;
+}
+div.tabify {
+  clear: both;
+  margin: 0px 0px 10px 0px;
+}
+div.tabify ul.tabs {
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+}
+div.tabify ul.tabs li {
+  display: inline;
+  float: left;
+  margin: 0px 0px 0px 5px;
+}
+div.tabify ul.tabs li a {
+  border-radius: 3px 3px 0px 0px;
+  -o-border-radius: 3px 3px 0px 0px;
+  -ms-border-radius: 3px 3px 0px 0px;
+  -moz-border-radius: 3px 3px 0px 0px;
+  -webkit-border-radius: 3px 3px 0px 0px;
+  background: #243854;
+  color: white;
+  display: block;
+  font-family: "Lato", "Arial Black", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  line-height: 20px;
+  padding: 8px 10px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+div.tabify ul.tabs li a:hover {
+  background: rgb(23.1176470588%, 35.9607843137%, 53.9411764706%);
+}
+div.tabify ul.tabs li a.active {
+  background: #184C88;
+}
+div.tabify div.tabContent h1, div.tabify div.tabContent h2, div.tabify div.tabContent h3, div.tabify div.tabContent h4, div.tabify div.tabContent h5, div.tabify div.tabContent h6, div.tabify div.tabContent p, div.tabify div.tabContent blockquote, div.tabify div.tabContent ol, div.tabify div.tabContent ul, div.tabify div.tabContent hgroup, div.tabify div.tabContent hr {
+  display: block !important;
+  float: none !important;
+  margin: 0px 0px 15px 0px !important;
+  width: auto !important;
+}
+div.tabify div.tabContent .fl {
+  float: left;
+  margin: 0px 25px 15px 0px;
+}
+div.tabify div.tabContent .fr {
+  float: right;
+  margin: 0px 0px 15px 25px;
+}
+div.tabify div.tabContent img.left {
+  float: left;
+  margin: 5px 20px 15px 0px;
+}
+div.tabify div.tabContent img.right {
+  float: right;
+  margin: 5px 0px 15px 20px;
+}
+div.tabify div.tabContent table {
+  display: table;
+  width: 100% !important;
+}
+div.tabify div.tabContent {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border: dashed 1px #babbbb;
+  border-top: 3px solid #184C88;
+  clear: both;
+  overflow: auto;
+  padding: 15px;
+}
+div.tabify div.tabContent > p.title {
+  display: none !important;
+}
+
+/* Figure
+------------------------------------------------------*/
+figure {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -ms-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  margin-bottom: 20px !important;
+  overflow: hidden;
+}
+figure img {
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  display: block;
+  height: auto;
+  width: 100%;
+}
+figure.center, figure.left, figure.right {
+  background: #78E3C6;
+  width: 200px;
+}
+figure.center img, figure.left img, figure.right img {
+  border-radius: 3px 3px 0px 0px;
+  -o-border-radius: 3px 3px 0px 0px;
+  -ms-border-radius: 3px 3px 0px 0px;
+  -moz-border-radius: 3px 3px 0px 0px;
+  -webkit-border-radius: 3px 3px 0px 0px;
+  height: auto;
+  margin: 0px;
+  width: 100%;
+}
+figure.center figcaption, figure.left figcaption, figure.right figcaption {
+  color: #152030;
+  display: block;
+  font-size: 12px;
+  font-style: italic;
+  line-height: 16px;
+  padding: 15px;
+  text-align: center;
+}
+figure.center.center, figure.left.center, figure.right.center {
+  display: block;
+  margin: 10px auto 25px auto;
+}
+figure.center.left, figure.left.left, figure.right.left {
+  float: left;
+  margin: 10px 25px 25px 0px;
+}
+figure.center.right, figure.left.right, figure.right.right {
+  float: right;
+  margin: 10px 0px 25px 25px;
+}
+
+/* Tables
+------------------------------------------------------*/
+table {
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -ms-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border: 0px;
+  overflow: hidden;
+  margin: 0 0 15px 0;
+  width: 100%;
+}
+table thead th, table thead td {
+  background: #78E3C6;
+  border: 0px;
+  color: #152030;
+  font-weight: bold;
+  padding: 10px;
+}
+table thead th p, table thead td p {
+  margin: 0 !important;
+}
+table tbody th, table tbody td {
+  background: white;
+  border: 0px;
+  color: #7a7b7b;
+  font-weight: normal;
+  padding: 5px 10px;
+  vertical-align: top;
+}
+table tbody th p, table tbody td p {
+  margin: 0 !important;
+}
+table tbody tr:nth-child(2n) th, table tbody tr:nth-child(2n) td {
+  background: rgb(94.8039215686%, 94.8039215686%, 94.8039215686%);
+}
+
+/* HTML
+------------------------------------------------------*/
+.htmlOutput blockquote p {
+  margin: 0 !important;
+}
+
+/*------------------------------------------------------
+
+  Responsive
+
+--------------------------------------------------------*/
+/* Fluid Responsive Designs
+--------------------------------------------------------*/
+@media screen and (min-width: 601px) and (max-width: 1020px) {
+  header,
+  section.content {
+    min-width: 580px;
+  }
+  header > div,
+  section.content > div {
+    width: 90%;
+  }
+  header nav ul li a {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  header nav ul li a:hover {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+  section.content nav {
+    width: 20%;
+  }
+  section.content article {
+    padding: 15px 3%;
+    width: 74%;
+  }
+  section.content article section.main {
+    width: 60%;
+  }
+  section.content article section.sidebar {
+    width: 35%;
+  }
+}
+/* Mobile Responsive Designs
+--------------------------------------------------------*/
+@media screen and (max-width: 600px) {
+  body {
+    overflow-x: hidden;
+  }
+  body.shift .adapt {
+    left: 200px;
+    top: 0px;
+  }
+  section.mobile {
+    display: block;
+  }
+  header,
+  section.content {
+    min-width: 280px;
+  }
+  header > div,
+  section.content > div {
+    width: 90%;
+  }
+  body.bop-it header,
+  header {
+    position: static;
+  }
+  body.bop-it header > div,
+  header > div {
+    position: static;
+  }
+  body.bop-it header > div a.logo,
+  header > div a.logo {
+    height: 67px !important;
+    left: auto;
+    right: 15px;
+    width: 184px !important;
+  }
+  body.bop-it header > div nav,
+  header > div nav {
+    float: none;
+    left: -200px;
+    position: absolute;
+    right: auto;
+    text-align: left;
+    top: 0px;
+    width: 200px;
+    z-index: 100;
+  }
+  body.bop-it header > div nav ul,
+  header > div nav ul {
+    border-top: 1px dotted #babbbb;
+    float: none;
+    list-style: none;
+    padding: 0px;
+    display: block;
+    text-align: left;
+    width: 200px;
+  }
+  body.bop-it header > div nav ul li,
+  header > div nav ul li {
+    border-bottom: 1px dotted #babbbb;
+    display: block;
+    float: none;
+    margin: 0px;
+    padding: 0;
+    width: 200px;
+  }
+  body.bop-it header > div nav ul li a,
+  header > div nav ul li a {
+    color: #424242;
+    display: block;
+    float: none;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    line-height: 14px;
+    padding: 8px;
+    text-align: left;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: auto;
+  }
+  body.bop-it header > div nav ul li a:hover,
+  header > div nav ul li a:hover {
+    background: #F26304;
+    color: white;
+    padding: 12px 8px;
+  }
+  body.bop-it header > div nav ul li ul,
+  header > div nav ul li ul {
+    background: transparent;
+    border-top: 0px;
+    display: block;
+    max-height: 1000px;
+    position: static;
+    opacity: 1;
+    top: 0;
+  }
+  body.bop-it header > div nav ul li ul li,
+  header > div nav ul li ul li {
+    border-bottom: 0px;
+  }
+  body.bop-it header > div nav ul li ul li a,
+  header > div nav ul li ul li a {
+    padding-left: 20px !important;
+  }
+  body.bop-it header > div nav ul li ul li ul,
+  header > div nav ul li ul li ul {
+    display: block !important;
+  }
+  body.bop-it header > div nav ul li ul li ul li a,
+  header > div nav ul li ul li ul li a {
+    padding-left: 40px !important;
+  }
+  section.content .inner nav {
+    display: none;
+  }
+  section.content .inner article {
+    padding: 15px 3%;
+    width: 94%;
+  }
+  section.content .inner article section.main {
+    width: 100%;
+  }
+  section.content .inner article section.sidebar {
+    width: 100%;
+  }
+  body.home section.content .inner article section.homeBoxes {
+    padding: 0 5%;
+    width: 90%;
+  }
+  body.home section.content .inner article section.homeBoxes div.homeBox:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+  }
+  * html body.home section.content .inner article section.homeBoxes div.homeBox {
+    height: 1px;
+  }
+  body.home section.content .inner article section.homeBoxes div.homeBox {
+    clear: both;
+    display: block;
+    float: none;
+    margin: 0;
+    width: auto;
+  }
+}

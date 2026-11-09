@@ -1,0 +1,21 @@
+figure {
+  display: block;
+}
+figure.left {
+  display: inline;
+  float: left;
+}
+figure.right {
+  display: inline;
+  float: right;
+}
+figure.center {
+  margin: 0 auto;
+  float: none;
+}
+figure figcaption {
+  text-align: center;
+}
+figure figcaption .title {
+  display: block;
+}

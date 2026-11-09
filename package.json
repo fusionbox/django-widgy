@@ -1,0 +1,11 @@
+{
+  "name": "django-widgy-build",
+  "private": true,
+  "description": "Build tooling for django-widgy's stylesheets. Not published.",
+  "engines": {
+    "node": ">=18.18"
+  },
+  "devDependencies": {
+    "sass": "1.106.1"
+  }
+}

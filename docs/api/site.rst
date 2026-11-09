@@ -139,29 +139,51 @@ Widgy Site
         server when adding a
         new file.
 
-    .. attribute:: scss_files
+    .. attribute:: css_files
 
-    Returns a list of SCSS files to be included on the front-end.
-    Widgets can add SCSS files just by making a file available
+    Returns a list of CSS files to be included on the front-end.
+    Widgets can add CSS files just by making a file available
     at a location determined by its app label and name (see
     :func:`widgy.models.Content.get_templates_hierarchy`). For example::
 
-          widgy/page_builder/html.scss
+          widgy/page_builder/html.css
+
+    .. attribute:: uncompiled_scss_files
+
+    SCSS files for widgets that ship SCSS without a compiled ``.css`` file of
+    the same name next to it. Render these alongside :attr:`css_files`; they
+    require a ``text/x-scss`` precompiler in ``COMPRESS_PRECOMPILERS``.
+    Widgy's own widgets all ship compiled CSS, so they never appear here.
+
+    .. attribute:: scss_files
+
+    All SCSS files, including widgy's own, whether or not they have been
+    compiled. This is for templates written before widgy shipped CSS, which
+    loop over ``scss_files`` alone and compile everything with a
+    ``text/x-scss`` precompiler. New templates should use :attr:`css_files`
+    and :attr:`uncompiled_scss_files` instead. Using both ``css_files`` and
+    ``scss_files`` includes widgy's styles twice.
 
     .. attribute:: js_files
 
-       Like ``scss_files``, but JavaScript files.
+       Like ``css_files``, but JavaScript files.
 
-    .. attribute:: admin_scss_files
+    .. attribute:: admin_css_files
 
-      Like ``scss_files``, but for the back-end editing interface. These
+      Like ``css_files``, but for the back-end editing interface. These
       paths look like, for an app::
 
-          widgy/page_builder/admin.scss
+          widgy/page_builder/admin.css
 
       and for a widget::
 
-          widgy/page_builder/table.admin.scss
+          widgy/page_builder/table.admin.css
+
+    .. attribute:: admin_uncompiled_scss_files
+    .. attribute:: admin_scss_files
+
+      The back-end equivalents of :attr:`uncompiled_scss_files` and
+      :attr:`scss_files`.
 
       If you want to included JavaScript for the editing interface, you should
       use a :attr:`component <widgy.models.base.Content.component_name>`.
