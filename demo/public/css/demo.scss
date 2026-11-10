@@ -879,26 +879,20 @@ div.tabify {
   clear: both;
   margin: 0px 0px 10px 0px;
 
+  // Basic tab layout (list reset, flex row) comes from widgy's
+  // page_builder/tabs.scss; only the visual treatment lives here.
   ul.tabs {
-    list-style: none;
-    margin: 0px;
-    padding: 0px;
-
     li {
-      display: inline;
-      float: left;
       margin: 0px 0px 0px 5px;
 
       a {
         @include rounded(3px 3px 0px 0px);
         background: $blue;
         color: white;
-        display: block;
         font-family: $font-primary;
         font-size: 13px;
         line-height: 20px;
         padding: 8px 10px;
-        text-decoration: none;
         text-transform: uppercase;
 
         &:hover {
@@ -917,7 +911,6 @@ div.tabify {
     @include rounded(3px);
     border: dashed 1px $lightgrey;
     border-top: 3px solid $lightblue;
-    clear: both;
     overflow: auto;
     padding: 15px;
     
