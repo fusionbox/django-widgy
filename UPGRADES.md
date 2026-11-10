@@ -39,3 +39,8 @@ The steps to success should look like:
   there is a bit of stylistic monkeypatching in here that can be
   removed when those packages are updated. Specifically
   widgy_mezzanine/admin_layout.css and references.
+* All *pyscss* packages and related stuff depend on libsass, which is
+  deprecated. Claude's recommendation is to move to sass compilation
+  in the build step, using the npm package that implements dart
+  sass. That felt like a bit shift, so all that code is in the
+  dart-sass branch.
