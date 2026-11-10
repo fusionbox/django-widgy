@@ -1,6 +1,11 @@
 {% load compress static %}
+{# layout_select.scss styles ul/li. Django's own radio.html renders nested divs since 4.0, so render the list ourselves. #}
 <div class="layoutSelect">
-  {% include 'django/forms/widgets/radio.html' %}
+  <ul{% if widget.attrs.id %} id="{{ widget.attrs.id }}"{% endif %}>
+    {% for group, options, index in widget.optgroups %}{% for option in options %}
+    <li>{% include option.template_name with widget=option %}</li>
+    {% endfor %}{% endfor %}
+  </ul>
 </div>
 {% compress css %}
 <link type="text/x-scss" rel="stylesheet" href="{% static 'widgy/css/layout_select.scss' %}">

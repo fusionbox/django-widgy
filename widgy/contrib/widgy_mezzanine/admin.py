@@ -77,6 +77,9 @@ class WidgyPageAdmin(PageAdmin):
     form = WidgyPageAdminForm
     readonly_fields = ['status']
 
+    class Media:
+        css = {'all': ('widgy/widgy_mezzanine/admin_layout.css',)}
+
     unreviewed_buttons = {
         CONTENT_STATUS_EMBRYO    : [('_continue', _('Save'))],
         CONTENT_STATUS_DRAFT     : [('_continue', _('Save as Draft')),

@@ -1,0 +1,20 @@
+/*
+ * Multi-field rows in the page admin ("Published from" / "Expires on").
+ *
+ * Since Django 3.0 the admin wraps each field of a multi-field row in an
+ * extra <div> and renders its help text outside .fieldBox. grappelli_safe
+ * still floats .fieldBox left, which pushes the second field in beside the
+ * first one's help text. Lay the row out with flexbox instead, with each
+ * field's help text below it.
+ */
+.form-row .form-multiline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: 40px;
+}
+
+.form-row .form-multiline > div > .fieldBox {
+  float: none;
+  margin: 0 0 4px 0 !important;
+}

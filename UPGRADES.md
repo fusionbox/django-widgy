@@ -35,3 +35,7 @@ The steps to success should look like:
   declare it as a dependency. Neither django-widgy nor
   django-widgy-blog make use of mezzanine.generic, but the
   django-widgy demo site does, so that's why it shows up there.
+* Mezzanine/Grapelli have outdated admin templates and styles, so
+  there is a bit of stylistic monkeypatching in here that can be
+  removed when those packages are updated. Specifically
+  widgy_mezzanine/admin_layout.css and references.
