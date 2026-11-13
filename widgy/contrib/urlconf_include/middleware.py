@@ -1,4 +1,4 @@
-import imp
+import types
 import re
 
 from importlib import import_module
@@ -36,7 +36,7 @@ class PatchUrlconfMiddleware(MiddlewareMixin):
             qs = cls.get_pages(logged_in=False)
         urlconf_pages = sorted(qs, key=lambda p: len(p.slug))
 
-        new_urlconf = imp.new_module('urlconf')
+        new_urlconf = types.ModuleType('urlconf')
         new_urlconf.urlpatterns = []
         for page in urlconf_pages:
             new_urlconf.urlpatterns.extend(cls.get_pattern_for_page(page))
@@ -65,7 +65,7 @@ class PatchUrlconfMiddleware(MiddlewareMixin):
                 # request.resolver_match.
                 urls.resolve(request.get_full_path(), request.urlconf)
             except urls.Resolver404:
-                empty_urlconf = imp.new_module('urlconf')
+                empty_urlconf = types.ModuleType('urlconf')
                 empty_urlconf.urlpatterns = []
                 urlconf = self.get_urlconf(empty_urlconf, self.get_pages(logged_in=True))
                 try:

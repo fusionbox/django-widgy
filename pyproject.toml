@@ -20,6 +20,9 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Web Environment",
     "Framework :: Django",
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4.0",
+    "Framework :: Django :: 4.1",
     "Framework :: Django :: 4.2",
     "Intended Audience :: Developers",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
@@ -28,22 +31,26 @@ classifiers = [
     "Programming Language :: JavaScript",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.9"
 dependencies = [
     "beautifulsoup4>=4.15.0",
-    "bleach>=6.4.0",
+    "bleach>=6.2.0",
     "bleach-allowlist>=1.0.3",
     "dj-database-url>=2.2.0",
-    "django>=4.1,<4.3",
-    "django-compressor>=1.3",
+    "django>=3.2,<5.0",
+    "django-compressor>=4.4",
     "django-filer>=3.6.0",
     "django-pyscss>=2.0.3",
     "django-treebeard>=4.7.1",
     "html2text>=2025.4.15",
     "html5lib>=1.1",
-    "markdown>=3.11.2",
+    "markdown>=3.9",
     "mezzanine>=6.1.1",
     "phonenumbers>=9.0.42",
     "pyscss",
@@ -67,20 +74,25 @@ include = ["widgy*"]
 
 [dependency-groups]
 dev = [
-    "pytest>=9.2.0",
-    "pytest-django>=4.14.0",
+    "pytest>=8.3",
+    "pytest-django>=4.11",
     "django-debug-toolbar",
     "django-extensions",
-    "python-lsp-server>=1.15.0",
+    "python-lsp-server",
 ]
 demo = [
     "werkzeug",
     "django-contrib-comments",
 ]
 
-# Redundant with Makefile test-py target
-[tool.pytest]
+# DJANGO_SETTINGS_MODULE is redundant with the Makefile test-py target.
+# [tool.pytest.ini_options] rather than the pytest>=9 native [tool.pytest]
+# table, so that pytest 8 (the newest available on Python 3.9) reads it too.
+[tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings_contrib"
+# Several apps keep their tests in a module named tests.py, which pytest does
+# not collect by default.
+python_files = "test_*.py tests.py"
 
 [tool.uv.sources]
 pyscss = { git = "https://github.com/Kronuz/pyScss.git" }

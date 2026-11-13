@@ -121,7 +121,7 @@ class Migration(migrations.Migration):
             name='ReviewedVersionedPage',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('version_tracker', widgy.db.fields.VersionedWidgyField(to='review_queue.ReviewedVersionTracker')),
+                ('version_tracker', widgy.db.fields.VersionedWidgyField(to='widgy.VersionTracker')),
             ],
         ),
         migrations.CreateModel(

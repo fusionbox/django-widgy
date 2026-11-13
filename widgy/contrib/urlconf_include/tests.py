@@ -1,4 +1,4 @@
-import imp
+import types
 
 import django
 from django.test import TestCase
@@ -28,7 +28,9 @@ def view_that_resolves(request, login_url):
     # Use request.urlconf because we're mocking everything. BaseHandler
     # would call set_urlconf if we were making a real request.
     match = urls.resolve(login_url, request.urlconf)
-    assert 'LoginView' in match.func.__name__
+    # as_view() stopped copying the class name onto the view function in
+    # Django 4.0; view_class is available on every supported version.
+    assert match.func.view_class.__name__ == 'LoginView'
     return HttpResponse('')
 
 
@@ -45,7 +47,7 @@ def view_not_found(request):
 def view_that_switches_urlconf(request, login_url):
     urls.resolve(login_url, request.urlconf)
 
-    new_urlconf = imp.new_module('urlconf')
+    new_urlconf = types.ModuleType('urlconf')
     new_urlconf.urlpatterns = [re_path(r'^bar/', include('django.contrib.auth.urls'))]
     request.urlconf = new_urlconf
 

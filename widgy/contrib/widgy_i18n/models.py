@@ -9,15 +9,14 @@ from widgy.contrib.page_builder.models import Layout
 from widgy.models.mixins import TabbedContainer, StrictDefaultChildrenMixin
 from widgy import register
 
+from .fields import LanguageCodeField
+
 
 class I18NChild(models.Model):
     """
     Mixin for Contents that go directly inside I18NTabbedContainers.
     """
-    language_code = models.CharField(verbose_name=_('Layout'),
-                                     max_length=10,
-                                     choices=settings.LANGUAGES,
-                                     )
+    language_code = LanguageCodeField(verbose_name=_('Layout'), max_length=10)
 
     class Meta:
         abstract = True

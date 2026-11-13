@@ -169,6 +169,21 @@ class VersionedWidgyField(WidgyField):
             to = get_site(site).get_version_tracker_model()
         super(VersionedWidgyField, self).__init__(site, to, root_choices, **kwargs)
 
+    def deconstruct(self):
+        """
+        Which version tracker model the field points at depends on the
+        project's widgy site (``get_version_tracker_model()``). When that is a
+        proxy, such as review_queue's ReviewedVersionTracker, the choice has
+        no effect on the database, so migrations record the concrete model
+        instead. Otherwise every project that configures a different site
+        would generate its own migration for apps it does not own.
+        """
+        name, path, args, kwargs = super(VersionedWidgyField, self).deconstruct()
+        model = self.remote_field.model
+        if not isinstance(model, str) and model._meta.proxy:
+            kwargs['to'] = model._meta.concrete_model._meta.label_lower
+        return name, path, args, kwargs
+
     def add_root(self, model_instance, root_content_kwargs={}):
         VersionTracker = self.site.get_version_tracker_model()
         node = super(VersionedWidgyField, self).add_root(model_instance, root_content_kwargs)
